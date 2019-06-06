@@ -23,6 +23,7 @@ class Given_All_Cards(object):
 		BlacksmithCard.BlacksmithCard()
 		OreMineConstructionCard.OreMineConstructionCard()
 		SheepFarmingCard.SheepFarmingCard()
+		DonkeyFarmingCard.DonkeyFarmingCard()
 		OreDeliveryCard.OreDeliveryCard()
 		RubyMiningCard.RubyMiningCard()
 		
