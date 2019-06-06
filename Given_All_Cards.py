@@ -23,6 +23,7 @@ class Given_All_Cards(object):
 		StartingPlayerCard.StartingPlayerCard()
 		WeeklyMarketCard.WeeklyMarketCard()
 		OreMineConstructionCard.OreMineConstructionCard()
+		OreTradingCard.OreTradingCard()
 		RubyMiningCard.RubyMiningCard()
 		
 if __name__ == "__main__":
