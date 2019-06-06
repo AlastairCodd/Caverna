@@ -1,8 +1,7 @@
 from Core.baseCard import BaseCard
 from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
-from player import Player
-from dwarf import Dwarf
-#from action import Action
+from Common.Entities.multicombination import Combination
+from BuisnessLogic.Actions import *
 
 class HardwareRentalCard(BaseCard):
 	
@@ -10,9 +9,10 @@ class HardwareRentalCard(BaseCard):
 		self._name = "Hardware Rental"
 		self._id = 9
 		self._level = -1
-		self._actionCombinationType = ActionCombinationEnum.AndThenOr
-		self._actions = [
-			Receive( ResourceTypeEnum.wood, 2 ),
-			GoOnAnExpedition(),
-			Sow()
-		]
+		self._actions = Combination(
+			ActionCombinationEnum.AndThenOr,
+			receiveAction.ReceiveAction( {ResourceTypeEnum.wood, 2} ),
+			Combination(
+				ActionCombinationEnum.AndThenOr,
+				goOnAnExpeditionAction.GoOnAnExpeditionAction( 2 ),
+				sowAction.SowAction() ) )
