@@ -25,6 +25,7 @@ class Given_All_Cards(object):
 		OreMineConstructionCard.OreMineConstructionCard()
 		OreTradingCard.OreTradingCard()
 		RubyMiningCard.RubyMiningCard()
+		AdventureCard.AdventureCard()
 		
 if __name__ == "__main__":
 	Given_All_Cards()
