@@ -62,3 +62,8 @@ class ResourceContainer(object):
 		for resource in self._resources:
 			self._resources[resource] = 0
 		return True
+		
+class ActiveResourceContainer(ResourceContainer):
+	
+	def RefillAction(self):
+		raise NotImplementedError("abstract base class")

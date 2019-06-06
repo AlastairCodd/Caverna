@@ -1,11 +1,11 @@
 from typing import Dict
 from Core.baseCard import BaseCard
 from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from Core.resourceContainer import ResourceContainer
+from Core.resourceContainer import ActiveResourceContainer
 from Common.Entities.multicombination import Combination
 from BuisnessLogic.Actions import *
 
-class ExcavationCard(BaseCard, ResourceContainer):
+class ExcavationCard(BaseCard, ActiveResourceContainer):
 	
 	def __init__(self):
 		self._name = "Excavation"

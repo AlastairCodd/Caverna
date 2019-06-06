@@ -1,10 +1,10 @@
 from typing import Dict
 from Core.baseCard import BaseCard
 from Core.cavernaEnums import ResourceTypeEnum
-from Core.resourceContainer import ResourceContainer
+from Core.resourceContainer import ActiveResourceContainer
 from BuisnessLogic.Actions import *
 
-class DepotCard(BaseCard, ResourceContainer):
+class DepotCard(BaseCard, ActiveResourceContainer):
 	
 	def __init__(self):
 		self._name = "Depot"

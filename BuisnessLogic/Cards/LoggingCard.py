@@ -1,11 +1,11 @@
 from typing import Dict
 from Core.baseCard import BaseCard
 from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
-from Core.resourceContainer import ResourceContainer
+from Core.resourceContainer import ActiveResourceContainer
 from Common.Entities.multicombination import Combination
 from BuisnessLogic.Actions import *
 
-class LoggingCard(BaseCard, ResourceContainer):
+class LoggingCard(BaseCard, ActiveResourceContainer):
 	
 	def __init__(self):
 		self._name = "Logging"
@@ -17,6 +17,6 @@ class LoggingCard(BaseCard, ResourceContainer):
 			goOnAnExpeditionAction.GoOnAnExpeditionAction( 1 ) )
 		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
-		self.GiveResource( ResourceTypeEnum.wood, 3 )
+		self.GiveResource( ResourceTypeEnum.wood: 3 )
 		
 		return self.GetResources()
