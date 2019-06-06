@@ -1,24 +1,22 @@
 from typing import Dict
 from Core.baseCard import BaseCard
 from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from player import Player
-from Common.Entities.dwarf import Dwarf
-import BuisnessLogic.Actions
+from Core.resourceContainer import ResourceContainer
+from Common.Entities.multicombination import Combination
+from BuisnessLogic.Actions import *
 
-class ClearingCard(BaseCard):
+class ClearingCard(BaseCard, ResourceContainer):
 	
 	def __init__(self):
 		self._name = "Clearing"
 		self._id = 0
 		self._level = -1
-		self._actionCombinationType = ActionCombinationEnum.AndThen
-		self._actions = [
-			TakeAccumulatedItemsAction(),
-			PlaceATileAction( TileTypeEnum.meadowFieldTwin ) 
-		]
-		self._currentItems = { ResourceTypeEnum.wood: 0 }
+		self._actions = Combination( 
+			ActionCombinationEnum.AndThenOr,
+			takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+			placeATileAction.PlaceATileAction( TileTypeEnum.meadowFieldTwin ) )
 		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
-		self._currentItems.setdefault( ResourceTypeEnum.wood, 0 )
-		self._currentItems[ ResourceTypeEnum.wood ] += 2
-		return self._currentItems
+		self.GiveResource( ResourceTypeEnum.wood, 2 )
+		
+		return self.GetResources()

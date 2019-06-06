@@ -1,23 +1,23 @@
+from typing import Dict
 from Core.baseCard import BaseCard
 from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
-from Common.Entities.multiconditional import Conditional
-from BuisnessLogic.Actions.takeAccumulatedItemsAction import TakeAccumulatedItemsAction
-from BuisnessLogic.Actions.receiveAction import ReceiveAction
-from BuisnessLogic.Actions.becomeStartingPlayerAction import BecomeStartingPlayerAction
+from Core.resourceContainer import ResourceContainer
+from Common.Entities.multicombination import Combination
+from BuisnessLogic.Actions import *
 
-class StartingPlayerCard(BaseCard):
+class StartingPlayerCard(BaseCard, ResourceContainer):
 	
 	def __init__(self):
 		self._name = "Starting Player"
 		self._id = 17
 		self._level = -1
-		self._actions = Conditional(
+		self._actions = Combination(
 			ActionCombinationEnum.AndThen,
-			TakeAccumulatedItems(),
-			Conditional(
+			takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+			Combination(
 				ActionCombinationEnum.AndThen,
-				BecomeStartingPlayerAction(),
-				ReceiveAction( {ResourceTypeEnum.ruby, 1} ) ) )
+				becomeStartingPlayerAction.BecomeStartingPlayerAction(),
+				receiveAction.ReceiveAction( {ResourceTypeEnum.ruby, 1} ) ) )
 		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		self.GiveResource( ResourceTypeEnum.food, 1 )

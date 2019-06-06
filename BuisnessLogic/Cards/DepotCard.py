@@ -1,15 +1,16 @@
 from typing import Dict
 from Core.baseCard import BaseCard
 from Core.cavernaEnums import ResourceTypeEnum
-from BuisnessLogic.Actions.takeAccumulatedItemsAction import TakeAccumulatedItemsAction
+from Core.resourceContainer import ResourceContainer
+from BuisnessLogic.Actions import *
 
-class DepotCard(BaseCard):
+class DepotCard(BaseCard, ResourceContainer):
 	
 	def __init__(self):
 		self._name = "Depot"
 		self._id = 1
 		self._level = -1
-		self._actions = TakeAccumulatedItemsAction()
+		self._actions = takeAccumulatedItemsAction.TakeAccumulatedItemsAction()
 		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		newResources = {

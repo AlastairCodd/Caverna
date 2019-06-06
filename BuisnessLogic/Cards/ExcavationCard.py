@@ -1,23 +1,23 @@
 from typing import Dict
 from Core.baseCard import BaseCard
 from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from Common.Entities.multiconditional import Conditional
-from BuisnessLogic.Actions.takeAccumulatedItemsAction import TakeAccumulatedItemsAction
-from BuisnessLogic.Actions.placeATileAction import PlaceATileAction
+from Core.resourceContainer import ResourceContainer
+from Common.Entities.multicombination import Combination
+from BuisnessLogic.Actions import *
 
-class ExcavationCard(BaseCard):
+class ExcavationCard(BaseCard, ResourceContainer):
 	
 	def __init__(self):
-		self._name = "Drift Mining"
+		self._name = "Excavation"
 		self._id = 4
 		self._level = -1
-		self._actions = Conditional( 
+		self._actions = Combination( 
 			ActionCombinationEnum.AndThen,
-			TakeAccumulatedItemsAction(),
-			Conditional( 
+			takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+			Combination( 
 				ActionCombinationEnum.Or,
-				PlaceATileAction( TileTypeEnum.cavernTunnelTwin ),
-				PlaceATileAction( TileTypeEnum.cavernCavernTwin ) ) )
+				placeATileAction.PlaceATileAction( TileTypeEnum.cavernTunnelTwin ),
+				placeATileAction.PlaceATileAction( TileTypeEnum.cavernCavernTwin ) ) )
 		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		newResources = {ResourceTypeEnum.stone: 1} if self.HasResources() else {ResourceTypeEnum.stone: 2}

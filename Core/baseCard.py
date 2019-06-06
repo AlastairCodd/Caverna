@@ -1,11 +1,9 @@
 from typing import Dict, Iterable
 from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
 from Core.baseAction import BaseAction
-from Core.resourceContainer import ResourceContainer
-#from player import Player
 from Common.Entities.dwarf import Dwarf
 
-class BaseCard(ResourceContainer):
+class BaseCard(object):
 	_name: str = "Uninitialised"
 	_id: int = -1
 	_level: int = -1
