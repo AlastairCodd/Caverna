@@ -17,3 +17,14 @@ class PlaceATileAction(BaseAction):
 			raise ValueException("player")
 		
 		raise NotImplementedError()
+		
+class PlaceAStableAction(BaseAction):
+	
+	def Invoke(
+		self,
+		player: Player,
+		activeCard: BaseCard ) -> bool:
+		if player is None:
+			raise ValueException("player")
+		
+		raise NotImplementedError()
