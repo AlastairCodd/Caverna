@@ -5,11 +5,11 @@ from Core.baseAction import BaseAction
 from player import Player
 
 class ReceiveAction(BaseAction):
-	_receiveItems = Dict[ResourceTypeEnum, int]
+	_receiveItems: Dict[ResourceTypeEnum, int]
 	
 	def __init__(self, receiveItems: Dict[ResourceTypeEnum, int]):
 		if receiveItems is None:
-			raise ValueException("receiveItems")
+			raise ValueError("receiveItems")
 		self._receiveItems = receiveItems
 	
 	def Invoke(
@@ -17,7 +17,7 @@ class ReceiveAction(BaseAction):
 		player: Player,
 		activeCard: BaseCard ) -> bool:
 		if player is None:
-			raise ValueException("player")
+			raise ValueError("player")
 		
 		player.GiveResources( self._receiveItems )
 		
