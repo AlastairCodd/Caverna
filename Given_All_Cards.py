@@ -20,6 +20,7 @@ class Given_All_Cards(object):
 		SuppliesCard.SuppliesCard()
 		SustenanceCard.SustenanceCard()
 		WeeklyMarketCard.WeeklyMarketCard()
+		BlacksmithCard.BlacksmithCard()
 		OreMineConstructionCard.OreMineConstructionCard()
 		OreDeliveryCard.OreDeliveryCard()
 		RubyMiningCard.RubyMiningCard()
