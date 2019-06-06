@@ -14,6 +14,7 @@ __all__ = [
 "SmallScaleDriftMiningCard",
 "StartingPlayerCard",
 "SuppliesCard",
+"SustenanceCard",
 "WeeklyMarketCard",
 "OreMineConstructionCard",
 "OreDeliveryCard",

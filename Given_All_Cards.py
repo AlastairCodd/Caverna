@@ -18,6 +18,7 @@ class Given_All_Cards(object):
 		SmallScaleDriftMiningCard.SmallScaleDriftMiningCard()
 		StartingPlayerCard.StartingPlayerCard()
 		SuppliesCard.SuppliesCard()
+		SustenanceCard.SustenanceCard()
 		WeeklyMarketCard.WeeklyMarketCard()
 		OreMineConstructionCard.OreMineConstructionCard()
 		OreDeliveryCard.OreDeliveryCard()
