@@ -13,6 +13,7 @@ __all__ = [
 "LoggingCard",
 "SmallScaleDriftMiningCard",
 "StartingPlayerCard",
+"SuppliesCard",
 "WeeklyMarketCard",
 "OreMineConstructionCard",
 "OreDeliveryCard",
