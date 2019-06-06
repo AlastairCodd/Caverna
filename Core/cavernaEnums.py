@@ -28,6 +28,10 @@ class TileTypeEnum(Enum):
 	cavernCavernTwin = auto()
 	pasture = auto()
 	pastureTwin = auto()
+	furnishedCavern = auto()
+	furnishedDwelling = auto()
+	oreMineDeepTunnelTwin = auto()
+	rubyMine = auto()
 	
 class TileDimensionEnum(Enum):
 	oneByOne = auto()
