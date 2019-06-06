@@ -1,8 +1,3 @@
-from typing import Dict
-from Core.baseCard import BaseCard
-from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
-from Core.resourceContainer import ResourceContainer
-from Common.Entities.multiconditional import Conditional
 from BuisnessLogic.Cards import *
 
 class Given_All_Cards(object):
@@ -23,6 +18,7 @@ class Given_All_Cards(object):
 		StartingPlayerCard.StartingPlayerCard()
 		WeeklyMarketCard.WeeklyMarketCard()
 		OreMineConstructionCard.OreMineConstructionCard()
+		OreDeliveryCard.OreDeliveryCard()
 		RubyMiningCard.RubyMiningCard()
 		
 if __name__ == "__main__":
