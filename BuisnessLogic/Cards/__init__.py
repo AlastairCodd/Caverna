@@ -18,5 +18,7 @@ __all__ = [
 "WeeklyMarketCard",
 "BlacksmithCard",
 "OreMineConstructionCard",
+"AdventureCard",
+"OreTradingCard",
 "OreDeliveryCard",
 "RubyMiningCard" ]
