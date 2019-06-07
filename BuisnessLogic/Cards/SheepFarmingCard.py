@@ -1,6 +1,6 @@
 from typing import Dict
 from Core.baseCard import BaseCard
-from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
+from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
 from Core.resourceContainer import ResourceContainer
 from Common.Entities.multicombination import Combination
 from BuisnessLogic.Actions import *

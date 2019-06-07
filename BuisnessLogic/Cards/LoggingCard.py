@@ -17,6 +17,6 @@ class LoggingCard(BaseCard, ActiveResourceContainer):
 			goOnAnExpeditionAction.GoOnAnExpeditionAction( 1 ) )
 		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
-		self.GiveResource( ResourceTypeEnum.wood: 3 )
+		self.GiveResource( ResourceTypeEnum.wood, 3 )
 		
 		return self.GetResources()

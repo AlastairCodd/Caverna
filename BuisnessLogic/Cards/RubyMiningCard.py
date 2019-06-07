@@ -1,3 +1,4 @@
+from typing import Dict
 from Core.baseCard import BaseCard
 from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
 from Core.resourceContainer import ResourceContainer

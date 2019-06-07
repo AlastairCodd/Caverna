@@ -11,10 +11,9 @@ class SuppliesCard(BaseCard):
 		self._name = "Supplies"
 		self._id = 18
 		self._level = -1
-		self._actions = receiveAction
-			.receiveAction( {
-				ResourceTypeEnum.wood:1,
-				ResourceTypeEnum.stone:1,
-				ResourceTypeEnum.ore:1,
-				ResourceTypeEnum.food:1,
-				ResourceTypeEnum.coin:2 } )
+		self._actions = receiveAction.ReceiveAction( {
+			ResourceTypeEnum.wood:1,
+			ResourceTypeEnum.stone:1,
+			ResourceTypeEnum.ore:1,
+			ResourceTypeEnum.food:1,
+			ResourceTypeEnum.coin:2 } )

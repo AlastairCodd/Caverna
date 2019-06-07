@@ -1,6 +1,6 @@
 from typing import Dict
 from Core.baseCard import BaseCard
-from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
+from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
 from Core.resourceContainer import ActiveResourceContainer
 from Common.Entities.multicombination import Combination
 from BuisnessLogic.Actions import *
@@ -13,5 +13,5 @@ class SmallScaleDriftMiningCard(BaseCard):
 		self._level = -1
 		self._actions = Combination(
 			ActionCombinationEnum.AndOr,
-			receiveAction.receiveAction( {ResourceTypeEnum.stone:1} ),
+			receiveAction.ReceiveAction( {ResourceTypeEnum.stone:1} ),
 			placeATileAction.PlaceATileAction( TileTypeEnum.cavern ) )
