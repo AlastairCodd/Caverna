@@ -16,6 +16,6 @@ class DepotCard(BaseCard, ActiveResourceContainer):
 		newResources = {
 			ResourceTypeEnum.wood: 2, 
 			ResourceTypeEnum.ore: 2 }
-		self.GiveResources(newResources)
+		self.GiveResources( newResources )
 		
 		return self.GetResources()

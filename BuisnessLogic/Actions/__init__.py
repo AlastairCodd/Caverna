@@ -9,4 +9,5 @@ __all__ = [
 "receiveAction",
 "sowAction",
 "takeAccumulatedItemsAction",
-"useAnotherCardAction" ]
+"useAnotherCardAction",
+"receiveConditionallyAction" ]

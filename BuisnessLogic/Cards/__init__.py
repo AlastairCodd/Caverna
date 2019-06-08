@@ -21,4 +21,6 @@ __all__ = [
 "SheepFarmingCard",
 "DonkeyFarmingCard",
 "OreDeliveryCard",
+"AdventureCard",
+"OreTradingCard",
 "RubyMiningCard" ]
