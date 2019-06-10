@@ -12,16 +12,18 @@ class RubyMiningCard(BaseCard, ActiveResourceContainer):
 		self._id = 33
 		self._level = 4
 		
-		conditional = lambda person, card: 
-			if person is None:
-				raise ValueError("ruby mining card conditional person")
-			tiles = person.GetTiles()
-			return False
+		conditional = lambda person, card : False
+			#if person is None:
+				#raise ValueError("ruby mining card conditional person")
+			#tiles = person.GetTiles()
+			#return False
 		
 		self._actions = Combination(
 			ActionCombinationEnum.AndThenOr,
 			takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
-			receiveConditionallyAction.ReceiveConditionallyAction( conditional ) )
+			receiveConditionallyAction.ReceiveConditionallyAction( 
+				conditional, 
+				{ ResourceTypeEnum.ruby: 1 } ) )
 				
 		super(RubyMiningCard, self).__init__()
 			
