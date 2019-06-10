@@ -13,14 +13,14 @@ class AdventureCard(BaseCard):
 		
 		self._actions = Combination(
 			ActionCombinationEnum.AndThenOr,
-			giveDwarf
-			Conditional(
+			getABabyDwarfAction.GetABabyDwarfAction(),
+			Combination(
 				ActionCombinationEnum.AndOr,
-				Conditional(
+				Combination(
 					ActionCombinationEnum.AndThen,
 					payAction.PayAction( {ResourceTypeEnum.ore: 2} ),
-					receiveAction.ReceiveAction( {ResourceTypeEnum.coins: 2, ResourceTypeEnum.food: 1} ) ),
-				Conditional(
+					receiveAction.ReceiveAction( {ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 1} ) ),
+				Combination(
 					ActionCombinationEnum.AndThen,
 					payAction.PayAction( {ResourceTypeEnum.ore: 2} ),
-					receiveAction.ReceiveAction( {ResourceTypeEnum.coins: 2, ResourceTypeEnum.food: 1} ) ) ) )
+					receiveAction.ReceiveAction( {ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 1} ) ) ) )

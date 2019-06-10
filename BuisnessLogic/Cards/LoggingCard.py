@@ -15,6 +15,7 @@ class LoggingCard(BaseCard, ActiveResourceContainer):
 			ActionCombinationEnum.AndThenOr,
 			takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
 			goOnAnExpeditionAction.GoOnAnExpeditionAction( 1 ) )
+		super(LoggingCard, self).__init__()
 		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		self.GiveResource( ResourceTypeEnum.wood, 3 )

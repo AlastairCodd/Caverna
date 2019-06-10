@@ -11,7 +11,8 @@ class DepotCard(BaseCard, ActiveResourceContainer):
 		self._id = 1
 		self._level = -1
 		self._actions = takeAccumulatedItemsAction.TakeAccumulatedItemsAction()
-		
+		super(DepotCard, self).__init__()
+
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		newResources = {
 			ResourceTypeEnum.wood: 2, 

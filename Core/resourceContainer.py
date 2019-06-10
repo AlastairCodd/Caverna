@@ -2,8 +2,9 @@ from typing import Dict
 from Core.cavernaEnums import ResourceTypeEnum
 
 class ResourceContainer(object):
-	_resources: Dict[ResourceTypeEnum, int] = {}
-	
+	def __init__(self):
+		self._resources: Dict[ResourceTypeEnum, int] = {}
+
 	def HasResources(self) -> bool:
 		if self._resources is None:
 			return False

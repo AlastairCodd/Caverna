@@ -25,6 +25,7 @@ class FenceBuildingCard(BaseCard, ActiveResourceContainer):
 					payAction.PayAction( {ResourceTypeEnum.wood, 4} ),
 					placeATileAction.PlaceATileAction( TileTypeEnum.pastureTwin )
 				) ) )
+		super(FenceBuildingCard, self).__init__()
 		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		newResources = {ResourceTypeEnum.wood: 1} if self.HasResources() else {ResourceTypeEnum.wood: 2}

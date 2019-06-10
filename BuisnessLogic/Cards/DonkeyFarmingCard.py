@@ -1,11 +1,11 @@
 from typing import Dict
 from Core.baseCard import BaseCard
 from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from Core.resourceContainer import ResourceContainer
+from Core.resourceContainer import ActiveResourceContainer
 from Common.Entities.multicombination import Combination
 from BuisnessLogic.Actions import *
 
-class DonkeyFarmingCard(BaseCard, ResourceContainer):
+class DonkeyFarmingCard(BaseCard, ActiveResourceContainer):
 	
 	def __init__(self):
 		self._name = "Donkey Farming"
@@ -30,7 +30,8 @@ class DonkeyFarmingCard(BaseCard, ResourceContainer):
 					payAction.PayAction( {ResourceTypeEnum.stone, 1} ),
 					placeATileAction.PlaceAStableAction() ) ),
 			takeAccumulatedItemsAction.TakeAccumulatedItemsAction() )
-		
+		super().__init__()
+
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		self.GiveResource( ResourceTypeEnum.donkey, 1 )
 		

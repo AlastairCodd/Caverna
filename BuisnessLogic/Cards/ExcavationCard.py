@@ -18,6 +18,7 @@ class ExcavationCard(BaseCard, ActiveResourceContainer):
 				ActionCombinationEnum.Or,
 				placeATileAction.PlaceATileAction( TileTypeEnum.cavernTunnelTwin ),
 				placeATileAction.PlaceATileAction( TileTypeEnum.cavernCavernTwin ) ) )
+		super(ExcavationCard, self).__init__()
 		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		newResources = {ResourceTypeEnum.stone: 1} if self.HasResources() else {ResourceTypeEnum.stone: 2}

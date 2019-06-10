@@ -15,6 +15,7 @@ class SustenanceCard(BaseCard, ActiveResourceContainer):
 			ActionCombinationEnum.AndThen,
 			takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
 			placeATileAction.PlaceATileAction( TileTypeEnum.meadowFieldTwin ) )
+		super(SustenanceCard, self).__init__()
 		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		if self.HasResources():

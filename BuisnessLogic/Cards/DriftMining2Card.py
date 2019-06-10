@@ -15,7 +15,8 @@ class DriftMining2Card(BaseCard, ActiveResourceContainer):
 			ActionCombinationEnum.AndThen,
 			takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
 			placeATileAction.PlaceATileAction( TileTypeEnum.cavernTunnelTwin ) )
-		
+		super(DriftMining2Card, self).__init__()
+	
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		self.GiveResource( ResourceTypeEnum.stone, 1 )
 		

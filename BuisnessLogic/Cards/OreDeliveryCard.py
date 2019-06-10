@@ -12,7 +12,8 @@ class OreDeliveryCard(BaseCard, ActiveResourceContainer):
 		self._id = 30
 		self._level = 3
 		self._actions = takeAccumulatedItemsAction.TakeAccumulatedItemsAction()
-			
+		super(OreDeliveryCard, self).__init__()
+		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		self.GiveResources( { 
 			ResourceTypeEnum.stone: 1,

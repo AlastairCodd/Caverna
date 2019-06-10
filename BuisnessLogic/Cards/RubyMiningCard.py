@@ -1,11 +1,11 @@
 from typing import Dict
 from Core.baseCard import BaseCard
 from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
-from Core.resourceContainer import ResourceContainer
+from Core.resourceContainer import ActiveResourceContainer
 from Common.Entities.multicombination import Combination
 from BuisnessLogic.Actions import *
 
-class RubyMiningCard(BaseCard, ResourceContainer):
+class RubyMiningCard(BaseCard, ActiveResourceContainer):
 	
 	def __init__(self):
 		self._name = "Ruby Mining"
@@ -22,9 +22,14 @@ class RubyMiningCard(BaseCard, ResourceContainer):
 			ActionCombinationEnum.AndThenOr,
 			takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
 			receiveConditionallyAction.ReceiveConditionallyAction( conditional ) )
+				
+		super(RubyMiningCard, self).__init__()
 			
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
-		newResources = {ResourceTypeEnum.ruby: 1} if self.HasResources() else {ResourceTypeEnum.ruby: 2}
+		if self.HasResources():
+			newResources = {ResourceTypeEnum.ruby: 1} 
+		else:
+			newResources = {ResourceTypeEnum.ruby: 2} 
 		self.GiveResources(newResources)
 		
 		return self.GetResources()

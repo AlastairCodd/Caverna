@@ -15,6 +15,7 @@ class ClearingCard(BaseCard, ActiveResourceContainer):
 			ActionCombinationEnum.AndThenOr,
 			takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
 			placeATileAction.PlaceATileAction( TileTypeEnum.meadowFieldTwin ) )
+		super(ClearingCard, self).__init__()
 		
 	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
 		self.GiveResource( ResourceTypeEnum.wood, 2 )
