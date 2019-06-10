@@ -18,6 +18,7 @@ class Given_All_Cards(object):
 			HouseworkCard.HouseworkCard(),
 			Imitation1Card.Imitation1Card(),
 			LoggingCard.LoggingCard(),
+			OreMiningCard.OreMiningCard(),
 			SmallScaleDriftMiningCard.SmallScaleDriftMiningCard(),
 			StartingPlayerCard.StartingPlayerCard(),
 			SuppliesCard.SuppliesCard(),
