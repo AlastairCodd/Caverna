@@ -16,6 +16,10 @@ class TileContainer(object):
 		self._tileCount = height * width
 		
 		self._tiles: List[BaseTile]
+		self._tilesType: Dict[int, TileTypeEnum] = {}
+		if (height == 6 and width == 8):
+			default = TileContainerDefault.TileContainerDefault()
+			default.AssignInitialTiles( self._tilesType )
 		
 		self._twinTiles = [
 			TileTypeEnum.meadowFieldTwin,
@@ -23,8 +27,24 @@ class TileContainer(object):
 			TileTypeEnum.cavernCavernTwin,
 			TileTypeEnum.pastureTwin,
 			TileTypeEnum.oreMineDeepTunnelTwin ]
-		self._outdoorTiles = [
-			Tile
+			
+		self._tileRequisites: Dict[TileTypeEnum, List[TileTypeEnum]] = {
+			TileTypeEnum.unavailable: [],
+			TileTypeEnum.forest: [],
+			TileTypeEnum.underground: [],
+			TileTypeEnum.meadow: [TileTypeEnum.forest],
+			TileTypeEnum.field: [TileTypeEnum.forest],
+			TileTypeEnum.meadowFieldTwin: [TileTypeEnum.forest],
+			TileTypeEnum.cavern: [TileTypeEnum.underground],
+			TileTypeEnum.tunnel: [TileTypeEnum.underground],
+			TileTypeEnum.cavernTunnelTwin: [TileTypeEnum.underground],
+			TileTypeEnum.cavernCavernTwin: [TileTypeEnum.underground],
+			TileTypeEnum.pasture: [TileTypeEnum.field],
+			TileTypeEnum.pastureTwin: [TileTypeEnum.field],
+			TileTypeEnum.furnishedCavern: [TileTypeEnum.cavern],
+			TileTypeEnum.furnishedDwelling: [TileTypeEnum.cavern],
+			TileTypeEnum.oreMineDeepTunnelTwin: [TileTypeEnum.tunnel],
+			TileTypeEnum.rubyMine: [TileTypeEnum.tunnel, TileTypeEnum.deepTunnel] }
 		
 	def GetTiles(self) -> List[BaseTile]:
 		return self._tiles
@@ -51,10 +71,16 @@ class TileContainer(object):
 		if location in availableLocations:
 			self._tiles.append( tile )
 		
-	def GetAvailableLocations(self, tile: BaseTile) -> List[int]:
-		if tile is None:
-			raise ValueError
-		if 
+	def GetAvailableLocations(self, tile: TileTypeEnum) -> List[int]:
+		boardEffects = self.GetEffectsOfType( boardEffects.BaseBoardEffect )
+		
+		
+		for effect in BoardEffects:
+			#get the correct requisites -- if adjacent, allow unavailable
+			#filter _tilesType by new requisites
+			#if twin, check all requisites for adjacent
+			
+			#only unavailable with adjacent (in correct section) will pass both checks
 		
 	def GetAdjacentTiles(self, location: int) -> List[int]:
 		if location < 0 or location > self._tileCount:
