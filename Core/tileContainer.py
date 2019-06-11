@@ -76,6 +76,7 @@ class TileContainer(object):
 		
 		
 		for effect in BoardEffects:
+			#gotta clone dictionary
 			#get the correct requisites -- if adjacent, allow unavailable
 			#filter _tilesType by new requisites
 			#if twin, check all requisites for adjacent
