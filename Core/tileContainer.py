@@ -10,13 +10,21 @@ class TileContainer(object):
 			raise ValueError("height must be greater than 0")
 		if width < 0:
 			raise ValueError("width must be greater than 0")
-		self._tiles: List[BaseTile] = [x for x in range(height*width)]
+		self._height = height
+		self._width = width
+		
+		self._tileCount = height * width
+		
+		self._tiles: List[BaseTile]
+		
 		self._twinTiles = [
 			TileTypeEnum.meadowFieldTwin,
 			TileTypeEnum.cavernTunnelTwin,
 			TileTypeEnum.cavernCavernTwin,
 			TileTypeEnum.pastureTwin,
 			TileTypeEnum.oreMineDeepTunnelTwin ]
+		self._outdoorTiles = [
+			Tile
 		
 	def GetTiles(self) -> List[BaseTile]:
 		return self._tiles
@@ -25,7 +33,7 @@ class TileContainer(object):
 		effects = map(lambda tile: tile.GetEffects(), self._tiles)
 		return list(effects)
 		
-	def GetEffectsOfType(self, type) -> List[baseEffect]:
+	def GetEffectsOfType(self, type) -> List[BaseEffect]:
 		result = [x for x in self.GetEffects() if isinstance(x, type)]
 		return result
 		
@@ -38,11 +46,37 @@ class TileContainer(object):
 		
 		if tile in self._twinTiles and direction is None:
 			raise ValueError("direct cannot be null if tile is a twin tile")
+			
+		availableLocations = self.GetAvailableLocations( tile )
+		if location in availableLocations:
+			self._tiles.append( tile )
 		
-	def GetAdjacentTile(self, location: int, direction: TileDirectionEnum) -> int:
+	def GetAvailableLocations(self, tile: BaseTile) -> List[int]:
+		if tile is None:
+			raise ValueError
+		if 
+		
+	def GetAdjacentTiles(self, location: int) -> List[int]:
+		if location < 0 or location > self._tileCount:
+			raise ValueError
+	
 		directionOffset = {
 			TileDirectionEnum.up: -8,
 			TileDirectionEnum.down: 8,
 			TileDirectionEnum.left: -1,
 			TileDirectionEnum.right: 1 }
-		raise NotImplementedException()
+		
+		adjacentDirectionCondition = {
+			TileDirectionEnum.up: lambda adjloc: adjloc > 0,
+			TileDirectionEnum.down: lambda adjloc: adjloc < self._tileCount,
+			TileDirectionEnum.left: lambda adjloc: adjloc % self._width != 7,
+			TileDirectionEnum.right: lambda adjloc: adjloc % self._width != 0 }
+		
+		result = []
+		
+		for x in directionOffset:
+			adjacentLocation = location + directionOffset[x]
+			if adjacentDirectionCondition[x]( adjacentLocation ):
+				result.append( adjacentLocation )
+				
+		return result

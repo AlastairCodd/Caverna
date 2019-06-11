@@ -19,6 +19,8 @@ class ResourceTypeEnum(Enum):
 	dog = auto()
 	
 class TileTypeEnum(Enum):
+	forest = auto()
+	underground = auto()
 	meadow = auto()
 	field = auto()
 	meadowFieldTwin = auto()
