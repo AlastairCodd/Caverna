@@ -1,8 +1,9 @@
 from typing import List
 from Core.cavernaEnums import TileDirectionEnum, TileTypeEnum
 from Core.baseEffect import BaseEffect
+from BuisnessLogic.Effects import boardEffects
 from Core.baseTile import BaseTile
-from Common import TileContainerDefault, TileTwinDefault
+from Common.Services import TileContainerDefault, TileTwinDefault
 
 class TileContainer(object):
 	
@@ -19,7 +20,7 @@ class TileContainer(object):
 		twinDefault = TileTwinDefault.TileTwinDefault()
 		self._twinTiles = twinDefault.Assign( [] )
 		
-		self._tiles: List[BaseTile]
+		self._tiles: List[BaseTile] = []
 		self._tilesType: Dict[int, TileTypeEnum] = {}
 		if (height == 6 and width == 8):
 			default = TileContainerDefault.TileContainerDefault()
@@ -70,14 +71,30 @@ class TileContainer(object):
 			self._tiles.append( tile )
 		
 	def GetAvailableLocations(self, tile: TileTypeEnum) -> List[int]:
-		boardEffects = self.GetEffectsOfType( boardEffects.BaseBoardEffect )
+		effects = self.GetEffectsOfType( boardEffects.BaseBoardEffect )
 		
+		#gotta clone dictionary
+		allTileRequisites = dict(self._tileRequisites)
 		
-		for effect in BoardEffects:
-			#gotta clone dictionary
-			#get the correct requisites -- if adjacent, allow unavailable
-			#filter _tilesType by new requisites
-			#if twin, check all requisites for adjacent
+		for effect in effects:
+			effect.Invoke( allTileRequisites )
+			
+		#get the correct requisites -- if adjacent, allow unavailable
+		tileRequisites: List[TileTypeEnum] = allTileRequisites[ tile ]
+		
+		#filter _tilesType by new requisites
+		validPositions: List[int] = [x for x in self._tilesType if self._tilesType[x] in tileRequisites]
+		
+		#if twin, check all requisites for adjacent
+		if tile in self._twinTiles:
+			for position in validPositions:
+				adjacentTiles: List[int] = self.GetAdjacentTiles( position )
+				for adjacentTile in adjacentTiles:
+					if self._tilesType[adjacentTile] not in tileRequisites:
+						del validPositions[position]
+						break
+					
+		return validPositions
 			
 			#only unavailable with adjacent (in correct section) will pass both checks
 		

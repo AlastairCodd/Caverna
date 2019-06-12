@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import List
 from Core.cavernaEnums import TileTypeEnum
 
 class TileTwinDefault(object):
