@@ -87,12 +87,14 @@ class TileContainer(object):
 		
 		#if twin, check all requisites for adjacent
 		if tile in self._twinTiles:
+			validPositionsWithAdjacent: List[Tuple[int, TileDirectionEnum]] = []
 			for position in validPositions:
-				adjacentTiles: List[int] = self.GetAdjacentTiles( position )
+				adjacentTiles: List[Tuple[int, TileDirectionEnum]] = self.GetAdjacentTiles( position )
 				for adjacentTile in adjacentTiles:
-					if self._tilesType[adjacentTile] not in tileRequisites:
-						del validPositions[position]
+					if self._tilesType[adjacentTile[0]] in tileRequisites:
+						validPositionsWithAdjacent.append( (position, adjacentTile[1]) )
 						break
+			return list(map(lambda validPositionWithAdjacent: validPositionWithAdjacent[0], validPositionsWithAdjacent))
 					
 		return validPositions
 			
