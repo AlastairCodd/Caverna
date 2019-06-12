@@ -27,6 +27,7 @@ class TileTypeEnum(Enum):
 	meadowFieldTwin = auto()
 	cavern = auto()
 	tunnel = auto()
+	deepTunnel = auto()
 	cavernTunnelTwin = auto()
 	cavernCavernTwin = auto()
 	pasture = auto()

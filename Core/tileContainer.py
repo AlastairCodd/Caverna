@@ -2,6 +2,7 @@ from typing import List
 from Core.cavernaEnums import TileDirectionEnum, TileTypeEnum
 from Core.baseEffect import BaseEffect
 from Core.baseTile import BaseTile
+from Common import TileContainerDefault, TileTwinDefault
 
 class TileContainer(object):
 	
@@ -15,18 +16,14 @@ class TileContainer(object):
 		
 		self._tileCount = height * width
 		
+		twinDefault = TileTwinDefault.TileTwinDefault()
+		self._twinTiles = twinDefault.Assign( [] )
+		
 		self._tiles: List[BaseTile]
 		self._tilesType: Dict[int, TileTypeEnum] = {}
 		if (height == 6 and width == 8):
 			default = TileContainerDefault.TileContainerDefault()
 			default.AssignInitialTiles( self._tilesType )
-		
-		self._twinTiles = [
-			TileTypeEnum.meadowFieldTwin,
-			TileTypeEnum.cavernTunnelTwin,
-			TileTypeEnum.cavernCavernTwin,
-			TileTypeEnum.pastureTwin,
-			TileTypeEnum.oreMineDeepTunnelTwin ]
 			
 		self._tileRequisites: Dict[TileTypeEnum, List[TileTypeEnum]] = {
 			TileTypeEnum.unavailable: [],
@@ -37,6 +34,7 @@ class TileContainer(object):
 			TileTypeEnum.meadowFieldTwin: [TileTypeEnum.forest],
 			TileTypeEnum.cavern: [TileTypeEnum.underground],
 			TileTypeEnum.tunnel: [TileTypeEnum.underground],
+			TileTypeEnum.deepTunnel: [TileTypeEnum.tunnel],
 			TileTypeEnum.cavernTunnelTwin: [TileTypeEnum.underground],
 			TileTypeEnum.cavernCavernTwin: [TileTypeEnum.underground],
 			TileTypeEnum.pasture: [TileTypeEnum.field],
