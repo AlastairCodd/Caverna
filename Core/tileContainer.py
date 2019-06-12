@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from Core.cavernaEnums import TileDirectionEnum, TileTypeEnum
 from Core.baseEffect import BaseEffect
 from BuisnessLogic.Effects import boardEffects
@@ -98,7 +98,7 @@ class TileContainer(object):
 			
 			#only unavailable with adjacent (in correct section) will pass both checks
 		
-	def GetAdjacentTiles(self, location: int) -> List[int]:
+	def GetAdjacentTiles(self, location: int) -> List[Tuple[int, TileDirectionEnum]]:
 		if location < 0 or location > self._tileCount:
 			raise ValueError
 	
@@ -119,6 +119,6 @@ class TileContainer(object):
 		for x in directionOffset:
 			adjacentLocation = location + directionOffset[x]
 			if adjacentDirectionCondition[x]( adjacentLocation ):
-				result.append( adjacentLocation )
+				result.append( (adjacentLocation, x) )
 				
 		return result
