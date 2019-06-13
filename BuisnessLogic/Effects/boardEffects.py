@@ -8,24 +8,34 @@ class BaseBoardEffect(BaseEffect):
 	def Invoke(self, source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
 		raise NotImplementedException("base population effect class")
 	
-class FurnishTunnelsEffect(BaseBoardEffect):
-	def Invoke(self, source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
-		if source is None:
-			raise ValueError()
+class FurnishTunnelsEffect(ChangeRequisiteEffect):
+	def __init__(self):
+		super().__init__(
+			[TileTypeEnum.furnishedCavern, TileTypeEnum.furnishedDwelling], 
+			[TileTypeEnum.tunnel, TileTypeEnum.deepTunnel] )
 		
-		source[TileTypeEnum.furnishedCavern].extend([TileTypeEnum.tunnel, TileTypeEnum.deepTunnel])
-		source[TileTypeEnum.furnishedDwelling].extend([TileTypeEnum.tunnel, TileTypeEnum.deepTunnel])
-		return source
-		
-class TwinTilesOverhangEffect(BaseBoardEffect):
-	def Invoke(self, source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
-		if source is None:
-			raise ValueError()
-			
+class TwinTilesOverhangEffect(ChangeRequisiteEffect):
+	def __init__(self):
 		twinDefault = TileTwinDefault.TileTwinDefault()
 		twinTiles = twinDefault.Assign( [] )
-		
-		for x in [x for x in source if x in twinTiles]:
-			source[x].add( TileTypeEnum.unavailable )
+		super().__init__(
+			twinTiles,
+			[TileTypeEnum.unavailable] )
+
+class ChangeRequisiteEffect(BaseBoardEffect):
+	def __init__(self, tiles: List[TileTypeEnum], newRequisites: List[TileTypeEnum]):
+		if tiles is None:
+			raise ValueError()
+		if newRequisites is None:
+			raise ValueError()
 			
+		self._tiles: List[TileTypeEnum] = tiles
+		self._newRequisites: List[TileTypeEnum] = newRequisites
+	
+	def Invoke(self, source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
+		if source is None:
+			raise ValueError()
+		
+		for tile in self._tiles
+			source[tile].extend(self._newRequisites)
 		return source
