@@ -53,6 +53,7 @@ class CoupleDwelling(BaseTile):
 		self._name = "Couple Dwelling"
 		self._id = 4
 		self._isDwelling = True
+		self._basePoints = 5
 		self._cost = {
 			ResourceTypeEnum.wood: 8,
 			ResourceTypeEnum.stone: 6 }
@@ -63,6 +64,7 @@ class AdditionalDwelling(BaseTile):
 		self._name = "Couple Dwelling"
 		self._id = 5
 		self._isDwelling = True
+		self._basePoints = 5
 		self._cost = {
 			ResourceTypeEnum.wood: 4,
 			ResourceTypeEnum.stone: 3 }

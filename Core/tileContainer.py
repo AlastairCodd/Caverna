@@ -97,8 +97,7 @@ class TileContainer(object):
 			return list(map(lambda validPositionWithAdjacent: validPositionWithAdjacent[0], validPositionsWithAdjacent))
 					
 		return validPositions
-			
-			#only unavailable with adjacent (in correct section) will pass both checks
+		#only unavailable with adjacent (in correct section) will pass both checks
 		
 	def GetAdjacentTiles(self, location: int) -> List[Tuple[int, TileDirectionEnum]]:
 		if location < 0 or location > self._tileCount:
