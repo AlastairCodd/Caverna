@@ -21,7 +21,10 @@ class Player(ResourceContainer):
 			Dwarf(True),
 			Dwarf(True),
 		]
-		
+	
+    def SetTurnIndex(self, turnIndex: int):
+        
+    
 	def GiveBabyDwarf(self):
 		babyDwarf: Dwarf = Dwarf()
 		
