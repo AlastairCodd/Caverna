@@ -9,7 +9,8 @@ class GameRunner(object):
 		memory, 
 		max_eps, 
 		min_eps,
-        decay, render=True):
+        decay, 
+        render: bool = True):
         self._sess = sess
         self._env = env
         self._model = model
