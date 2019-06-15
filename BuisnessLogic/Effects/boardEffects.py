@@ -6,7 +6,7 @@ from Common.Services.TileTwinDefault import TileTwinDefault
 
 class BaseBoardEffect(BaseEffect):
 	def Invoke(self, source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
-		raise NotImplementedException("base population effect class")
+		raise NotImplementedException("base board effect class")
 	
 class FurnishTunnelsEffect(ChangeRequisiteEffect):
 	def __init__(self):
