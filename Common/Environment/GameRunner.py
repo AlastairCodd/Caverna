@@ -1,17 +1,16 @@
 import tensorflow as tf
+from gym import Env
 
 class GameRunner(object):
     def __init__(
 		self, 
-		sess: tensorflow,
 		model, 
-		env, 
+		env: Env, 
 		memory, 
 		max_eps, 
 		min_eps,
         decay, 
         render: bool = True):
-        self._sess = sess
         self._env = env
         self._model = model
         self._memory = memory
@@ -23,3 +22,11 @@ class GameRunner(object):
         self._steps = 0
         self._reward_store = []
         self._max_x_store = []
+       
+    def run(self):
+        observation = self._env.reset() #this is a vector in input space
+        
+        while True:
+            for player in self._players
+                action = player._choose_action(observation) #this is a vector in output space
+                post_player_observation, reward, done, info = self._env.step(action)
