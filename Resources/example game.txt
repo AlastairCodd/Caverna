@@ -1,0 +1,8 @@
+player0:
+	place dwarf on weekly market
+		receive 4 coins
+		market buy action: buy 1 donkey					
+		market buy action: buy 1 grain
+		market buy action: buy 1 vegetable
+	food convert action: convert 1 donkey into food
+	food convert action: convert 3 coins into food		# invalid, all coins have been converted into food. evaluated after donkey into food, because coins are prereq for buying donkey

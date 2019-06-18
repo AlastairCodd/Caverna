@@ -1,0 +1,25 @@
+action vector to game action
+
+weekly market:
+	input: [[recive coin and then evaluate market buy actions], [evaluate market buy actions]
+
+	market buy actions thresholded above 0
+	and ordered by priority (sigmoid out)
+	[dog, sheep, donkey, boar, cow, wood, stone, ore, grain, vegetable]: 
+  
+	example 1:
+		[-0.1, -0.3, 0.5, 0.8, 0.7, 0.6, -0.2, -0.5, -0.6, 1] -> vegetable, boar, cow, wood, donkey -> vegetable, boar (info: no cow, no wood, no donkey, too expensive)
+	example 2: 
+		[-0.1, -0.3, 0.5, 0.1, 0.7, 0.6, -0.2, -0.5, -0.6, 1] 
+		-> vegetable, cow, wood, donkey, boar 
+		-> vegetable (2 coin), [no cow, 2 coin < 3 coin], wood (1 coin), donkey (0 coin), [no boar, 0 coin < 2 coin]
+
+	integration example 2: has beer parlor ( 2 grain to 3 coin or 2 grain to 4 food ):
+		market: [-0.1, -0.3, 0.5, 0.1, 0.7, 0.6, -0.2, -0.5, 1, -0.7], beer: [0.3, 0.2], resource: 1 grain
+		-> grain (3 coin), convert 2 grain to 4 coin (6 coin), cow (3 coin), wood (2 coin), donkey (1 coin), [no boar, 1 coin < 2 coin]
+
+drift mining:
+	input: no choice
+	
+	place cavern-tunnel-twin-tiles determined by cavern-tunnel-twin-tile section:
+	[ 
