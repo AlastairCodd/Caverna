@@ -22,4 +22,12 @@ drift mining:
 	input: no choice
 	
 	place cavern-tunnel-twin-tiles determined by cavern-tunnel-twin-tile section:
-	[ 
+	[ 4,  5,  6,  _,
+	 12, 13, 14, 15,
+	 20, 21, 22, 23,
+	 28, 29, 30, 31,
+	 36, 37, 38, 39,
+	 44, 45, 46,  _]
+	
+	('_' excluded)
+	for each: (left, right, up, down)
