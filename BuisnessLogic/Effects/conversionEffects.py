@@ -4,18 +4,19 @@ from Core.baseEffect import BaseEffect
 from Core.cavernaEnums import TileTypeEnum
 from Common.Services.TileTwinDefault import TileTwinDefault
 
-class BaseBoardEffect(BaseEffect):
+class BaseConversionEffect(BaseEffect):
 	def Invoke(self, source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
 		raise NotImplementedException("base board effect class")
 	
-class FurnishTunnelsEffect(ChangeRequisiteEffect):
+class ChangeFoodConversionRate(ChangeRequisiteEffect):
 	def __init__(self):
 		super().__init__(
 			[TileTypeEnum.furnishedCavern, TileTypeEnum.furnishedDwelling], 
 			[TileTypeEnum.tunnel, TileTypeEnum.deepTunnel] )
 		
-class TwinTilesOverhangEffect(ChangeRequisiteEffect):
-	def __init__(self):
+class Convert(ChangeRequisiteEffect):
+	def __init__(self, input, output):
+        self._input = 
 		twinDefault = TileTwinDefault.TileTwinDefault()
 		twinTiles = twinDefault.Assign( [] )
 		super().__init__(
