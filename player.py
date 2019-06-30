@@ -32,3 +32,12 @@ class Player(ResourceContainer):
 		
 	def GetDwarves(self) -> Iterable[Dwarf]:
 		return self._dwarves
+		
+	def GetPlayerResponse(self, action)
+		"""Gets a player response for the given action. 
+		Implementation left to implementing class -- either from user input, or from analysis of the action value function
+		
+		Returns relevant information to allow the calling action to change the player or board state based in accordance with the action"""
+		raise NotImplementedError()
+		
+		

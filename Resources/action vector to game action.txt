@@ -52,3 +52,11 @@ hardware rental:
 				pay 2 wood (nominal) and place 1 pasture-twin (10) [15], cow (10) [16], place 1 meadow (11) [17], pay 2 wood and 2 stone (nominal) and place 1 basic dwelling (1) [18],
 				place 1 field tile (12) [19], sow (12) [20],
 				place 1 cavern tile (14) [21], [[breed 1 animal pair], [breed 1 animal pair and breed 1 animal pair]]] (14) [22] : new float[23] (relu?)
+				
+	sow:
+	[ _,  1,  2,  3,   + 3 x [use action 1, [sow veg, sow grain] softmaxed]
+	  8,  9, 10, 11,
+	 16, 17, 18, 19,
+	 24, 25, 26, 27,
+	 32, 33, 34, 35,
+	 40, 41, 42, 43]
