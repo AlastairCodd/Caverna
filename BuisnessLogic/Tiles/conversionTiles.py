@@ -1,3 +1,5 @@
+from Core.cavernaEnums import ResourceTypeEnum
+from Common.Entities import weapon
 
 class SlaughteringCaveTile(BaseTile):
 	def __init__(self):
@@ -7,11 +9,11 @@ class SlaughteringCaveTile(BaseTile):
 		self._basePoints = 2
 		self._cost = { ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2 }
 		self._effect = [conversionEffect.ChangeFoodConversionRate( { 
-			ResourceTypeEnum.donkey: 2,
-			ResourceTypeEnum.sheep: 2,
-			ResourceTypeEnum.boar: 3,
-			ResourceTypeEnum.cow: 4,
-			[ResourceTypeEnum.donkey, ResourceTypeEnum.donkey]: 4 } ) ]
+			{ResourceTypeEnum.donkey: 1}: 2,
+			{ResourceTypeEnum.sheep: 1}: 2,
+			{ResourceTypeEnum.boar: 1}: 3,
+			{ResourceTypeEnum.cow: 1}: 4,
+			{ResourceTypeEnum.donkey: 2}: 4 } ) ]
 			
 class CookingCaveTile(BaseTile):
 	def __init__(self):

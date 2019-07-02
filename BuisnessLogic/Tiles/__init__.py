@@ -1,1 +1,1 @@
-__all__ = ["dwelling"]
+__all__ = ["dwelling", "conversionTiles", "gameChangeTiles", "purchaseTiles"]

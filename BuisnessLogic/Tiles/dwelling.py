@@ -46,7 +46,7 @@ class MixedDwelling(BaseTile):
 			ResourceTypeEnum.stone: 4 }
 		self._effect = [
 			populationEffects.IncreasePopulationCapEffect( 1 ),
-			animalStorageEffects.IncreasePopulationCapEffect( 1 )]
+			animalStorageEffects.Store( {}, 2 )]
 			
 class CoupleDwelling(BaseTile):
 	def __init__(self):
