@@ -26,5 +26,5 @@ class StubbleRoomTile(BaseTile):
 		self._isDwelling = False
 		self._basePoints = 1
 		self._cost = { ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 1 }
-		self._effect = [animalStorageEffects.ChangeAnimalStorageBase( { ResourceTypeEnum.cow: 3 } ) ]
+		self._effect = [animalStorageEffects.ChangeAnimalStorageBase( [ResourceTypeEnum.field], 1 ) ]
 		
