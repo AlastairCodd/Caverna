@@ -22,7 +22,7 @@ class ChangeRequisiteEffect(BaseBoardEffect):
 		if source is None:
 			raise ValueError()
 		
-		for tile in self._tiles
+		for tile in self._tiles:
 			source[tile].extend(self._newRequisites)
 		return source
 

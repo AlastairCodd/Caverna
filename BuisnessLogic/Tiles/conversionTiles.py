@@ -1,6 +1,17 @@
 from Core.cavernaEnums import ResourceTypeEnum
 from Common.Entities import weapon
 
+class TraderTile(BaseTile):
+	def __init__(self):
+		self._name = "Trader"
+		self._id = 17
+		self._isDwelling = False
+		self._basePoints = 2
+		self._cost = { ResourceTypeEnum.wood: 2 }
+		self._effect = [conversionEffect.Convert( { 
+			{ ResourceTypeEnum.coin: 2 },
+            { ResourceTypeEnum.stone: 1, ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 1 } ) ]
+            
 class SlaughteringCaveTile(BaseTile):
 	def __init__(self):
 		self._name = "Slaughtering Cave"
@@ -42,7 +53,7 @@ class HuntingParlorTile(BaseTile):
     def __init__(self):
         self._name = "Hunting Parlor"
         self._id = 33
-        self._isDwelling = false
+        self._isDwelling = False
         self._basePoints = 1
         self._cost = { ResourceTypeEnum.wood: 2 }
         self._effect = [conversionEffect.Convert(
@@ -53,7 +64,7 @@ class BeerParlorTile(BaseTile):
     def __init__(self):
         self._name = "Beer Parlor"
         self._id = 34
-        self._isDwelling = false
+        self._isDwelling = False
         self._basePoints = 3
         self._cost = { ResourceTypeEnum.wood: 2 }
         self._effect = [
@@ -68,7 +79,7 @@ class BlacksmithingPalorTile(BaseTile):
     def __init__(self):
         self._name = "Blacksmithing Palor"
         self._id = 35
-        self._isDwelling = false
+        self._isDwelling = False
         self._basePoints = 2
         self._cost = { ResourceTypeEnum.ore: 3 }
         self._effect = [conversionEffect.Convert(
@@ -79,14 +90,9 @@ class SparePartStorageTile(BaseTile):
     def __init__(self):
         self._name = "Spare Part Storage"
         self._id = 38
-        self._isDwelling = false
+        self._isDwelling = False
         self._basePoints = 0
         self._cost = { ResourceTypeEnum.wood: 2 }
         self._effect = [conversionEffect.Convert(
             { ResourceTypeEnum.stone: 1, ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 1 },
             { ResourceTypeEnum.coin: 2 } ) ]
-    
-#working cave
-#mining cave
-#breeding cave
-#peaceful cave
