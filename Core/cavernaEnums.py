@@ -53,3 +53,8 @@ class ActionCombinationEnum(Enum):
 	AndThenOr = auto()
 	Or = auto()
 	AndThen = auto()
+	
+class TriggerStateEnum(Enum):
+	StartOfTurn = auto()
+	OnPurchase = auto()
+	UserChoice = auto()

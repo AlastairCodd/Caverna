@@ -15,3 +15,7 @@ class ReceiveConditional(BaseResourceEffect):
 class AllowSixthDwarfEffect(BasePopulationEffect):
 	def Invoke(self, player: Player) -> bool:
 		raise NotImplementedException()
+		
+class ReceiveOnPurchasedEffect(BaseResourceEffect):
+	def __init__(self):
+		
