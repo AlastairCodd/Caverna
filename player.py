@@ -2,8 +2,9 @@ from typing import Iterable, Dict
 from Common.Entities.dwarf import Dwarf
 from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
 from Core.resourceContainer import ResourceContainer
+from Core.tileContainer import TileContainer
 
-class Player(ResourceContainer):
+class Player(ResourceContainer, TileContainer):
 	_id: int
 	_turnIndex: int
 	_dwarves: Iterable[Dwarf]

@@ -4,8 +4,6 @@ from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeE
 from Core.baseCard import BaseCard
 
 class PlaceATileAction(BaseAction):
-	_tileType: TileTypeEnum
-	
 	def __init__(self, tileType: TileTypeEnum):
 		self._tileType = tileType
 	
@@ -13,10 +11,15 @@ class PlaceATileAction(BaseAction):
 		self,
 		player: Player,
 		activeCard: BaseCard ) -> bool:
-		if player is None:
-			raise ValueException("player")
+		'''An action where a player:
+			- chooses a tile
+			- pays the cost (taking additional discount effects into account)
+			- places the tile on the board in an available location'''
+		if player is None: raise ValueException("player")
 		
-		raise NotImplementedError()
+		
+		
+		position = player.get_player_input(self)
 		
 class PlaceAStableAction(BaseAction):
 	
