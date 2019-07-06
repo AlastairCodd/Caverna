@@ -19,11 +19,15 @@ class ResourceTypeEnum(Enum):
 	dog = auto()
 	
 class TileTypeEnum(Enum):
+	unavailable = auto()
+	forest = auto()
+	underground = auto()
 	meadow = auto()
 	field = auto()
 	meadowFieldTwin = auto()
 	cavern = auto()
 	tunnel = auto()
+	deepTunnel = auto()
 	cavernTunnelTwin = auto()
 	cavernCavernTwin = auto()
 	pasture = auto()
@@ -49,3 +53,8 @@ class ActionCombinationEnum(Enum):
 	AndThenOr = auto()
 	Or = auto()
 	AndThen = auto()
+	
+class TriggerStateEnum(Enum):
+	StartOfTurn = auto()
+	OnPurchase = auto()
+	UserChoice = auto()
