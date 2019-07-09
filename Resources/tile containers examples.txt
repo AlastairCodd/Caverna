@@ -24,3 +24,23 @@ _|  1  v  v | v  v  6 |_
  >  <  v  v | e  v  > < 
 -| 41  ^  ^ |-|  ^ 46 |-
 30 points
+
+tile space:
+- id
+- tile type enum
+- base tile
+ - id
+ - name
+ - effects
+  - receive x for y turns
+  - change building rules
+  - change game meta rules
+  - discount construction cost
+  - points
+  - receive x given z condition
+  - increase dwarf cap by p
+  - increase animal storage
+? indoors
+- animal type
+- animal quantity
+- has stable

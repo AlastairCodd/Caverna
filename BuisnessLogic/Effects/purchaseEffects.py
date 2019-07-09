@@ -1,4 +1,5 @@
 from typing import Dict
+from Common.Defaults import tileCostDefault
 
 class BasePurchaseEffect(BaseEffect):
 	'''Abstract class for purchase effects'''
@@ -15,7 +16,7 @@ class DecreasePrice(BasePurchaseEffect):
 		'''Decrease the current price of target by self._decreaseBy
 			to a minimum cost of 0
 			
-			Target: either a tileTypeEnum
+			Target: either a tileTypeEnum'''
 		price = dict(target.get_price())
 		for key in self._decreaseBy:
 			currentPriceForKey = price.get(key, 0)
@@ -23,3 +24,16 @@ class DecreasePrice(BasePurchaseEffect):
 			targetPriceForKey = max(0, targetPriceForKey)
 			price[key] = targetPriceForKey
 		return price
+       
+    def _get_cost(self, target) -> Dict[ResourceTypeEnum, int]:
+        '''Get the default cost of the given target
+        
+        Target: either a tileTypeEnum, or an extension of BaseTile'''
+        if target is None: raise ValueError("target")
+                
+        if issubclass(target, BaseTile):
+            result = target.get_cost()
+        elif isinstance(target, TileTypeEnum):
+            costDefault = tileCostDefault.TileCostDefault()
+            costs = costDefault.assign( {} )
+            result = costs.getvalueordefault( target ) 
