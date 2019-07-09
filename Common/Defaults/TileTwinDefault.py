@@ -3,7 +3,7 @@ from Core.cavernaEnums import TileTypeEnum
 
 class TileTwinDefault(object):
 
-	def Assign(self, currentTiles: List[TileTypeEnum]) -> List[TileTypeEnum]:
+	def assign(self, currentTiles: List[TileTypeEnum]) -> List[TileTypeEnum]:
 		if currentTiles is None:
 			raise ValueError()
 
