@@ -21,42 +21,26 @@ class TileContainer(object):
 		self._twinTiles = twinDefault.Assign( [] )
 		
 		self._tiles: List[BaseTile] = []
+		if ( height == 6 and width == 8):
 		self._tilesType: Dict[int, TileTypeEnum] = {}
-		if (height == 6 and width == 8):
 			default = TileContainerDefault.TileContainerDefault()
 			default.AssignInitialTiles( self._tilesType )
 			
-		self._tileRequisites: Dict[TileTypeEnum, List[TileTypeEnum]] = {
-			TileTypeEnum.unavailable: [],
-			TileTypeEnum.forest: [],
-			TileTypeEnum.underground: [],
-			TileTypeEnum.meadow: [TileTypeEnum.forest],
-			TileTypeEnum.field: [TileTypeEnum.forest],
-			TileTypeEnum.meadowFieldTwin: [TileTypeEnum.forest],
-			TileTypeEnum.cavern: [TileTypeEnum.underground],
-			TileTypeEnum.tunnel: [TileTypeEnum.underground],
-			TileTypeEnum.deepTunnel: [TileTypeEnum.tunnel],
-			TileTypeEnum.cavernTunnelTwin: [TileTypeEnum.underground],
-			TileTypeEnum.cavernCavernTwin: [TileTypeEnum.underground],
-			TileTypeEnum.pasture: [TileTypeEnum.field],
-			TileTypeEnum.pastureTwin: [TileTypeEnum.field],
-			TileTypeEnum.furnishedCavern: [TileTypeEnum.cavern],
-			TileTypeEnum.furnishedDwelling: [TileTypeEnum.cavern],
-			TileTypeEnum.oreMineDeepTunnelTwin: [TileTypeEnum.tunnel],
-			TileTypeEnum.rubyMine: [TileTypeEnum.tunnel, TileTypeEnum.deepTunnel] }
+        requisiteDefault = tileRequisiteDefault.TileRequisiteDefault()
+		self._tileRequisites: Dict[TileTypeEnum, List[TileTypeEnum]] = requisiteDefault.assign( {} )
 		
-	def GetTiles(self) -> List[BaseTile]:
+	def get_tiles(self) -> List[BaseTile]:
 		return self._tiles
 		
-	def GetEffects(self) -> List[BaseEffect]:
+	def get_effects(self) -> List[BaseEffect]:
 		effects = map(lambda tile: tile.GetEffects(), self._tiles)
 		return list(effects)
 		
-	def GetEffectsOfType(self, type) -> List[BaseEffect]:
+	def get_effects_of_type(self, type) -> List[BaseEffect]:
 		result = [x for x in self.GetEffects() if isinstance(x, type)]
 		return result
 		
-	def PlaceTile(self, tile: BaseTile, location: int, direction: TileDirectionEnum = None) -> bool:
+	def place_tile(self, tile: BaseTile, location: int, direction: TileDirectionEnum = None) -> bool:
 		if tile is None:
 			raise ValueError("base tile")
 			
@@ -70,7 +54,7 @@ class TileContainer(object):
 		if location in availableLocations:
 			self._tiles.append( tile )
 		
-	def GetAvailableLocations(self, tile: TileTypeEnum) -> List[int]:
+	def get_available_locations(self, tile: TileTypeEnum) -> List[int]:
 		effects = self.GetEffectsOfType( boardEffects.BaseBoardEffect )
 		
 		#gotta clone dictionary
@@ -99,7 +83,7 @@ class TileContainer(object):
 		return validPositions
 		#only unavailable with adjacent (in correct section) will pass both checks
 		
-	def GetAdjacentTiles(self, location: int) -> List[Tuple[int, TileDirectionEnum]]:
+	def get_adjacent_tiles(self, location: int) -> List[Tuple[int, TileDirectionEnum]]:
 		if location < 0 or location > self._tileCount:
 			raise ValueError
 	
