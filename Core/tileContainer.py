@@ -20,9 +20,8 @@ class TileContainer(object):
 		twinDefault = TileTwinDefault.TileTwinDefault()
 		self._twinTiles = twinDefault.Assign( [] )
 		
-		self._tiles: List[BaseTile] = []
+		self._tiles: List[TileEntity] = []
 		if ( height == 6 and width == 8):
-		self._tilesType: Dict[int, TileTypeEnum] = {}
 			default = TileContainerDefault.TileContainerDefault()
 			default.AssignInitialTiles( self._tilesType )
 			
