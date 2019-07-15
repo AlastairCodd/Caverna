@@ -1,5 +1,5 @@
 from typing import List, Dict
-from Core.cavernaEnums import TileTypeEnum
+from Core.cavernaEnums import TileTypeEnum, ResourceTypeEnum
 
 class TileCostDefault(object):
 	def assign(self, currentRequisites: Dict[TileTypeEnum, Dict[ResourceTypeEnum, int]]) -> Dict[TileTypeEnum, Dict[ResourceTypeEnum, int]]:
