@@ -26,4 +26,5 @@ class TileRequisiteDefault(object):
 				TileTypeEnum.oreMineDeepTunnelTwin: [TileTypeEnum.tunnel],
 				TileTypeEnum.rubyMine: [TileTypeEnum.tunnel, TileTypeEnum.deepTunnel] }
 			)
+			
 		return currentRequisites
