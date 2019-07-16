@@ -1,0 +1,46 @@
+base:
+ 0  1  2  3  4  5  6  7
+ 8  9 10 11 12 13 14 15
+16 17 18 19 20 21 22 23
+24 25 26 27 28 29 30 31
+32 33 34 35 36 37 38 39
+40 41 42 43 44 45 46 47
+
+ 0  1  2  3  4  5  6  7
+
+initial
+_|  1  2  3 | 4  5  6 |_
+ 8  o  o  b | i  i ff 15
+16  o  o  o | i  i  i 23
+24  b  o  o | c  i  i 31
+32  o  o  o | e  f  i 39
+-| 41 42 43 |-| 45 46 |-
+
+check
+_|  1  v  v | v  v  6 |_
+ >  <  ^  ^ | ^  ^  > < 
+ >  <  v  v | x  v  > < 
+ >  <  ^  ^ | c  ^  > < 
+ >  <  v  v | e  v  > < 
+-| 41  ^  ^ |-|  ^ 46 |-
+30 points
+
+tile space:
+- id
+- tile type enum
+- base tile
+ - id
+ - name
+ - effects
+  - receive x for y turns
+  - change building rules
+  - change game meta rules
+  - discount construction cost
+  - points
+  - receive x given z condition
+  - increase dwarf cap by p
+  - increase animal storage
+? indoors
+- animal type
+- animal quantity
+- has stable
