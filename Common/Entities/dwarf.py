@@ -1,31 +1,28 @@
-from Common.Entities.weapon import Weapon
+from common.entities.weapon import Weapon
 
 class Dwarf(object):
-	_isAdult: bool
-	_weapon: Weapon
-	_currentCard = None
-	
 	def __init__(self, isAdult: bool = False):
 		self._isAdult = isAdult
 		self._weapon = None
+        self._currentCard = None
 	
-	def IsAdult(self) -> bool:
+	def is_adult(self) -> bool:
 		return self._isAdult
 			
-	def SetIsAdult(self, isAdult: bool) -> bool:
+	def set_is_Adult(self, isAdult: bool) -> bool:
 		self._isAdult = isAdult
 		return self._isAdult
 	
-	def GiveWeapon(self, weapon: Weapon):
+	def give_weapon(self, weapon: Weapon):
 		if self._weapon is not None:
 			raise ValueError("dwarf already has a weapon")
 		
 		self._weapon = weapon
 		
-	def GetWeapon(self) -> Weapon:
+	def get_weapon(self) -> Weapon:
 		return self._weapon
 	
-	def SetActive(self, currentCard):
+	def set_active(self, currentCard):
 		if currentCard is None:
 			raise ValueError("current card must not be none")
 	
@@ -34,9 +31,9 @@ class Dwarf(object):
 		
 		self._currentCard = currentCard
 		
-	def ClearActiveCard(self):
+	def clear_active_card(self):
 		self._currentCard = None
 		
-	def GetIsActive(self) -> bool:
+	def get_is_active(self) -> bool:
 		isActive = self._currentCard is None
 		return isActive

@@ -1,4 +1,4 @@
-from Core.cavernaEnums import ActionCombinationEnum
+from core.enums.cavernaEnums import ActionCombinationEnum
 
 class Combination(object):
 	
