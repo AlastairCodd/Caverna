@@ -1,7 +1,7 @@
-from core.baseClasses.base_card import BaseCard
-from core.enums.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
-from common.entities.multicombination import Combination
-from buisness_logic.actions import *
+from Core.baseCard import BaseCard
+from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
+from Common.Entities.multicombination import Combination
+from BuisnessLogic.Actions import *
 
 class WeeklyMarketCard(BaseCard):
 	
