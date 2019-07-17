@@ -1,9 +1,9 @@
 from typing import List, Tuple
-from core.enums.cavernaEnums import TileDirectionEnum, TileTypeEnum
+from core.enums.caverna_enums import TileDirectionEnum, TileTypeEnum
 from core.baseClasses.base_effect import BaseEffect
-from buisness_logic.effects import boardEffects
 from core.baseClasses.base_tile import BaseTile
-from Common.Services import TileContainerDefault, TileTwinDefault
+from buisness_logic.effects import board_effects
+from common.defaults import tile_container_default, tile_twin_default
 
 class TileContainer(object):
     
@@ -49,7 +49,7 @@ class TileContainer(object):
         
         Input:
         '''
-		if tile is None:
+        if tile is None:
             raise ValueError("base tile")
             
         if location < 0 or location > 47:

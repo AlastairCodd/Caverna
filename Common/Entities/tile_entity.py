@@ -1,4 +1,4 @@
-from core.enums.cavernaEnums import TileTypeEnum, ResourceTypeEnum
+from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum
 from core.baseClasses.base_tile import BaseTile
 
 class TileEntity(object):

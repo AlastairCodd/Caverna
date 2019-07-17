@@ -1,8 +1,8 @@
 from typing import Iterable, Dict
 from common.entities.dwarf import Dwarf
-from core.enums.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from core.containers.resourceContainer import ResourceContainer
-from core.containers.tileContainer import TileContainer
+from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
+from core.containers.resource_container import ResourceContainer
+from core.containers.tile_container import TileContainer
 
 class Player(ResourceContainer, TileContainer):
 

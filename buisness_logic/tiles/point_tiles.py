@@ -1,7 +1,7 @@
 class BaseConditionalPointTile(BaseTile):
-	def invoke(self, source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
-		raise NotImplementedException("base conditional point effect class")
-		
+    def invoke(self, source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
+        raise NotImplementedException("base conditional point effect class")
+        
 class WeavingParlorTile(BaseConditionalPointTile):
     def __init__(self):
         self._name = "Weaving Parlor"

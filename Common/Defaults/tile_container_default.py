@@ -1,6 +1,6 @@
 from typing import Dict
-from core.enums.cavernaEnums import TileTypeEnum
-from common.entities.tileEntity import TileEntity
+from core.enums.caverna_enums import TileTypeEnum
+from common.entities.tile_entity import TileEntity
 
 class TileContainerDefault(object):
 
