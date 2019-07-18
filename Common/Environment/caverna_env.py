@@ -13,14 +13,12 @@ class CavernaEnv(Env):
         self._numberOfPlayers = numberOfPlayers
     
     def reset(self) -> array:
-        raise NotImplementedError()
-        
         self._players = []
         
         for x in range(self._numberOfPlayers):
-            self._players[x] = player.Player( x, x )
+            self._players[x] = player.Player( id = x, turnIndex = x )
         
-    def step(self, action: ActionService) -> Tuple[array, float, bool, Dict]:
+    def step(self, action) -> Tuple[array, float, bool, Dict]:
         """Takes an action service (either the output of a network or a delayed decision maker)
         and applies the actions to get the next state"""
         if action is None: raise ValueError("action")
