@@ -19,19 +19,22 @@ class ChangeFoodConversionRate(BaseConversionEffect):
         self._newConversion = newConversions
         
 class Convert(BaseConversionEffect):
-    """Optional conversion. Pay input and get output
-    
-    Params:
-        input = Dict[ResourceTypeEnum, int]:
-        output =  Dict[ResourceTypeEnum, int]:
-        number of each type to give"""
-
     def __init__(self, input, output):
+        """Optional conversion. Pay input and get output
+    
+        Params:
+            input = Dict[ResourceTypeEnum, int]:
+            output =  Dict[ResourceTypeEnum, int]:
+            number of each type to give"""
         self._input = input
         self._output = output
 
-class ConvertConditional(BaseConversionEffect):
-    """Optional conversion. Pay input and get some quantity of output
+class ConvertProportional(BaseConversionEffect):
+    def __init__(self, input, output, condition):
+        """Optional conversion. Pay an input and get a variable output
     
-    Params:
-        input = List[ResourceTypeEnum]: 
+        Params:
+            input: any object"""
+        self._input = input
+        self._output = output
+        self._condition = condition

@@ -44,7 +44,7 @@ class PeacefulCaveTile(BaseTile):
         self._isDwelling = False
         self._basePoints = 2
         self._cost = { ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1 }
-        self._effect = [conversionEffect.ConvertConditional( 
+        self._effect = [conversionEffect.ConvertProportional( 
             [ weapon.Weapon ],
             [ ResourceTypeEnum.food ],
             lambda x: x.GetLevel() ) ]
