@@ -4,7 +4,7 @@ from core.enums.caverna_enums import ResourceTypeEnum
 class ResourceContainer(object):
     _resources: Dict[ResourceTypeEnum, int] = {}
     
-    def HasResources(self) -> bool:
+    def has_resources(self) -> bool:
         if self._resources is None:
             return False
         
@@ -14,10 +14,10 @@ class ResourceContainer(object):
         
         return any
     
-    def GetResources(self) -> Dict[ResourceTypeEnum, int]:
-        return self._resources
+    def get_resources(self) -> Dict[ResourceTypeEnum, int]:
+        return dict(self._resources)
         
-    def GiveResource(self, type: ResourceTypeEnum, amount: int) -> bool:
+    def give_resource(self, type: ResourceTypeEnum, amount: int) -> bool:
         if amount < 0:
             #raise ValueError("amount")
             return False
@@ -26,7 +26,7 @@ class ResourceContainer(object):
         self._resources[type] = currentAmount + amount
         return True
         
-    def GiveResources(self, resources: Dict[ResourceTypeEnum, int]) -> bool:
+    def give_resources(self, resources: Dict[ResourceTypeEnum, int]) -> bool:
         if resources is None:
             #raise ValueError("resources")
             return False
@@ -36,7 +36,7 @@ class ResourceContainer(object):
             any &= self.GiveResource(resource, resources[resource])
         return any
             
-    def TakeResource(self, type: ResourceTypeEnum, amount: int) -> bool:
+    def take_resource(self, type: ResourceTypeEnum, amount: int) -> bool:
         if amount < 0:
             #raise ValueError("amount")
             return False
@@ -48,7 +48,7 @@ class ResourceContainer(object):
         self._resources[type] = currentAmount - amount
         return True
         
-    def TakeResources(self, resources: Dict[ResourceTypeEnum, int]) -> bool:
+    def take_resources(self, resources: Dict[ResourceTypeEnum, int]) -> bool:
         if resources is None:
             #raise ValueError("resources")
             return False
@@ -58,7 +58,7 @@ class ResourceContainer(object):
             any &= self.GiveResource(resource, resources[resource])
         return any
         
-    def ClearResources(self) -> bool:
+    def clear_resources(self) -> bool:
         for resource in self._resources:
             self._resources[resource] = 0
         return True
