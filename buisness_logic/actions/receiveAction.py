@@ -12,7 +12,7 @@ class ReceiveAction(BaseAction):
             raise ValueError("receiveItems")
         self._receiveItems = receiveItems
     
-    def Invoke(
+    def invoke(
         self,
         player: Player,
         activeCard: BaseCard ) -> bool:

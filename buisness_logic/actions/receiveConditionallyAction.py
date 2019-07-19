@@ -17,7 +17,7 @@ class ReceiveConditionallyAction(ReceiveAction):
         self._condition = condition
         super(ReceiveConditionallyAction, self).__init__(receiveItems)
 
-    def Invoke(
+    def invoke(
         self,
         player: Player,
         activeCard: BaseCard ) -> bool:
@@ -27,5 +27,5 @@ class ReceiveConditionallyAction(ReceiveAction):
             raise ValueError("activeCard")
         
         if self._condition(player, activeCard):
-            return super(ReceiveConditionallyAction, self).Invoke(player, activeCard)
+            return super(ReceiveConditionallyAction, self).invoke(player, activeCard)
         return False

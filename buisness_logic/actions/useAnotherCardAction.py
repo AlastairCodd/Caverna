@@ -4,7 +4,7 @@ from common.entities.player import Player
 
 class UseAnotherCardAction(BaseAction):
 
-    def Invoke(
+    def invoke(
         self,
         player: Player,
         activeCard: BaseCard ) -> bool:

@@ -5,7 +5,7 @@ from core.baseClasses.base_action import BaseAction
 from common.entities.player import Player
 
 class BecomeStartingPlayerAction(BaseAction):
-    def Invoke(
+    def invoke(
         self,
         player: Player,
         activeCard: BaseCard ) -> bool:

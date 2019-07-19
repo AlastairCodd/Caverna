@@ -3,7 +3,7 @@ from core.baseClasses.base_card import BaseCard
 from common.entities.player import Player
 
 class GetABabyDwarfAction(BaseAction):
-    def Invoke(
+    def invoke(
         self,
         player: Player,
         activeCard: BaseCard ) -> bool:

@@ -12,7 +12,7 @@ class PayAction(BaseAction):
             raise ValueException("payItems")
         self._payItems = payItems
     
-    def Invoke(
+    def invoke(
         self,
         player: Player,
         activeCard: BaseCard ) -> bool:

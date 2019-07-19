@@ -9,7 +9,7 @@ class PlaceATileAction(BaseAction):
     def __init__(self, tileType: TileTypeEnum):
         self._tileType = tileType
     
-    def Invoke(
+    def invoke(
         self,
         player: Player,
         activeCard: BaseCard ) -> bool:

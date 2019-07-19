@@ -14,7 +14,7 @@ class BaseCard(object):
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         raise NotImplementedError("abstract base card class")
         
-    def ActivateCard(
+    def activate_card(
             self, 
             player,
             dwarf: Dwarf ) -> bool:

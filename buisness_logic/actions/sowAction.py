@@ -5,7 +5,7 @@ from core.baseClasses.base_card import BaseCard
 
 class SowAction(BaseAction):
 
-    def Invoke(
+    def invoke(
         self,
         player: Player,
         activeCard: BaseCard ) -> bool:

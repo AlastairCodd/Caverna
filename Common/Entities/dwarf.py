@@ -34,6 +34,6 @@ class Dwarf(object):
     def clear_active_card(self):
         self._currentCard = None
         
-    def get_is_active(self) -> bool:
+    def is_active(self) -> bool:
         isActive = self._currentCard is None
         return isActive
