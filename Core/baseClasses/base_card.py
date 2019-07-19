@@ -11,6 +11,7 @@ class BaseCard(object):
         self._level: int = -1
         self._actions: Iterable[BaseAction] = []
         self._isActive = False
+        self._isAvailable = False
     
     def activate_card(
             self, 
@@ -23,3 +24,6 @@ class BaseCard(object):
         for action in self._actions:
             action.invoke(player, self)
         dwarf.set_active(self)
+        
+    def make_available(self):
+        self._isAvailable = True
