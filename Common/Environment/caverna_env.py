@@ -24,8 +24,12 @@ class CavernaEnv(Env):
         self._turnIndex = 0
         self._turnPhase = raise ValueError()
         self._currentPlayer = 0
+        
         cardCreator = CardCreator()
         self._cards = cardCreator.create_all_cards()
+        self._activeCards = [x for x in self._cards if x.get_level() == -1]
+        
+        return self.observe()
 
     def step(self, action) -> Tuple[array, float, bool, Dict]:
         """Takes an action service (either the output of a network or a delayed decision maker)
@@ -37,6 +41,9 @@ class CavernaEnv(Env):
             bool: whether or not the game has finished
             dict: additional debug information"""
         if action is None: raise ValueError("action")
+        # filter action to get card
+        cardChoice = None
+        
         
     def observe(self):
         observation = array([self._turnIndex, self._turnPhase, self._currentPlayer])
