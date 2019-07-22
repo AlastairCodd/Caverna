@@ -11,3 +11,14 @@ class Conditional(object):
         self._condition1 = condition1
         self._condition2 = condition2
         self._type = type
+        
+    def get_left_branch(self):
+        if self._condition1 is self: raise ValueError("cannot recurse conditions")
+        return self._condition1
+    
+    def get_right_branch(self):
+        if self._condition2 is self: raise ValueError("cannot recurse conditions")
+        return self._condition2
+        
+    def get_combination_type(self):
+        return self._type

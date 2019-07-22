@@ -44,3 +44,66 @@ tile space:
 - animal type
 - animal quantity
 - has stable
+
+( a AND_THEN_OR b ) AND_OR ( c OR d )
+
+AND_OR
+AND_THEN_OR    OR
+a b            c d
+
+AND_THEN:1 = a THEN b
+AND_THEN:2 = b
+
+AND_OR:1 = a AND b
+AND_OR:2 = a
+AND_OR:2 = b
+
+OR = AND_OR
+
+(BREADTH_FIRST: AND_OR, AND_THEN, OR):
+1,1,1: (a b) (c d)
+1,1,2: (a b) (c)
+1,1,3: (a b) (d)
+1,2,1: (b) (c d)
+1,2,2: (b) (c)
+1,2,3: (b) (d)
+2,1,_: (a b)
+2,2,_: (b)
+3,_,1: (c d)
+3,_,2: (c)
+3,_,3: (d)
+
+example: hardware rental
+self._actions = Combination(
+    ActionCombinationEnum.AndThenOr,
+    receiveAction.ReceiveAction( {ResourceTypeEnum.wood, 2} ),
+    Combination(
+        ActionCombinationEnum.AndThenOr,
+        goOnAnExpeditionAction.GoOnAnExpeditionAction( 2 ),
+        sowAction.SowAction() ) )
+AND_THEN_OR
+A    AND_THEN_OR
+     B  C
+     
+1,1: a b c
+1,2: a c
+2,1: b c
+2,2: c
+
+example: ore mine construction
+self._actions = Combination(
+    ActionCombinationEnum.AndThenOr,
+    Combination(
+        ActionCombinationEnum.AndThen,
+        placeATileAction.PlaceATileAction( TileTypeEnum.oreMineDeepTunnelTwin ),
+        receiveAction.ReceiveAction( { ResourceTypeEnum.ore: 3 } ) ),
+    goOnAnExpeditionAction.GoOnAnExpeditionAction( 3 ) )
+    
+AND_THEN_OR
+AND_OR    c
+a    b
+
+1,1: a b c
+1,2: a c
+1,3: b c
+2,_: c
