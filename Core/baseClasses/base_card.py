@@ -9,7 +9,7 @@ class BaseCard(object):
         self._name: str = "Uninitialised"
         self._id: int = -1
         self._level: int = -1
-        self._actions: Iterable[BaseAction] = []
+        self._actions: None
         self._isActive = False
         self._isAvailable = False
     
@@ -21,9 +21,13 @@ class BaseCard(object):
         if dwarf is None: raise ValueError("dwarf")    
         if dwarf.get_is_active: raise ValueError("dwarf cannot already be active")
         
+        actionChoices: Iterable[BaseAction] = []
         for action in self._actions:
             action.invoke(player, self)
         dwarf.set_active(self)
         
     def make_available(self):
         self._isAvailable = True
+        
+    def get_level(self):
+        return self._level
