@@ -2,6 +2,7 @@ from typing import Dict, Iterable
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
 from core.baseClasses.base_action import BaseAction
 from common.entities.dwarf import Dwarf
+from common.services.conditional_service import ConditionalService
 
 class BaseCard(object):
 
@@ -11,7 +12,6 @@ class BaseCard(object):
         self._level: int = -1
         self._actions: None
         self._isActive = False
-        self._isAvailable = False
     
     def activate_card(
             self, 
@@ -21,13 +21,24 @@ class BaseCard(object):
         if dwarf is None: raise ValueError("dwarf")    
         if dwarf.get_is_active: raise ValueError("dwarf cannot already be active")
         
-        actionChoices: Iterable[BaseAction] = []
+        conditional_service = ConditionalService()
+        
+        actionChoices: Iterable[BaseAction] = ConditionalService.get_possible_choices( self._actions )
+        
+        player.get_player_choice
+
         for action in self._actions:
             action.invoke(player, self)
         dwarf.set_active(self)
         
-    def make_available(self):
-        self._isAvailable = True
-        
     def get_level(self):
         return self._level
+        
+    def is_active(self):
+        return self._isActive;
+        
+    def is_available(self):
+        return not self._isActive
+        
+    def make_available(self):
+        self._isActive = True

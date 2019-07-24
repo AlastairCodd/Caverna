@@ -29,10 +29,10 @@ class Player(ResourceContainer, TileContainer):
         
     def can_take_move(self) -> bool:
         """Determines whether this player can still make a move this turn"""
-        isDwarfActive: List[bool] = map(lambda x: not x.get_is_active(), self._dwarves)
+        isDwarfActive: List[bool] = map(lambda x: not x.is_active(), self._dwarves)
         return any(isDwarfActive)
        
-    def get_player_response(self, action):
+    def get_player_choice(self, action):
         """Gets a player response for the given action. 
         Implementation left to implementing class -- either from user input, or from analysis of the action value function
         
