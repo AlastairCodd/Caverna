@@ -1,6 +1,6 @@
+from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
-from buisness_logic.effects import populationEffects, animalStorageEffect
-from Core.baseTile import BaseTile
+from buisness_logic.effects import population_effects, animal_storage_effects
 
 class WorkRoomTile(BaseTile):
     def __init__(self):

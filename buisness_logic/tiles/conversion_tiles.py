@@ -1,3 +1,4 @@
+from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
 from common.entities import weapon
 
@@ -8,7 +9,7 @@ class TraderTile(BaseTile):
         self._isDwelling = False
         self._basePoints = 2
         self._cost = { ResourceTypeEnum.wood: 2 }
-        self._effect = [conversionEffect.Convert( { 
+        self._effect = [conversionEffect.Convert( 
             { ResourceTypeEnum.coin: 2 },
             { ResourceTypeEnum.stone: 1, ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 1 } ) ]
             
@@ -19,7 +20,7 @@ class SlaughteringCaveTile(BaseTile):
         self._isDwelling = False
         self._basePoints = 2
         self._cost = { ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2 }
-        self._effect = [conversionEffect.ChangeFoodConversionRate( { 
+        self._effect = [conversionEffect.ChangeFoodConversionRate( {
             {ResourceTypeEnum.donkey: 1}: 2,
             {ResourceTypeEnum.sheep: 1}: 2,
             {ResourceTypeEnum.boar: 1}: 3,
@@ -35,7 +36,7 @@ class CookingCaveTile(BaseTile):
         self._cost = { ResourceTypeEnum.stone: 2 }
         self._effect = [conversionEffect.Convert( 
             { ResourceTypeEnum.veg: 1, ResourceTypeEnum.grain: 1 }, 
-            { ResourceTypeEnum.food: 5 ) ]
+            { ResourceTypeEnum.food: 5 } ) ]
 
 class PeacefulCaveTile(BaseTile):
     def __init__(self):

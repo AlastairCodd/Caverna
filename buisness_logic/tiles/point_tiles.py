@@ -1,3 +1,8 @@
+from typing import Dict, List
+from core.baseClasses.base_tile import BaseTile
+from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TriggerStateEnum
+from buisness_logic.effects import *
+
 class BaseConditionalPointTile(BaseTile):
     def invoke(self, source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
         raise NotImplementedException("base conditional point effect class")
@@ -9,7 +14,11 @@ class WeavingParlorTile(BaseConditionalPointTile):
         self._isDwelling = False
         self._basePoints = 0
         self._cost = { ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1 }
-        self._effect = [ when purchased receive 1 food per sheep ]
+        self._effect = [ resource_effects.ReceiveConditoinal( 
+            { ResourceTypeEnum.sheep: 1 },
+            { ResourceTypeEnum.food: 1 },
+            ) ]
+        #when purchased receive 1 food per sheep
         self._conditionalPoints = { { ResourceTypeEnum.sheep: 1 }: 1 }
         
 class MilkingParlorTile(BaseConditionalPointTile):
@@ -19,7 +28,10 @@ class MilkingParlorTile(BaseConditionalPointTile):
         self._isDwelling = False
         self._basePoints = 0
         self._cost = { ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2 }
-        self._effect = [ when purchased receive 1 food per cow ]
+        self._effect = [ resource_effects.ReceiveConditoinal( 
+            { ResourceTypeEnum.cow: 1 },
+            { ResourceTypeEnum.food: 1 } ) ]
+        #when purchased receive 1 food per cow 
         self._conditionalPoints = { { ResourceTypeEnum.cow: 1 }: 1 }
         
 class StateParlorTile(BaseConditionalPointTile):
@@ -39,7 +51,6 @@ class StoneStorageTile(BaseConditionalPointTile):
         self._isDwelling = False
         self._basePoints = 0
         self._cost = { ResourceTypeEnum.wood: 3, ResourceTypeEnum.ore: 1 }
-        self._effect = [  ]
         self._conditionalPoints = { { ResourceTypeEnum.stone: 1 }: 1 }
         
 class OreStorageTile(BaseConditionalPointTile):
