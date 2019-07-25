@@ -22,7 +22,7 @@ class MilkingParlorTile(BaseConditionalPointTile):
         self._effect = [ when purchased receive 1 food per cow ]
         self._conditionalPoints = { { ResourceTypeEnum.cow: 1 }: 1 }
         
-class state ParlorTile(BaseConditionalPointTile):
+class StateParlorTile(BaseConditionalPointTile):
     def __init__(self):
         self._name = "State Parlor"
         self._id = 32

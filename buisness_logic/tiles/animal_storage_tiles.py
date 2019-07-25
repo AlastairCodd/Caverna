@@ -18,7 +18,6 @@ class BreakfastRoomTile(BaseTile):
         self._cost = { ResourceTypeEnum.wood: 1 }
         self._effect = [animalStorageEffects.Store( { ResourceTypeEnum.cow: 3 } ) ]
         
-            
 class StubbleRoomTile(BaseTile):
     def __init__(self):
         self._name = "Stubble Room"
