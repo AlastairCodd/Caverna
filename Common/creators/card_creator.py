@@ -1,3 +1,4 @@
+from typing import List
 from buisness_logic.cards import *
 from core.baseClasses.base_card import BaseCard
 

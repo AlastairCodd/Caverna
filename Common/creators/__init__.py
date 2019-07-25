@@ -1,1 +1,1 @@
-__all__ = ["CardCreator", "TileCreator"]
+__all__ = ["card_creator", "tile_creator"]

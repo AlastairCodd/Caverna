@@ -1,5 +1,7 @@
 from typing import Dict
-from common.defaults.tileCostDefault import TileCostDefault
+from core.baseClasses.base_effect import BaseEffect
+from core.enums.caverna_enums import ResourceTypeEnum
+from common.defaults.tile_cost_default import TileCostDefault
 
 class BasePurchaseEffect(BaseEffect):
     '''Abstract class for purchase effects'''

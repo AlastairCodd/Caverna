@@ -1,8 +1,7 @@
-from typing import Dict
-from Core.baseCard import BaseCard
-from Core.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
-from Common.Entities.multicombination import Combination
-from BuisnessLogic.Actions import *
+from core.baseClasses.base_card import BaseCard
+from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
+from common.entities.multicombination import Combination
+from buisness_logic.actions import *
 
 class Imitation1Card(BaseCard):
     

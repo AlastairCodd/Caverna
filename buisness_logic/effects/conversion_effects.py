@@ -2,7 +2,7 @@ from typing import Dict, List
 from common.entities.player import Player
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import TileTypeEnum
-from common.services.tileTwinDefault import TileTwinDefault
+from common.defaults.tile_twin_default import TileTwinDefault
 
 class BaseConversionEffect(BaseEffect):
     def Invoke(self, source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
