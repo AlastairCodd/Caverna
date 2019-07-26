@@ -11,16 +11,44 @@ class Receive(BaseResourceEffect):
         self._output = output
     
 class ReceiveConditional(BaseResourceEffect):
-    def __init__(self, increaseBy: int, triggerState: TriggerStateEnum = TriggerStateEnum.StartOfTurn):
-        self._increaseBy = increaseBy
-        self._triggerState = triggerState
-
-    def invoke(self, player: Player) -> bool:
-        raise NotImplementedException()
-
-class ReceiveConditional(BaseResourceEffect):
     def __init__(self, input, condition, triggerState:  TriggerStateEnum = TriggerStateEnum.StartOfTurn):
         """Recieve some input when some condition is true."""
         self._input = input
         self._condition = condition
-        super().__init__(self, triggerState
+        super().__init__(triggerState)
+        
+    def invoke(self, player):
+        numberOfTimesConditionMet = self._condition(player)
+        if numberOfTimesConditionMet == 0:
+            return False
+        resources = {key: self._input[key] * numberOfTimesConditionMet for key in self._input}
+        player.give_resources( resources )
+        return True
+        
+class ReceiveProportional(BaseResourceEffect):
+    def __init__(self, input, proportionalTo, triggerState:  TriggerStateEnum = TriggerStateEnum.StartOfTurn):
+        """Recieve some x input per x "proportionalTo"."""
+        self._input = input
+        self._proportionalTo = proportionalTo
+        super().__init__(triggerState)
+        
+    def invoke(self, player):
+        playerResources = player.get_resources()
+        numberOfProportionalResources = count_dictionary_contains(playerResources, self._proportionalTo)
+        for _ in range(numberOfProportionalResources):
+            player.give_resources( self._input )
+            
+def does_dictionary_contain(inDict, containedDict):
+    isContained = True
+    for key in containedDict:
+        isContained &= inDict.get(key, 0) >= containedDict[key]
+    return isContained
+    
+def count_dictionary_contains(inDict, containedDict):
+    count = 0
+    while True:
+        if not does_dictionary_contain(inDict, containedDict):
+            return count
+        count += 1
+        for key in containedDict:
+            inDict[key] -= containedDict[key]

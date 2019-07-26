@@ -14,10 +14,9 @@ class WeavingParlorTile(BaseConditionalPointTile):
         self._isDwelling = False
         self._basePoints = 0
         self._cost = { ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1 }
-        self._effect = [ resource_effects.ReceiveConditoinal( 
+        self._effect = [ resource_effects.ReceiveProportional( 
             { ResourceTypeEnum.sheep: 1 },
-            { ResourceTypeEnum.food: 1 },
-            ) ]
+            { ResourceTypeEnum.food: 1 } ) ]
         #when purchased receive 1 food per sheep
         self._conditionalPoints = { { ResourceTypeEnum.sheep: 1 }: 1 }
         
@@ -28,7 +27,7 @@ class MilkingParlorTile(BaseConditionalPointTile):
         self._isDwelling = False
         self._basePoints = 0
         self._cost = { ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2 }
-        self._effect = [ resource_effects.ReceiveConditoinal( 
+        self._effect = [ resource_effects.ReceiveProportional( 
             { ResourceTypeEnum.cow: 1 },
             { ResourceTypeEnum.food: 1 } ) ]
         #when purchased receive 1 food per cow 

@@ -33,7 +33,7 @@ class ResourceContainer(object):
         
         any = True
         for resource in resources:
-            any &= self.GiveResource(resource, resources[resource])
+            any &= self.give_resource(resource, resources[resource])
         return any
             
     def take_resource(self, type: ResourceTypeEnum, amount: int) -> bool:
@@ -55,7 +55,7 @@ class ResourceContainer(object):
         
         any = True
         for resource in resources:
-            any &= self.GiveResource(resource, resources[resource])
+            any &= self.give_resource(resource, resources[resource])
         return any
         
     def clear_resources(self) -> bool:
