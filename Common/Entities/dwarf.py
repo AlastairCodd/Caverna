@@ -21,6 +21,10 @@ class Dwarf(object):
         
     def get_weapon(self) -> Weapon:
         return self._weapon
+
+    def has_weapon(self) -> bool:
+        result = self._weapon is None
+        return result
     
     def set_active(self, currentCard):
         if currentCard is None:

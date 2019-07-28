@@ -25,7 +25,7 @@ class Player(ResourceContainer, TileContainer):
         self._dwarves.append(babyDwarf)
         
     def get_dwarves(self) -> Iterable[Dwarf]:
-        return self._dwarves
+        return list(self._dwarves)
         
     def can_take_move(self) -> bool:
         """Determines whether this player can still make a move this turn"""

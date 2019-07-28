@@ -59,3 +59,8 @@ class TriggerStateEnum(Enum):
     StartOfTurn = auto()
     OnPurchase = auto()
     UserChoice = auto()
+
+class TileColourEnum(Enum):
+    Brown = auto()
+    Green = auto()
+    Yellow = auto()

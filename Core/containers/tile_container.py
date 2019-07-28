@@ -32,7 +32,13 @@ class TileContainer(object):
         '''Get the base tiles contained in this container'''
         result = [x.get_tile() for x in self._tiles if x.get_tile() is not None]
         return result
-        
+
+    def get_tile_at_location(self, int) -> BaseTile:
+        """Get the tile at the given location
+
+        Returns: the tile. This may be null"""
+        return self._tiles.get(int, None)
+
     def get_effects(self) -> List[BaseEffect]:
         '''Get a list of all the effects held by any tile in this container'''
         effects = map(lambda tile: tile.GetEffects(), self._tiles)
