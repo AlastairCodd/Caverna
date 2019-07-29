@@ -1,10 +1,11 @@
+from typing import List
 from buisness_logic.tiles import *
 from core.baseClasses.base_tile import BaseTile
 
 class TileCreator(object):
     
-    def create_all_tiles(self) -> List[BaseCard]:
-        '''Returns a list containing a single instance of all of the tiles'''
+    def create_all_tiles(self) -> List[BaseTile]:
+        """Returns a list containing a single instance of all of the tiles"""
         tiles = [
             animal_storage_tiles.CuddleRoomTile(),
             animal_storage_tiles.BreakfastRoomTile(),
