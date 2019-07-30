@@ -2,3 +2,5 @@
 __pycache__/
 *.xlsx
 workenv/
+venv/
+.idea/
