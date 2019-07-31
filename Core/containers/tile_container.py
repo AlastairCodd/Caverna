@@ -59,44 +59,48 @@ class TileContainer(object):
         """
         if tile is None:
             raise ValueError("base tile")
-
         if location < 0 or location > 47:
-            raise ValueError("base tile")
-
+            raise ValueError("location must point to a valid position")
         if tile in self._twinTiles and direction is None:
-            raise ValueError("direct cannot be null if tile is a twin tile")
+            raise ValueError("direction cannot be null if tile is a twin tile")
 
-        available_locations = self.get_available_locations(tile)
+        tile_type = TileTypeEnum.furnishedDwelling if tile.is_dwelling() else TileTypeEnum.furnishedCavern
+
+        available_locations: List[int] = self.get_available_locations(tile_type)
         if location in available_locations:
-            self._tiles.append(tile)
+            self._tiles[location].set_tile(tile)
 
-    def get_available_locations(self, tile: TileTypeEnum) -> List[int]:
+    def get_available_locations(self, tile_type: TileTypeEnum) -> List[int]:
+        """Get all locations available for a tile with the given type"""
         effects = self.get_effects_of_type(board_effects.BaseBoardEffect)
 
         # gotta clone dictionary
-        allTileRequisites = dict(self._tileRequisites)
+        all_tile_requisites = dict(self._tileRequisites)
 
         for effect in effects:
-            effect.invoke(allTileRequisites)
+            effect.invoke(all_tile_requisites)
 
         # get the correct requisites -- if adjacent, allow unavailable
-        tileRequisites: List[TileTypeEnum] = allTileRequisites[tile]
+        tile_requisites: List[TileTypeEnum] = all_tile_requisites[tile_type]
 
         # filter _tilesType by new requisites
-        validPositions: List[int] = [x for x in self._tilesType if self._tilesType[x] in tileRequisites]
+        valid_positions: List[int] = [x[0] for x in self._tiles.items() if x[1].get_tile_type() in tile_requisites]
 
         # if twin, check all requisites for adjacent
-        if tile not in self._twinTiles:
-            return validPositions
+        if tile_type not in self._twinTiles:
+            return valid_positions
 
         valid_positions_with_adjacent: List[Tuple[int, TileDirectionEnum]] = []
-        for position in validPositions:
-            adjacent_tiles: List[Tuple[int, TileDirectionEnum]] = self.GetAdjacentTiles(position)
-            for adjacentTile in adjacent_tiles:
-                if self._tilesType[adjacentTile[0]] in tileRequisites:
+        for position in valid_positions:
+            adjacent_tile_locations: List[Tuple[int, TileDirectionEnum]] = self.get_adjacent_tiles(position)
+            for adjacentTile in adjacent_tile_locations:
+                adjacent_tile_type: TileTypeEnum = self._tiles[adjacentTile[0]].get_tile_type()
+                if adjacent_tile_type in tile_requisites:
                     valid_positions_with_adjacent.append((position, adjacentTile[1]))
                     break
-        return list(map(lambda valid_position_with_adjacent: valid_position_with_adjacent[0], valid_positions_with_adjacent))
+
+        return list(map(
+            lambda valid_position_with_adjacent: valid_position_with_adjacent[0], valid_positions_with_adjacent))
         # only unavailable with adjacent (in correct section) will pass both checks
 
     def get_adjacent_tiles(self, location: int) -> List[Tuple[int, TileDirectionEnum]]:
