@@ -1,99 +1,92 @@
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
 from common.entities import weapon
+from buisness_logic.effects import *
+
 
 class TraderTile(BaseTile):
     def __init__(self):
-        self._name = "Trader"
-        self._id = 17
-        self._isDwelling = False
-        self._basePoints = 2
-        self._cost = { ResourceTypeEnum.wood: 2 }
-        self._effect = [conversionEffect.Convert( 
-            { ResourceTypeEnum.coin: 2 },
-            { ResourceTypeEnum.stone: 1, ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 1 } ) ]
-            
+        super().__init__(
+            "Trader", 17, False, 2,
+            {ResourceTypeEnum.wood: 2},
+            [conversion_effects.Convert(
+                {ResourceTypeEnum.coin: 2},
+                {ResourceTypeEnum.stone: 1, ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 1})])
+
+
 class SlaughteringCaveTile(BaseTile):
     def __init__(self):
-        self._name = "Slaughtering Cave"
-        self._id = 24
-        self._isDwelling = False
-        self._basePoints = 2
-        self._cost = { ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2 }
-        self._effect = [conversionEffect.ChangeFoodConversionRate( {
-            {ResourceTypeEnum.donkey: 1}: 2,
-            {ResourceTypeEnum.sheep: 1}: 2,
-            {ResourceTypeEnum.boar: 1}: 3,
-            {ResourceTypeEnum.cow: 1}: 4,
-            {ResourceTypeEnum.donkey: 2}: 4 } ) ]
-            
+        super().__init__(
+            "Slaughtering Cave", 24, False, 2,
+            {ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2},
+            [conversion_effects.ChangeFoodConversionRate({
+                {ResourceTypeEnum.donkey: 1}: 2,
+                {ResourceTypeEnum.sheep: 1}: 2,
+                {ResourceTypeEnum.boar: 1}: 3,
+                {ResourceTypeEnum.cow: 1}: 4,
+                {ResourceTypeEnum.donkey: 2}: 4})])
+
+
 class CookingCaveTile(BaseTile):
     def __init__(self):
-        self._name = "Cooking Cave"
-        self._id = 25
-        self._isDwelling = False
-        self._basePoints = 2
-        self._cost = { ResourceTypeEnum.stone: 2 }
-        self._effect = [conversionEffect.Convert( 
-            { ResourceTypeEnum.veg: 1, ResourceTypeEnum.grain: 1 }, 
-            { ResourceTypeEnum.food: 5 } ) ]
+        super().__init__(
+            "Cooking Cave", 25, False, 2,
+            {ResourceTypeEnum.stone: 2},
+            [conversion_effects.Convert(
+                {ResourceTypeEnum.veg: 1, ResourceTypeEnum.grain: 1},
+                {ResourceTypeEnum.food: 5})])
+
 
 class PeacefulCaveTile(BaseTile):
     def __init__(self):
-        self._name = "Peaceful Cave"
-        self._id = 29
-        self._isDwelling = False
-        self._basePoints = 2
-        self._cost = { ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1 }
-        self._effect = [conversionEffect.ConvertProportional( 
-            [ weapon.Weapon ],
-            [ ResourceTypeEnum.food ],
-            lambda x: x.GetLevel() ) ]
-    
+        super().__init__(
+            "Peaceful Cave", 29, False, 2,
+            {ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1},
+            [conversion_effects.ConvertProportional(
+                [weapon.Weapon],
+                [ResourceTypeEnum.food],
+                lambda x: x.GetLevel())])
+
+
 class HuntingParlorTile(BaseTile):
     def __init__(self):
-        self._name = "Hunting Parlor"
-        self._id = 33
-        self._isDwelling = False
-        self._basePoints = 1
-        self._cost = { ResourceTypeEnum.wood: 2 }
-        self._effect = [conversionEffect.Convert(
-            { ResourceTypeEnum.boar: 2 },
-            { ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 2 } ) ]
-    
+        super().__init__(
+            "Hunting Parlor", 33, False, 1,
+            {ResourceTypeEnum.wood: 2},
+            [conversion_effects.Convert(
+                {ResourceTypeEnum.boar: 2},
+                {ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 2})])
+
+
 class BeerParlorTile(BaseTile):
     def __init__(self):
-        self._name = "Beer Parlor"
-        self._id = 34
-        self._isDwelling = False
-        self._basePoints = 3
-        self._cost = { ResourceTypeEnum.wood: 2 }
-        self._effect = [
-            conversionEffect.Convert(
-                { ResourceTypeEnum.grain: 2 },
-                { ResourceTypeEnum.coin: 3 } ),
-            conversionEffect.Convert(
-                { ResourceTypeEnum.grain: 2 },
-                { ResourceTypeEnum.food: 4 } ) ]
-    
+        super().__init__(
+            "Beer Parlor", 34, False, 3,
+            {ResourceTypeEnum.wood: 2},
+            [
+                conversion_effects.Convert(
+                    {ResourceTypeEnum.grain: 2},
+                    {ResourceTypeEnum.coin: 3}),
+                conversion_effects.Convert(
+                    {ResourceTypeEnum.grain: 2},
+                    {ResourceTypeEnum.food: 4})])
+
+
 class BlacksmithingPalorTile(BaseTile):
     def __init__(self):
-        self._name = "Blacksmithing Palor"
-        self._id = 35
-        self._isDwelling = False
-        self._basePoints = 2
-        self._cost = { ResourceTypeEnum.ore: 3 }
-        self._effect = [conversionEffect.Convert(
-            { ResourceTypeEnum.ore: 1, ResourceTypeEnum.ruby: 1 },
-            { ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 1 } ) ]
-    
+        super().__init__(
+            "Blacksmithing Palor", 35, False, 2,
+            {ResourceTypeEnum.ore: 3},
+            [conversion_effects.Convert(
+                {ResourceTypeEnum.ore: 1, ResourceTypeEnum.ruby: 1},
+                {ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 1})])
+
+
 class SparePartStorageTile(BaseTile):
     def __init__(self):
-        self._name = "Spare Part Storage"
-        self._id = 38
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = { ResourceTypeEnum.wood: 2 }
-        self._effect = [conversionEffect.Convert(
-            { ResourceTypeEnum.stone: 1, ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 1 },
-            { ResourceTypeEnum.coin: 2 } ) ]
+        super().__init__(
+            "Spare Part Storage", 38, False, 0,
+            {ResourceTypeEnum.wood: 2},
+            [conversion_effects.Convert(
+                {ResourceTypeEnum.stone: 1, ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 1},
+                {ResourceTypeEnum.coin: 2})])

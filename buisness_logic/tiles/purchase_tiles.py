@@ -1,47 +1,40 @@
+from buisness_logic.effects import purchase_effects, resource_effects
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.baseClasses.base_tile import BaseTile
 from common.entities import weapon
 
+
 class CarpenterTile(BaseTile):
     def __init__(self):
-        self._name = "Carpenter"
-        self._id = 12
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = { ResourceTypeEnum.stone: 1 }
-        self._effect = [ purchaseEffect.DecreasePrice( {ResourceTypeEnum.wood: 1}, BaseTile ) ]
-            
+        super().__init__(
+            "Carpenter", 12,
+            cost={ResourceTypeEnum.stone: 1},
+            effects=[purchase_effects.DecreasePrice({ResourceTypeEnum.wood: 1}, BaseTile)])
+
+
 class StoneCarverTile(BaseTile):
     def __init__(self):
-        self._name = "Stone Carver"
-        self._id = 13
-        self._isDwelling = False
-        self._basePoints = 1
-        self._cost = { ResourceTypeEnum.wood: 1 }
-        self._effect = [
-            resourceEffect.Receive( {ResourceTypeEnum.stone: 2} ),
-            purchaseEffect.DecreasePrice( {ResourceTypeEnum.stone: 1}, BaseTile ) ]
+        super().__init__(
+            "Stone Carver", 13, base_points=1,
+            cost={ResourceTypeEnum.wood: 1},
+            effects=[
+                resource_effects.Receive({ResourceTypeEnum.stone: 2}),
+                purchase_effects.DecreasePrice({ResourceTypeEnum.stone: 1}, BaseTile)])
+
 
 class BlacksmithTile(BaseTile):
     def __init__(self):
-        self._name = "Blacksmith"
-        self._id = 14
-        self._isDwelling = False
-        self._basePoints = 3
-        self._cost = {
-            ResourceTypeEnum.wood: 1,
-            ResourceTypeEnum.stone: 2 }
-        self._effect = [
-            resourceEffect.Receive( {ResourceTypeEnum.ore: 2} ),
-            purchaseEffect.DecreasePrice( {ResourceTypeEnum.ore: 2}, weapon.Weapon ) ]
-            
+        super().__init__(
+            "Blacksmith", 14, base_points=3,
+            cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.stone: 2},
+            effects=[
+                resource_effects.Receive({ResourceTypeEnum.ore: 2}),
+                purchase_effects.DecreasePrice({ResourceTypeEnum.ore: 2}, weapon.Weapon)])
+
+
 class BuilderTile(BaseTile):
     def __init__(self):
-        self._name = "Builder"
-        self._id = 16
-        self._isDwelling = False
-        self._basePoints = 2
-        self._cost = { ResourceTypeEnum.stone: 1 }
-        self._effect = [
-            purchaseEffect.DecreasePrice( {ResourceTypeEnum.ore: 2}, weapon.Weapon ) ]
-        
+        super().__init__(
+            "Builder", 16, base_points=2,
+            cost={ResourceTypeEnum.stone: 1},
+            effects=[purchase_effects.DecreasePrice({ResourceTypeEnum.ore: 2}, weapon.Weapon)])
