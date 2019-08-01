@@ -1,59 +1,72 @@
-from typing import Dict, List
+from typing import Dict, List, Callable
 import math
+
+from common.entities.point_entity import PointEntity
+from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseTile
-from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileColourEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum
+from common.entities.player import Player
 from common.defaults.farm_animal_resource_type_default import FarmAnimalResourceTypeDefault
 from buisness_logic.effects import *
 
 
 class BaseConditionalPointTile(BaseTile):
-    def invoke(self, source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
-        raise NotImplementedError("base conditional point effect class")
+    def __init__(
+            self,
+            name: str,
+            tile_id: int,
+            is_dwelling: bool = False,
+            base_points: int = 0,
+            cost: Dict[ResourceTypeEnum, int] = {},
+            effects: List[BaseEffect] = [],
+            conditional_points: Callable[[Player], PointEntity] = None):
+        self._conditional_points = conditional_points
+        super().__init__(
+            name,
+            tile_id,
+            is_dwelling,
+            base_points,
+            cost,
+            effects)
 
 
 class WeavingParlorTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Weaving Parlor"
-        self._id = 30
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1}
-        self._effect = [resource_effects.ReceiveProportional(
-            {ResourceTypeEnum.sheep: 1},
-            {ResourceTypeEnum.food: 1})]
-        # when purchased receive 1 food per sheep
-        self._conditionalPoints = lambda player: player.get_resources().get(ResourceTypeEnum.sheep, 0)
-        # 1 per sheep
+        super().__init__(
+            "Weaving Parlor", 30,
+            cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1},
+            # when purchased receive 1 food per sheep
+            effects=[resource_effects.ReceiveProportional(
+                input={ResourceTypeEnum.food: 1},
+                proportionalTo={ResourceTypeEnum.sheep: 1})],
+            # 1 per sheep
+            conditional_points=lambda player: PointEntity(player.get_resources().get(ResourceTypeEnum.sheep, 0)))
 
 
 class MilkingParlorTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Milking Parlor"
-        self._id = 31
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2}
-        self._effect = [resource_effects.ReceiveProportional(
-            {ResourceTypeEnum.cow: 1},
-            {ResourceTypeEnum.food: 1})]
-        # when purchased receive 1 food per cow
-        self._conditionalPoints = lambda player: player.get_resources().get(ResourceTypeEnum.sheep, 0)
-        # 1 per cow
+        super().__init__(
+            "Milking Parlor", 31,
+            cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2},
+            # when purchased receive 1 food per cow
+            effects=[resource_effects.ReceiveProportional(
+                {ResourceTypeEnum.food: 1},
+                {ResourceTypeEnum.cow: 1})],
+            # 1 per cow
+            conditional_points=lambda player: PointEntity(player.get_resources().get(ResourceTypeEnum.sheep, 0)))
 
 
 class StateParlorTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "State Parlor"
-        self._id = 32
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.wood: 3, ResourceTypeEnum.coin: 5}
-        self._effect = []
-        # when purchased per adjacent dwelling receive 2 food
-        self._conditionalPoints = self._state_palour_points
-        # 4 per adjacent dwelling
+        super().__init__(
+            "State Parlor", 32,
+            cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.coin: 5},
+            # when purchased per adjacent dwelling receive 2 food
+            effects=[],
+            # 4 per adjacent dwelling
+            conditional_points=self._state_palour_points)
 
-    def _state_palour_points(self, player) -> int:
+    def _state_palour_points(self, player) -> PointEntity:
         if player is None: raise ValueError(str(player))
 
         adjacentTileLocations = player.get_adjacent_tiles()
@@ -65,179 +78,152 @@ class StateParlorTile(BaseConditionalPointTile):
                 adjacentTileLocations)]
         numberOfAdjacentDwellings = len([d for d in adjacentTiles if d.is_dwelling()])
         result = 4 * numberOfAdjacentDwellings
-        return result
+        return PointEntity(result)
 
 
 class StoneStorageTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Stone Storage"
-        self._id = 36
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.wood: 3, ResourceTypeEnum.ore: 1}
-        self._conditionalPoints = lambda player: player.get_resources().get(ResourceTypeEnum.stone, 0)
-        # 1 per stone
+        super().__init__(
+            "Stone Storage", 36,
+            cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.ore: 1},
+            # 1 per stone
+            conditional_points=lambda player: PointEntity(player.get_resources().get(ResourceTypeEnum.stone, 0)))
 
 
 class OreStorageTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Ore Storage"
-        self._id = 37
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 2}
-        self._conditionalPoints = lambda player: math.floor(player.get_resources().get(ResourceTypeEnum.ore, 0) / 2)
-        # 1 per 2 ore
+        super().__init__(
+            "Ore Storage", 37,
+            cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 2},
+            # 1 per 2 ore
+            conditional_points=lambda player: PointEntity(
+                math.floor(player.get_resources().get(ResourceTypeEnum.ore, 0) / 2)))
 
 
 class MainStorageTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Main Storage"
-        self._id = 39
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1}
-        self._conditionalPoints = lambda player: len(
-            [t for t in player.get_tiles() if t.colour == TileColourEnum.Yellow])
-        # 2 per yellow furnishing
+        super().__init__(
+            "Main Storage", 39,
+            cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1},
+            # 2 per yellow furnishing
+            conditional_points=lambda player: PointEntity(len(
+                [t for t in player.get_tiles() if t.colour == TileColourEnum.Yellow])))
 
 
 class WeaponStorageTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Weapon Storage"
-        self._id = 40
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.wood: 3, ResourceTypeEnum.stone: 2}
-        self._conditionalPoints = lambda player: len([d for d in player.get_dwarves() if d.has_weapon()])
-        # 3 per dwarf with weapon
+        super().__init__(
+            "Weapon Storage", 40,
+            cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.stone: 2},
+            # 3 per dwarf with weapon
+            conditional_points=lambda player: PointEntity(len([d for d in player.get_dwarves() if d.has_weapon()])))
 
 
 class SuppliesStorageTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Supplies Storage"
-        self._id = 41
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.food: 3, ResourceTypeEnum.wood: 1}
-        self._conditionalPoints = self._supplies_storage_points
-        # 8 if all dwarves have a weapon
+        super().__init__(
+            "Supplies Storage", 41, cost={ResourceTypeEnum.food: 3, ResourceTypeEnum.wood: 1},
+            # 8 if all dwarves have a weapon
+            conditional_points=self._supplies_storage_points)
 
-    def _supplies_storage_points(self, player) -> int:
+    def _supplies_storage_points(self, player) -> PointEntity:
         if player is None: raise ValueError(str(player))
         if all([d.has_weapon() for d in player.get_dwarves()]):
             result = 8
         else:
             result = 0
-        return result
+        return PointEntity(result)
 
 
 class BroomChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Broom Chamber"
-        self._id = 42
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.wood: 1}
-        self._conditionalPoints = self._broom_chamber_points
-        # 5 for 5 dwarves and 5 for the 6th dwarf
+        super().__init__(
+            "Broom Chamber", 42,
+            cost={ResourceTypeEnum.wood: 1},
+            # 5 for 5 dwarves and 5 for the 6th dwarf
+            conditional_points=self._broom_chamber_points)
 
-    def _broom_chamber_points(self, player) -> int:
+    def _broom_chamber_points(self, player) -> PointEntity:
         if player is None: raise ValueError(str(player))
 
         numberOfDwarfs = len(player.get_dwarves())
         if numberOfDwarfs == 5:
-            return 5
+            return PointEntity(5)
         elif numberOfDwarfs == 6:
-            return 10
+            return PointEntity(10)
         else:
-            return 0
+            return PointEntity()
 
 
 class TreasureChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Treasure Chamber"
-        self._id = 43
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.wood: 1, ResourceTypeEnum.stone: 1}
-        self._effect = []
-        self._conditionalPoints = lambda player: player.get_resources().get(ResourceTypeEnum.ruby, 0)
-        # 1 per ruby
+        super().__init__(
+            "Treasure Chamber", 43,
+            cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.stone: 1},
+            # 1 per ruby
+            conditional_points=lambda player: player.get_resources().get(ResourceTypeEnum.ruby, 0))
 
 
 class FoodChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Food Chamber"
-        self._id = 44
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.wood: 2, ResourceTypeEnum.vegetable: 2}
-        self._effect = []
-        self._conditionalPoints = self._food_chamber_points
-        # 2 per vegetable and grain
+        super().__init__(
+            "Food Chamber", 44,
+            cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.vegetable: 2},
+            # 2 per vegetable and grain
+            conditional_points=self._food_chamber_points)
 
-    def _food_chamber_points(self, player) -> int:
+    def _food_chamber_points(self, player) -> PointEntity:
         if player is None: raise ValueError(str(player))
         playerResources: Dict[ResourceTypeEnum, int] = player.get_resources()
         numberVeg = playerResources.get(ResourceTypeEnum.veg, 0)
         numberGrain = playerResources.get(ResourceTypeEnum.grain, 0)
         result = min(numberGrain, numberVeg) * 2
-        return result
+        return PointEntity(result)
 
 
 class PrayerChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Prayer Chamber"
-        self._id = 45
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.wood: 2}
-        self._effect = []
-        self._conditionalPoints = self._prayer_chamber_points
-        # 8 if no dwarves have a weapon
+        super().__init__(
+            "Prayer Chamber", 45,
+            cost={ResourceTypeEnum.wood: 2},
+            # 8 if no dwarves have a weapon
+            conditional_points=self._prayer_chamber_points)
 
-    def _prayer_chamber_points(self, player) -> int:
+    def _prayer_chamber_points(self, player) -> PointEntity:
         if player is None: raise ValueError(str(player))
         if any([d.has_weapon() for d in player.get_dwarves()]):
             result = 0
         else:
             result = 8
-        return result
+        return PointEntity(result)
 
 
 class WritingChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Writing Chamber"
-        self._id = 46
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.stone: 2}
-        self._effect = []
-        self._conditionalPoints = self._writing_chamber_points
-        # prevents up to 7 negative points
+        super(WritingChamberTile, self).__init__(
+            "Writing Chamber", 46,
+            cost={ResourceTypeEnum.stone: 2},
+            # prevents up to 7 negative points
+            conditional_points=self._writing_chamber_points)
 
     def _writing_chamber_points(self, player):
-        if player is None: raise ValueError(str(player))
-        raise NotImplementedError()
+        return PointEntity(0, 0, 7)
 
 
 class FodderChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        self._name = "Fodder Chamber"
-        self._id = 47
-        self._isDwelling = False
-        self._basePoints = 0
-        self._cost = {ResourceTypeEnum.grain: 2, ResourceTypeEnum.stone: 1}
-        self._effect = []
-        self._conditionalPoints = self._fodder_chamber_points
-        # 1 per 3 farm animals
+        super().__init__(
+            "Fodder Chamber", 47,
+            cost={ResourceTypeEnum.grain: 2, ResourceTypeEnum.stone: 1},
+            # 1 per 3 farm animals
+            conditional_points=self._fodder_chamber_points)
 
-    def _fodder_chamber_points(self, player) -> int:
+    def _fodder_chamber_points(self, player) -> PointEntity:
         if player is None: raise ValueError(str(player))
         default = FarmAnimalResourceTypeDefault()
         farmAnimals: List[ResourceTypeEnum] = default.assign([])
-        playersFarmAnimals = [player.get_resources().get(x, 0) for x in farmAnimals]
-        numberOfFarmAnimals = playersFarmAnimals.count()
-        result = math.floor(numberOfFarmAnimals / 3)
-        return result
+        playersFarmAnimals: List[int] = [player.get_resources().get(x, 0) for x in farmAnimals]
+        numberOfFarmAnimals: int = sum(playersFarmAnimals)
+        result: int = math.floor(numberOfFarmAnimals / 3)
+
+        return PointEntity(result)
