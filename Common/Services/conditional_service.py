@@ -1,7 +1,11 @@
 from typing import List, Dict, Iterable, Callable
+
+from buisness_logic.effects import action_effects
+from buisness_logic.effects.action_effects import ChangeDecisionVerb
 from core.baseClasses.base_action import BaseAction
 from core.enums.caverna_enums import ActionCombinationEnum
 from common.entities.multiconditional import Conditional
+from common.entities.player import Player
 
 
 class ConditionalService(object):
@@ -18,11 +22,12 @@ class ConditionalService(object):
             ActionCombinationEnum.Or: self._combine_or,
             ActionCombinationEnum.AndThen: self._combine_and_then}
 
-    def get_possible_choices(self, conditional) -> List[List[BaseAction]]:
+    def get_possible_choices(self, conditional, player: Player = None) -> List[List[BaseAction]]:
         """recurse through the conditional tree in order to find which possible action choices the agent may make
         
         params: 
             conditional. Either a conditional object or an action. This cannot be null
+            player (optional):
         
         returns: 
             a list containing all possible (base) actions which can be take. This will never be null."""
@@ -32,9 +37,15 @@ class ConditionalService(object):
         if not isinstance(conditional, Conditional):
             raise ValueError("input must be either multiconditional.Conditional or baseAction.BaseAction")
 
-        left: List[List[BaseAction]] = self.get_possible_choices(conditional.get_left_branch())
-        right: List[List[BaseAction]] = self.get_possible_choices(conditional.get_right_branch())
-        choices: List[List[BaseAction]] = self._actionDictionary[conditional.get_combination_type()](left, right)
+        left: List[List[BaseAction]] = self.get_possible_choices(conditional.get_left_branch(), player)
+        right: List[List[BaseAction]] = self.get_possible_choices(conditional.get_right_branch(), player)
+
+        combination_type = conditional.get_combination_type()
+        change_decision_effects: Iterable[ChangeDecisionVerb] = player.get_effects_of_type(ChangeDecisionVerb)
+        for change_decision_effect in change_decision_effects:
+            combination_type = change_decision_effect.invoke(combination_type)
+
+        choices: List[List[BaseAction]] = self._actionDictionary[combination_type](left, right)
         return choices
 
     def _combine_either_or(self, left: Iterable[List[BaseAction]], right: Iterable[List[BaseAction]]) \
