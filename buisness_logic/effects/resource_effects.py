@@ -11,11 +11,11 @@ class Receive(BaseResourceEffect):
         self._output = output
     
 class ReceiveConditional(BaseResourceEffect):
-    def __init__(self, input, condition, triggerState:  TriggerStateEnum = TriggerStateEnum.StartOfTurn):
+    def __init__(self, input, condition, trigger_state:  TriggerStateEnum = TriggerStateEnum.StartOfTurn):
         """Recieve some input when some condition is true."""
         self._input = input
         self._condition = condition
-        super().__init__(triggerState)
+        super().__init__(trigger_state)
         
     def invoke(self, player):
         numberOfTimesConditionMet = self._condition(player)
@@ -26,11 +26,11 @@ class ReceiveConditional(BaseResourceEffect):
         return True
         
 class ReceiveProportional(BaseResourceEffect):
-    def __init__(self, input, proportionalTo, triggerState:  TriggerStateEnum = TriggerStateEnum.StartOfTurn):
+    def __init__(self, input, proportionalTo, trigger_state:  TriggerStateEnum = TriggerStateEnum.StartOfTurn):
         """Recieve some x input per x "proportionalTo"."""
         self._input = input
         self._proportionalTo = proportionalTo
-        super().__init__(triggerState)
+        super().__init__(trigger_state)
         
     def invoke(self, player):
         playerResources = player.get_resources()
