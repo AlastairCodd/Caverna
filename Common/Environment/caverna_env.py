@@ -43,7 +43,9 @@ class CavernaEnv(Env):
         if action is None: raise ValueError("action")
         # filter action to get card
         available_choices = [ for c in self._activeCards if c.is_available() ]
-        
+
+        return array([]), 0, False, {}
+
     def observe(self):
         observation = array([self._turnIndex, self._turnPhase, self._currentPlayer])
         
