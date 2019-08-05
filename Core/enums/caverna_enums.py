@@ -17,7 +17,9 @@ class ResourceTypeEnum(Enum):
     cow = auto()
     boar = auto()
     dog = auto()
-    
+
+    begging_marker = auto()
+
 class TileTypeEnum(Enum):
     unavailable = auto()
     forest = auto()

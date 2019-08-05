@@ -21,5 +21,8 @@ class BaseTile(object):
         self._cost = cost
         self._effects = effects
 
-    def is_dwelling(self):
-        self.is_dwelling()
+    def is_dwelling(self) -> bool:
+        return self.is_dwelling()
+
+    def get_base_points(self) -> int:
+        return self._basePoints

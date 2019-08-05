@@ -29,6 +29,8 @@ class BaseConditionalPointTile(BaseTile):
             cost,
             effects)
 
+    def get_conditional_point(self, player: Player) -> PointEntity:
+        return self._conditional_points(player)
 
 class WeavingParlorTile(BaseConditionalPointTile):
     def __init__(self):

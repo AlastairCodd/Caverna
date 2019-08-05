@@ -5,7 +5,6 @@ from common.entities.tile_entity import TileEntity
 from core.enums.caverna_enums import TileDirectionEnum, TileTypeEnum
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseTile
-from buisness_logic.effects import board_effects
 from common.defaults import tile_container_default, tile_twin_default, tile_requisite_default
 
 T = TypeVar('T')
@@ -33,9 +32,16 @@ class TileContainer(object):
         requisite_default = tile_requisite_default.TileRequisiteDefault()
         self._tileRequisites: Dict[TileTypeEnum, List[TileTypeEnum]] = requisite_default.assign({})
 
+    def get_number_of_tiles_of_type(self, tile_type: TileTypeEnum) -> int:
+        return len([t for t in self._tiles.values() if t.get_tile_type() == tile_type])
+
     def get_tiles(self) -> List[BaseTile]:
         """Get the base tiles contained in this container"""
         result = [x.get_tile() for x in self._tiles.values() if x.get_tile() is not None]
+        return result
+
+    def get_tiles_of_type(self, base_tile_type: Generic[T]) -> List[T]:
+        result = [x for x in self._tiles.values() if isinstance(x, base_tile_type)]
         return result
 
     def get_tile_at_location(self, tileIndex: int) -> BaseTile:

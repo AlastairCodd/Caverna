@@ -3,6 +3,9 @@ from core.enums.caverna_enums import ResourceTypeEnum
 
 
 class ResourceContainer(object):
+    def __init__(self):
+        self._resources: Dict[ResourceTypeEnum, int] = {}
+
     def has_resources(self) -> bool:
         if self._resources is None:
             return False
@@ -29,6 +32,10 @@ class ResourceContainer(object):
             ResourceTypeEnum.boar: self._resources.get(ResourceTypeEnum.boar, 0),
             ResourceTypeEnum.dog: self._resources.get(ResourceTypeEnum.dog, 0),
         }
+        return result
+
+    def get_resources_of_type(self, resource_type: ResourceTypeEnum) -> int:
+        result = self._resources.get(type, 0)
         return result
 
     def give_resource(self, type: ResourceTypeEnum, amount: int) -> bool:
