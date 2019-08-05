@@ -1,4 +1,6 @@
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, TypeVar, Generic, Iterable
+
+from buisness_logic.effects.board_effects import ChangeRequisiteEffect
 from common.entities.tile_entity import TileEntity
 from core.enums.caverna_enums import TileDirectionEnum, TileTypeEnum
 from core.baseClasses.base_effect import BaseEffect
@@ -6,6 +8,7 @@ from core.baseClasses.base_tile import BaseTile
 from buisness_logic.effects import board_effects
 from common.defaults import tile_container_default, tile_twin_default, tile_requisite_default
 
+T = TypeVar('T')
 
 class TileContainer(object):
 
@@ -47,9 +50,9 @@ class TileContainer(object):
         effects = map(lambda tile: tile.GetEffects(), self.get_tiles())
         return list(effects)
 
-    def get_effects_of_type(self, tileType) -> List[BaseEffect]:
+    def get_effects_of_type(self, tile_type: Generic[T]) -> List[T]:
         """Get a list of all of the effects which extend a certain base effect in this container"""
-        result = [x for x in self.get_effects() if isinstance(x, tileType)]
+        result = [x for x in self.get_effects() if isinstance(x, tile_type)]
         return result
 
     def place_tile(self, tile: BaseTile, location: int, direction: TileDirectionEnum = None) -> bool:
@@ -69,13 +72,15 @@ class TileContainer(object):
         available_locations: List[int] = self.get_available_locations(tile_type)
         if location in available_locations:
             self._tiles[location].set_tile(tile)
+            return True
+        return False
 
     def get_available_locations(self, tile_type: TileTypeEnum) -> List[int]:
         """Get all locations available for a tile with the given type"""
-        effects = self.get_effects_of_type(board_effects.BaseBoardEffect)
+        effects: Iterable[ChangeRequisiteEffect] = self.get_effects_of_type(ChangeRequisiteEffect)
 
         # gotta clone dictionary
-        all_tile_requisites = dict(self._tileRequisites)
+        all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = dict(self._tileRequisites)
 
         for effect in effects:
             effect.invoke(all_tile_requisites)
