@@ -71,10 +71,23 @@ class CavernaEnv(Env):
 
     def _create_player_turn_order(self) -> List[Player]:
         player_dwarf_count: Dict[int, int] = {p.id: 0 for p in self._players}
-        any_players_with_dwarves = True
-        while any_players_with_dwarves:
+        player_turn_order: List[Player] = []
+        players_with_more_dwarves: List[bool] = [True for p in self._players]
+        while any(players_with_more_dwarves):
+            # for each player, starting at starting player
             for i in range(self._number_of_players):
                 index = i + self._starting_player.id % self._number_of_players
-                player_dwarves = self._players[index].dwarves
-                if player_dwarves.count() < player_dwarf_count[index]:
-                    
+
+                current_player = self._players[index]
+
+                # does the current player have more dwarves than currently stored
+                player_dwarves: List[Dwarf] = current_player.dwarves
+                if len(player_dwarves) < player_dwarf_count[index]:
+                    player_turn_order.append( current_player )
+
+                    player_dwarf_count[current_player.id] += 1
+
+                if len(player_dwarves) < player_dwarf_count[index]:
+                    any_players_with_dwarves[i] = False
+
+        return player_turn_order
