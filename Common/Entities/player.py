@@ -1,20 +1,20 @@
-from typing import Iterable, Dict, List
+from typing import Iterable, List, Dict
 from common.entities.dwarf import Dwarf
-from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
 from core.containers.resource_container import ResourceContainer
 from core.containers.tile_container import TileContainer
+from core.enums.caverna_enums import ResourceTypeEnum
 
 
-class Player(ResourceContainer, TileContainer):
+class Player(TileContainer, ResourceContainer):
 
-    def __init__(
-            self,
-            id: int,
-            turnIndex: int):
+    def __init__(self, id: int, turnIndex: int):
         self._id = id
         self._turnIndex = turnIndex
 
         self._dwarves: List[Dwarf] = [Dwarf(True), Dwarf(True)]
+        self._resources: Dict[ResourceTypeEnum, int] = {}
+
+        super().__init__()
 
     def set_turn_index(self, turnIndex: int):
         self._turnIndex = turnIndex

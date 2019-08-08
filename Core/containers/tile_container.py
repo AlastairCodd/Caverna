@@ -9,6 +9,7 @@ from common.defaults import tile_container_default, tile_twin_default, tile_requ
 
 T = TypeVar('T')
 
+
 class TileContainer(object):
 
     def __init__(self, height=6, width=8):
