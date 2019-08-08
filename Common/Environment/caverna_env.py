@@ -75,19 +75,27 @@ class CavernaEnv(Env):
         players_with_more_dwarves: List[bool] = [True for p in self._players]
         while any(players_with_more_dwarves):
             # for each player, starting at starting player
-            for i in range(self._number_of_players):
-                index = i + self._starting_player.id % self._number_of_players
-
-                current_player = self._players[index]
+            for current_player in self._get_players_starting_at(self._starting_player.id):
 
                 # does the current player have more dwarves than currently stored
-                player_dwarves: List[Dwarf] = current_player.dwarves
-                if len(player_dwarves) < player_dwarf_count[index]:
+                if len(current_player.dwarves) < player_dwarf_count[current_player.id]:
                     player_turn_order.append( current_player )
 
                     player_dwarf_count[current_player.id] += 1
 
-                if len(player_dwarves) < player_dwarf_count[index]:
-                    any_players_with_dwarves[i] = False
+                if len(current_player.dwarves) < player_dwarf_count[current_player.id]:
+                    players_with_more_dwarves[current_player.id] = False
 
         return player_turn_order
+    
+    def _get_players_starting_at(self, starting_index: int) -> List[Player]:
+        result = self._players[starting_index:] + self._players[:starting_index-1]
+        return result
+
+    def _observe_player(self, player: Player) -> array:
+        player_observation = array()
+        return player_observation
+
+    def _observe_dwarf(self, dwarf: Dwarf) -> array:
+        if dwarf is None: return array([0, 0, 0, 0])
+        dwarf_observation = array([dwarf.is_active(), dwarf.is_adult(), dwarf.get_weapon()])
