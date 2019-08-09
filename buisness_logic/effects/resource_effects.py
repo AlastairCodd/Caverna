@@ -33,7 +33,7 @@ class ReceiveProportional(BaseResourceEffect):
         super().__init__(trigger_state)
         
     def invoke(self, player):
-        playerResources = player.get_resources()
+        playerResources = player.resources
         numberOfProportionalResources = count_dictionary_contains(playerResources, self._proportionalTo)
         for _ in range(numberOfProportionalResources):
             player.give_resources( self._input )

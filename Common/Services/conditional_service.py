@@ -1,4 +1,4 @@
-from typing import List, Dict, Iterable, Callable, TypeVar
+from typing import List, Dict, Iterable, Callable, Union
 
 from buisness_logic.effects import action_effects
 from buisness_logic.effects.action_effects import ChangeDecisionVerb
@@ -7,7 +7,6 @@ from core.enums.caverna_enums import ActionCombinationEnum
 from common.entities.multiconditional import Conditional
 from common.entities.player import Player
 
-T = TypeVar('T', BaseAction, Conditional)
 
 class ConditionalService(object):
 
@@ -23,7 +22,10 @@ class ConditionalService(object):
             ActionCombinationEnum.Or: self._combine_or,
             ActionCombinationEnum.AndThen: self._combine_and_then}
 
-    def get_possible_choices(self, conditional: T, player: Player = None) -> List[List[BaseAction]]:
+    def get_possible_choices(
+            self,
+            conditional: Union[Conditional, BaseAction],
+            player: Player = None) -> List[List[BaseAction]]:
         """recurse through the conditional tree in order to find which possible action choices the agent may make
         
         params: 

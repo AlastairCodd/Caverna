@@ -17,25 +17,26 @@ class Dwarf(object):
         return self._weapon
 
     @property
+    def has_weapon(self) -> bool:
+        result = self._weapon is None
+        return result
+
+    @property
     def weapon_level(self) -> int:
         if self._weapon is None:
             return 0
         return self._weapon.level
 
     @property
-    def has_weapon(self) -> bool:
-        result = self._weapon is None
-        return result
-
-    @property
     def is_active(self) -> bool:
         is_active = self._current_card is None
         return is_active
 
+    @property
     def current_card_id(self) -> int:
         if self._current_card is None:
             return -1
-        return self._current_card._id
+        return self._current_card.id
 
     def make_adult(self):
         self._is_adult = True
@@ -46,14 +47,14 @@ class Dwarf(object):
 
         self._weapon = weapon
 
-    def set_active(self, current_card):
-        if current_card is None:
+    def set_active(self, new_card: BaseCard):
+        if new_card is None:
             raise ValueError("current card must not be none")
 
         if self._current_card is not None:
             raise ValueError("already active")
 
-        self._current_card = current_card
+        self._current_card = new_card
 
     def clear_active_card(self):
         self._current_card = None

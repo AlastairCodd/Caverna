@@ -17,7 +17,7 @@ class When_Called(unittest.TestCase):
     def test_Then_Player_Should_Have_4_Wood(self):
         self.assertEqual(
             self._player
-                .get_resources()
+                .resources
                 .get(ResourceTypeEnum.wood),
             4 )
                 

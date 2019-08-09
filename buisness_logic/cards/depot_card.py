@@ -9,8 +9,8 @@ class DepotCard(BaseCard, ResourceContainer):
 
     def __init__(self):
         BaseCard.__init__(
-            self, "Depot", 1, -1,
-            takeAccumulatedItemsAction.TakeAccumulatedItemsAction())
+            self, "Depot", 1,
+            actions=takeAccumulatedItemsAction.TakeAccumulatedItemsAction())
         ResourceContainer.__init__(self)
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
@@ -19,4 +19,4 @@ class DepotCard(BaseCard, ResourceContainer):
             ResourceTypeEnum.ore: 2}
         self.give_resources(newResources)
 
-        return self.get_resources()
+        return self.resources

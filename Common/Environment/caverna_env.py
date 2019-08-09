@@ -11,6 +11,10 @@ from core.baseClasses.base_card import BaseCard
 
 class CavernaEnv(Env):
     """Environment for running caverna games"""
+
+    def render(self, mode='human'):
+        pass
+
     def __init__(self, number_of_players: int = 7):
         """Ctor
         
@@ -41,7 +45,7 @@ class CavernaEnv(Env):
         
         card_creator = CardCreator()
         self._cards = card_creator.create_all_cards()
-        self._active_cards = [x for x in self._cards if x.level() == -1]
+        self._active_cards = [x for x in self._cards if x.level == -1]
         
         return self.observe()
 
@@ -93,7 +97,7 @@ class CavernaEnv(Env):
         return result
 
     def _observe_player(self, player: Player) -> array:
-        player_observation = array(player.get_resources())
+        player_observation = array(player.resources)
         for i in range(self._max_dwarves):
             dwarf = player.dwarves[i] if i <= len(player.dwarves) - 1 else None
             player_observation = concatenate(player_observation, self._observe_dwarf(dwarf), axis=None)

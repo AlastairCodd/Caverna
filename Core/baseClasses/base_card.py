@@ -1,4 +1,5 @@
-from typing import List, TypeVar, Generic, Union
+from typing import Dict, Iterable, Union, List
+
 from common.entities.multiconditional import Conditional
 from common.entities.player import Player
 from core.baseClasses.base_action import BaseAction
@@ -6,9 +7,7 @@ from common.entities.dwarf import Dwarf
 from common.services.conditional_service import ConditionalService
 
 
-
 class BaseCard(object):
-
     def __init__(
             self,
             name: str,
@@ -26,7 +25,7 @@ class BaseCard(object):
         return self._id
 
     @property
-    def level(self):
+    def level(self) -> int:
         return self._level
 
     @property
@@ -44,7 +43,8 @@ class BaseCard(object):
         if player is None: raise ValueError("player")
         if dwarf is None: raise ValueError("dwarf")
         if dwarf.is_active: raise ValueError("dwarf cannot already be active")
-        if self.is_active: return False
+
+        if self._isActive: return False
 
         conditional_service: ConditionalService = ConditionalService()
 
@@ -58,4 +58,4 @@ class BaseCard(object):
         return True
 
     def make_available(self):
-        self._isActive = True
+        self._isActive = False

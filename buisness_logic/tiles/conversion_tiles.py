@@ -63,10 +63,9 @@ class BeerParlorTile(BaseTile):
         super().__init__(
             "Beer Parlor", 34, False, 3,
             {ResourceTypeEnum.wood: 2},
-            [
-                conversion_effects.Convert(
-                    {ResourceTypeEnum.grain: 2},
-                    {ResourceTypeEnum.coin: 3}),
+            [conversion_effects.Convert(
+                {ResourceTypeEnum.grain: 2},
+                {ResourceTypeEnum.coin: 3}),
                 conversion_effects.Convert(
                     {ResourceTypeEnum.grain: 2},
                     {ResourceTypeEnum.food: 4})])

@@ -1,17 +1,18 @@
 from enum import Enum, auto
 
+
 class ResourceTypeEnum(Enum):
     stone = auto()
     wood = auto()
     ore = auto()
     ruby = auto()
-    
+
     coin = auto()
     food = auto()
-    
+
     grain = auto()
     veg = auto()
-    
+
     sheep = auto()
     donkey = auto()
     cow = auto()
@@ -19,6 +20,7 @@ class ResourceTypeEnum(Enum):
     dog = auto()
 
     begging_marker = auto()
+
 
 class TileTypeEnum(Enum):
     unavailable = auto()
@@ -39,28 +41,33 @@ class TileTypeEnum(Enum):
     oreMineDeepTunnelTwin = auto()
     rubyMine = auto()
     stable = auto()
-    
+
+
 class TileDimensionEnum(Enum):
     oneByOne = auto()
     twoByOne = auto()
+
 
 class TileDirectionEnum(Enum):
     up = auto()
     right = auto()
     down = auto()
     left = auto()
-    
+
+
 class ActionCombinationEnum(Enum):
     EitherOr = auto()
     AndOr = auto()
     AndThenOr = auto()
     Or = auto()
     AndThen = auto()
-    
+
+
 class TriggerStateEnum(Enum):
     StartOfTurn = auto()
     OnPurchase = auto()
     UserChoice = auto()
+
 
 class TileColourEnum(Enum):
     Brown = auto()

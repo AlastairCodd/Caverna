@@ -6,6 +6,7 @@ class ResourceContainer(object):
     def __init__(self):
         self._resources: Dict[ResourceTypeEnum, int] = {}
 
+    @property
     def has_resources(self) -> bool:
         if self._resources is None:
             return False
@@ -16,7 +17,8 @@ class ResourceContainer(object):
 
         return result
 
-    def get_resources(self) -> Dict[ResourceTypeEnum, int]:
+    @property
+    def resources(self) -> Dict[ResourceTypeEnum, int]:
         result = {
             ResourceTypeEnum.stone: self._resources.get(ResourceTypeEnum.stone, 0),
             ResourceTypeEnum.wood: self._resources.get(ResourceTypeEnum.wood, 0),

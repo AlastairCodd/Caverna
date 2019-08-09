@@ -1,17 +1,18 @@
 from typing import Dict
+
+from common.entities.multiconditional import Conditional
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
 from core.containers.resource_container import ResourceContainer
-from common.entities.multicombination import Combination
 from buisness_logic.actions import *
 
 
-class ClearingCard(ResourceContainer, BaseCard):
+class ClearingCard(BaseCard, ResourceContainer):
 
     def __init__(self):
         BaseCard.__init__(
-            self, "Clearing", 0, -1,
-            Combination(
+            self, "Clearing", 0,
+            actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
                 takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
                 placeATileAction.PlaceATileAction(TileTypeEnum.meadowFieldTwin)))
@@ -20,4 +21,4 @@ class ClearingCard(ResourceContainer, BaseCard):
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         self.give_resource(ResourceTypeEnum.wood, 2)
 
-        return self.get_resources()
+        return self.resources
