@@ -5,22 +5,23 @@ from core.containers.resource_container import ResourceContainer
 from common.entities.multicombination import Combination
 from buisness_logic.actions import *
 
+
 class ExcavationCard(BaseCard, ResourceContainer):
-    
+
     def __init__(self):
-        self._name = "Excavation"
-        self._id = 4
-        self._level = -1
-        self._actions = Combination( 
-            ActionCombinationEnum.AndThen,
-            takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
-            Combination( 
-                ActionCombinationEnum.Or,
-                placeATileAction.PlaceATileAction( TileTypeEnum.cavernTunnelTwin ),
-                placeATileAction.PlaceATileAction( TileTypeEnum.cavernCavernTwin ) ) )
-        
+        BaseCard.__init__(
+            self, "Excavation", 4, -1,
+            Combination(
+                ActionCombinationEnum.AndThen,
+                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+                Combination(
+                    ActionCombinationEnum.Or,
+                    placeATileAction.PlaceATileAction(TileTypeEnum.cavernTunnelTwin),
+                    placeATileAction.PlaceATileAction(TileTypeEnum.cavernCavernTwin))))
+        ResourceContainer.__init__(self)
+
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
-        newResources = {ResourceTypeEnum.stone: 1} if self.HasResources() else {ResourceTypeEnum.stone: 2}
-        self.GiveResources(newResources)
-        
-        return self.GetResources()
+        newResources = {ResourceTypeEnum.stone: 1} if self.has_resources() else {ResourceTypeEnum.stone: 2}
+        self.give_resources(newResources)
+
+        return self.get_resources()

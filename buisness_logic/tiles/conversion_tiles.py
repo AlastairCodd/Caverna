@@ -45,7 +45,7 @@ class PeacefulCaveTile(BaseTile):
             [conversion_effects.ConvertProportional(
                 [weapon.Weapon],
                 [ResourceTypeEnum.food],
-                lambda x: x.GetLevel())])
+                lambda x: x.level())])
 
 
 class HuntingParlorTile(BaseTile):
