@@ -1,44 +1,61 @@
-from typing import Dict, Iterable
-from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
+from typing import List, TypeVar, Generic, Union
+from common.entities.multiconditional import Conditional
+from common.entities.player import Player
 from core.baseClasses.base_action import BaseAction
 from common.entities.dwarf import Dwarf
 from common.services.conditional_service import ConditionalService
 
+
+
 class BaseCard(object):
 
-    def __init__(self):
-        self._name: str = "Uninitialised"
-        self._id: int = -1
-        self._level: int = -1
-        self._actions: None
+    def __init__(
+            self,
+            name: str,
+            card_id: int,
+            level: int = -1,
+            actions: Union[BaseAction, Conditional] = None):
+        self._name: str = name
+        self._id: int = card_id
+        self._level: int = level
+        self._actions: Union[BaseAction, Conditional] = actions
         self._isActive = False
-    
-    def activate_card(
-            self, 
-            player,
-            dwarf: Dwarf ) -> bool:
-        if player is None: raise ValueError("player")    
-        if dwarf is None: raise ValueError("dwarf")    
-        if dwarf.get_is_active: raise ValueError("dwarf cannot already be active")
-        
-        conditional_service = ConditionalService()
-        
-        actionChoices: Iterable[BaseAction] = ConditionalService.get_possible_choices( self._actions )
-        
-        player.get_player_choice
 
-        for action in self._actions:
-            action.invoke(player, self)
-        dwarf.set_active(self)
-        
-    def get_level(self):
+    @property
+    def id(self) -> int:
+        return self._id
+
+    @property
+    def level(self):
         return self._level
-        
+
+    @property
     def is_active(self):
-        return self._isActive;
-        
+        return self._isActive
+
+    @property
     def is_available(self):
         return not self._isActive
-        
+
+    def activate_card(
+            self,
+            player: Player,
+            dwarf: Dwarf) -> bool:
+        if player is None: raise ValueError("player")
+        if dwarf is None: raise ValueError("dwarf")
+        if dwarf.is_active: raise ValueError("dwarf cannot already be active")
+        if self.is_active: return False
+
+        conditional_service: ConditionalService = ConditionalService()
+
+        action_choices: List[List[BaseAction]] = conditional_service.get_possible_choices(self._actions)
+
+        chosen_action_choice: List[BaseAction] = player.get_player_choice(action_choices)
+
+        for action in chosen_action_choice:
+            action.invoke(player, self)
+        dwarf.set_active(self)
+        return True
+
     def make_available(self):
         self._isActive = True

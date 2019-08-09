@@ -1,6 +1,6 @@
 from typing import Tuple, Dict, List
 from gym import Env
-from numpy import array
+from numpy import array, concatenate
 from common.creators.card_creator import CardCreator
 from common.defaults.players_default import PlayersDefault
 from common.entities.dwarf import Dwarf
@@ -41,7 +41,7 @@ class CavernaEnv(Env):
         
         card_creator = CardCreator()
         self._cards = card_creator.create_all_cards()
-        self._active_cards = [x for x in self._cards if x.get_level() == -1]
+        self._active_cards = [x for x in self._cards if x.level() == -1]
         
         return self.observe()
 
@@ -93,9 +93,14 @@ class CavernaEnv(Env):
         return result
 
     def _observe_player(self, player: Player) -> array:
-        player_observation = array()
+        player_observation = array(player.get_resources())
+        for i in range(self._max_dwarves):
+            dwarf = player.dwarves[i] if i <= len(player.dwarves) - 1 else None
+            player_observation = concatenate(player_observation, self._observe_dwarf(dwarf), axis=None)
+
         return player_observation
 
     def _observe_dwarf(self, dwarf: Dwarf) -> array:
         if dwarf is None: return array([0, 0, 0, 0])
-        dwarf_observation = array([dwarf.is_active(), dwarf.is_adult(), dwarf.get_weapon()])
+        dwarf_observation = array([dwarf.is_active, dwarf.is_adult, dwarf.weapon.level, dwarf.current_card_id])
+        return dwarf_observation

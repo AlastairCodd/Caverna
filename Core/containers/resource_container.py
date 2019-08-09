@@ -10,11 +10,11 @@ class ResourceContainer(object):
         if self._resources is None:
             return False
 
-        any = False
+        result = False
         for resource in self._resources:
-            any |= self._resources[resource] != 0
+            result |= self._resources[resource] != 0
 
-        return any
+        return result
 
     def get_resources(self) -> Dict[ResourceTypeEnum, int]:
         result = {
@@ -35,49 +35,45 @@ class ResourceContainer(object):
         return result
 
     def get_resources_of_type(self, resource_type: ResourceTypeEnum) -> int:
-        result = self._resources.get(type, 0)
+        result = self._resources.get(resource_type, 0)
         return result
 
-    def give_resource(self, type: ResourceTypeEnum, amount: int) -> bool:
+    def give_resource(self, resource_type: ResourceTypeEnum, amount: int) -> bool:
         if amount < 0:
-            # raise ValueError("amount")
             return False
 
-        currentAmount = self._resources.setdefault(type, 0)
-        self._resources[type] = currentAmount + amount
+        current_amount = self._resources.setdefault(type, 0)
+        self._resources[resource_type] = current_amount + amount
         return True
 
     def give_resources(self, resources: Dict[ResourceTypeEnum, int]) -> bool:
         if resources is None:
-            # raise ValueError("resources")
             return False
 
-        any = True
+        success = True
         for resource in resources:
-            any &= self.give_resource(resource, resources[resource])
-        return any
+            success &= self.give_resource(resource, resources[resource])
+        return success
 
-    def take_resource(self, type: ResourceTypeEnum, amount: int) -> bool:
+    def take_resource(self, resource_type: ResourceTypeEnum, amount: int) -> bool:
         if amount < 0:
-            # raise ValueError("amount")
             return False
 
-        currentAmount = self._resources.setdefault(type, 0)
-        if currentAmount < amount:
+        current_amount = self._resources.setdefault(resource_type, 0)
+        if current_amount < amount:
             return False
 
-        self._resources[type] = currentAmount - amount
+        self._resources[resource_type] = current_amount - amount
         return True
 
     def take_resources(self, resources: Dict[ResourceTypeEnum, int]) -> bool:
         if resources is None:
-            # raise ValueError("resources")
             return False
 
-        any = True
+        success = True
         for resource in resources:
-            any &= self.give_resource(resource, resources[resource])
-        return any
+            success &= self.give_resource(resource, resources[resource])
+        return success
 
     def clear_resources(self) -> bool:
         for resource in self._resources:

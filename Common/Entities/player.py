@@ -7,27 +7,35 @@ from core.enums.caverna_enums import ResourceTypeEnum
 
 class Player(TileContainer, ResourceContainer):
 
-    def __init__(self, id: int, turnIndex: int):
-        self._id = id
-        self._turnIndex = turnIndex
+    def __init__(self, player_id: int, turnIndex: int):
+        self._id: int = player_id
+        self._turnIndex: int = turnIndex
 
         self._dwarves: List[Dwarf] = [Dwarf(True), Dwarf(True)]
-        self._resources: Dict[ResourceTypeEnum, int] = {}
 
-        super().__init__()
+        TileContainer.__init__(self)
+        ResourceContainer.__init__(self)
+
+    @property
+    def id(self) -> int:
+        return self._id
+
+    @property
+    def dwarves(self) -> List[Dwarf]:
+        return list(self._dwarves)
 
     def set_turn_index(self, turnIndex: int):
         self._turnIndex = turnIndex
 
     def give_baby_dwarf(self):
-        babyDwarf: Dwarf = Dwarf()
+        baby_dwarf: Dwarf = Dwarf()
 
-        self._dwarves.append(babyDwarf)
+        self._dwarves.append(baby_dwarf)
 
     def can_take_move(self) -> bool:
         """Determines whether this player can still make a move this turn"""
-        isDwarfActive: Iterable[bool] = map(lambda x: not x.is_active(), self._dwarves)
-        return any(isDwarfActive)
+        is_dwarf_active: Iterable[bool] = map(lambda x: not x.is_active(), self._dwarves)
+        return any(is_dwarf_active)
 
     def get_player_choice(self, action):
         """Gets a player response for the given action. 
@@ -36,10 +44,6 @@ class Player(TileContainer, ResourceContainer):
         Returns relevant information to allow the calling action to change the player or board state based in accordance with the action"""
         raise NotImplementedError()
 
-    @property
-    def id(self):
-        return self._id
-
-    @property
-    def dwarves(self) -> List[Dwarf]:
-        return list(self._dwarves)
+    def start_new_turn(self):
+        for dwarf in self._dwarves:
+            dwarf.make_adult()
