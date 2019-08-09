@@ -6,16 +6,18 @@ class ResourceContainer(object):
     def __init__(self):
         self._resources: Dict[ResourceTypeEnum, int] = {}
 
+    @property
     def has_resources(self) -> bool:
         if self._resources is None:
             return False
 
-        any = False
+        result = False
         for resource in self._resources:
-            any |= self._resources[resource] != 0
+            result |= self._resources[resource] != 0
 
-        return any
+        return result
 
+    @property
     def get_resources(self) -> Dict[ResourceTypeEnum, int]:
         result = {
             ResourceTypeEnum.stone: self._resources.get(ResourceTypeEnum.stone, 0),
@@ -52,10 +54,10 @@ class ResourceContainer(object):
             # raise ValueError("resources")
             return False
 
-        any = True
+        result = True
         for resource in resources:
-            any &= self.give_resource(resource, resources[resource])
-        return any
+            result &= self.give_resource(resource, resources[resource])
+        return result
 
     def take_resource(self, type: ResourceTypeEnum, amount: int) -> bool:
         if amount < 0:
@@ -74,10 +76,10 @@ class ResourceContainer(object):
             # raise ValueError("resources")
             return False
 
-        any = True
+        result = True
         for resource in resources:
-            any &= self.give_resource(resource, resources[resource])
-        return any
+            result &= self.give_resource(resource, resources[resource])
+        return result
 
     def clear_resources(self) -> bool:
         for resource in self._resources:
