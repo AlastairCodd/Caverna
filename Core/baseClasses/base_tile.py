@@ -50,3 +50,7 @@ class BaseTile(object):
     @property
     def location(self) -> int:
         return self._location
+
+    @property
+    def colour(self) -> TileColourEnum:
+        return TileColourEnum

@@ -15,7 +15,7 @@ class PlayersDefault(object):
         playersList.clear()
         
         for x in range(self._numberOfPlayers)
-            player_x = player.Player( id = x, turnIndex = x )
+            player_x = player.Player(id = x, turn_index= x)
             player_x.give_resource( ResourceTypeEnum.food, self._initialFood[x] )
             playersList.append( player_x )
            

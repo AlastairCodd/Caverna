@@ -11,10 +11,6 @@ from core.baseClasses.base_card import BaseCard
 
 class CavernaEnv(Env):
     """Environment for running caverna games"""
-
-    def render(self, mode='human'):
-        pass
-
     def __init__(self, number_of_players: int = 7):
         """Ctor
         
@@ -49,6 +45,9 @@ class CavernaEnv(Env):
         
         return self.observe()
 
+    def render(self, mode='human'):
+        pass
+
     def step(self, action) -> Tuple[array, float, bool, Dict]:
         """Takes an action service (either the output of a network or a delayed decision maker)
         and applies the actions to get the next state
@@ -58,7 +57,8 @@ class CavernaEnv(Env):
             float: the reward for the last action
             bool: whether or not the game has finished
             dict: additional debug information"""
-        if action is None: raise ValueError("action")
+        if action is None:
+            raise ValueError("action")
 
         # get dwarf from player
 
@@ -76,7 +76,7 @@ class CavernaEnv(Env):
     def _create_player_turn_order(self) -> List[Player]:
         player_dwarf_count: Dict[int, int] = {p.id: 0 for p in self._players}
         player_turn_order: List[Player] = []
-        players_with_more_dwarves: List[bool] = [True for p in self._players]
+        players_with_more_dwarves: List[bool] = [True for _ in self._players]
         while any(players_with_more_dwarves):
             # for each player, starting at starting player
             for current_player in self._get_players_starting_at(self._starting_player.id):
@@ -98,7 +98,7 @@ class CavernaEnv(Env):
 
     def _observe_player(self, player: Player) -> array:
         player_observation = array(player.resources)
-        for i in range(self._max_dwarves):
+        for i in range(6):
             dwarf = player.dwarves[i] if i <= len(player.dwarves) - 1 else None
             player_observation = concatenate(player_observation, self._observe_dwarf(dwarf), axis=None)
 

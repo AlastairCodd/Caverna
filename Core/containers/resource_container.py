@@ -44,7 +44,7 @@ class ResourceContainer(object):
         if amount < 0:
             return False
 
-        current_amount = self._resources.setdefault(type, 0)
+        current_amount = self._resources.setdefault(resource_type, 0)
         self._resources[resource_type] = current_amount + amount
         return True
 

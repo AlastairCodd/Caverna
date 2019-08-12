@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Callable
+from typing import Dict, List
 import math
 
 from common.entities.point_entity import PointEntity
@@ -13,12 +13,12 @@ from buisness_logic.effects import *
 
 class BaseConditionalPointTile(BaseTile, ABC):
     def __init__(
-            self, 
-            name: str, 
+            self,
+            name: str,
             tile_id: int,
             is_dwelling: bool = False,
             base_points: int = 0,
-                 cost: Dict[ResourceTypeEnum, int] = None, 
+            cost: Dict[ResourceTypeEnum, int] = None,
             effects: List[BaseEffect] = None):
         if effects is None:
             effects = []
@@ -66,15 +66,15 @@ class StateParlorTile(BaseConditionalPointTile):
         if player is None:
             raise ValueError(str(player))
 
-        adjacentTileLocations = player.get_adjacent_tiles(self.location)
-        adjacentTiles = [
+        adjacent_tile_locations = player.get_adjacent_tiles(self.location)
+        adjacent_tiles = [
             player.get_tile_at_location(t)
             for t
             in map(
-                lambda locationDirectionPair: locationDirectionPair[0],
-                adjacentTileLocations)]
-        numberOfAdjacentDwellings = len([d for d in adjacentTiles if d.is_dwelling])
-        result = 4 * numberOfAdjacentDwellings
+                lambda location_direction_pair: location_direction_pair[0],
+                adjacent_tile_locations)]
+        number_of_adjacent_dwellings = len([d for d in adjacent_tiles if d.is_dwelling])
+        result = 4 * number_of_adjacent_dwellings
         return PointEntity(result)
 
 
@@ -105,7 +105,7 @@ class MainStorageTile(BaseConditionalPointTile):
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
             raise ValueError(str(player))
-        return PointEntity(len( [t for t in player.get_tiles() if t.colour == TileColourEnum.Yellow]))
+        return PointEntity(len([t for t in player.get_tiles() if t.colour == TileColourEnum.Yellow]))
 
 
 class WeaponStorageTile(BaseConditionalPointTile):
@@ -140,10 +140,10 @@ class BroomChamberTile(BaseConditionalPointTile):
         if player is None:
             raise ValueError(str(player))
 
-        numberOfDwarfs = len(player.dwarves)
-        if numberOfDwarfs == 5:
+        number_of_dwarfs = len(player.dwarves)
+        if number_of_dwarfs == 5:
             return PointEntity(5)
-        elif numberOfDwarfs == 6:
+        elif number_of_dwarfs == 6:
             return PointEntity(10)
         else:
             return PointEntity()
@@ -198,11 +198,12 @@ class FodderChamberTile(BaseConditionalPointTile):
         super().__init__("Fodder Chamber", 47, cost={ResourceTypeEnum.grain: 2, ResourceTypeEnum.stone: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
-        if player is None: raise ValueError(str(player))
+        if player is None:
+            raise ValueError(str(player))
         default = FarmAnimalResourceTypeDefault()
-        farmAnimals: List[ResourceTypeEnum] = default.assign([])
-        playersFarmAnimals: List[int] = [player.resources[x] for x in farmAnimals]
-        numberOfFarmAnimals: int = sum(playersFarmAnimals)
-        result: int = math.floor(numberOfFarmAnimals / 3)
+        farm_animals: List[ResourceTypeEnum] = default.assign([])
+        players_farm_animals: List[int] = [player.resources[x] for x in farm_animals]
+        number_of_farm_animals: int = sum(players_farm_animals)
+        result: int = math.floor(number_of_farm_animals / 3)
 
         return PointEntity(result)
