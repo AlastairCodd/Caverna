@@ -1,6 +1,6 @@
 from typing import Tuple, Dict, List
 from gym import Env
-from numpy import array, concatenate
+from numpy import argmax, array, concatenate
 from common.creators.card_creator import CardCreator
 from common.defaults.players_default import PlayersDefault
 from common.entities.dwarf import Dwarf
@@ -26,7 +26,6 @@ class CavernaEnv(Env):
         self._current_player: Player = self._players[0]
         self._starting_player: Player = self._players[0]
         self._cards: List[BaseCard] = []
-        self._active_cards: List[BaseCard] = []
 
         self._point_calculation_service = PointCalculationService()
     
@@ -41,8 +40,7 @@ class CavernaEnv(Env):
         
         card_creator = CardCreator()
         self._cards = card_creator.create_all_cards()
-        self._active_cards = [x for x in self._cards if x.level == -1]
-        
+
         return self.observe()
 
     def render(self, mode='human'):
@@ -61,9 +59,16 @@ class CavernaEnv(Env):
             raise ValueError("action")
 
         # get dwarf from player
+        chosen_dwarf = self._current_player.dwarves[0]
+
+        all_actions: List[Tuple[BaseCard, Action]] = []
 
         # filter action to get card
-        available_choices = [for c in self._active_cards if c.is_available()]
+        for card in self._cards:
+            for choice in conditional_service.get_possible_choices(card):
+                all_actions.append((card, choice))
+
+        choice = all_actions[argmax(action[0:len(all_actions)])]
 
         player_points: int = self._point_calculation_service.calculate_points(self._current_player)
         return array([]), player_points, False, {}
