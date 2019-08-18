@@ -1,6 +1,5 @@
-from Core.baseAction import BaseAction
-from Core.baseCard import BaseCard
-from player import Player
+from core.baseClasses.base_action import BaseAction
+
 
 class GetABabyDwarfAction(BaseAction):
 	def Invoke(
