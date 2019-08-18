@@ -46,7 +46,7 @@ class CavernaEnv(Env):
     def render(self, mode='human'):
         pass
 
-    def step(self, action) -> Tuple[array, float, bool, Dict]:
+    def step(self, action: array) -> Tuple[array, float, bool, Dict]:
         """Takes an action service (either the output of a network or a delayed decision maker)
         and applies the actions to get the next state
         
@@ -68,7 +68,13 @@ class CavernaEnv(Env):
             for choice in conditional_service.get_possible_choices(card):
                 all_actions.append((card, choice))
 
-        choice = all_actions[argmax(action[0:len(all_actions)])]
+        action_choice_segment: array = action[0:len(all_actions)]
+
+        chosen_card: BaseCard
+        chosen_action: BaseAction
+        chosen_card, chosen_action = all_actions[int(argmax(action_choice_segment))]
+
+        chosen_card.activate_card(self._current_player, chosen_card, chosen_action)
 
         player_points: int = self._point_calculation_service.calculate_points(self._current_player)
         return array([]), player_points, False, {}

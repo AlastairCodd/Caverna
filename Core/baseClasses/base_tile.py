@@ -1,9 +1,10 @@
+from abc import ABC
 from typing import Dict, List
 from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum
 from core.baseClasses.base_effect import BaseEffect
 
 
-class BaseTile(object):
+class BaseTile(object, ABC):
 
     def __init__(
             self,
@@ -53,4 +54,4 @@ class BaseTile(object):
 
     @property
     def colour(self) -> TileColourEnum:
-        return TileColourEnum
+        return self._color

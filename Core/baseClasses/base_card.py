@@ -1,5 +1,5 @@
-from typing import Dict, Iterable, Union, List
-
+from abc import ABC
+from typing import Union, List
 from common.entities.multiconditional import Conditional
 from common.entities.player import Player
 from core.baseClasses.base_action import BaseAction
@@ -7,7 +7,7 @@ from common.entities.dwarf import Dwarf
 from common.services.conditional_service import ConditionalService
 
 
-class BaseCard(object):
+class BaseCard(object, ABC):
     def __init__(
             self,
             name: str,
@@ -39,23 +39,30 @@ class BaseCard(object):
     def activate_card(
             self,
             player: Player,
-            dwarf: Dwarf) -> bool:
-        if player is None: raise ValueError("player")
-        if dwarf is None: raise ValueError("dwarf")
-        if dwarf.is_active: raise ValueError("dwarf cannot already be active")
+            dwarf: Dwarf,
+            action_choice: List[BaseAction]) -> bool:
+        if player is None:
+            raise ValueError("player")
+        if dwarf is None:
+            raise ValueError("dwarf")
+        if dwarf.is_active:
+            raise ValueError("dwarf cannot already be active")
 
-        if self._isActive: return False
+        if self._isActive:
+            return False
 
         conditional_service: ConditionalService = ConditionalService()
 
-        action_choices: List[List[BaseAction]] = conditional_service.get_possible_choices(self._actions)
+        possible_choices: List[List[BaseAction]] = conditional_service\
+            .get_possible_choices(self._actions, player)
 
-        chosen_action_choice: List[BaseAction] = player.get_player_choice(action_choices)
+        success: bool = action_choice in possible_choices
 
-        for action in chosen_action_choice:
-            action.invoke(player, self)
-        dwarf.set_active(self)
-        return True
+        if success:
+            for action in action_choice:
+                action.invoke(player, self)
+            dwarf.set_active(self)
+        return success
 
     def make_available(self):
         self._isActive = False
