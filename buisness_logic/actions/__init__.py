@@ -1,11 +1,10 @@
 __all__ = [
-"becomeStartingPlayerAction",
-"buyFromMarketAction",
-"getABabyDwarfAction",
-"goOnAnExpeditionAction",
-"payAction",
-"placeATileAction",
-"receiveAction",
-"sowAction",
-"takeAccumulatedItemsAction",
-"useAnotherCardAction" ]
+    "becomeStartingPlayerAction",
+    "getABabyDwarfAction",
+    "goOnAnExpeditionAction",
+    "payAction",
+    "placeATileAction",
+    "receiveAction",
+    "sowAction",
+    "takeAccumulatedItemsAction",
+    "useAnotherCardAction"]

@@ -1,12 +1,11 @@
 from common.entities.weapon import Weapon
-from core.baseClasses.base_card import BaseCard
 
 
 class Dwarf(object):
     def __init__(self, is_adult: bool = False):
         self._is_adult: bool = is_adult
         self._weapon: Weapon = None
-        self._current_card: BaseCard = None
+        self._current_card = None
 
     @property
     def is_adult(self) -> bool:
@@ -47,7 +46,7 @@ class Dwarf(object):
 
         self._weapon = weapon
 
-    def set_active(self, new_card: BaseCard):
+    def set_active(self, new_card):
         if new_card is None:
             raise ValueError("current card must not be none")
 

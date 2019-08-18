@@ -11,21 +11,21 @@ class ReceiveConditionallyAction(ReceiveAction):
     def __init__(
         self, 
         condition: Callable[[Player, BaseCard], bool], 
-        receiveItems: Dict[ResourceTypeEnum, int]):
+        receive_items: Dict[ResourceTypeEnum, int]):
         if condition is None:
             raise ValueError("condition")
         self._condition = condition
-        super(ReceiveConditionallyAction, self).__init__(receiveItems)
+        super(ReceiveConditionallyAction, self).__init__(receive_items)
 
     def invoke(
         self,
         player: Player,
-        activeCard: BaseCard ) -> bool:
+        active_card: BaseCard ) -> bool:
         if player is None:
             raise ValueError("player")
-        if activeCard is None:
+        if active_card is None:
             raise ValueError("activeCard")
         
-        if self._condition(player, activeCard):
-            return super(ReceiveConditionallyAction, self).invoke(player, activeCard)
+        if self._condition(player, active_card):
+            return super(ReceiveConditionallyAction, self).invoke(player, active_card)
         return False
