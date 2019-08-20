@@ -10,7 +10,7 @@ class WeeklyMarketCard(BaseCard):
         BaseCard.__init__(
             self, "Weekly Market", 20,
             actions=Conditional(
-                ActionCombinationEnum.AndThenOr,
+                ActionCombinationEnum.AndOr,
                 receiveAction.ReceiveAction({ResourceTypeEnum.coin: 4}),
                 Conditional(  # 9
                     ActionCombinationEnum.AndOr,
