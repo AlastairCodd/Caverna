@@ -1,11 +1,9 @@
 from typing import List, Dict, Iterable, Callable, Union
-
-from buisness_logic.effects import action_effects
 from buisness_logic.effects.action_effects import ChangeDecisionVerb
 from core.baseClasses.base_action import BaseAction
+from core.containers.tile_container import TileContainer
 from core.enums.caverna_enums import ActionCombinationEnum
 from common.entities.multiconditional import Conditional
-from common.entities.player import Player
 
 
 def _combine_and_then(left: Iterable[List[BaseAction]], right: Iterable[List[BaseAction]]) \
@@ -164,14 +162,14 @@ class ConditionalService(object):
     def get_possible_choices(
             self,
             conditional: Union[Conditional, BaseAction],
-            player: Player = None) -> List[List[BaseAction]]:
+            tile_container: TileContainer = None) -> List[List[BaseAction]]:
         """recurse through the conditional tree in order to find which possible action choices the agent may make
-        
-        params: 
+
+        params:
             conditional. Either a conditional object or an action. This cannot be null
             player (optional):
-        
-        returns: 
+
+        returns:
             a list containing all possible (base) actions which can be take. This will never be null."""
         if conditional is None:
             raise ValueError("conditional")
@@ -180,12 +178,13 @@ class ConditionalService(object):
         if not isinstance(conditional, Conditional):
             raise ValueError("input must be either multiconditional.Conditional or baseAction.BaseAction")
 
-        left: List[List[BaseAction]] = self.get_possible_choices(conditional.get_left_branch(), player)
-        right: List[List[BaseAction]] = self.get_possible_choices(conditional.get_right_branch(), player)
+        left: List[List[BaseAction]] = self.get_possible_choices(conditional.get_left_branch(), tile_container)
+        right: List[List[BaseAction]] = self.get_possible_choices(conditional.get_right_branch(), tile_container)
 
         combination_type = conditional.get_combination_type()
-        if player is not None:
-            change_decision_effects: Iterable[ChangeDecisionVerb] = player.get_effects_of_type(ChangeDecisionVerb)
+        if tile_container is not None:
+            change_decision_effects: Iterable[ChangeDecisionVerb] = \
+                tile_container.get_effects_of_type(ChangeDecisionVerb)
             for change_decision_effect in change_decision_effects:
                 combination_type = change_decision_effect.invoke(combination_type)
 
