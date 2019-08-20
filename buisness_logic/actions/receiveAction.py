@@ -1,8 +1,9 @@
 from typing import Dict
-from core.enums.caverna_enums import ResourceTypeEnum
-from core.baseClasses.base_card import BaseCard
-from core.baseClasses.base_action import BaseAction
+
 from common.entities.player import Player
+from core.containers.resource_container import ResourceContainer
+from core.enums.caverna_enums import ResourceTypeEnum
+from core.baseClasses.base_action import BaseAction
 
 
 class ReceiveAction(BaseAction):
@@ -11,15 +12,23 @@ class ReceiveAction(BaseAction):
             raise ValueError("receiveItems")
         self._receiveItems: Dict[ResourceTypeEnum, int] = receive_items
 
-    def invoke(
-            self,
-            player: Player,
-            active_card: BaseCard) -> bool:
+    def invoke(self, player: Player, active_card: ResourceContainer) -> bool:
         if player is None:
             raise ValueError("player")
 
         return player.give_resources(self._receiveItems)
 
+    def new_turn_reset(self):
+        pass
+
     def __str__(self) -> str:
-        result = f"ReceiveAction({self._receiveItems})"
+        result = "ReceiveAction("
+        count = 0
+        for resource in self._receiveItems:
+            result += f"{resource.name}: {self._receiveItems[resource]}"
+            count += 1
+            if count != len(self._receiveItems):
+                result += ", "
+        result += ")"
+
         return result

@@ -1,14 +1,14 @@
+from typing import Dict
 from core.baseClasses.base_action import BaseAction
-from core.baseClasses.base_card import BaseCard
-from common.entities.player import Player
+from core.enums.caverna_enums import ResourceTypeEnum
+
 
 class UseAnotherCardAction(BaseAction):
 
-    def invoke(
-        self,
-        player: Player,
-        activeCard: BaseCard ) -> bool:
+    def invoke(self, player: Player active_card: Dict[ResourceTypeEnum, int]) -> bool:
         if player is None:
-            raise ValueException("player")
-        raise NotImplementedException
-        
+            raise ValueError("player")
+        raise NotImplementedError
+
+    def new_turn_reset(self):
+        pass

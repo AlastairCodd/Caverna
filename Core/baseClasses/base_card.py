@@ -7,7 +7,7 @@ from common.entities.dwarf import Dwarf
 from common.services.conditional_service import ConditionalService
 
 
-class BaseCard(object, ABC):
+class BaseCard(ABC):
     def __init__(
             self,
             name: str,

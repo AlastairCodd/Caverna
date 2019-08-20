@@ -1,19 +1,15 @@
 from common.entities.player import Player
 from core.baseClasses.base_action import BaseAction
-from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from core.baseClasses.base_card import BaseCard
+from core.containers.resource_container import ResourceContainer
+from core.enums.caverna_enums import TileTypeEnum
+
 
 class PlaceATileAction(BaseAction):
-    _tileType: TileTypeEnum
-    
-    def __init__(self, tileType: TileTypeEnum):
-        self._tileType = tileType
-    
-    def invoke(
-        self,
-        player: Player,
-        activeCard: BaseCard ) -> bool:
-        if player is None:
-            raise ValueException("player")
-        
-        raise NotImplementedError()
+    def __init__(self, tile_type: TileTypeEnum):
+        self._tileType = tile_type
+
+    def invoke(self, player: Player, active_card: ResourceContainer) -> bool:
+        raise NotImplementedError
+
+    def new_turn_reset(self):
+        pass

@@ -4,7 +4,7 @@ from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum
 from core.baseClasses.base_effect import BaseEffect
 
 
-class BaseTile(object, ABC):
+class BaseTile(ABC):
 
     def __init__(
             self,

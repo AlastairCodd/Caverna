@@ -1,3 +1,3 @@
-__all__=[
-"buisness_logic_tests",
-"common_tests"]
+__all__ = [
+    'business_logic_tests',
+    'common_tests']

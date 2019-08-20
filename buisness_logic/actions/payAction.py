@@ -1,23 +1,33 @@
-from typing import Dict, Mapping
+from typing import Dict
+
 from common.entities.player import Player
-from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
+from core.containers.resource_container import ResourceContainer
+from core.enums.caverna_enums import ResourceTypeEnum
 from core.baseClasses.base_action import BaseAction
-from core.baseClasses.base_card import BaseCard
 
 
 class PayAction(BaseAction):
-    _payItems = Dict[ResourceTypeEnum, int]
-
-    def __init__(self, payItems: Mapping[ResourceTypeEnum, int]):
-        if payItems is None:
+    def __init__(self, pay_items: Dict[ResourceTypeEnum, int]):
+        if pay_items is None:
             raise ValueError("payItems")
-        self._payItems = payItems
+        self._payItems: Dict[ResourceTypeEnum, int] = pay_items
 
-    def invoke(
-            self,
-            player: Player,
-            activeCard: BaseCard) -> bool:
+    def invoke(self, player: Player, active_card: ResourceContainer) -> bool:
         if player is None:
             raise ValueError("player")
 
         raise NotImplementedError()
+
+    def new_turn_reset(self):
+        pass
+
+    def __str__(self):
+        result = "PayAction("
+        count = 0
+        for resource in self._payItems:
+            result += f"{resource.name}: {self._payItems[resource]}"
+            count += 1
+            if count != len(self._payItems):
+                result += ", "
+        result += ")"
+        return result
