@@ -59,7 +59,7 @@ class CavernaEnv(Env):
             raise ValueError("action")
 
         # get dwarf from player
-        chosen_dwarf = self._current_player.dwarves[0]
+        chosen_dwarf: Dwarf = self._current_player.dwarves[0]
 
         all_actions: List[Tuple[BaseCard, Action]] = []
 
@@ -74,7 +74,7 @@ class CavernaEnv(Env):
         chosen_action: BaseAction
         chosen_card, chosen_action = all_actions[int(argmax(action_choice_segment))]
 
-        chosen_card.activate_card(self._current_player, chosen_card, chosen_action)
+        chosen_card.activate_card(self._current_player, chosen_dwarf, chosen_action)
 
         player_points: int = self._point_calculation_service.calculate_points(self._current_player)
         return array([]), player_points, False, {}
