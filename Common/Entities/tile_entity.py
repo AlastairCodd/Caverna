@@ -18,7 +18,8 @@ class TileEntity(object):
         self._animalQuantity = animal_quantity
         self._hasStable = has_stable
 
-    def get_tile(self):
+    @property
+    def tile(self):
         return self._baseTile
 
     def set_tile(self, base_tile: BaseTile):
