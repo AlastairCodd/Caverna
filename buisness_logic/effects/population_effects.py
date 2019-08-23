@@ -4,20 +4,25 @@ from common.entities.player import Player
 from core.baseClasses.base_effect import BaseEffect
 
 
-class BasePopulationEffect(ABC, BaseEffect):
-    def __init__(self, ):
-        pass
+class BasePopulationEffect(BaseEffect, ABC):
+    pass
 
 
-class IncreasePopulationCapEffect(BasePopulationEffect):
-    def __init__(self, increase_by: int):
-        self._increaseBy = increase_by
+class IncreasePopulationCapacityEffect(BasePopulationEffect):
+    def __init__(self, increase_capacity_by: int = 1):
+        BaseEffect.__init__(self)
+        self._increase_capacity_by = increase_capacity_by
 
     @property
-    def increase_by(self) -> int:
-        return self._increaseBy
+    def capacity(self) -> int:
+        return self._increase_capacity_by
 
 
-class AllowSixthDwarfEffect(BasePopulationEffect):
-    def __init__(self):
+class IncreasePopulationMaximumEffect(BasePopulationEffect):
+    def __init__(self, raise_maximum_by: int = 1):
         BaseEffect.__init__(self)
+        self._raise_maximum_by = raise_maximum_by
+
+    @property
+    def raise_maximum_population_by(self) -> int:
+        return self._raise_maximum_by

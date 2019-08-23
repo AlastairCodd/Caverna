@@ -55,3 +55,7 @@ class BaseTile(ABC):
     @property
     def colour(self) -> TileColourEnum:
         return self._color
+
+    @property
+    def effects(self) -> List[BaseEffect]:
+        return self._effects
