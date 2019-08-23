@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, TypeVar, Generic, Iterable
+from typing import List, Tuple, Dict, TypeVar, Generic, Iterable, cast
 
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
 from common.entities.tile_entity import TileEntity
@@ -36,25 +36,26 @@ class TileContainer(object):
     def get_number_of_tiles_of_type(self, tile_type: TileTypeEnum) -> int:
         return len([t for t in self._tiles.values() if t.get_tile_type() == tile_type])
 
-    def get_tiles(self) -> List[BaseTile]:
+    @property
+    def tiles(self) -> List[BaseTile]:
         """Get the base tiles contained in this container"""
-        result = [x.get_tile() for x in self._tiles.values() if x.get_tile() is not None]
+        result = [x.tile for x in self._tiles.values() if x.tile is not None]
         return result
 
     def get_tiles_of_type(self, base_tile_type: Generic[T]) -> List[T]:
-        result = [x for x in self._tiles.values() if isinstance(x, base_tile_type)]
+        """Get the (base tiles) tiles which extend some base type."""
+        result = [cast(base_tile_type, x.tile) for x in self._tiles.values() if isinstance(x.tile, base_tile_type)]
         return result
 
-    def get_tile_at_location(self, tileIndex: int) -> BaseTile:
+    def get_tile_at_location(self, tile_index: int) -> BaseTile:
         """Get the tile at the given location
 
         Returns: the tile. This may be null"""
-        return self._tiles.get(tileIndex, None).get_tile()
+        return self._tiles.get(tile_index, None).tile
 
     def get_effects(self) -> List[BaseEffect]:
         """Get a list of all the effects held by any tile in this container"""
-        effects = map(lambda tile: tile.GetEffects(), self._tiles)
-        effects = map(lambda tile: tile.GetEffects(), self.get_tiles())
+        effects = map(lambda tile: tile.GetEffects(), self.tiles)
         return list(effects)
 
     def get_effects_of_type(self, tile_type: Generic[T]) -> List[T]:
@@ -74,7 +75,7 @@ class TileContainer(object):
         if tile in self._twinTiles and direction is None:
             raise ValueError("direction cannot be null if tile is a twin tile")
 
-        tile_type = TileTypeEnum.furnishedDwelling if tile.is_dwelling() else TileTypeEnum.furnishedCavern
+        tile_type = TileTypeEnum.furnishedDwelling if tile.is_dwelling else TileTypeEnum.furnishedCavern
 
         available_locations: List[int] = self.get_available_locations(tile_type)
         if location in available_locations:

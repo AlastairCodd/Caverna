@@ -105,7 +105,7 @@ class MainStorageTile(BaseConditionalPointTile):
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
             raise ValueError(str(player))
-        return PointEntity(len([t for t in player.get_tiles() if t.colour == TileColourEnum.Yellow]))
+        return PointEntity(len([t for t in player.tiles if t.colour == TileColourEnum.Yellow]))
 
 
 class WeaponStorageTile(BaseConditionalPointTile):

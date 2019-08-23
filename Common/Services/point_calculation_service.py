@@ -39,7 +39,7 @@ class PointCalculationService(object):
             lambda player: PointEntity(0, player.get_number_of_tiles_of_type(TileTypeEnum.underground)),
 
             # base points
-            lambda player: PointEntity(sum([t.get_points() for t in player.get_tiles()])),
+            lambda player: PointEntity(sum([t.get_points() for t in player.tiles])),
 
             # -3 per begging marker
             lambda player: PointEntity(0, 3 * player.get_resources_of_type(ResourceTypeEnum.begging_marker)),
