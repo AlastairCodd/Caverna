@@ -1,20 +1,23 @@
+from abc import abstractmethod, ABC
+
 from common.entities.player import Player
 from core.baseClasses.base_effect import BaseEffect
 
 
-class BasePopulationEffect(BaseEffect):
-    def Invoke(self, player: Player) -> bool:
-        raise NotImplementedError("base population effect class")
+class BasePopulationEffect(ABC, BaseEffect):
+    def __init__(self, ):
+        pass
 
 
 class IncreasePopulationCapEffect(BasePopulationEffect):
     def __init__(self, increase_by: int):
         self._increaseBy = increase_by
 
-    def Invoke(self, player: Player) -> bool:
-        raise NotImplementedError()
+    @property
+    def increase_by(self) -> int:
+        return self._increaseBy
 
 
 class AllowSixthDwarfEffect(BasePopulationEffect):
-    def Invoke(self, player: Player) -> bool:
-        raise NotImplementedError()
+    def __init__(self):
+        BaseEffect.__init__(self)
