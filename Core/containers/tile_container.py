@@ -53,14 +53,16 @@ class TileContainer(object):
         Returns: the tile. This may be null"""
         return self._tiles.get(tile_index, None).tile
 
-    def get_effects(self) -> List[BaseEffect]:
+    @property
+    def effects(self) -> List[BaseEffect]:
         """Get a list of all the effects held by any tile in this container"""
-        effects = map(lambda tile: tile.GetEffects(), self.tiles)
-        return list(effects)
+        effects = [effect for tile in self.tiles for effect in tile.effects]
+
+        return effects
 
     def get_effects_of_type(self, tile_type: Generic[T]) -> List[T]:
         """Get a list of all of the effects which extend a certain base effect in this container"""
-        result = [x for x in self.get_effects() if isinstance(x, tile_type)]
+        result = [x for x in self.effects if isinstance(x, tile_type)]
         return result
 
     def place_tile(self, tile: BaseTile, location: int, direction: TileDirectionEnum = None) -> bool:
