@@ -1,10 +1,12 @@
-from typing import Iterable, List
+from abc import abstractmethod, ABC
+from typing import Iterable, List, Dict
 from common.entities.dwarf import Dwarf
 from core.containers.resource_container import ResourceContainer
 from core.containers.tile_container import TileContainer
+from core.enums.caverna_enums import ResourceTypeEnum
 
 
-class Player(TileContainer, ResourceContainer):
+class Player(TileContainer, ResourceContainer, ABC):
 
     def __init__(self, player_id: int, turn_index: int):
         self._id: int = player_id
@@ -37,15 +39,20 @@ class Player(TileContainer, ResourceContainer):
         is_dwarf_active: Iterable[bool] = map(lambda x: not x.is_active(), self._dwarves)
         return any(is_dwarf_active)
 
+    def start_new_turn(self):
+        for dwarf in self._dwarves:
+            dwarf.make_adult()
+
     def get_player_choice(self, action):
-        """Gets a player response for the given action. 
+        """Gets a player response for the given action.
         Implementation left to implementing class -- either from user input, or
             from analysis of the action value function
-        
+
         Returns relevant information to allow the calling action to change
             the player or board state based in accordance with the action"""
         raise NotImplementedError()
 
-    def start_new_turn(self):
-        for dwarf in self._dwarves:
-            dwarf.make_adult()
+    @abstractmethod
+    def get_player_choice_market_action(self, possible_items_and_costs: Dict[ResourceTypeEnum, int]) \
+            -> List[ResourceTypeEnum]:
+        raise NotImplementedError()
