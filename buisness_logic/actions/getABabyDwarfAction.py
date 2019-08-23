@@ -17,16 +17,21 @@ class GetABabyDwarfAction(BaseAction):
 
         result: bool = False
         numberOfDwarves: int = len(player.dwarves)
-        if numberOfDwarves <= 5:
-            populationCap: int = len(player.get_effects_of_type(IncreasePopulationCapEffect))
-            if numberOfDwarves < populationCap:
-                player.give_baby_dwarf()
-                result = True
-        elif numberOfDwarves == 6:
-            sixthDwarfAllowed: bool = any(player.get_effects_of_type(AllowSixthDwarfEffect))
-            if sixthDwarfAllowed:
-                player.give_baby_dwarf()
-                result = True
+
+        increase_population_maximum_effects = player.get_effects_of_type(IncreasePopulationMaximumEffect)
+        maximum_population: int = 5 + sum(map(
+            lambda effect: effect.raise_maximum_population_by,
+            increase_population_maximum_effects))
+
+        increase_population_capacity_effects = player.get_effects_of_type(IncreasePopulationCapacityEffect)
+        player_population_capacity: int = sum(map(
+            lambda effect: effect.capacity,
+            increase_population_capacity_effects))
+
+        if numberOfDwarves < maximum_population and numberOfDwarves < player_population_capacity:
+            player.give_baby_dwarf()
+            result = True
+
         return result
 
     def new_turn_reset(self):
