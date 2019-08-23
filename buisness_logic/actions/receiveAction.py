@@ -1,23 +1,34 @@
 from typing import Dict
-from Core.cavernaEnums import ResourceTypeEnum
-from Core.baseCard import BaseCard
-from Core.baseAction import BaseAction
-from player import Player
+
+from common.entities.player import Player
+from core.containers.resource_container import ResourceContainer
+from core.enums.caverna_enums import ResourceTypeEnum
+from core.baseClasses.base_action import BaseAction
+
 
 class ReceiveAction(BaseAction):
-	_receiveItems: Dict[ResourceTypeEnum, int]
-	
-	def __init__(self, receiveItems: Dict[ResourceTypeEnum, int]):
-		if receiveItems is None:
-			raise ValueError("receiveItems")
-		self._receiveItems = receiveItems
-	
-	def Invoke(
-		self,
-		player: Player,
-		activeCard: BaseCard ) -> bool:
-		if player is None:
-			raise ValueError("player")
-		
-		player.GiveResources( self._receiveItems )
-		
+    def __init__(self, receive_items: Dict[ResourceTypeEnum, int]):
+        if receive_items is None:
+            raise ValueError("receiveItems")
+        self._receiveItems: Dict[ResourceTypeEnum, int] = receive_items
+
+    def invoke(self, player: Player, active_card: ResourceContainer) -> bool:
+        if player is None:
+            raise ValueError("player")
+
+        return player.give_resources(self._receiveItems)
+
+    def new_turn_reset(self):
+        pass
+
+    def __str__(self) -> str:
+        result = "ReceiveAction("
+        count = 0
+        for resource in self._receiveItems:
+            result += f"{resource.name}: {self._receiveItems[resource]}"
+            count += 1
+            if count != len(self._receiveItems):
+                result += ", "
+        result += ")"
+
+        return result

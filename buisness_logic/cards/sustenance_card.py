@@ -1,25 +1,27 @@
 from typing import Dict
-from Core.baseCard import BaseCard
-from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from Core.resourceContainer import ActiveResourceContainer
-from Common.Entities.multicombination import Combination
-from BuisnessLogic.Actions import *
 
-class SustenanceCard(BaseCard, ActiveResourceContainer):
-	
-	def __init__(self):
-		self._name = "Sustenance"
-		self._id = 19
-		self._level = -1
-		self._actions = Combination(
-			ActionCombinationEnum.AndThen,
-			takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
-			placeATileAction.PlaceATileAction( TileTypeEnum.meadowFieldTwin ) )
-		super(SustenanceCard, self).__init__()
-		
-	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
-		if self.HasResources():
-			self.GiveResource( ResourceTypeEnum.veg, 1 )
-		self.GiveResource( ResourceTypeEnum.grain, 1 )
-		
-		return self.GetResources()
+from buisness_logic.actions import takeAccumulatedItemsAction, placeATileAction
+from common.entities.multiconditional import Conditional
+from core.baseClasses.base_card import BaseCard
+from core.containers.resource_container import ResourceContainer
+from core.enums.caverna_enums import ActionCombinationEnum, TileTypeEnum, ResourceTypeEnum
+
+
+class SustenanceCard(BaseCard, ResourceContainer):
+
+    def __init__(self):
+        BaseCard.__init__(
+            self, "Sustenance", 19,
+            actions=Conditional(
+                ActionCombinationEnum.AndThen,
+                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+                placeATileAction.PlaceATileAction(TileTypeEnum.meadowFieldTwin)))
+        ResourceContainer.__init__(self)
+
+    def refill_action(self) -> Dict[ResourceTypeEnum, int]:
+        if self.has_resources:
+            self.give_resource(ResourceTypeEnum.veg, 1)
+        else:
+            self.give_resource(ResourceTypeEnum.grain, 1)
+
+        return self.resources

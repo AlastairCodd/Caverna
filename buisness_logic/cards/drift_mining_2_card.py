@@ -1,23 +1,23 @@
 from typing import Dict
-from Core.baseCard import BaseCard
-from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from Core.resourceContainer import ActiveResourceContainer
-from Common.Entities.multicombination import Combination
-from BuisnessLogic.Actions import *
+from common.entities.multiconditional import Conditional
+from core.baseClasses.base_card import BaseCard
+from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
+from core.containers.resource_container import ResourceContainer
+from buisness_logic.actions import *
 
-class DriftMining2Card(BaseCard, ActiveResourceContainer):
-	
-	def __init__(self):
-		self._name = "Drift Mining 2"
-		self._id = 3
-		self._level = -1
-		self._actions = Combination( 
-			ActionCombinationEnum.AndThen,
-			takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
-			placeATileAction.PlaceATileAction( TileTypeEnum.cavernTunnelTwin ) )
-		super(DriftMining2Card, self).__init__()
-	
-	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
-		self.GiveResource( ResourceTypeEnum.stone, 1 )
-		
-		return self.GetResources()
+
+class DriftMining2Card(BaseCard, ResourceContainer):
+
+    def __init__(self):
+        BaseCard.__init__(
+            self, "Drift Mining 2", 3,
+            actions=Conditional(
+                ActionCombinationEnum.AndThen,
+                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+                placeATileAction.PlaceATileAction(TileTypeEnum.cavernTunnelTwin)))
+        ResourceContainer.__init__(self)
+
+    def refill_action(self) -> Dict[ResourceTypeEnum, int]:
+        self.give_resource(ResourceTypeEnum.stone, 1)
+
+        return self.resources

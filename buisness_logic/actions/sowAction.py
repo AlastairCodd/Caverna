@@ -1,15 +1,13 @@
-from player import Player
-from Core.baseAction import BaseAction
-from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from Core.baseCard import BaseCard
+from core.containers.resource_container import ResourceContainer
+from core.baseClasses.base_action import BaseAction
+
 
 class SowAction(BaseAction):
 
-	def Invoke(
-		self,
-		player: Player,
-		activeCard: BaseCard ) -> bool:
-		if player is None:
-			raise ValueException("player")
-		
-		raise NotImplementedError()
+    def invoke(self, player: Player active_card: ResourceContainer) -> bool:
+        if player is None:
+            raise ValueError("player")
+        raise NotImplementedError()
+
+    def new_turn_reset(self):
+        pass

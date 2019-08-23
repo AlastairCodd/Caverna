@@ -1,1 +1,3 @@
-all=["UnitTests"]
+__all__ = [
+    'business_logic_tests',
+    'common_tests']

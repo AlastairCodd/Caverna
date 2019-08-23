@@ -1,33 +1,15 @@
-from player import Player
-from Core.baseAction import BaseAction
-from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from Core.baseCard import BaseCard
+from common.entities.player import Player
+from core.baseClasses.base_action import BaseAction
+from core.containers.resource_container import ResourceContainer
+from core.enums.caverna_enums import TileTypeEnum
+
 
 class PlaceATileAction(BaseAction):
-	def __init__(self, tileType: TileTypeEnum):
-		self._tileType = tileType
-	
-	def Invoke(
-		self,
-		player: Player,
-		activeCard: BaseCard ) -> bool:
-		'''An action where a player:
-			- chooses a tile
-			- pays the cost (taking additional discount effects into account)
-			- places the tile on the board in an available location'''
-		if player is None: raise ValueException("player")
-		
-		
-		
-		position = player.get_player_input(self)
-		
-class PlaceAStableAction(BaseAction):
-	
-	def Invoke(
-		self,
-		player: Player,
-		activeCard: BaseCard ) -> bool:
-		if player is None:
-			raise ValueException("player")
-		
-		raise NotImplementedError()
+    def __init__(self, tile_type: TileTypeEnum):
+        self._tileType = tile_type
+
+    def invoke(self, player: Player, active_card: ResourceContainer) -> bool:
+        raise NotImplementedError
+
+    def new_turn_reset(self):
+        pass

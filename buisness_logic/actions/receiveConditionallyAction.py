@@ -1,31 +1,28 @@
 from typing import Dict, Callable
-from Core.baseAction import BaseAction
-from Core.baseCard import BaseCard
-from Core.cavernaEnums import ResourceTypeEnum
-from player import Player
-from BuisnessLogic.Actions.receiveAction import ReceiveAction
+from core.containers.resource_container import ResourceContainer
+from core.enums.caverna_enums import ResourceTypeEnum
+from common.entities.player import Player
+from buisness_logic.actions.receiveAction import ReceiveAction
+
 
 class ReceiveConditionallyAction(ReceiveAction):
-	_condition: Callable[[Player, BaseCard], bool]
+    def __init__(self, condition: Callable[[Player], int], receive_items: Dict[ResourceTypeEnum, int]):
+        if condition is None:
+            raise ValueError("condition")
+        self._condition = condition
+        ReceiveAction.__init__(self, receive_items)
 
-	def __init__(
-		self, 
-		condition: Callable[[Player, BaseCard], bool], 
-		receiveItems: Dict[ResourceTypeEnum, int]):
-		if condition is None:
-			raise ValueError("condition")
-		self._condition = condition
-		super(ReceiveConditionallyAction, self).__init__(receiveItems)
+    def invoke(self, player: Player, active_card: ResourceContainer) -> bool:
+        if player is None:
+            raise ValueError("player")
 
-	def Invoke(
-		self,
-		player: Player,
-		activeCard: BaseCard ) -> bool:
-		if player is None:
-			raise ValueError("player")
-		if activeCard is None:
-			raise ValueError("activeCard")
-		
-		if self._condition(player, activeCard):
-			return super(ReceiveConditionallyAction, self).Invoke(player, activeCard)
-		return False
+        condition: int = self._condition(player)
+        result = True
+
+        for _ in range(condition):
+            result &= super().invoke(player, active_card)
+
+        return result
+
+    def new_turn_reset(self):
+        pass

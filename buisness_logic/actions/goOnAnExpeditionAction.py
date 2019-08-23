@@ -1,20 +1,18 @@
-from Core.baseAction import BaseAction
-from Core.baseCard import BaseCard
-from player import Player
+from common.entities.player import Player
+from core.baseClasses.base_action import BaseAction
+from core.containers.resource_container import ResourceContainer
+
 
 class GoOnAnExpeditionAction(BaseAction):
-	_level: int
+    def __init__(self, level: int):
+        if level < 1 or level > 4:
+            raise ValueError("level")
+        self._level = level
 
-	def __init__(self, level: int):
-		if level < 1 or level > 4:
-			raise ValueException("level")
-		self._level = level
+    def invoke(self, player: Player, active_card: ResourceContainer) -> bool:
+        if player is None:
+            raise ValueError("player")
+        raise NotImplementedError
 
-	def Invoke(
-		self,
-		player: Player,
-		activeCard: BaseCard ) -> bool:
-		if player is None:
-			raise ValueException("player")
-		raise NotImplementedException
-		
+    def new_turn_reset(self):
+        pass

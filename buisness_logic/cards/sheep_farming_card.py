@@ -1,38 +1,28 @@
 from typing import Dict
-from Core.baseCard import BaseCard
-from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from Core.resourceContainer import ActiveResourceContainer
-from Common.Entities.multicombination import Combination
-from BuisnessLogic.Actions import *
 
-class SheepFarmingCard(BaseCard, ActiveResourceContainer):
-	
-	def __init__(self):
-		self._name = "Sheep Farming"
-		self._id = 23
-		self._level = 1
-		self._actions = Combination(
-			ActionCombinationEnum.AndThen,
-			Combination(
-				ActionCombinationEnum.AndOr,
-				Combination(
-					ActionCombinationEnum.AndOr,
-					Combination(
-						ActionCombinationEnum.AndThen,
-						payAction.PayAction( {ResourceTypeEnum.wood, 2} ),
-						placeATileAction.PlaceATileAction( TileTypeEnum.pasture ) ),
-					Combination(
-						ActionCombinationEnum.AndThen,
-						payAction.PayAction( {ResourceTypeEnum.wood, 4} ),
-						placeATileAction.PlaceATileAction( TileTypeEnum.pastureTwin ) ) ),
-				Combination(
-					ActionCombinationEnum.AndThen,
-					payAction.PayAction( {ResourceTypeEnum.stone, 1} ),
-					placeATileAction.PlaceAStableAction() ) ),
-			takeAccumulatedItemsAction.TakeAccumulatedItemsAction() )
-		super().__init__()
-		
-	def RefillAction(self) -> Dict[ResourceTypeEnum, int]:
-		self.GiveResource( ResourceTypeEnum.sheep, 1 )
-		
-		return self.GetResources()
+from buisness_logic.actions import placeATileAction, takeAccumulatedItemsAction
+from common.entities.multiconditional import Conditional
+from core.baseClasses.base_card import BaseCard
+from core.containers.resource_container import ResourceContainer
+from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
+
+
+class SheepFarmingCard(BaseCard, ResourceContainer):
+    def __init__(self):
+        BaseCard.__init__(
+            self, "Sheep Farming", 24, 2,
+            actions=Conditional(
+                ActionCombinationEnum.AndThen,
+                Conditional(
+                    ActionCombinationEnum.AndOr,
+                    Conditional(
+                        ActionCombinationEnum.AndOr,
+                        placeATileAction.PlaceATileAction(TileTypeEnum.pasture),
+                        placeATileAction.PlaceATileAction(TileTypeEnum.pastureTwin)),
+                    placeATileAction.PlaceAStableAction()),
+                takeAccumulatedItemsAction.TakeAccumulatedItemsAction()))
+
+    def refill_action(self) -> Dict[ResourceTypeEnum, int]:
+        self.give_resource(ResourceTypeEnum.sheep, 1)
+
+        return self.resources

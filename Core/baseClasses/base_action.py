@@ -1,10 +1,14 @@
-from typing import Dict
-from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
+from abc import abstractmethod, ABC
 
-class BaseAction(object):
-	
-	def invoke(
-		self,
-		player,
-		accumulatedItems: Dict[ResourceTypeEnum, int] ) -> bool:
-		raise NotImplementedError("abstract base action class")
+from core.containers.resource_container import ResourceContainer
+
+
+class BaseAction(ABC):
+
+    @abstractmethod
+    def invoke(self, player: 'Player', active_card: ResourceContainer) -> bool:
+        raise NotImplementedError("abstract base action class")
+
+    @abstractmethod
+    def new_turn_reset(self):
+        pass

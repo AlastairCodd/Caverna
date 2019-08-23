@@ -1,26 +1,18 @@
-from Core.baseCard import BaseCard
-from Core.cavernaEnums import ResourceTypeEnum, ActionCombinationEnum
-from Core.resourceContainer import ResourceContainer
-from Common.Entities.multicombination import Combination
-from BuisnessLogic.Actions import *
+from buisness_logic.actions import *
+from common.entities.multiconditional import Conditional
+from core.baseClasses.base_card import BaseCard
+from core.enums.caverna_enums import ActionCombinationEnum
+
 
 class AdventureCard(BaseCard):
-	
-	def __init__(self):
-		self._name = "Adventure"
-		self._id = 31
-		self._level = 4
-		
-		self._actions = Combination(
-			ActionCombinationEnum.AndThenOr,
-			getABabyDwarfAction.GetABabyDwarfAction(),
-			Combination(
-				ActionCombinationEnum.AndOr,
-				Combination(
-					ActionCombinationEnum.AndThen,
-					payAction.PayAction( {ResourceTypeEnum.ore: 2} ),
-					receiveAction.ReceiveAction( {ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 1} ) ),
-				Combination(
-					ActionCombinationEnum.AndThen,
-					payAction.PayAction( {ResourceTypeEnum.ore: 2} ),
-					receiveAction.ReceiveAction( {ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 1} ) ) ) )
+
+    def __init__(self):
+        BaseCard.__init__(
+            self, "Adventure", 31, 4,
+            actions=Conditional(
+                ActionCombinationEnum.AndThenOr,
+                giveDwarfAWeaponAction.GiveDwarfAWeaponAction(),
+                Conditional(
+                    ActionCombinationEnum.AndThen,
+                    goOnAnExpeditionAction.GoOnAnExpeditionAction(1),
+                    goOnAnExpeditionAction.GoOnAnExpeditionAction(1))))
