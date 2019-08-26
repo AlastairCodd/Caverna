@@ -13,7 +13,7 @@ class Test_When_Number_Of_Dwarves_Is_Less_Than_Default_And_Less_Than_Capacity(Gi
         additional_tile: BaseTile = MockTile(effects=[IncreasePopulationCapacityEffect(1)])
         self._mockPlayer: Player = MockPlayer(tiles=[starting_tile, additional_tile])
 
-        self._result: bool = self.SUT.invoke(self._mockPlayer, None)
+        self._result: bool = self.SUT.invoke(self._mockPlayer, None, None)
 
     def test_Then_Result_Should_Be_True(self):
         self.assertTrue(self._result)

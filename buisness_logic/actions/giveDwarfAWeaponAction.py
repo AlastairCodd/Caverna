@@ -1,3 +1,4 @@
+from common.entities.dwarf import Dwarf
 from common.entities.player import Player
 from core.baseClasses.base_action import BaseAction
 from core.containers.resource_container import ResourceContainer
@@ -5,7 +6,7 @@ from core.containers.resource_container import ResourceContainer
 
 class GiveDwarfAWeaponAction(BaseAction):
 
-    def invoke(self, player: Player, active_card: ResourceContainer) -> bool:
+    def invoke(self, player: Player, active_card: ResourceContainer, current_dwarf: Dwarf) -> bool:
         if player is None:
             raise ValueError("player")
         raise NotImplementedError

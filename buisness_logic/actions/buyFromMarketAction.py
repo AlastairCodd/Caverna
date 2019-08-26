@@ -1,5 +1,6 @@
 from typing import List, Dict
 
+from common.entities.dwarf import Dwarf
 from common.entities.player import Player
 from core.baseClasses.base_action import BaseAction
 from core.containers.resource_container import ResourceContainer
@@ -21,11 +22,12 @@ class BuyFromMarketAction(BaseAction):
             ResourceTypeEnum.veg: 1,
         }
 
-    def invoke(self, player: Player, active_card: ResourceContainer) -> bool:
+    def invoke(self, player: Player, active_card: ResourceContainer, current_dwarf: Dwarf) -> bool:
         """Asks the player which things they would like to buy from the market.
 
         :param player: The player who will buy things. This may not be null.
         :param active_card: Unused.
+        :param current_dwarf: Unused.
         :return: True if player chosen items were successfully purchased, false if not.
         """
         if player is None:
@@ -37,7 +39,7 @@ class BuyFromMarketAction(BaseAction):
         total_cost_of_resources_chosen_by_player: int = \
             sum(map(lambda resource: self._possible_items_and_costs[resource], resources_chosen_by_player))
 
-        return False
+        raise NotImplementedError()
 
     def new_turn_reset(self):
         pass

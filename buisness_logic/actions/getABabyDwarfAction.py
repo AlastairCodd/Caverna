@@ -5,11 +5,12 @@ from core.containers.resource_container import ResourceContainer
 
 
 class GetABabyDwarfAction(BaseAction):
-    def invoke(self, player: Player, active_card: ResourceContainer) -> bool:
+    def invoke(self, player: Player, active_card: ResourceContainer, current_dwarf) -> bool:
         """Gives player a new dwarf, if they have room.
 
         :param player: The player to give the new dwarf to. This may not be none.
         :param active_card: Unused.
+        :param current_dwarf: Unused.
         :return: True if a new dwarf has been born, false if not.
         """
         if player is None:
