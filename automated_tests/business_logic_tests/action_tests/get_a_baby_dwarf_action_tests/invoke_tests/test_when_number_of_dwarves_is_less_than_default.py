@@ -1,5 +1,5 @@
-from automated_tests.business_logic_tests.action_tests.get_a_baby_dwarf_action_tests.MockPlayer import MockPlayer
-from automated_tests.business_logic_tests.action_tests.get_a_baby_dwarf_action_tests.MockTile import MockTile
+from automated_tests.mocks.mock_player import MockPlayer
+from automated_tests.mocks.mock_tile import MockTile
 from automated_tests.business_logic_tests.action_tests.get_a_baby_dwarf_action_tests.given_a_getababydwarfaction import \
     Given_A_GetABabyDwarfAction
 from buisness_logic.effects.population_effects import IncreasePopulationCapacityEffect
