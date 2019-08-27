@@ -25,7 +25,7 @@ class BaseConditionalPointTile(BaseTile, ABC):
         if cost is None:
             cost = {}
 
-        super().__init__(name, tile_id, is_dwelling, base_points, cost, effects, TileColourEnum.Yellow)
+        BaseTile.__init__(self, name, tile_id, is_dwelling, base_points, cost, effects, TileColourEnum.Yellow)
 
     @abstractmethod
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -34,10 +34,12 @@ class BaseConditionalPointTile(BaseTile, ABC):
 
 class WeavingParlorTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Weaving Parlor", 30, cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1},
-                         effects=[resource_effects.ReceiveProportional(
-                             input={ResourceTypeEnum.food: 1},
-                             proportionalTo={ResourceTypeEnum.sheep: 1})])
+        BaseConditionalPointTile.__init__(
+            self, "Weaving Parlor", 30,
+            cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1},
+            effects=[resource_effects.ReceiveProportional(
+                received={ResourceTypeEnum.food: 1},
+                proportionalTo={ResourceTypeEnum.sheep: 1})])
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -47,10 +49,12 @@ class WeavingParlorTile(BaseConditionalPointTile):
 
 class MilkingParlorTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Milking Parlor", 31, cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2},
-                         effects=[resource_effects.ReceiveProportional(
-                             {ResourceTypeEnum.food: 1},
-                             {ResourceTypeEnum.cow: 1})])
+        BaseConditionalPointTile.__init__(
+            self, "Milking Parlor", 31,
+            cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2},
+            effects=[resource_effects.ReceiveProportional(
+                {ResourceTypeEnum.food: 1},
+                {ResourceTypeEnum.cow: 1})])
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -60,7 +64,9 @@ class MilkingParlorTile(BaseConditionalPointTile):
 
 class StateParlorTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("State Parlor", 32, cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.coin: 5}, effects=[])
+        BaseConditionalPointTile.__init__(
+            self, "State Parlor", 32,
+            cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.coin: 5}, effects=[])
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -80,7 +86,9 @@ class StateParlorTile(BaseConditionalPointTile):
 
 class StoneStorageTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Stone Storage", 36, cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.ore: 1})
+        BaseConditionalPointTile.__init__(
+            self, "Stone Storage", 36,
+            cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.ore: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -90,7 +98,9 @@ class StoneStorageTile(BaseConditionalPointTile):
 
 class OreStorageTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Ore Storage", 37, cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 2})
+        BaseConditionalPointTile.__init__(
+            self, "Ore Storage", 37,
+            cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 2})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -100,7 +110,9 @@ class OreStorageTile(BaseConditionalPointTile):
 
 class MainStorageTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Main Storage", 39, cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1})
+        BaseConditionalPointTile.__init__(
+            self, "Main Storage", 39,
+            cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -110,7 +122,9 @@ class MainStorageTile(BaseConditionalPointTile):
 
 class WeaponStorageTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Weapon Storage", 40, cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.stone: 2})
+        BaseConditionalPointTile.__init__(
+            self, "Weapon Storage", 40,
+            cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.stone: 2})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -120,7 +134,9 @@ class WeaponStorageTile(BaseConditionalPointTile):
 
 class SuppliesStorageTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Supplies Storage", 41, cost={ResourceTypeEnum.food: 3, ResourceTypeEnum.wood: 1})
+        BaseConditionalPointTile.__init__(
+            self, "Supplies Storage", 41,
+            cost={ResourceTypeEnum.food: 3, ResourceTypeEnum.wood: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -134,7 +150,9 @@ class SuppliesStorageTile(BaseConditionalPointTile):
 
 class BroomChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Broom Chamber", 42, cost={ResourceTypeEnum.wood: 1})
+        BaseConditionalPointTile.__init__(
+            self, "Broom Chamber", 42,
+            cost={ResourceTypeEnum.wood: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -151,7 +169,9 @@ class BroomChamberTile(BaseConditionalPointTile):
 
 class TreasureChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Treasure Chamber", 43, cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.stone: 1})
+        BaseConditionalPointTile.__init__(
+            self, "Treasure Chamber", 43,
+            cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.stone: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -161,7 +181,9 @@ class TreasureChamberTile(BaseConditionalPointTile):
 
 class FoodChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Food Chamber", 44, cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.vegetable: 2})
+        BaseConditionalPointTile.__init__(
+            self, "Food Chamber", 44,
+            cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.vegetable: 2})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -173,7 +195,9 @@ class FoodChamberTile(BaseConditionalPointTile):
 
 class PrayerChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Prayer Chamber", 45, cost={ResourceTypeEnum.wood: 2})
+        BaseConditionalPointTile.__init__(
+            self, "Prayer Chamber", 45,
+            cost={ResourceTypeEnum.wood: 2})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
@@ -187,7 +211,9 @@ class PrayerChamberTile(BaseConditionalPointTile):
 
 class WritingChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        super(WritingChamberTile, self).__init__("Writing Chamber", 46, cost={ResourceTypeEnum.stone: 2})
+        BaseConditionalPointTile.__init__(
+            self, "Writing Chamber", 46,
+            cost={ResourceTypeEnum.stone: 2})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         return PointEntity(0, 0, 7)
@@ -195,7 +221,9 @@ class WritingChamberTile(BaseConditionalPointTile):
 
 class FodderChamberTile(BaseConditionalPointTile):
     def __init__(self):
-        super().__init__("Fodder Chamber", 47, cost={ResourceTypeEnum.grain: 2, ResourceTypeEnum.stone: 1})
+        BaseConditionalPointTile.__init__(
+            self, "Fodder Chamber", 47,
+            cost={ResourceTypeEnum.grain: 2, ResourceTypeEnum.stone: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
