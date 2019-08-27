@@ -60,7 +60,7 @@ class BaseCard(ABC):
 
         if success:
             for action in action_choice:
-                action.invoke(player, self)
+                action.invoke(player, self, dwarf)
             dwarf.set_active(self)
         return success
 
