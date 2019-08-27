@@ -9,8 +9,8 @@ class CuddleRoomTile(BaseTile):
             "Cuddle Room", 6, False, 2,
             {ResourceTypeEnum.wood: 1},
             [animal_storage_effects.StoreConditional(
-                {ResourceTypeEnum.sheep: 1},
-                lambda p: len(p.GetDwarves()))])
+                ResourceTypeEnum.sheep,
+                lambda p: len(p.dwarves))])
 
 
 class BreakfastRoomTile(BaseTile):

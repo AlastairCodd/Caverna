@@ -1,11 +1,21 @@
-from typing import Dict, List
+from abc import abstractmethod, ABC
+from typing import Dict, List, Callable
 from common.entities.player import Player
 from core.baseClasses.base_effect import BaseEffect
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 
 
-class BaseAnimalStorageEffect(BaseEffect):
-    def invoke(self, player: Player) -> bool:
+class BaseAnimalStorageEffect(BaseEffect, ABC):
+    def __init(self):
+        self._farm_animals = [
+            ResourceTypeEnum.sheep,
+            ResourceTypeEnum.donkey,
+            ResourceTypeEnum.boar,
+            ResourceTypeEnum.cow]
+        BaseEffect.__init__(self)
+
+    @abstractmethod
+    def get_animal_storage_buckets(self, player: Player) -> List[Dict[ResourceTypeEnum, int]]:
         raise NotImplementedError("base population effect class")
 
 
@@ -14,29 +24,30 @@ class StoreAny(BaseAnimalStorageEffect):
 
     def __init__(self, quantity: int):
         self._quantity = quantity
-        BaseEffect.__init__(self)
+        BaseAnimalStorageEffect.__init__(self)
 
-    def invoke(self, player: Player) -> bool:
-        raise NotImplementedError()
+    def get_animal_storage_buckets(self, player: Player) -> List[Dict[ResourceTypeEnum, int]]:
+        result: List[Dict[ResourceTypeEnum, int]] = \
+            [{farm_animal: self._quantity for farm_animal in self._farm_animals}]
+        return result
 
 
 class StoreSpecific(BaseAnimalStorageEffect):
-    def __init__(self, animals: Dict[ResourceTypeEnum, int]):
+    def  __init__(self, animals: Dict[ResourceTypeEnum, int]):
         """Add storage capacity for some number of a specific type of animal
     
-        Inputs: animals: a dictionary containing animals and the number which can be stored.
-        This cannot be null. """
+        :param animals: A dictionary containing animals and the number which can be stored. This cannot be null. """
         if animals is None:
             raise ValueError("animals")
         self._animals = animals
-        BaseEffect.__init__(self)
+        BaseAnimalStorageEffect.__init__(self)
 
-    def invoke(self, player: Player) -> bool:
-        raise NotImplementedError()
+    def get_animal_storage_buckets(self, player: Player) -> List[Dict[ResourceTypeEnum, int]]:
+        return [self._animals]
 
 
 class StoreConditional(BaseAnimalStorageEffect):
-    def __init__(self, then: Dict[ResourceTypeEnum, int], condition):
+    def __init__(self, animal_type: ResourceTypeEnum, condition: Callable[[Player], int]):
         """Add a conditional amount of storage capacity for a specific type of animal
     
         Inputs:
@@ -46,25 +57,23 @@ class StoreConditional(BaseAnimalStorageEffect):
                 This cannot be null."""
         if condition is None:
             raise ValueError("Condition")
-        if then is None:
-            raise ValueError("then")
-        self._condition = condition
+        self._animal_type = animal_type
+        self._condition: Callable[[Player], int] = condition
         BaseEffect.__init__(self)
 
-    def invoke(self, player: Player) -> bool:
-        self._condition(player)
-        raise NotImplementedError()
+    def get_animal_storage_buckets(self, player: Player) -> List[Dict[ResourceTypeEnum, int]]:
+        storage_multiplier: int = self._condition(player)
+        result = [{farm_animal: storage_multiplier for farm_animal in self._farm_animals}]
+        return result
 
 
 class ChangeAnimalStorageBase(BaseAnimalStorageEffect):
 
-    def __init__(self, tiles: List[ResourceTypeEnum], quantity: int):
+    def __init__(self, tiles: List[TileTypeEnum], quantity: int):
         """Change where animals can be stored on base tiles
     
-        Inputs:
-            tiles: A list of tiles which can now have animals stored on them.
-                This cannot be null.
-            quantity: the quantity of animals which can be stored on this tile. 
+        :param tiles: A list of tiles which can now have animals stored on them. This cannot be null.
+        :param quantity: the quantity of animals which can be stored on this tile.
                 This overrides previous default values.
                 This must be greater than or equal to 0."""
         if tiles is None:
@@ -73,5 +82,5 @@ class ChangeAnimalStorageBase(BaseAnimalStorageEffect):
             raise ValueError("quantity must be greater than zero")
         BaseEffect.__init__(self)
 
-    def invoke(self, player: Player) -> bool:
+    def get_animal_storage_buckets(self, player: Player) -> bool:
         raise NotImplementedError()
