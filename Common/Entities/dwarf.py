@@ -5,7 +5,7 @@ class Dwarf(object):
     def __init__(self, is_adult: bool = False):
         self._is_adult: bool = is_adult
         self._weapon: Weapon = None
-        self._current_card = None
+        self._current_card: 'Card' = None
 
     @property
     def is_adult(self) -> bool:
