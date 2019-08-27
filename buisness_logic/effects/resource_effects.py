@@ -1,54 +1,50 @@
+from abc import abstractmethod, ABC
+from typing import Dict, Callable
+
 from common.entities.player import Player
 from core.baseClasses.base_effect import BaseEffect
-from core.enums.caverna_enums import TriggerStateEnum
+from core.enums.caverna_enums import TriggerStateEnum, ResourceTypeEnum
 
-class BaseResourceEffect(BaseEffect):
+
+class BaseResourceEffect(BaseEffect, ABC):
+    @abstractmethod
     def invoke(self, player: Player) -> bool:
-        raise NotImplementedException("base resource effect class")
-    
+        raise NotImplementedError("base resource effect class")
+
+
 class Receive(BaseResourceEffect):
     def __init__(self, output):
         self._output = output
-    
+        BaseEffect.__init__(self)
+
+    def invoke(self, player: Player) -> bool:
+        raise NotImplementedError()
+
+
 class ReceiveConditional(BaseResourceEffect):
-    def __init__(self, input, condition, trigger_state:  TriggerStateEnum = TriggerStateEnum.StartOfTurn):
-        """Recieve some input when some condition is true."""
-        self._input = input
-        self._condition = condition
-        super().__init__(trigger_state)
-        
-    def invoke(self, player):
-        numberOfTimesConditionMet = self._condition(player)
-        if numberOfTimesConditionMet == 0:
+    def __init__(
+            self,
+            received: Dict[ResourceTypeEnum, int],
+            condition: Callable[[Player], int],
+            trigger_state: TriggerStateEnum = TriggerStateEnum.StartOfTurn) -> None:
+        """Receive some input when some condition is true.
+
+        :param received: The resources which are received when the condition is met. This cannot be null.
+        :param condition: A function which takes a player and returns the number of times they should be given
+            "received". This cannot be null.
+        :param trigger_state: When does this action trigger? (Optional)
+        """
+        if received is None:
+            raise ValueError("Received")
+        if condition is None:
+            raise ValueError("Condition")
+        self._received: Dict[ResourceTypeEnum, int] = received
+        self._condition: Callable[[Player], int] = condition
+        BaseEffect.__init__(self, trigger_state=trigger_state)
+
+    def invoke(self, player: Player) -> bool:
+        number_of_times_condition_met: int = self._condition(player)
+        if number_of_times_condition_met == 0:
             return False
-        resources = {key: self._input[key] * numberOfTimesConditionMet for key in self._input}
-        player.give_resources( resources )
-        return True
-        
-class ReceiveProportional(BaseResourceEffect):
-    def __init__(self, input, proportionalTo, trigger_state:  TriggerStateEnum = TriggerStateEnum.StartOfTurn):
-        """Recieve some x input per x "proportionalTo"."""
-        self._input = input
-        self._proportionalTo = proportionalTo
-        super().__init__(trigger_state)
-        
-    def invoke(self, player):
-        playerResources = player.resources
-        numberOfProportionalResources = count_dictionary_contains(playerResources, self._proportionalTo)
-        for _ in range(numberOfProportionalResources):
-            player.give_resources( self._input )
-            
-def does_dictionary_contain(inDict, containedDict):
-    isContained = True
-    for key in containedDict:
-        isContained &= inDict.get(key, 0) >= containedDict[key]
-    return isContained
-    
-def count_dictionary_contains(inDict, containedDict):
-    count = 0
-    while True:
-        if not does_dictionary_contain(inDict, containedDict):
-            return count
-        count += 1
-        for key in containedDict:
-            inDict[key] -= containedDict[key]
+        resources = {resource: self._received[resource] * number_of_times_condition_met for resource in self._received}
+        return player.give_resources(resources)
