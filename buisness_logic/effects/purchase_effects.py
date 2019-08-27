@@ -11,7 +11,11 @@ from core.enums.caverna_enums import ResourceTypeEnum
 class BasePurchaseEffect(BaseEffect, ABC):
     """Abstract class for purchase effects"""
 
-    def invoke(self, player: Player, target: Union[BaseTile, Weapon], current_price: Dict[ResourceTypeEnum, int]) \
+    def invoke(
+            self,
+            player: Player,
+            target: Union[BaseTile, Weapon],
+            current_price: Dict[ResourceTypeEnum, int]) \
             -> Dict[ResourceTypeEnum, int]:
         """Returns the new price of the target.
 
@@ -24,7 +28,10 @@ class BasePurchaseEffect(BaseEffect, ABC):
 
 
 class DecreasePrice(BasePurchaseEffect):
-    def __init__(self, subject: Union[Type[BaseTile], Type[Weapon]], decrease_by: Dict[ResourceTypeEnum, int]):
+    def __init__(
+            self,
+            subject: Union[BaseTile, Weapon, Type],
+            decrease_by: Dict[ResourceTypeEnum, int]):
         """Decreases the price required to purchase something (either a tile, including pastures and stables or weapons)
 
         :param subject: The object which is effected by this discount. This cannot be null.
@@ -34,7 +41,7 @@ class DecreasePrice(BasePurchaseEffect):
             raise ValueError("Subject cannot be none")
         if decrease_by is None:
             raise ValueError("Amount to decrease by cannot be null.")
-        self._subject: Type = type(subject)
+        self._subject_type: Type = subject if isinstance(subject, type) else type(subject)
         self._decreaseBy: Dict[ResourceTypeEnum] = decrease_by
         BaseEffect.__init__(self)
 
@@ -56,7 +63,7 @@ class DecreasePrice(BasePurchaseEffect):
         if current_price is None:
             raise ValueError("Current price cannot be null")
 
-        if not isinstance(target, self._subject):
+        if not isinstance(target, self._subject_type):
             return current_price
 
         result: Dict[ResourceTypeEnum, int] = {}
@@ -76,7 +83,7 @@ class DecreasePrice(BasePurchaseEffect):
 class AllowSubstitutionForPurchase(BaseEffect):
     def __init__(
             self,
-            subject: Union[BaseTile, Weapon],
+            subject: Union[BaseTile, Weapon, Type],
             substitute_for: Dict[ResourceTypeEnum, int],
             substitute_with: Dict[ResourceTypeEnum, int],
             allow_multiple: bool = False):
@@ -93,7 +100,7 @@ class AllowSubstitutionForPurchase(BaseEffect):
             raise ValueError("Substitute for cannot be null")
         if substitute_with is None:
             raise ValueError("Substitute with cannot be null")
-        self._subject: Union[BaseTile, Weapon] = subject
+        self._subject_type: Type = subject if isinstance(subject, type) else type(subject)
         self._substitute_for: Dict[ResourceTypeEnum, int] = substitute_for
         self._substitute_with: Dict[ResourceTypeEnum, int] = substitute_with
         self._allow_multiple: bool = allow_multiple
@@ -120,7 +127,7 @@ class AllowSubstitutionForPurchase(BaseEffect):
         if current_price is None:
             raise ValueError("Current price cannot be null")
 
-        if not isinstance(target, type(self._subject)):
+        if not isinstance(target, type(self._subject_type)):
             return current_price
 
         number_of_times_substitute_for_is_in_current_price: int = self.times_contained(
