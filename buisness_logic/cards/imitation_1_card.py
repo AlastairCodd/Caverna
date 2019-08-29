@@ -9,7 +9,4 @@ class Imitation1Card(BaseCard):
     def __init__(self):
         BaseCard.__init__(
             self, "Imitation", 10,
-            actions=Conditional(
-                ActionCombinationEnum.AndThen,
-                payAction.PayAction({ResourceTypeEnum.food: 1}),
-                useAnotherCardAction.UseAnotherCardAction()))
+            actions=useAnotherCardAction.UseAnotherCardAction({ResourceTypeEnum.food: 1}))

@@ -8,8 +8,7 @@ class HouseworkCard(BaseCard):
 
     def __init__(self):
         BaseCard.__init__(
-            self,
-            "Housework", 8, -1,
+            self, "Housework", 8, -1,
             Conditional(
                 ActionCombinationEnum.AndOr,
                 receiveAction.ReceiveAction({ResourceTypeEnum.dog: 1}),
