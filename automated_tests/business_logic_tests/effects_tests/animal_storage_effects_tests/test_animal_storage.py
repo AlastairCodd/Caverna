@@ -46,8 +46,12 @@ class Investigation():
         return successes
 
     def generate_resource_layouts(self, max_resources_per_tile: int, number_of_tiles: int) \
-        -> Generator[List[Dict[ResourceTypeEnum, int]], None, None]:
-        pass
+            -> Generator[List[Dict[ResourceTypeEnum, int]], None, None]:
+        result: List[Dict[ResourceTypeEnum, int]] = []
+        animal_seed = [0 for animal in self._animals]
+
+        for animal in self._animals:
+
 
     def generate_set_partitions(self, number_of_tiles: int) -> Generator[List[Union[ResourceTypeEnum, None]], None, None]:
         number_of_partitions: int = pow(len(self._animals_or_none), number_of_tiles)

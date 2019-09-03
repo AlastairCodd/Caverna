@@ -46,7 +46,5 @@ class BreedAnimalsAction(BaseAction):
         else:
             animals_to_reproduce = animals_which_can_reproduce
 
-
-
     def new_turn_reset(self):
         pass
