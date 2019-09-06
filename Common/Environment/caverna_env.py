@@ -1,7 +1,7 @@
 from typing import Tuple, Dict, List
 from gym import Env
 from numpy import argmax, array, concatenate
-from common.creators.card_creator import CardCreator
+from common.forges.card_forge import CardForge
 from common.defaults.players_default import PlayersDefault
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
@@ -38,7 +38,7 @@ class CavernaEnv(Env):
         self._turn_phase = None
         self._current_player: Player = self._players[0]
         
-        card_creator = CardCreator()
+        card_creator = CardForge()
         self._cards = card_creator.create_all_cards()
 
         return self.observe()
