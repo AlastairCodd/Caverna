@@ -2,10 +2,11 @@ from typing import List
 from buisness_logic.cards import *
 from core.baseClasses.base_card import BaseCard
 
-class CardCreator(object):
+
+class CardForge(object):
     
     def create_all_cards(self) -> List[BaseCard]:
-        '''Returns a list containing a single instance of all of the cards'''
+        """Returns a list containing a single instance of all of the cards"""
         cards = [
             clearing_card.clearingCard(),
             depot_card.depotCard(),
