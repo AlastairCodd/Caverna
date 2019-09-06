@@ -1,12 +1,14 @@
 from math import floor
-from typing import List, Generator, Union, Dict
+from typing import List, Generator, Union, Dict, Iterable
 from buisness_logic.validators.partition_resource_validator import PartitionResourceValidator
+from common.forges.integer_partition_forge import IntegerPartitionForge
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
 class Investigation():
     def __init__(self):
         self._partitionResourceValidator: PartitionResourceValidator = PartitionResourceValidator()
+        self._integerPartitionForge: IntegerPartitionForge = IntegerPartitionForge()
         self._animals: List[ResourceTypeEnum] = [
             ResourceTypeEnum.sheep,
             ResourceTypeEnum.boar,
@@ -48,9 +50,15 @@ class Investigation():
     def generate_resource_layouts(self, max_resources_per_tile: int, number_of_tiles: int) \
             -> Generator[List[Dict[ResourceTypeEnum, int]], None, None]:
         result: List[Dict[ResourceTypeEnum, int]] = []
-        animal_seed = [0 for animal in self._animals]
+        last_occurrence: Dict[ResourceTypeEnum, int] = {animal: 0 for animal in self._animals}
+        integer_partitions: Iterable[List[int]] = self._integerPartitionForge.generate_integer_partitions(max_resources_per_tile)
 
         for animal in self._animals:
+            for integer_partition in integer_partitions:
+                #sheep, [3, 2, 1]
+
+    def generate_resource_layout_for_partition(self, animal_type: ResourceTypeEnum, partition: List[int], number_of_tiles) \
+            -> Generator[List[Dict[ResourceTypeEnum, int]], None, None]:
 
 
     def generate_set_partitions(self, number_of_tiles: int) -> Generator[List[Union[ResourceTypeEnum, None]], None, None]:
