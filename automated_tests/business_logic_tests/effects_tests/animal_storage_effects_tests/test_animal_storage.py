@@ -50,16 +50,27 @@ class Investigation():
     def generate_resource_layouts(self, max_resources_per_tile: int, number_of_tiles: int) \
             -> Generator[List[Dict[ResourceTypeEnum, int]], None, None]:
         result: List[Dict[ResourceTypeEnum, int]] = []
-        last_occurrence: Dict[ResourceTypeEnum, int] = {animal: 0 for animal in self._animals}
         integer_partitions: Iterable[List[int]] = self._integerPartitionForge.generate_integer_partitions(max_resources_per_tile)
 
         for animal in self._animals:
             for integer_partition in integer_partitions:
                 #sheep, [3, 2, 1]
+                for permutation in self.permute_integer_partition(integer_partition, number_of_tiles):
 
     def generate_resource_layout_for_partition(self, animal_type: ResourceTypeEnum, partition: List[int], number_of_tiles) \
             -> Generator[List[Dict[ResourceTypeEnum, int]], None, None]:
 
+    def permute_integer_partition(self, partition: List[int], number_of_tiles: int) -> Generator[List[int], None, None]:
+        if partition is None:
+            raise ValueError("partition may not be null")
+        if len(partition) > number_of_tiles:
+            raise ValueError("cannot fill x tiles with more than x items")
+
+        last_occurrence: Dict[int, int] = {x: 0 for x in partition}
+        result: List[int] = [0 for _ in range(number_of_tiles)]
+        for position in range(number_of_tiles):
+            result[position] = partition[0]
+            for pos_1 in range(number_of_tiles - 1):
 
     def generate_set_partitions(self, number_of_tiles: int) -> Generator[List[Union[ResourceTypeEnum, None]], None, None]:
         number_of_partitions: int = pow(len(self._animals_or_none), number_of_tiles)
