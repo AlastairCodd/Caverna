@@ -2,6 +2,7 @@ from math import floor
 from typing import List, Generator, Union, Dict, Iterable
 from buisness_logic.validators.partition_resource_validator import PartitionResourceValidator
 from common.forges.integer_partition_forge import IntegerPartitionForge
+from common.services.integer_partition_permutation_forge import IntegerPartitionPermutationForge
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
@@ -9,6 +10,7 @@ class Investigation():
     def __init__(self):
         self._partitionResourceValidator: PartitionResourceValidator = PartitionResourceValidator()
         self._integerPartitionForge: IntegerPartitionForge = IntegerPartitionForge()
+        self._integerPartitionPermutationForge: IntegerPartitionPermutationForge = IntegerPartitionPermutationForge()
         self._animals: List[ResourceTypeEnum] = [
             ResourceTypeEnum.sheep,
             ResourceTypeEnum.boar,
@@ -55,22 +57,12 @@ class Investigation():
         for animal in self._animals:
             for integer_partition in integer_partitions:
                 #sheep, [3, 2, 1]
-                for permutation in self.permute_integer_partition(integer_partition, number_of_tiles):
+                for permutation in self._integerPartitionPermutationForge.generate_permutation(integer_partition, number_of_tiles):
+                    pass
 
     def generate_resource_layout_for_partition(self, animal_type: ResourceTypeEnum, partition: List[int], number_of_tiles) \
             -> Generator[List[Dict[ResourceTypeEnum, int]], None, None]:
-
-    def permute_integer_partition(self, partition: List[int], number_of_tiles: int) -> Generator[List[int], None, None]:
-        if partition is None:
-            raise ValueError("partition may not be null")
-        if len(partition) > number_of_tiles:
-            raise ValueError("cannot fill x tiles with more than x items")
-
-        last_occurrence: Dict[int, int] = {x: 0 for x in partition}
-        result: List[int] = [0 for _ in range(number_of_tiles)]
-        for position in range(number_of_tiles):
-            result[position] = partition[0]
-            for pos_1 in range(number_of_tiles - 1):
+        pass
 
     def generate_set_partitions(self, number_of_tiles: int) -> Generator[List[Union[ResourceTypeEnum, None]], None, None]:
         number_of_partitions: int = pow(len(self._animals_or_none), number_of_tiles)
