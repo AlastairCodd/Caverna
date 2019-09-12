@@ -26,10 +26,20 @@ class Investigation():
             ResourceTypeEnum.cow
         ]
 
-    def main(self, max_for_resource: int = 5, max_per_tile: int = 3, number_of_tiles: int = 5):
-        for resource_layout in self.generate_resource_layouts(max_per_tile, number_of_tiles):
-            successful_partitions: List[List[Union[ResourceTypeEnum, None]]] = \
-                self.check_resource_layout_against_possible_set_partitions(resource_layout, {})
+    def main(self, max_for_resource: int = 5, max_per_tile: int = 3, number_of_tiles: int = 5) -> None:
+        number_of_resource_possibilities: int = (max_for_resource + 1) ** len(self._animals)
+        print(number_of_resource_possibilities)
+        print()
+        for i in range(number_of_resource_possibilities):
+            resources_per_animal: Dict[ResourceTypeEnum, int] = {
+                ResourceTypeEnum.sheep: floor((i / (max_for_resource + 1) ** 0)) % (max_for_resource + 1),
+                ResourceTypeEnum.boar: floor((i / (max_for_resource + 1) ** 1)) % (max_for_resource + 1),
+                ResourceTypeEnum.donkey: floor((i / (max_for_resource + 1) ** 2)) % (max_for_resource + 1),
+                ResourceTypeEnum.cow: floor((i / (max_for_resource + 1) ** 3)) % (max_for_resource + 1)
+            }
+            for resource_layout in self.generate_resource_layouts(resources_per_animal, max_per_tile, number_of_tiles):
+                successful_partitions: List[List[Union[ResourceTypeEnum, None]]] = \
+                   self.check_resource_layout_against_possible_set_partitions(resource_layout, {})
 
     def check_resource_layout_against_possible_set_partitions(
             self,
@@ -49,23 +59,68 @@ class Investigation():
                 successes.append(partition)
         return successes
 
-    def generate_resource_layouts(self, max_resources_per_tile: int, number_of_tiles: int) \
+    def generate_resource_layouts(
+            self,
+            resources_per_animal: Dict[ResourceTypeEnum, int],
+            max_resources_per_tile: int,
+            number_of_tiles: int) \
             -> Generator[List[Dict[ResourceTypeEnum, int]], None, None]:
-        result: List[Dict[ResourceTypeEnum, int]] = []
-        integer_partitions: Iterable[List[int]] = self._integerPartitionForge.generate_integer_partitions(max_resources_per_tile)
+        sheep_partitions: Iterable[List[int]] = self._integerPartitionForge\
+            .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.sheep])
+        for sheep_partition in sheep_partitions:
+            if not self._are_partition_dimensions_valid(sheep_partition, max_resources_per_tile, number_of_tiles):
+                continue
+            permuted_sheep_partitions: Iterable[List[int]] = self._integerPartitionPermutationForge \
+                .generate_permutation(sheep_partition, number_of_tiles)
+            for permuted_sheep_partition in permuted_sheep_partitions:
 
-        for animal in self._animals:
-            for integer_partition in integer_partitions:
-                #sheep, [3, 2, 1]
-                for permutation in self._integerPartitionPermutationForge.generate_permutation(integer_partition, number_of_tiles):
-                    pass
+                boar_partitions: Iterable[List[int]] = self._integerPartitionForge\
+                    .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.boar])
+                for boar_partition in boar_partitions:
+                    if not self._are_partition_dimensions_valid(boar_partition, max_resources_per_tile, number_of_tiles):
+                        continue
+                    permuted_boar_partitions: Iterable[List[int]] = self._integerPartitionPermutationForge \
+                        .generate_permutation(boar_partition, number_of_tiles)
+                    for permuted_boar_partition in permuted_boar_partitions:
 
-    def generate_resource_layout_for_partition(self, animal_type: ResourceTypeEnum, partition: List[int], number_of_tiles) \
-            -> Generator[List[Dict[ResourceTypeEnum, int]], None, None]:
-        pass
+                        donkey_partitions: Iterable[List[int]] = self._integerPartitionForge\
+                            .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.donkey])
+                        for donkey_partition in donkey_partitions:
+                            if not self._are_partition_dimensions_valid(donkey_partition, max_resources_per_tile, number_of_tiles):
+                                continue
+                            permuted_donkey_partitions: Iterable[List[int]] = self._integerPartitionPermutationForge \
+                                .generate_permutation(donkey_partition, number_of_tiles)
+                            for permuted_donkey_partition in permuted_donkey_partitions:
+
+                                cow_partitions: Iterable[List[int]] = self._integerPartitionForge\
+                                    .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.cow])
+                                for cow_partition in cow_partitions:
+                                    if not self._are_partition_dimensions_valid(cow_partition, max_resources_per_tile, number_of_tiles):
+                                        continue
+                                    permuted_cow_partitions: Iterable[List[int]] = self._integerPartitionPermutationForge \
+                                        .generate_permutation(cow_partition, number_of_tiles)
+                                    for permuted_cow_partition in permuted_cow_partitions:
+
+                                        result: List[Dict[ResourceTypeEnum, int]] = []
+                                        for i in range(number_of_tiles):
+                                            result.append({
+                                                ResourceTypeEnum.sheep: permuted_sheep_partition[i],
+                                                ResourceTypeEnum.boar: permuted_boar_partition[i],
+                                                ResourceTypeEnum.donkey: permuted_donkey_partition[i],
+                                                ResourceTypeEnum.cow: permuted_cow_partition[i],
+                                            })
+                                        yield result
+
+    def _are_partition_dimensions_valid(
+            self,
+            partition: List[int],
+            max_resources_per_tile: int,
+            number_of_tiles: int) -> bool:
+        result: bool = len(partition) <= number_of_tiles and all(x for x in partition if x < max_resources_per_tile)
+        return result
 
     def generate_set_partitions(self, number_of_tiles: int) -> Generator[List[Union[ResourceTypeEnum, None]], None, None]:
-        number_of_partitions: int = pow(len(self._animals_or_none), number_of_tiles)
+        number_of_partitions: int = len(self._animals_or_none) ** number_of_tiles
         for i in range(number_of_partitions):
             yield self.generate_set_partition_for_index(number_of_tiles, i)
 
@@ -73,7 +128,7 @@ class Investigation():
         result: List[Union[ResourceTypeEnum, None]] = []
         for p in range(number_of_tiles):
             number_of_animals = len(self._animals_or_none)
-            animal_index: int = floor(index / pow(number_of_animals, p) % number_of_animals)
+            animal_index: int = floor(index / (number_of_animals ** p) % number_of_animals)
             animal: Union[ResourceTypeEnum, None] = self._animals_or_none[animal_index]
             result.append(animal)
 
