@@ -1,14 +1,18 @@
 from typing import List, Generator, Dict, Iterable, Tuple, cast
 
 
-class IntegerPartitionPermutationForge():
+class IntegerPartitionPermutationForge(object):
     def generate_permutation(self, partition: List[int], number_of_tiles: int) -> Generator[List[int], None, None]:
-        # partition = [1,2,2], n_o_t = 4
+        """Permutes the given partition across "number_of_tiles" spaces.
+
+        :param partition: The partition of some integer to be permuted. This cannot be null, and its length must be less than "number_of_tiles"
+        :param number_of_tiles: The number of possible spaces to permute the partition over. This must be greater than zero.
+        :return: A generator which provides all permutations of the partition. This will never be null, and will yield at least one item.
+        """
         if partition is None:
             raise ValueError("partition may not be null")
         if len(partition) > number_of_tiles:
             raise ValueError("cannot fill x tiles with more than x items")
-        # p_part = [1,2,2,0]
         padded_partition: List[int] = partition + [0 for _ in range(number_of_tiles - len(partition))]
         index_to_count_dictionary: Dict[int, int] = {}
         for index in padded_partition:
@@ -16,12 +20,18 @@ class IntegerPartitionPermutationForge():
 
         dict_as_tuple_list: List[Tuple[int, int]] = cast(List[Tuple[int, int]], list(list(index_to_count_dictionary.items())))
 
-        return self.recurse(dict_as_tuple_list)
+        return self._recurse(dict_as_tuple_list)
 
-    def recurse(
+    def _recurse(
             self,
             integer_counts: List[Tuple[int, int]],
             current_index: int = 0) -> Generator[List[int], None, None]:
+        """Recurses through integer counts, and returns all permutations of elements which have index >= "current_index"
+
+        :param integer_counts: The number of times each integer appears in the permutation. This must be longer than current_index.
+        :param current_index: The current index, which will be permuted into each possible permutation of elements which have index > "current_index".
+        :returns: All possible permutations of elements with index >= "current_index". This will never be null.
+        """
         # result = [0]
         # result = [2,2,0],[2,0,2],[0,2,2]
         # result = [1,2,2,0],[1,2,0,2],[1,0,2,2]
@@ -35,17 +45,16 @@ class IntegerPartitionPermutationForge():
         count_for_remaining_indices: int = 0
 
         if current_index + 1 < len(integer_counts):
-            remaining_integer_recursion_result = self.recurse(integer_counts, current_index + 1)
             count_for_remaining_indices = sum(map(lambda t: t[1], integer_counts[current_index + 1:]))
 
         possible_positions: Iterable[List[int]] = list(self.generate_integer_positions(
-            integer_counts[current_index][1],
+            count_for_current_index,
             count_for_current_index + count_for_remaining_indices - 1))
         for position in possible_positions:
             # [1, 3]
             remaining_integer_recursion_result: Iterable[List[int]] = [[]]
             if current_index + 1 < len(integer_counts):
-                remaining_integer_recursion_result = self.recurse(integer_counts, current_index + 1)
+                remaining_integer_recursion_result = self._recurse(integer_counts, current_index + 1)
 
             for r in remaining_integer_recursion_result:
                 result: List[int] = [integer_counts[current_index][0] for _ in range(count_for_current_index + count_for_remaining_indices)]
