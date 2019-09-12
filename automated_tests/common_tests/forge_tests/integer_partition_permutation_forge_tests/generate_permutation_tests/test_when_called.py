@@ -6,6 +6,7 @@ from automated_tests.common_tests.forge_tests.integer_partition_permutation_forg
 
 class Test_When_Test_When_Called(Given_A_IntegerPartitionPermutationForge):
     def because(self) -> None:
+        self.maxDiff = None
         self._expected_result: List[List[int]] = [
             [1, 2, 2, 0], [1, 2, 0, 2], [1, 0, 2, 2],
             [2, 1, 2, 0], [2, 1, 0, 2], [0, 1, 2, 2],
