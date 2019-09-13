@@ -51,10 +51,17 @@ class Investigation():
                         print(f"{tile[animal]}\t", end="")
                     print()
 
-                successful_partitions: List[Tuple[List[Union[ResourceTypeEnum, None]], Dict[ResourceTypeEnum, int]]] = \
-                    list(self.check_resource_layout_against_possible_set_partitions(resource_layout, resources_per_animal))
-                if any(successful_partitions):
-                    for (partition, excess) in successful_partitions:
+                evaluated_partitions: Iterable[Tuple[bool, List[Union[ResourceTypeEnum, None]], Dict[ResourceTypeEnum, int], Dict[ResourceTypeEnum, int]]] = \
+                    self.check_resource_layout_against_possible_set_partitions(resource_layout, resources_per_animal)
+
+                has_headed_been_added_to_successful_output: bool = False
+                has_headed_been_added_to_unsuccessful_output: bool = False
+
+                for (success, partition, remaining, excess) in evaluated_partitions:
+                    if success:
+                        if not has_headed_been_added_to_successful_output:
+                            pass
+
                         tile: Union[ResourceTypeEnum, None]
                         for tile in partition:
                             if tile is None:
@@ -69,15 +76,29 @@ class Investigation():
                         print(f"boar: {excess[ResourceTypeEnum.boar]}, ", end="")
                         print(f"donkey: {excess[ResourceTypeEnum.donkey]}, ", end=""),
                         print(f"cow: {excess[ResourceTypeEnum.cow]}}}")
-                else:
-                    print("no successful allocations")
+
+                    else:
+                        tile: Union[ResourceTypeEnum, None]
+                        for tile in partition:
+                            if tile is None:
+                                print("_\t\t", end="")
+                            else:
+                                if tile is ResourceTypeEnum.cow:
+                                    print(f"cow\t\t", end="")
+                                else:
+                                    print(f"{tile.name}\t", end="")
+                        print(f"excess: {{", end="")
+                        print(f"sheep: {excess[ResourceTypeEnum.sheep]}, ", end="")
+                        print(f"boar: {excess[ResourceTypeEnum.boar]}, ", end="")
+                        print(f"donkey: {excess[ResourceTypeEnum.donkey]}, ", end=""),
+                        print(f"cow: {excess[ResourceTypeEnum.cow]}}}")
                 print()
 
     def check_resource_layout_against_possible_set_partitions(
             self,
             resource_layout: List[Dict[ResourceTypeEnum, int]],
             current_resources: Dict[ResourceTypeEnum, int]) \
-            -> Iterable[Tuple[List[Union[ResourceTypeEnum, None]], Dict[ResourceTypeEnum, int]]]:
+            -> Iterable[Tuple[bool, List[Union[ResourceTypeEnum, None]], Dict[ResourceTypeEnum, int], Dict[ResourceTypeEnum, int]]]:
         """Checks the provided resource layout against all possible set partitions,
         and returns the ones which are able to store the provided resources.
 
@@ -87,9 +108,9 @@ class Investigation():
         partition. This will never be null, but may be empty.
         """
         for partition in self.generate_set_partitions(len(resource_layout)):
-            excess = self._partitionResourceValidator.get_resource_excess(resource_layout, current_resources, partition)
-            if all([x == 0 for x in excess.values()]):
-                yield (partition, excess)
+            remaining, excess = self._partitionResourceValidator.get_resource_remaining_and_excess(resource_layout, current_resources, partition)
+            success: bool =  all([x == 0 for x in remaining.values()])
+            yield (success, partition, remaining, excess)
 
     def generate_resource_layouts(
             self,
