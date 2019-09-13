@@ -1,4 +1,4 @@
-from typing import List, Dict, Union, TypeVar
+from typing import List, Dict, Union, TypeVar, Tuple
 from core.exceptions.ArgumentOutOfRangeError import ArgumentOutOfRangeError
 
 T = TypeVar('T')
@@ -20,15 +20,17 @@ class PartitionResourceValidator:
         if len(partition) != len(resource_layout):
             raise ArgumentOutOfRangeError("partition", "resource layout")
 
-        remaining_resources: Dict[T, int] = self.get_resource_excess(resource_layout, current_resources, partition)
+        remaining_resources: Dict[T, int]
+        excess_storage: Dict[T, int]
+        remaining_resources, excess_storage = self.get_resource_remaining_and_excess(resource_layout, current_resources, partition)
         result: bool = all([x == 0 for x in remaining_resources.values()])
         return result
 
-    def get_resource_excess(
+    def get_resource_remaining_and_excess(
             self,
             resource_layout: List[Dict[T, int]],
             current_resources: Dict[T, int],
-            partition: List[Union[T, None]]) -> Dict[T, int]:
+            partition: List[Union[T, None]]) -> Tuple[Dict[T, int], Dict[T, int]]:
         if resource_layout is None:
             raise ValueError("resource layout may not be null")
         if current_resources is None:
@@ -39,13 +41,16 @@ class PartitionResourceValidator:
             raise ArgumentOutOfRangeError("partition", "resource layout")
 
         remaining_resources: Dict[T, int] = dict(current_resources)
+        excess_resources: Dict[T, int] = {}
         for i in range(len(partition)):
             object_stored_in_current: Union[T, None] = partition[i]
             if object_stored_in_current is not None:
                 amount_of_resources_allowed_in_current: int = resource_layout[i][object_stored_in_current]
                 if object_stored_in_current in remaining_resources:
                     if remaining_resources[object_stored_in_current] < amount_of_resources_allowed_in_current:
+                        excess_resources.setdefault(object_stored_in_current, 0)
+                        excess_resources[object_stored_in_current] += amount_of_resources_allowed_in_current - remaining_resources[object_stored_in_current]
                         remaining_resources[object_stored_in_current] = 0
                     else:
                         remaining_resources[object_stored_in_current] -= amount_of_resources_allowed_in_current
-        return remaining_resources
+        return remaining_resources, excess_resources
