@@ -41,14 +41,13 @@ class PartitionResourceValidator:
             raise ArgumentOutOfRangeError("partition", "resource layout")
 
         remaining_resources: Dict[T, int] = dict(current_resources)
-        excess_resources: Dict[T, int] = {}
+        excess_resources: Dict[T, int] = {t: 0 for t in current_resources}
         for i in range(len(partition)):
             object_stored_in_current: Union[T, None] = partition[i]
             if object_stored_in_current is not None:
                 amount_of_resources_allowed_in_current: int = resource_layout[i][object_stored_in_current]
                 if object_stored_in_current in remaining_resources:
                     if remaining_resources[object_stored_in_current] < amount_of_resources_allowed_in_current:
-                        excess_resources.setdefault(object_stored_in_current, 0)
                         excess_resources[object_stored_in_current] += amount_of_resources_allowed_in_current - remaining_resources[object_stored_in_current]
                         remaining_resources[object_stored_in_current] = 0
                     else:
