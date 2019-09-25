@@ -243,6 +243,38 @@ class Investigation(object):
                                             })
                                         yield result
 
+    def recursive_generate_resource_layout(
+            self,
+            resources_per_animal: Dict[ResourceTypeEnum, int],
+            excess_per_animal: Dict[ResourceTypeEnum, int],
+            animal_iterator: Generator[ResourceTypeEnum, None, None],
+            max_resources_per_tile: int,
+            number_of_tiles: int) -> Generator[Dict[ResourceTypeEnum, List[int]], None, None]:
+        try:
+            current_animal: ResourceTypeEnum = animal_iterator.__next__()
+
+            current_layouts: Generator[Dict[ResourceTypeEnum, List[int]], None, None] = self.recursive_generate_resource_layout(
+                resources_per_animal,
+                excess_per_animal,
+                animal_iterator,
+                max_resources_per_tile,
+                number_of_tiles)
+            current_layout: Dict[ResourceTypeEnum, List[int]]
+
+            partitions_for_current_animal: Iterable[List[int]] = self._integerPartitionForge \
+                .generate_integer_partitions(resources_per_animal[current_animal] + excess_per_animal[current_animal])
+
+            for partition in partitions_for_current_animal:
+                if self._are_partition_dimensions_valid(partition, max_resources_per_tile, number_of_tiles):
+                    permuted_partitions: Iterable[List[int]] = self._integerPartitionPermutationForge \
+                        .generate_permutation(partition, number_of_tiles)
+                    for permuted_partition in permuted_partitions:
+                        for current_layout in current_layouts:
+                            current_layout[current_animal] = permuted_partition
+
+        except StopIteration:
+            yield {}
+
     def _are_partition_dimensions_valid(
             self,
             partition: List[int],
