@@ -4,3 +4,4 @@ __pycache__/
 workenv/
 venv/
 .idea/
+*failure_[0-9][0-9][0-9].txt
