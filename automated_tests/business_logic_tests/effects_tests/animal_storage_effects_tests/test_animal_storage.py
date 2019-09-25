@@ -100,7 +100,12 @@ class Investigation(object):
             ResourceTypeEnum.cow
         ]
 
-    def main(self, max_for_resource: int = 5, max_per_tile: int = 3, number_of_tiles: int = 5, start_possibility: int = 1) -> None:
+    def main(
+            self,
+            max_for_resource: int = 5,
+            max_per_tile: int = 3,
+            number_of_tiles: int = 5,
+            start_possibility: int = 1) -> None:
         number_of_resource_possibilities: int = (max_for_resource + 1) ** len(self._animals)
 
         logger: SuccessFailLogger = SuccessFailLogger(
@@ -110,14 +115,15 @@ class Investigation(object):
 
         logger.split_files()
 
-        logger.log(f"number of resource possibilities: {number_of_resource_possibilities}\n", True, True)
+        if start_possibility != 1:
+            logger.log(f"number of resource possibilities: {number_of_resource_possibilities}\n", True, True)
 
         try:
             for i in range(start_possibility, number_of_resource_possibilities):
                 resources_per_animal: Dict[ResourceTypeEnum, int] = {
-                    ResourceTypeEnum.sheep:  floor((i / (max_for_resource + 1) ** 0)) % (max_for_resource + 1), #3
-                    ResourceTypeEnum.boar:   floor((i / (max_for_resource + 1) ** 1)) % (max_for_resource + 1), #1
-                    ResourceTypeEnum.donkey: floor((i / (max_for_resource + 1) ** 2)) % (max_for_resource + 1), #3
+                    ResourceTypeEnum.sheep:  floor((i / (max_for_resource + 1) ** 0)) % (max_for_resource + 1),
+                    ResourceTypeEnum.boar:   floor((i / (max_for_resource + 1) ** 1)) % (max_for_resource + 1),
+                    ResourceTypeEnum.donkey: floor((i / (max_for_resource + 1) ** 2)) % (max_for_resource + 1),
                     ResourceTypeEnum.cow:    floor((i / (max_for_resource + 1) ** 3)) % (max_for_resource + 1)
                 }
 
@@ -184,32 +190,15 @@ class Investigation(object):
         except KeyboardInterrupt:
             logger.close_files()
 
-    def check_resource_layout_against_possible_set_partitions(
-            self,
-            resource_layout: List[Dict[ResourceTypeEnum, int]],
-            current_resources: Dict[ResourceTypeEnum, int]) \
-            -> Iterable[Tuple[bool, List[Union[ResourceTypeEnum, None]], Dict[ResourceTypeEnum, int], Dict[ResourceTypeEnum, int]]]:
-        """Checks the provided resource layout against all possible set partitions,
-        and returns the ones which are able to store the provided resources.
-
-        :param resource_layout: A list of dictionaries, each of which indicates how many of each resource may be stored in this set. This cannot be null.
-        :param current_resources: A dictionary which says how many of each animal is attempting to be stored. This cannot be null.
-        :returns: A list containing all set partitions (list with same length as resource layout, with entries matching which resource type holds this
-        partition. This will never be null, but may be empty.
-        """
-        for partition in self.generate_set_partitions(len(resource_layout)):
-            remaining, excess = self._partitionResourceValidator.get_resource_remaining_and_excess(resource_layout, current_resources, partition)
-            success: bool = all([x == 0 for x in remaining.values()])
-            yield (success, partition, remaining, excess)
-
     def generate_resource_layouts(
             self,
             resources_per_animal: Dict[ResourceTypeEnum, int],
             max_resources_per_tile: int,
-            number_of_tiles: int) \
+            number_of_tiles: int,
+            excess: int = 0) \
             -> Generator[List[Dict[ResourceTypeEnum, int]], None, None]:
         sheep_partitions: Iterable[List[int]] = self._integerPartitionForge \
-            .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.sheep])
+            .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.sheep] + excess)
         for sheep_partition in sheep_partitions:
             if not self._are_partition_dimensions_valid(sheep_partition, max_resources_per_tile, number_of_tiles):
                 continue
@@ -218,7 +207,7 @@ class Investigation(object):
             for permuted_sheep_partition in permuted_sheep_partitions:
 
                 boar_partitions: Iterable[List[int]] = self._integerPartitionForge \
-                    .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.boar])
+                    .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.boar] + excess)
                 for boar_partition in boar_partitions:
                     if not self._are_partition_dimensions_valid(boar_partition, max_resources_per_tile, number_of_tiles):
                         continue
@@ -227,7 +216,7 @@ class Investigation(object):
                     for permuted_boar_partition in permuted_boar_partitions:
 
                         donkey_partitions: Iterable[List[int]] = self._integerPartitionForge \
-                            .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.donkey])
+                            .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.donkey] + excess)
                         for donkey_partition in donkey_partitions:
                             if not self._are_partition_dimensions_valid(donkey_partition, max_resources_per_tile, number_of_tiles):
                                 continue
@@ -236,7 +225,7 @@ class Investigation(object):
                             for permuted_donkey_partition in permuted_donkey_partitions:
 
                                 cow_partitions: Iterable[List[int]] = self._integerPartitionForge \
-                                    .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.cow])
+                                    .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.cow] + excess)
                                 for cow_partition in cow_partitions:
                                     if not self._are_partition_dimensions_valid(cow_partition, max_resources_per_tile, number_of_tiles):
                                         continue
@@ -260,21 +249,6 @@ class Investigation(object):
             max_resources_per_tile: int,
             number_of_tiles: int) -> bool:
         result: bool = len(partition) <= number_of_tiles and all(x for x in partition if x < max_resources_per_tile)
-        return result
-
-    def generate_set_partitions(self, number_of_tiles: int) -> Generator[List[Union[ResourceTypeEnum, None]], None, None]:
-        number_of_partitions: int = len(self._animals_or_none) ** number_of_tiles
-        for i in range(number_of_partitions):
-            yield self.generate_set_partition_for_index(number_of_tiles, i)
-
-    def generate_set_partition_for_index(self, number_of_tiles: int, index: int) -> List[Union[ResourceTypeEnum, None]]:
-        result: List[Union[ResourceTypeEnum, None]] = []
-        for p in range(number_of_tiles):
-            number_of_animals = len(self._animals_or_none)
-            animal_index: int = floor(index / (number_of_animals ** p) % number_of_animals)
-            animal: Union[ResourceTypeEnum, None] = self._animals_or_none[animal_index]
-            result.append(animal)
-
         return result
 
     def log_header(
