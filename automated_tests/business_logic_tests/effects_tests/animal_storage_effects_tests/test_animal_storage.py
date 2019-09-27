@@ -5,6 +5,7 @@ from typing import List, Generator, Union, Dict, Iterable, Tuple, TextIO
 from buisness_logic.validators.partition_resource_validator import PartitionResourceValidator
 from common.forges.integer_partition_forge import IntegerPartitionForge
 from common.services.integer_partition_permutation_forge import IntegerPartitionPermutationForge
+from common.services.resource_layout_exhaustive_checker import ResourceLayoutExhaustiveChecker
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
@@ -85,6 +86,8 @@ class Investigation(object):
         self._partitionResourceValidator: PartitionResourceValidator = PartitionResourceValidator()
         self._integerPartitionForge: IntegerPartitionForge = IntegerPartitionForge()
         self._integerPartitionPermutationForge: IntegerPartitionPermutationForge = IntegerPartitionPermutationForge()
+        self._resourceLayoutExhaustiveChecker: ResourceLayoutExhaustiveChecker = ResourceLayoutExhaustiveChecker()
+
         self._animals: List[ResourceTypeEnum] = [
             ResourceTypeEnum.sheep,
             ResourceTypeEnum.boar,
@@ -138,7 +141,7 @@ class Investigation(object):
 
                 for resource_layout in self.generate_resource_layouts(resources_per_animal, max_per_tile, number_of_tiles):
                     evaluated_partitions: Iterable[Tuple[bool, List[Union[ResourceTypeEnum, None]], Dict[ResourceTypeEnum, int], Dict[ResourceTypeEnum, int]]] = \
-                        self.check_resource_layout_against_possible_set_partitions(resource_layout, resources_per_animal)
+                        self._resourceLayoutExhaustiveChecker.check_resource_layout_against_possible_set_partitions(resource_layout, resources_per_animal)
 
                     has_header_been_added_to_successful_output: bool = False
                     has_header_been_added_to_failure_output: bool = False

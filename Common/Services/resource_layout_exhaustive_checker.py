@@ -1,6 +1,7 @@
 from typing import Dict, List, Iterable, Tuple, Union
 
 from buisness_logic.validators.partition_resource_validator import PartitionResourceValidator
+from common.forges.set_partition_forge import SetPartitionForge
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
@@ -8,6 +9,7 @@ class ResourceLayoutExhaustiveChecker(object):
 
     def __init__(self):
         self._partitionResourceValidator: PartitionResourceValidator = PartitionResourceValidator()
+        self._setPartitionForge: SetPartitionForge = SetPartitionForge()
 
     def check_resource_layout_against_possible_set_partitions(
             self,
@@ -22,7 +24,9 @@ class ResourceLayoutExhaustiveChecker(object):
         :returns: A list containing all set partitions (list with same length as resource layout, with entries matching which resource type holds this
         partition. This will never be null, but may be empty.
         """
-        for partition in self.generate_set_partitions(len(resource_layout)):
+        animals_or_none: List[ResourceTypeEnum, None] = [None, ResourceTypeEnum.sheep, ResourceTypeEnum.donkey, ResourceTypeEnum.cow, ResourceTypeEnum.boar]
+
+        for partition in self._setPartitionForge.generate_set_partitions(len(resource_layout), animals_or_none):
             remaining, excess = self._partitionResourceValidator.get_resource_remaining_and_excess(resource_layout, current_resources, partition)
             success: bool = all([x == 0 for x in remaining.values()])
             yield (success, partition, remaining, excess)
