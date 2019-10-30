@@ -27,6 +27,10 @@ class Player(TileContainer, ResourceContainer, ABC):
     def dwarves(self) -> List[Dwarf]:
         return list(self._dwarves)
 
+    @property
+    def turn_index(self) -> int:
+        return self._turnIndex
+
     def set_turn_index(self, turn_index: int):
         self._turnIndex = turn_index
 
