@@ -37,6 +37,18 @@ class TileContainer(object):
         return len([t for t in self._tiles.values() if t.get_tile_type() == tile_type])
 
     @property
+    def tile_count(self) -> int:
+        return self._tileCount
+
+    @property
+    def width(self):
+        return self._width
+
+    @property
+    def height(self):
+        return self._height
+
+    @property
     def tiles(self) -> List[BaseTile]:
         """Get the base tiles contained in this container"""
         result = [x.tile for x in self._tiles.values() if x.tile is not None]
@@ -137,7 +149,7 @@ class TileContainer(object):
         result = []
 
         for x in direction_offset:
-            adjacent_location = location + direction_offset[x]
+            adjacent_location: int = location + direction_offset[x]
             if adjacent_direction_condition[x](adjacent_location):
                 result.append((adjacent_location, x))
 

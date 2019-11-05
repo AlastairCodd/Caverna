@@ -37,7 +37,7 @@ class BaseTile(ABC):
         if effects is None:
             effects = []
         self._effects: List[BaseEffect] = effects
-        self._location: int = -1
+        self.location: int = -1
         self._color: TileColourEnum = colour
 
     @property
@@ -49,13 +49,21 @@ class BaseTile(ABC):
         return self._basePoints
 
     @property
-    def location(self) -> int:
-        return self._location
-
-    @property
     def colour(self) -> TileColourEnum:
         return self._color
 
     @property
     def effects(self) -> List[BaseEffect]:
         return self._effects
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def cost(self):
+        return self._cost
