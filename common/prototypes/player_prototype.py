@@ -1,8 +1,10 @@
 from common.entities.player import Player
 from common.prototypes.dwarf_prototype import DwarfPrototype
+from common.prototypes.resource_container_prototype import ResourceContainerPrototype
+from core.baseClasses.base_prototype import BasePrototype
 
 
-class PlayerPrototype(object):
+class PlayerPrototype(BasePrototype[Player]):
     def __init__(self):
         self._dwarf_prototype: DwarfPrototype = DwarfPrototype()
         self._resource_container_prototype: ResourceContainerPrototype = ResourceContainerPrototype()
