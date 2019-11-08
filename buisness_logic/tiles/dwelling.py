@@ -1,58 +1,77 @@
+from abc import ABC
+from typing import Dict, List
+
+from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseTile
+from core.constants import tile_ids
 from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum
 from buisness_logic.effects import population_effects, animal_storage_effects
 
 
-class Dwelling(BaseTile):
+class BaseDwelling(BaseTile, ABC):
+    def __init__(
+            self,
+            name: str,
+            tile_id: int,
+            base_points: int,
+            cost: Dict[ResourceTypeEnum, int],
+            effects: List[BaseEffect]):
+        BaseTile.__init__(
+            self,
+            name,
+            tile_id,
+            True,
+            base_points,
+            cost,
+            effects,
+            TileColourEnum.Green
+        )
+
+
+class Dwelling(BaseDwelling):
     def __init__(self):
-        super().__init__(
-            "Dwelling", 0, True, 3,
+        BaseDwelling.__init__(
+            self, "Dwelling", tile_ids.DwellingTileId, 3,
             {ResourceTypeEnum.wood: 4, ResourceTypeEnum.stone: 3},
-            [population_effects.IncreasePopulationCapacityEffect(1)],
-            TileColourEnum.Green)
+            [population_effects.IncreasePopulationCapacityEffect(1)])
 
 
-class SimpleStoneDwelling(BaseTile):
+class SimpleStoneDwelling(BaseDwelling):
     def __init__(self):
-        super().__init__(
-            "Simple Dwelling (stone)", 1, True, 0,
+        BaseDwelling.__init__(
+            self, "Simple Dwelling (stone)", tile_ids.SimpleDwellingStoneTileId, 0,
             {ResourceTypeEnum.wood: 4, ResourceTypeEnum.stone: 2},
-            [population_effects.IncreasePopulationCapacityEffect(1)],
-            TileColourEnum.Green)
+            [population_effects.IncreasePopulationCapacityEffect(1)])
 
 
-class SimpleWoodDwelling(BaseTile):
+class SimpleWoodDwelling(BaseDwelling):
     def __init__(self):
-        super().__init__(
-            "Simple Dwelling (wood)", 2, True, 0,
+        BaseDwelling.__init__(
+            self, "Simple Dwelling (wood)", tile_ids.SimpleDwellingWoodTileId, 0,
             {ResourceTypeEnum.wood: 3, ResourceTypeEnum.stone: 3},
-            [population_effects.IncreasePopulationCapacityEffect(1)],
-            TileColourEnum.Green)
+            [population_effects.IncreasePopulationCapacityEffect(1)])
 
 
-class MixedDwelling(BaseTile):
+class MixedDwelling(BaseDwelling):
     def __init__(self):
-        super().__init__(
-            "Mixed Dwelling", 3, True, 4,
+        BaseDwelling.__init__(
+            self, "Mixed Dwelling", tile_ids.MixedDwellingTileId, 4,
             {ResourceTypeEnum.wood: 5, ResourceTypeEnum.stone: 4},
-            [population_effects.IncreasePopulationCapacityEffect(1), animal_storage_effects.StoreAny(2)],
-            TileColourEnum.Green)
+            [population_effects.IncreasePopulationCapacityEffect(1), animal_storage_effects.StoreAny(2)])
 
 
-class CoupleDwelling(BaseTile):
+class CoupleDwelling(BaseDwelling):
     def __init__(self):
-        super().__init__(
-            "Couple Dwelling", 4, True, 5,
+        BaseDwelling.__init__(
+            self, "Couple Dwelling", tile_ids.CoupleDwellingTileId, 5,
             {ResourceTypeEnum.wood: 8, ResourceTypeEnum.stone: 6},
-            [population_effects.IncreasePopulationCapacityEffect(2)],
-            TileColourEnum.Green)
+            [population_effects.IncreasePopulationCapacityEffect(2)])
 
 
-class AdditionalDwelling(BaseTile):
+class AdditionalDwelling(BaseDwelling):
     def __init__(self):
-        super().__init__(
-            "Couple Dwelling", 5, True, 5,
+        BaseDwelling.__init__(
+            self, "Additional Dwelling", tile_ids.AdditionalDwellingTileId, 5,
             {ResourceTypeEnum.wood: 4, ResourceTypeEnum.stone: 3},
             [population_effects.IncreasePopulationMaximumEffect(),
-             population_effects.IncreasePopulationCapacityEffect(1)],
-            TileColourEnum.Green)
+             population_effects.IncreasePopulationCapacityEffect(1)])

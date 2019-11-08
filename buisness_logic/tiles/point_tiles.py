@@ -5,9 +5,9 @@ import math
 from common.entities.point_entity import PointEntity
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseTile
+from core.constants import resource_types, tile_ids
 from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum
 from common.entities.player import Player
-from common.defaults.farm_animal_resource_type_default import FarmAnimalResourceTypeDefault
 from buisness_logic.effects import *
 
 
@@ -35,7 +35,7 @@ class BaseConditionalPointTile(BaseTile, ABC):
 class WeavingParlorTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Weaving Parlor", 30,
+            self, "Weaving Parlor", tile_ids.WeavingParlorTileId,
             cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1},
             effects=[resource_effects.ReceiveProportional(
                 received={ResourceTypeEnum.food: 1},
@@ -50,7 +50,7 @@ class WeavingParlorTile(BaseConditionalPointTile):
 class MilkingParlorTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Milking Parlor", 31,
+            self, "Milking Parlor", tile_ids.MilkingParlorTileId,
             cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2},
             effects=[resource_effects.ReceiveProportional(
                 {ResourceTypeEnum.food: 1},
@@ -65,7 +65,7 @@ class MilkingParlorTile(BaseConditionalPointTile):
 class StateParlorTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "State Parlor", 32,
+            self, "State Parlor", tile_ids.StateParlorTileId,
             cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.coin: 5}, effects=[])
 
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -87,7 +87,7 @@ class StateParlorTile(BaseConditionalPointTile):
 class StoneStorageTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Stone Storage", 36,
+            self, "Stone Storage", tile_ids.StoneStorageTileId,
             cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.ore: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -99,7 +99,7 @@ class StoneStorageTile(BaseConditionalPointTile):
 class OreStorageTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Ore Storage", 37,
+            self, "Ore Storage", tile_ids.OreStorageTileId,
             cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 2})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -111,7 +111,7 @@ class OreStorageTile(BaseConditionalPointTile):
 class MainStorageTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Main Storage", 39,
+            self, "Main Storage", tile_ids.MainStorageTileId,
             cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -123,7 +123,7 @@ class MainStorageTile(BaseConditionalPointTile):
 class WeaponStorageTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Weapon Storage", 40,
+            self, "Weapon Storage", tile_ids.WeaponStorageTileId,
             cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.stone: 2})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -135,7 +135,7 @@ class WeaponStorageTile(BaseConditionalPointTile):
 class SuppliesStorageTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Supplies Storage", 41,
+            self, "Supplies Storage", tile_ids.SuppliesStorageTileId,
             cost={ResourceTypeEnum.food: 3, ResourceTypeEnum.wood: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -151,7 +151,7 @@ class SuppliesStorageTile(BaseConditionalPointTile):
 class BroomChamberTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Broom Chamber", 42,
+            self, "Broom Chamber", tile_ids.BroomChamberTileId,
             cost={ResourceTypeEnum.wood: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -170,7 +170,7 @@ class BroomChamberTile(BaseConditionalPointTile):
 class TreasureChamberTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Treasure Chamber", 43,
+            self, "Treasure Chamber", tile_ids.TreasureChamberTileId,
             cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.stone: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -182,7 +182,7 @@ class TreasureChamberTile(BaseConditionalPointTile):
 class FoodChamberTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Food Chamber", 44,
+            self, "Food Chamber", tile_ids.FoodChamberTileId,
             cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.vegetable: 2})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -196,7 +196,7 @@ class FoodChamberTile(BaseConditionalPointTile):
 class PrayerChamberTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Prayer Chamber", 45,
+            self, "Prayer Chamber", tile_ids.PrayerChamberTileId,
             cost={ResourceTypeEnum.wood: 2})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -212,7 +212,7 @@ class PrayerChamberTile(BaseConditionalPointTile):
 class WritingChamberTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Writing Chamber", 46,
+            self, "Writing Chamber", tile_ids.WritingChamberTileId,
             cost={ResourceTypeEnum.stone: 2})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
@@ -222,15 +222,13 @@ class WritingChamberTile(BaseConditionalPointTile):
 class FodderChamberTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
-            self, "Fodder Chamber", 47,
+            self, "Fodder Chamber", tile_ids.FodderChamberTileId,
             cost={ResourceTypeEnum.grain: 2, ResourceTypeEnum.stone: 1})
 
     def get_conditional_point(self, player: Player) -> PointEntity:
         if player is None:
             raise ValueError(str(player))
-        default = FarmAnimalResourceTypeDefault()
-        farm_animals: List[ResourceTypeEnum] = default.assign([])
-        players_farm_animals: List[int] = [player.resources[x] for x in farm_animals]
+        players_farm_animals: List[int] = [player.resources[x] for x in resource_types.FarmAnimals]
         number_of_farm_animals: int = sum(players_farm_animals)
         result: int = math.floor(number_of_farm_animals / 3)
 
