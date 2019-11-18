@@ -2,7 +2,9 @@ from typing import List, Iterable
 from automated_tests.common_tests.service_tests.conditional_service_tests.mockBaseAction import MockBaseAction
 from automated_tests.common_tests.service_tests.conditional_service_tests.test_conditionalService import \
     Given_A_Conditional_Service
+from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.multiconditional import Conditional
+from common.proceeds_constraint import ProceedsConstraint
 from core.baseClasses.base_action import BaseAction
 from core.enums.caverna_enums import ActionCombinationEnum
 
@@ -18,6 +20,11 @@ class Test_When_Parameter_Is_AndThenOr_Conditional(Given_A_Conditional_Service):
             self.action1,
             self.action2)
 
+        self.combinations: List[ActionChoiceLookup] = [
+            ActionChoiceLookup([self.action1, self.action2], ProceedsConstraint(self.action1, self.action2)),
+            ActionChoiceLookup(self.action2)
+        ]
+
         self.result = self.SUT.get_possible_choices(self.conditional)
 
     def test_then_the_result_should_not_be_null(self):
@@ -27,14 +34,23 @@ class Test_When_Parameter_Is_AndThenOr_Conditional(Given_A_Conditional_Service):
         self.assertGreater(len(self.result), 0)
 
     def test_then_the_result_should_contain_one_item(self):
-        self.assertEqual(len(self.result), 2)
+        self.assertEqual(len(self.result), len(self.combinations))
 
     def test_then_the_result_should_contain_the_expected_combinations(self):
-        combinations: Iterable[List[BaseAction]] = [
-            [self.action1, self.action2],
-            [self.action2]
-        ]
+        for combination in self.combinations:
+            with self.subTest(combination):
+                self.assertContains(combination, self.result)
 
-        for combination in combinations:
-            with self.subTest():
-                self.assertIn(combination, self.result)
+    def assertContains(self, expected, collection) -> None:
+        if expected is None:
+            raise ValueError
+        if collection is None:
+            raise ValueError
+
+        for item in collection:
+            actionsEqual: bool = expected.actions == item.actions
+            constraintsEqual: bool = expected.constraints == item.constraints
+            if actionsEqual and constraintsEqual:
+                return
+
+        raise AssertionError("Collection should contain element satisfying predicate, but does not.")

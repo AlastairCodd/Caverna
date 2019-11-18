@@ -34,3 +34,12 @@ class ProceedsConstraint(BaseConstraint):
             action_two_location != -1 and \
             action_one_location < action_two_location
         return result
+
+    def __eq__(self, other):
+        if isinstance(other, ProceedsConstraint):
+            action_one_equal: bool = other._action_one == self._action_one
+            action_two_equal: bool = other._action_two == self._action_two
+            result: bool = action_one_equal and action_two_equal
+            return result
+        else:
+            return False

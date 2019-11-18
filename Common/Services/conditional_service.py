@@ -53,7 +53,6 @@ class ConditionalService(object):
                 combination_type = change_decision_effect.invoke(combination_type)
 
         choices: List[ActionChoiceLookup] = self._actionDictionary[combination_type](left, right)
-        choices = self._combine_and_or(left, right)
         return choices
 
     def _combine_and_then(self, left: Iterable[ActionChoiceLookup], right: Iterable[ActionChoiceLookup]) \
@@ -84,8 +83,10 @@ class ConditionalService(object):
                         result_constraint: BaseConstraint = ProceedsConstraint(l_action, r_action)
                         result_constraints.append(result_constraint)
 
-                result_constraints += l.constraints
-                result_constraints += r.constraints
+                if any(l.constraints):
+                    result_constraints += l.constraints
+                if any(r.constraints):
+                    result_constraints += r.constraints
 
                 result_lookup: ActionChoiceLookup = ActionChoiceLookup(result_actions, result_constraints)
                 result.append(result_lookup)
