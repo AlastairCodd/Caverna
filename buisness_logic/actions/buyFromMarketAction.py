@@ -2,8 +2,9 @@ from typing import List, Dict
 
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
+from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
-from core.containers.resource_container import ResourceContainer
+from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
@@ -22,7 +23,7 @@ class BuyFromMarketAction(BaseAction):
             ResourceTypeEnum.veg: 1,
         }
 
-    def invoke(self, player: Player, active_card: ResourceContainer, current_dwarf: Dwarf) -> bool:
+    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
         """Asks the player which things they would like to buy from the market.
 
         :param player: The player who will buy things. This may not be null.

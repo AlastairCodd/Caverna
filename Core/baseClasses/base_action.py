@@ -7,7 +7,7 @@ from core.containers.resource_container import ResourceContainer
 class BaseAction(ABC):
 
     @abstractmethod
-    def invoke(self, player: 'Player', active_card: ResourceContainer, current_dwarf: Dwarf) -> bool:
+    def invoke(self, player: 'Player', active_card: 'BaseCard', current_dwarf: Dwarf) -> bool:
         raise NotImplementedError("abstract base action class")
 
     @abstractmethod

@@ -1,10 +1,15 @@
 from abc import ABC
 from typing import Union, List
+
+import typing
+
+from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.multiconditional import Conditional
 from common.entities.player import Player
 from core.baseClasses.base_action import BaseAction
 from common.entities.dwarf import Dwarf
 from common.services.conditional_service import ConditionalService
+from core.containers.resource_container import ResourceContainer
 
 
 class BaseCard(ABC):
@@ -53,14 +58,14 @@ class BaseCard(ABC):
 
         conditional_service: ConditionalService = ConditionalService()
 
-        possible_choices: List[List[BaseAction]] = conditional_service\
+        possible_choices: List[ActionChoiceLookup] = conditional_service\
             .get_possible_choices(self._actions, player)
 
         success: bool = action_choice in possible_choices
 
         if success:
             for action in action_choice:
-                action.invoke(player, self, dwarf)
+                action.invoke(player, typing.cast(ResourceContainer, self), dwarf)
             dwarf.set_active(self)
         return success
 

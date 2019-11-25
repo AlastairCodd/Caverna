@@ -2,8 +2,9 @@ from typing import Dict, List
 from buisness_logic.effects.animal_storage_effects import BaseAnimalStorageEffect
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
+from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
-from core.containers.resource_container import ResourceContainer
+from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
@@ -13,7 +14,7 @@ class BreedAnimalsAction(BaseAction):
             raise ValueError("maximum")
         self._maximum = maximum
 
-    def invoke(self, player: Player, active_card: ResourceContainer, current_dwarf: Dwarf) -> bool:
+    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
         """Gives the player an additional farm animal, provided they have at least two and space. 
 
         :param player: The player who will buy things. This may not be null.
@@ -45,6 +46,8 @@ class BreedAnimalsAction(BaseAction):
             animals_to_reproduce = player.get_player_choice_breed_animals(animals_which_can_reproduce, self._maximum)
         else:
             animals_to_reproduce = animals_which_can_reproduce
+
+        raise NotImplementedError()
 
     def new_turn_reset(self):
         pass

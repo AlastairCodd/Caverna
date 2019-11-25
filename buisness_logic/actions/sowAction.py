@@ -2,7 +2,8 @@ from typing import Dict
 
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
-from core.containers.resource_container import ResourceContainer
+from common.entities.result_lookup import ResultLookup
+from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_action import BaseAction
 from core.enums.caverna_enums import ResourceTypeEnum
 
@@ -21,7 +22,7 @@ class SowAction(BaseAction):
             ResourceTypeEnum.veg: 1
         }
 
-    def invoke(self, player: Player, active_card: ResourceContainer, current_dwarf: Dwarf) -> bool:
+    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
         """Sows quantity seeds of some resource type, increasing the yield by the amount determined by "_grow_amount".
 
         :param player: The player. This cannot be null.

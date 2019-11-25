@@ -8,8 +8,9 @@ from buisness_logic.actions.upgrade_all_weapons_action import UpgradeAllWeaponsA
 from buisness_logic.tiles.dwelling import Dwelling
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
+from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
-from core.containers.resource_container import ResourceContainer
+from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 
 
@@ -47,7 +48,7 @@ class GoOnAnExpeditionAction(BaseAction):
 
         }
 
-    def invoke(self, player: Player, active_card: ResourceContainer, current_dwarf: Dwarf) -> bool:
+    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
         if player is None:
             raise ValueError(str(player))
         weapon_level = current_dwarf.weapon_level
@@ -59,7 +60,6 @@ class GoOnAnExpeditionAction(BaseAction):
                     possible_expedition_rewards.append(action)
 
         player_choice: List[BaseAction] = player.get_player_choice_expedition_reward(possible_expedition_rewards)
-
         raise NotImplementedError()
 
     def new_turn_reset(self):

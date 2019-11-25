@@ -1,13 +1,13 @@
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
 from core.baseClasses.base_action import BaseAction
+from core.baseClasses.base_card import BaseCard
 from core.containers.resource_container import ResourceContainer
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
 class GiveDwarfAWeaponAction(BaseAction):
-
-    def invoke(self, player: Player, active_card: ResourceContainer, current_dwarf: Dwarf) -> bool:
+    def invokeself, player: Player, active_card: BaseCard, current_dwarf: Dwarf -> ResultLookup[int]:
         """Gives the current dwarf a weapon.
         Player provides n ore (0<n<8), and exchanges it for a weapon with the same level.
         If player has any ore discount effects, these are applied to reduce the cost.

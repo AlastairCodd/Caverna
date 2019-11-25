@@ -2,8 +2,9 @@ from typing import Dict
 
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
+from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
-from core.containers.resource_container import ResourceContainer
+from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
@@ -14,7 +15,7 @@ class UseAnotherCardAction(BaseAction):
         :param cost: The cost which must be paid by the player in order to use this action. This cannot be null.
         """
 
-    def invoke(self, player: Player, active_card: ResourceContainer, current_dwarf: Dwarf) -> bool:
+    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
         """Allows the player to use an action which has already been claimed by another player.
 
         :param player: The player. This cannot be null.

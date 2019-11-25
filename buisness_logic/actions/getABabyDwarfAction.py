@@ -1,11 +1,13 @@
 from buisness_logic.effects.population_effects import *
+from common.entities.dwarf import Dwarf
 from common.entities.player import Player
+from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
-from core.containers.resource_container import ResourceContainer
+from core.baseClasses.base_card import BaseCard
 
 
 class GetABabyDwarfAction(BaseAction):
-    def invoke(self, player: Player, active_card: ResourceContainer, current_dwarf) -> bool:
+    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
         """Gives player a new dwarf, if they have room.
 
         :param player: The player to give the new dwarf to. This may not be none.
@@ -16,7 +18,6 @@ class GetABabyDwarfAction(BaseAction):
         if player is None:
             raise ValueError("player")
 
-        result: bool = False
         numberOfDwarves: int = len(player.dwarves)
 
         increase_population_maximum_effects = player.get_effects_of_type(IncreasePopulationMaximumEffect)
@@ -29,9 +30,15 @@ class GetABabyDwarfAction(BaseAction):
             lambda effect: effect.capacity,
             increase_population_capacity_effects))
 
-        if numberOfDwarves < maximum_population and numberOfDwarves < player_population_capacity:
-            player.give_baby_dwarf()
-            result = True
+        result: ResultLookup[int]
+        if numberOfDwarves < maximum_population:
+            if numberOfDwarves < player_population_capacity:
+                player.give_baby_dwarf()
+                result = ResultLookup(True, 1)
+            else:
+                result = ResultLookup(False, 0, "Currently no room for more dwarves")
+        else:
+            result = ResultLookup(False, 0, "Maximum number of dwarves reached")
 
         return result
 
