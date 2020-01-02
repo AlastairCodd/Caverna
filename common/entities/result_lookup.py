@@ -30,7 +30,7 @@ class ResultLookup(Generic[T]):
         return self._flag
 
     @property
-    def value(self) -> T:
+    def value(self) -> Union[T, None]:
         return self._value
 
     @property
