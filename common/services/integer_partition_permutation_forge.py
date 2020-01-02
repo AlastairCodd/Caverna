@@ -84,6 +84,13 @@ class IntegerPartitionPermutationForge(object):
                 yield result
 
     def shuffle_in(self, integer: int, integer_position: List[int], current_permutation: List[int]) -> List[int]:
+        """Inserts the given integer into the current_permuation, st the integer will end up at the integer_positions
+        :param integer: The integer to be inserted into the current_permutation.
+        :param integer_position: A list containing the positions the integer will end up. This cannot be null, and none of the values can be greater than the total count of
+        current_permutation and integer_position.
+        :param current_permutation: The current permutation the integer will be inserted into. This cannot be null.
+        :returns: A new list of integers, of length current_permutation plus integer_position. This will never be null.
+        """
         j: int = 0
         result: List[int] = []
         result_total_len: int = len(current_permutation) + len(integer_position)
