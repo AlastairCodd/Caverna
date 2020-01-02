@@ -21,7 +21,7 @@ class MockDiscountPlayer(MockPlayer):
 
 class Test_When_Substitute_For_Contained_Once(Given_An_AllowSubstitutionForPurchase):
     def because(self) -> None:
-        self._player: Player = MockDiscountPlayer()
+        self._player: Player = MockDiscountPlayer(2)
         self._tile: BaseTile = MockTile()
         self._given_current_price: Dict[ResourceTypeEnum, int] = {
             ResourceTypeEnum.stone: 3,

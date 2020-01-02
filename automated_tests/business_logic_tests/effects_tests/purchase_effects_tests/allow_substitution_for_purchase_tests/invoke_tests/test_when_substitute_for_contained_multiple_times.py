@@ -21,7 +21,7 @@ class MockDiscountPlayer(MockPlayer):
 
 class Test_When_Substitute_For_Contained_Multiple_Times(Given_An_AllowSubstitutionForPurchase):
     def because(self) -> None:
-        self._player: Player = MockDiscountPlayer()
+        self._player: Player = MockDiscountPlayer(3)
         self._tile: BaseTile = MockTile()
         self._given_current_price: Dict[ResourceTypeEnum, int] = {
             ResourceTypeEnum.stone: 5,
@@ -35,7 +35,7 @@ class Test_When_Substitute_For_Contained_Multiple_Times(Given_An_AllowSubstituti
             ResourceTypeEnum.coin: 8,
         }
 
-        self._result = self.SUT.invoke(
+        self._result: Dict[ResourceTypeEnum, int] = self.SUT.invoke(
             self._player,
             self._tile,
             self._given_current_price)

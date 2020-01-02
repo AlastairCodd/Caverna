@@ -10,7 +10,7 @@ from core.enums.caverna_enums import ResourceTypeEnum
 
 class Test_When_Target_Is_Not_An_Instance_Of_Subject(Given_An_AllowSubstitutionForPurchase):
     def because(self) -> None:
-        self._player: Player = MockPlayer()
+        self._player: Player = MockPlayer(5)
         self._weapon: Weapon = Weapon()
         self._given_current_price: Dict[ResourceTypeEnum, int] = {
             ResourceTypeEnum.cow: 3,

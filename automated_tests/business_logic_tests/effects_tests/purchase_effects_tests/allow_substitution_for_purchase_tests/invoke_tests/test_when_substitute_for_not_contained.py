@@ -11,7 +11,7 @@ from core.enums.caverna_enums import ResourceTypeEnum
 
 class Test_When_Substitute_For_Not_Contained(Given_An_AllowSubstitutionForPurchase):
     def because(self) -> None:
-        self._player: Player = MockPlayer()
+        self._player: Player = MockPlayer(4)
         self._tile: BaseTile = MockTile()
         self._given_current_price: Dict[ResourceTypeEnum, int] = {
             ResourceTypeEnum.cow: 3,

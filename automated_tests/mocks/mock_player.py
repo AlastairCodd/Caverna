@@ -7,11 +7,17 @@ from core.enums.caverna_enums import ResourceTypeEnum
 
 
 class MockPlayer(Player):
-    def __init__(self, tiles: List[BaseTile] = None):
-        Player.__init__(self, 0, 0)
+    def __init__(
+            self,
+            player_id: int,
+            tiles: List[BaseTile] = None,
+            resources: Dict[ResourceTypeEnum, int] = None):
+        Player.__init__(self, player_id, 0)
         if tiles is None:
             tiles = []
         self._mock_tiles = tiles
+        if resources is not None:
+            self._resources = resources
 
     @property
     def tiles(self) -> List[BaseTile]:

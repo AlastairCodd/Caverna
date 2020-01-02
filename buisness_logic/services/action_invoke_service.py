@@ -1,2 +1,0 @@
-class ActionInvokeService(object):
-    pass
