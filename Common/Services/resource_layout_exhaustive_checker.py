@@ -29,4 +29,4 @@ class ResourceLayoutExhaustiveChecker(object):
         for partition in self._setPartitionForge.generate_set_partitions(len(resource_layout), animals_or_none):
             remaining, excess = self._partitionResourceValidator.get_resource_remaining_and_excess(resource_layout, current_resources, partition)
             success: bool = all([x == 0 for x in remaining.values()])
-            yield (success, partition, remaining, excess)
+            yield success, partition, remaining, excess
