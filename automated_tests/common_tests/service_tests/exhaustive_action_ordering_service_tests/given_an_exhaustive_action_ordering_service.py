@@ -3,7 +3,10 @@ from unittest import TestCase
 
 
 # noinspection PyPep8Naming
-class Given_A_ExhaustiveActionOrderingService(TestCase, ABC):
+from common.services.exhaustive_action_ordering_service import ExhaustiveActionOrderingService
+
+
+class Given_An_ExhaustiveActionOrderingService(TestCase, ABC):
     def setUp(self) -> None:
         self.SUT: ExhaustiveActionOrderingService = ExhaustiveActionOrderingService()
         self.because()
