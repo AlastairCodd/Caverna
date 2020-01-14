@@ -15,7 +15,7 @@ from core.baseClasses.base_permutation_ordering_service import BasePermutationOr
 
 
 class ExhaustiveActionOrderingService(ActionOrderingService):
-    def __init__(self, permutation_ordering_services: Union[None, List[BasePermutationOrderingService], BasePermutationOrderingService]):
+    def __init__(self, permutation_ordering_services: Union[None, List[BasePermutationOrderingService], BasePermutationOrderingService] = None):
         self._player_prototype: PlayerPrototype = PlayerPrototype()
         self._permutation_forge: ListPermutationForge = ListPermutationForge()
 
