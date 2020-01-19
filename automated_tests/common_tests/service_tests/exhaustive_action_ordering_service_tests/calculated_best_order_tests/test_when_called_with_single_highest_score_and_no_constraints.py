@@ -3,7 +3,11 @@ from typing import List, Dict
 from automated_tests.common_tests.service_tests.exhaustive_action_ordering_service_tests.given_an_exhaustive_action_ordering_service import \
     Given_An_ExhaustiveActionOrderingService
 from automated_tests.mocks.mock_player import MockPlayer
+from buisness_logic.actions.giveDwarfAWeaponAction import GiveDwarfAWeaponAction
+from buisness_logic.actions.goOnAnExpeditionAction import GoOnAnExpeditionAction
+from buisness_logic.actions.takeAccumulatedItemsAction import TakeAccumulatedItemsAction
 from common.entities.action_choice_lookup import ActionChoiceLookup
+from common.entities.dwarf import Dwarf
 from common.entities.player import Player
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
@@ -14,9 +18,9 @@ from core.enums.caverna_enums import ResourceTypeEnum
 
 class Test_When_Called_With_Single_Highest_Score_And_No_Constraints(Given_An_ExhaustiveActionOrderingService):
     def because(self) -> None:
-        action1: BaseAction = None
-        action2: BaseAction = None
-        action3: BaseAction = None
+        action1: BaseAction = TakeAccumulatedItemsAction()
+        action2: BaseAction = GiveDwarfAWeaponAction()
+        action3: BaseAction = GoOnAnExpeditionAction(level=2)
 
         actions: List[BaseAction] = []
         constraints: List[BaseConstraint] = []
@@ -27,8 +31,8 @@ class Test_When_Called_With_Single_Highest_Score_And_No_Constraints(Given_An_Exh
         resources: Dict[ResourceTypeEnum, int] = {}
 
         player: Player = MockPlayer(3,resources=resources)
-        current_card: BaseCard = None
-        current_dwarf: Dwarf = None
+        current_card: BaseCard = MockCard(resources={ResourceTypeEnum.ore: 3})
+        current_dwarf: Dwarf = MockDwarf()
 
         self._result: ResultLookup[List[BaseAction]] = self.SUT.calculated_best_order(
             action_choice_lookup,
