@@ -49,15 +49,6 @@ class Player(TileContainer, ResourceContainer, ABC):
         for dwarf in self._dwarves:
             dwarf.make_adult()
 
-    def get_player_choice(self, action):
-        """Gets a player response for the given action.
-        Implementation left to implementing class -- either from user input, or
-            from analysis of the action value function
-
-        Returns relevant information to allow the calling action to change
-            the player or board state based in accordance with the action"""
-        raise NotImplementedError()
-
     @abstractmethod
     def get_player_choice_market_action(
             self,
