@@ -19,6 +19,7 @@ class TurnExecutionService(object):
             player: Player,
             turn_index: int,
             round_index: int,
+            harvest_type: HarvestTypeEnum,
             cards: List[BaseCard]) -> ResultLookup[Player]:
         if player is None:
             raise ValueError
