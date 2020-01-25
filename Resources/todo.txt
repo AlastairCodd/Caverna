@@ -1,0 +1,54 @@
+    a = {0: 2, 1: 2, 2: 3, 3: 4, 4: 3, 5: 3, 6: 2, 7: 3} # this is Dict[PlayerId, NumberOfDwarfs]
+    a = dict(list(a.items())[startingPlayerIndex:] + list(a.items())[:startingPlayerIndex])
+    b = [player for turn in [[x for (x, y) in a.items() if y > i] for i in range(max([v for (v, w) in a.items()]))] for player in turn]
+
+create human action choice printer:
+please choose a card:
+    1. starting player
+        - take accumulated items AND THEN
+            > 1 food
+        - receive
+            > 1 ruby 
+    2. blacksmith
+        - forge a weapon AND/OR
+        - go on a level three expedition
+    X. slash and burn -- TAKEN BY LAIN
+    X. sheep farming -- TAKEN BY YEN
+    5. strip mining
+        - take accumulated items AND THEN
+            > 1 stone
+            > 1 ore
+        - place a cavern-cavern twin tile OR
+        - place a cavern-tunnel twin tile
+
+    > 2
+
+    card 2 chosen: blacksmith
+    please choose a combination of actions
+        1. forge a weapon and go on an expedition
+        OR
+        2. forge a weapon
+        OR
+        3. go on an expedition
+    
+    > 1
+    
+    choice 1 chosen: forge a weapon and go on an expedition
+    forge a weapon: choose the strength of a weapon you would like to forge: 1 - 8  [** if has blacksmith tile, just change requirement. so can make level 8 even if only 6]
+    
+    > 7
+    
+    insufficient resources
+    forge a weapon: choose the strength of a weapon you would like to forge: 1 - 8  [** if has blacksmith tile, just change requirement. so can make level 8 even if only 6]
+
+    > 5
+    
+    cost 5 ore [** if blacksmith, cost 3 ore (using blacksmith effect)]
+    level 5 weapon forged
+    
+    [OR forge a weapon: > 7, dwarf already has a weapon. ]
+    
+    
+
+create thing which takes player, current board state, and asks player for input.
+extract "simple action in order invoke service"
