@@ -1,4 +1,4 @@
-from typing import List, Dict, Union
+from typing import List
 from unittest import mock
 
 from automated_tests.business_logic_tests.service_tests.turn_execution_service_tests.given_a_turn_execution_service import Given_A_TurnExecutionService
@@ -8,15 +8,15 @@ from core.baseClasses.base_card import BaseCard
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class Test_When_player_chooses_to_play_a_dwarf_out_of_turn_but_does_not_have_resources(Given_A_TurnExecutionService):
+class Test_When_player_chooses_to_play_a_dwarf_out_of_turn_but_chooses_an_invalid_dwarf(Given_A_TurnExecutionService):
     def because(self) -> None:
-        self._expected_errors: List[str] = ["Insufficient Resources (ruby) to perform action"]
+        self._expected_errors: List[str] = ["Invalid dwarf id "]
 
         cards: List[BaseCard] = []
 
         player: Player = mock.Mock(spec=Player)
-        self._result: ResultLookup[Player] = self.SUT.take_turn(player, 4, 2, HarvestTypeEnum.NoHarvest ,cards)
-        
+        self._result: ResultLookup[Player] = self.SUT.take_turn(player, 4, 2, HarvestTypeEnum.NoHarvest, cards)
+
     def test_then_result_should_not_be_null(self) -> None:
         self.assertIsNotNone(self._result)
 
