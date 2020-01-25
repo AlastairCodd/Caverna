@@ -4,6 +4,7 @@ from common.entities.player import Player
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
+from core.constants import game_constants
 
 
 class GetABabyDwarfAction(BaseAction):
@@ -21,7 +22,7 @@ class GetABabyDwarfAction(BaseAction):
         numberOfDwarves: int = len(player.dwarves)
 
         increase_population_maximum_effects = player.get_effects_of_type(IncreasePopulationMaximumEffect)
-        maximum_population: int = 5 + sum(map(
+        maximum_population: int = game_constants.soft_maximum_number_of_dwarves + sum(map(
             lambda effect: effect.raise_maximum_population_by,
             increase_population_maximum_effects))
 

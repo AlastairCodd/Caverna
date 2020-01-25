@@ -5,11 +5,14 @@ from common.entities.player import Player
 from common.entities.result_lookup import ResultLookup
 from common.services.action_invoke_service import ActionInvokeService
 from core.baseClasses.base_card import BaseCard
+from core.constants import game_constants
+from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
 class TurnExecutionService(object):
     def __init__(self):
         self._actionInvokeService: ActionInvokeService = ActionInvokeService()
+        self.number_of_rounds: int = game_constants.number_of_rounds
 
     def take_turn(
             self,
@@ -19,6 +22,10 @@ class TurnExecutionService(object):
             cards: List[BaseCard]) -> ResultLookup[Player]:
         if player is None:
             raise ValueError
+        if turn_index >= len(player.dwarves):
+            raise IndexError(f"Turn Index ({turn_index}) must be less than number of dwarves ({len(player.dwarves)})")
+        if round_index >= self.number_of_rounds:
+            raise IndexError(f"Maximum number of turns of ")
 
         success: bool = True
         errors: List[str] = []
