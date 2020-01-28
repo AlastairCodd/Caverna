@@ -8,14 +8,13 @@ from core.baseClasses.base_card import BaseCard
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class Test_When_player_chooses_to_play_a_dwarf_out_of_turn_but_chooses_an_invalid_dwarf(Given_A_TurnExecutionService):
+class when_player_chooses_to_play_a_dwarf_out_of_turn(Given_A_TurnExecutionService):
     def because(self) -> None:
         self._expected_errors: List[str] = ["Invalid dwarf id "]
 
         cards: List[BaseCard] = []
 
         player: Player = mock.Mock(spec=Player)
-        player.get_player_choice
         self._result: ResultLookup[Player] = self.SUT.take_turn(player, 4, 2, HarvestTypeEnum.Harvest, cards)
 
     def test_then_result_should_not_be_null(self) -> None:
