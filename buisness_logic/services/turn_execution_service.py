@@ -12,6 +12,7 @@ from core.enums.harvest_type_enum import HarvestTypeEnum
 class TurnExecutionService(object):
     def __init__(self):
         self._actionInvokeService: ActionInvokeService = ActionInvokeService()
+        self._available_dwarf_service: AvailableDwarfService = AvailableDwarfService()
         self.number_of_rounds: int = game_constants.number_of_rounds
 
     def take_turn(
@@ -31,17 +32,21 @@ class TurnExecutionService(object):
         success: bool = True
         errors: List[str] = []
 
-        dwarf_out_of_order_result: ResultLookup[bool] = player.get_player_choice_use_dwarf_out_of_order()
-        if not dwarf_out_of_order_result.flag:
-            success = False
-            errors.extend(dwarf_out_of_order_result.errors)
+        use_dwarf_out_of_order: bool = False
+        if self._available_dwarf_service.does_player_have_sufficient_resources_to_use_a_dwarf_out_of_order(player):
+            dwarf_out_of_order_result: ResultLookup[bool] = player.get_player_choice_use_dwarf_out_of_order()
+            if dwarf_out_of_order_result.flag:
+                use_dwarf_out_of_order = dwarf_out_of_order_result.value
+            else:
+                success = False
+                errors.extend(dwarf_out_of_order_result.errors)
 
         available_dwarves: List[Dwarf] = []
         if success:
             available_dwarves_result: ResultLookup[List[Dwarf]] = self._available_dwarf_service \
                 .get_available_dwarves(
                 player.dwarves,
-                dwarf_out_of_order_result.flag)
+                use_dwarf_out_of_order)
 
             if not available_dwarves_result.flag:
                 success = False

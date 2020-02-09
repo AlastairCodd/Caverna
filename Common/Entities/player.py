@@ -91,3 +91,15 @@ class Player(TileContainer, ResourceContainer, ABC):
         :returns: The chosen cost of the item. This will never be null, and will be an element of possible_prices.
         """
         raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_use_dwarf_out_of_order(
+            self,
+            dwarves: List[Dwarf],
+            resources: Dict[ResourceTypeEnum, int]):
+        """Gets user choice for whether or not to play a dwarf out of turn.
+
+        :param dwarves: The dwarves the player has available. This cannot be null, or empty.
+        :param resources: The resources the player has. This cannot be null, but may be empty.
+        :returns: True if the player has chosen to play a dwarf out of turn, false if not."""
+        raise NotImplementedError()
