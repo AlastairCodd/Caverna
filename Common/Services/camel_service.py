@@ -64,8 +64,11 @@ class CamelService(object):
             camel: CamelColourEnum,
             steps: int,
             camel_positions: Dict[int, List[CamelColourEnum]],
-            oasis_positions: Union[Dict[int, OasisTypeEnum], None]) -> ResultLookup[Dict[int, List[CamelColourEnum]]]:
+            oasis_positions: Union[Dict[int, OasisTypeEnum], None] = None) -> ResultLookup[Dict[int, List[CamelColourEnum]]]:
         result: ResultLookup[Dict[int, List[CamelColourEnum]]]
+
+        if oasis_positions is None:
+            oasis_positions = {}
 
         camel_position_result: ResultLookup[Tuple[int, List[CamelColourEnum]]] = self._find_camel_stack(camel, camel_positions)
 
@@ -79,18 +82,29 @@ class CamelService(object):
             result_camel_position: int = camel_position + steps
             result_camel_positions: Dict[int, List[CamelColourEnum]] = {}
             for position, stack in camel_positions.items():
-                pass
-
-            if result_camel_position not in result_camel_positions:
-                result_camel_positions[result_camel_position] = []
+                result_camel_positions[position]: List[CamelColourEnum] = []
+                for camel in stack:
+                    if camel not in camel_stack:
+                        result_camel_positions[position].append(camel)
 
             if result_camel_position in oasis_positions:
                 oasis_type: OasisTypeEnum = oasis_positions[result_camel_position]
                 if oasis_type == OasisTypeEnum.positive:
+                    result_camel_position += 1
+                    if result_camel_position not in result_camel_positions:
+                        result_camel_positions[result_camel_position] = []
+
                     result_camel_positions[result_camel_position] = camel_stack + result_camel_positions[result_camel_position]
                 if oasis_type == OasisTypeEnum.negative:
+                    result_camel_position -= 1
+                    if result_camel_position not in result_camel_positions:
+                        result_camel_positions[result_camel_position] = []
+
                     result_camel_positions[result_camel_position] += camel_stack
             else:
+                if result_camel_position not in result_camel_positions:
+                    result_camel_positions[result_camel_position] = []
+
                 result_camel_positions[result_camel_position] = camel_stack + result_camel_positions[result_camel_position]
 
             result = ResultLookup(True, result_camel_positions)
