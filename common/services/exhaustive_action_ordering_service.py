@@ -6,7 +6,7 @@ from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
 from common.entities.result_lookup import ResultLookup
-from common.forges.list_permuation_forge import ListPermutationForge
+from common.forges.list_permutation_forge import ListPermutationForge
 from common.prototypes.player_prototype import PlayerPrototype
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_action_ordering_service import ActionOrderingService

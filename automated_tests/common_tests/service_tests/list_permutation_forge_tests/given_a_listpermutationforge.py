@@ -3,7 +3,7 @@ from unittest import TestCase
 
 
 # noinspection PyPep8Naming
-from common.forges.list_permuation_forge import ListPermutationForge
+from common.forges.list_permutation_forge import ListPermutationForge
 
 
 class Given_A_ListPermutationForge(TestCase, ABC):
