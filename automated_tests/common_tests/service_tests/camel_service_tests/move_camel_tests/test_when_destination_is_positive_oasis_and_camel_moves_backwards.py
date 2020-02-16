@@ -20,7 +20,7 @@ class test_when_destination_is_positive_oasis(Given_A_CamelService):
         }
 
         self._expected_positions: Dict[int, List[CamelColourEnum]] = {
-            3: [CamelColourEnum.green, CamelColourEnum.yellow, CamelColourEnum.blue],
+            3: [CamelColourEnum.yellow, CamelColourEnum.blue, CamelColourEnum.green],
             5: [CamelColourEnum.orange],
             6: [CamelColourEnum.white]
         }

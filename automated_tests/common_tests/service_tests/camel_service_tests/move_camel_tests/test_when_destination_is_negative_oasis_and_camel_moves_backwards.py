@@ -20,8 +20,8 @@ class test_when_destination_is_negative_oasis_and_camel_moves_backwards(Given_A_
         }
 
         self._expected_positions: Dict[int, List[CamelColourEnum]] = {
-            3: [CamelColourEnum.yellow, CamelColourEnum.blue, CamelColourEnum.orange],
-            5: [CamelColourEnum.white],
+            3: [CamelColourEnum.orange],
+            5: [CamelColourEnum.white, CamelColourEnum.yellow, CamelColourEnum.blue],
             6: [CamelColourEnum.green],
         }
 

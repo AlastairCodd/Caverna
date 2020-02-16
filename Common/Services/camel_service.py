@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Union, List, Dict, Tuple
+from typing import Union, List, Dict, Tuple, Callable
 
 from common.entities.result_lookup import ResultLookup
 from common.forges.list_permutation_forge import ListPermutationForge
@@ -27,6 +27,7 @@ class CamelService(object):
         if camels_which_move_backwards is None:
             camels_which_move_backwards = []
 
+        self._camels_which_move_backwards: List[CamelColourEnum] = camels_which_move_backwards
         self._number_of_dice_to_roll: int = number_of_dice_to_roll
 
         self._camel_dice: Dict[CamelColourEnum, Dict[int, int]] = {}
@@ -83,29 +84,47 @@ class CamelService(object):
             result_camel_positions: Dict[int, List[CamelColourEnum]] = {}
             for position, stack in camel_positions.items():
                 result_camel_positions[position]: List[CamelColourEnum] = []
-                for camel in stack:
-                    if camel not in camel_stack:
-                        result_camel_positions[position].append(camel)
+                for stationary_camel in stack:
+                    if stationary_camel not in camel_stack:
+                        result_camel_positions[position].append(stationary_camel)
 
             if result_camel_position in oasis_positions:
                 oasis_type: OasisTypeEnum = oasis_positions[result_camel_position]
                 if oasis_type == OasisTypeEnum.positive:
-                    result_camel_position += 1
+                    camel_direction: int
+                    if camel in self._camels_which_move_backwards:
+                        camel_direction = -1
+                    else:
+                        camel_direction = 1
+
+                    result_camel_position += camel_direction
                     if result_camel_position not in result_camel_positions:
                         result_camel_positions[result_camel_position] = []
 
-                    result_camel_positions[result_camel_position] = camel_stack + result_camel_positions[result_camel_position]
+                    result_camel_positions[result_camel_position] = self._place_camel_at_position_on_top(
+                        camel_stack,
+                        result_camel_positions[result_camel_position])
                 if oasis_type == OasisTypeEnum.negative:
-                    result_camel_position -= 1
+                    camel_direction: int
+                    if camel in self._camels_which_move_backwards:
+                        camel_direction = 1
+                    else:
+                        camel_direction = -1
+
+                    result_camel_position += camel_direction
                     if result_camel_position not in result_camel_positions:
                         result_camel_positions[result_camel_position] = []
 
-                    result_camel_positions[result_camel_position] += camel_stack
+                    result_camel_positions[result_camel_position] = self._place_camel_at_position_on_bottom(
+                        camel_stack,
+                        result_camel_positions[result_camel_position])
             else:
                 if result_camel_position not in result_camel_positions:
                     result_camel_positions[result_camel_position] = []
 
-                result_camel_positions[result_camel_position] = camel_stack + result_camel_positions[result_camel_position]
+                result_camel_positions[result_camel_position] = self._place_camel_at_position_on_top(
+                    camel_stack,
+                    result_camel_positions[result_camel_position])
 
             result = ResultLookup(True, result_camel_positions)
         return result
@@ -133,4 +152,18 @@ class CamelService(object):
         else:
             result = ResultLookup(errors=f"camel {camel.name} not found at any position")
 
+        return result
+
+    def _place_camel_at_position_on_top(
+            self,
+            moving_camel_stack: List[CamelColourEnum],
+            current_camel_stack: List[CamelColourEnum]) -> List[CamelColourEnum]:
+        result: List[CamelColourEnum] = moving_camel_stack + current_camel_stack
+        return result
+
+    def _place_camel_at_position_on_bottom(
+            self,
+            moving_camel_stack: List[CamelColourEnum],
+            current_camel_stack: List[CamelColourEnum]) -> List[CamelColourEnum]:
+        result: List[CamelColourEnum] = current_camel_stack + moving_camel_stack
         return result
