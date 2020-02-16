@@ -31,8 +31,8 @@ class CamelService(object):
         self._number_of_dice_to_roll: int = number_of_dice_to_roll
 
         self._camel_dice: Dict[CamelColourEnum, Dict[int, int]] = {}
-        forward_dice: Dict[int, int] = {1:1, 2:1, 3:1}
-        backward_dice: Dict[int, int] = {-1:1, -2:1, -3:1}
+        forward_dice: Dict[int, int] = {1: 1, 2: 1, 3: 1}
+        backward_dice: Dict[int, int] = {-1: 1, -2: 1, -3: 1}
 
         for camel in CamelColourEnum:
             if camel in camels_which_move_backwards:
