@@ -65,6 +65,22 @@ class CamelService(object):
             for camel in camel_dice_order:
                 for dice in self._camel_dice[camel]:
                     print(dice)
+    def _generate_dice_combinations(self) -> Generator[UnorderedDice, None, None]:
+        number_of_combinations: int = reduce(lambda x, y: x * y, [len(x) for x in self._camel_dice.values()])
+        for i in range(number_of_combinations):
+            j: int = 0
+            dice_combination: UnorderedDice = UnorderedDice({})
+            q_product: int = 1
+            for camel in self._camel_dice:
+                current_camel_dice: Dict[int, int] = self._camel_dice[camel]
+                q_current: int = sum(current_camel_dice.values())
+                q_next: int = q_current * q_product
+                chosen_dice_index: int = math.floor((i % q_next) / q_product)
+                chosen_dice: int = list(current_camel_dice.keys())[chosen_dice_index]
+                dice_combination[camel] = chosen_dice
+                j += 1
+                q_product = q_next
+            yield dice_combination
 
     def _move_camel(
             self,
