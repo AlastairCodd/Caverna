@@ -28,23 +28,29 @@ class CamelService(object):
     def __init__(
             self,
             camels_which_move_backwards: Union[List[CamelColourEnum], None] = None,
-            number_of_dice_to_roll: int = 5):
+            number_of_dice_to_roll: int = 5,
+            camel_dice: Union[Dict[CamelColourEnum, Dict[int, int]], None] = None):
         self._list_permutation_forge: ListPermutationForge = ListPermutationForge()
         if camels_which_move_backwards is None:
             camels_which_move_backwards = []
 
+        self._total_path_length: int = 15
         self._camels_which_move_backwards: List[CamelColourEnum] = camels_which_move_backwards
         self._number_of_dice_to_roll: int = number_of_dice_to_roll
 
-        self._camel_dice: Dict[CamelColourEnum, Dict[int, int]] = {}
-        forward_dice: Dict[int, int] = {1: 1, 2: 1, 3: 1}
-        backward_dice: Dict[int, int] = {-1: 1, -2: 1, -3: 1}
+        self._camel_dice: Dict[CamelColourEnum, Dict[int, int]]
+        if camel_dice is None:
+            self._camel_dice = {}
+            forward_dice: Dict[int, int] = {1: 1, 2: 1, 3: 1}
+            backward_dice: Dict[int, int] = {-1: 1, -2: 1, -3: 1}
 
-        for camel in CamelColourEnum:
-            if camel in camels_which_move_backwards:
-                self._camel_dice[camel] = backward_dice
-            else:
-                self._camel_dice[camel] = forward_dice
+            for camel in CamelColourEnum:
+                if camel in camels_which_move_backwards:
+                    self._camel_dice[camel] = backward_dice
+                else:
+                    self._camel_dice[camel] = forward_dice
+        else:
+            self._camel_dice = camel_dice
 
     def get_possible_positions_for_camels(
             self,
