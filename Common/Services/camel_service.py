@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Union, List, Dict, Tuple, Callable
+from typing import Union, List, Dict, Tuple, Callable, Generator, NewType
 
 from common.entities.result_lookup import ResultLookup
 from common.forges.list_permutation_forge import ListPermutationForge
@@ -16,6 +16,12 @@ class CamelColourEnum(Enum):
 class OasisTypeEnum(Enum):
     positive = auto()
     negative = auto()
+
+
+CamelStack = NewType('CamelStack', List[CamelColourEnum])
+CamelPositions = NewType('CamelPosition', Dict[int, CamelStack])
+OrderedDice = NewType('OrderedDice', List[Tuple[CamelColourEnum, int]])
+UnorderedDice = NewType('UnorderedDice', Dict[CamelColourEnum, int])
 
 
 class CamelService(object):
@@ -42,9 +48,9 @@ class CamelService(object):
 
     def get_possible_positions_for_camels(
             self,
-            camel_positions: Dict[int, List[CamelColourEnum]],
-            oasis_positions: Union[Dict[int, OasisTypeEnum], None]) -> Dict[CamelColourEnum, Dict[int, float]]:
-        """
+            camel_positions: CamelPositions,
+            oasis_positions: Union[Dict[int, OasisTypeEnum], None] = None) -> Dict[CamelPositions, List[OrderedDice]]:
+        """Get all possible end states of camel positions after all dice have been rolled, and the rolls which put the camels in this state
 
         :param camel_positions: A dictionary keyed by position along the track, and a list containing the camels at this position.
             The list of camels is from highest camel (index 0) to lower camels down the stack. The dictionary does not have to contain
@@ -64,9 +70,9 @@ class CamelService(object):
             self,
             camel: CamelColourEnum,
             steps: int,
-            camel_positions: Dict[int, List[CamelColourEnum]],
-            oasis_positions: Union[Dict[int, OasisTypeEnum], None] = None) -> ResultLookup[Dict[int, List[CamelColourEnum]]]:
-        result: ResultLookup[Dict[int, List[CamelColourEnum]]]
+            camel_positions: CamelPositions,
+            oasis_positions: Union[Dict[int, OasisTypeEnum], None] = None) -> ResultLookup[CamelPositions]:
+        result: ResultLookup[CamelPositions]
 
         if oasis_positions is None:
             oasis_positions = {}
@@ -77,11 +83,11 @@ class CamelService(object):
             result = ResultLookup(errors=camel_position_result.errors)
         else:
             camel_position: int
-            camel_stack: List[CamelColourEnum]
+            camel_stack: CamelStack
             camel_position, camel_stack = camel_position_result.value
 
             result_camel_position: int = camel_position + steps
-            result_camel_positions: Dict[int, List[CamelColourEnum]] = {}
+            result_camel_positions: CamelPositions = CamelPositions({})
             for position, stack in camel_positions.items():
                 result_camel_positions[position]: List[CamelColourEnum] = []
                 for stationary_camel in stack:
@@ -132,22 +138,22 @@ class CamelService(object):
     def _find_camel_stack(
             self,
             camel: CamelColourEnum,
-            camel_positions: Dict[int, List[CamelColourEnum]]) -> ResultLookup[Tuple[int, List[CamelColourEnum]]]:
+            camel_positions: Dict[int, List[CamelColourEnum]]) -> ResultLookup[Tuple[int, CamelStack]]:
         success: bool = False
         result_position: int = -1
-        result_camel_stack: List[CamelColourEnum] = []
+        result_camel_stack: CamelStack = CamelStack([])
 
         for position in camel_positions:
             camels_at_position: List[CamelColourEnum] = camel_positions[position]
             if camel in camels_at_position:
                 success = True
                 result_position = position
-                result_camel_stack = camels_at_position[:camels_at_position.index(camel) + 1]
+                result_camel_stack = CamelStack(camels_at_position[:camels_at_position.index(camel) + 1])
                 break
 
-        result: ResultLookup[Tuple[int, List[CamelColourEnum]]]
+        result: ResultLookup[Tuple[int, CamelStack]]
         if success:
-            result_value: Tuple[int, List[CamelColourEnum]] = (result_position, result_camel_stack)
+            result_value: Tuple[int, CamelStack] = (result_position, result_camel_stack)
             result = ResultLookup(success, result_value)
         else:
             result = ResultLookup(errors=f"camel {camel.name} not found at any position")
@@ -156,14 +162,14 @@ class CamelService(object):
 
     def _place_camel_at_position_on_top(
             self,
-            moving_camel_stack: List[CamelColourEnum],
-            current_camel_stack: List[CamelColourEnum]) -> List[CamelColourEnum]:
-        result: List[CamelColourEnum] = moving_camel_stack + current_camel_stack
+            moving_camel_stack: CamelStack,
+            current_camel_stack: CamelStack) -> CamelStack:
+        result: CamelStack = CamelStack(moving_camel_stack + current_camel_stack)
         return result
 
     def _place_camel_at_position_on_bottom(
             self,
-            moving_camel_stack: List[CamelColourEnum],
-            current_camel_stack: List[CamelColourEnum]) -> List[CamelColourEnum]:
-        result: List[CamelColourEnum] = current_camel_stack + moving_camel_stack
+            moving_camel_stack: CamelStack,
+            current_camel_stack: CamelStack) -> CamelStack:
+        result: CamelStack = CamelStack(current_camel_stack + moving_camel_stack)
         return result
