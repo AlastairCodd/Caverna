@@ -82,6 +82,14 @@ class CamelService(object):
                 q_product = q_next
             yield dice_combination
 
+    def _is_finished(self, camel_positions: Dict[int, List[CamelColourEnum]]) -> bool:
+        is_finished: bool = False
+        for position in camel_positions:
+            if position > self._total_path_length:
+                is_finished = True
+                break
+        return is_finished
+
     def _move_camel(
             self,
             camel: CamelColourEnum,
