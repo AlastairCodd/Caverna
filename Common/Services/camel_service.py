@@ -1,4 +1,7 @@
+import math
 from enum import Enum, auto
+from functools import reduce
+from itertools import permutations
 from typing import Union, List, Dict, Tuple, Callable, Generator, NewType
 
 from common.entities.result_lookup import ResultLookup
@@ -64,13 +67,35 @@ class CamelService(object):
         :param oasis_positions: A dictionary keyed by position along the track, and the Oasis that is contained at that position. If
             the key is not in the dictionary, then no oasis is at this position. This dictionary may be null, in which case no oasis
             are placed.
-        :returns: Something. This will never be null.
+        :returns: A dictionary of resultant camel . This will never be null.
         """
+        result_camel_positions: Dict[CamelPositions, List[OrderedDice]] = {}
         camel_dice_order: List[CamelColourEnum]
-        for camel_dice_order in self._list_permutation_forge.generate_list_partitions([camel for camel in CamelColourEnum]):
-            for camel in camel_dice_order:
-                for dice in self._camel_dice[camel]:
-                    print(dice)
+        for camel_dice_order in permutations([camel for camel in CamelColourEnum], self._number_of_dice_to_roll):
+            dice_combination: UnorderedDice
+            for dice_combination in self._generate_dice_combinations():
+                current_camel_positions: CamelPositions = CamelPositions({position: list(camel_positions[position]) for position in camel_positions})
+
+                ordered_dice: OrderedDice = OrderedDice([])
+                for camel in camel_dice_order:
+                    camel_step: int = dice_combination[camel]
+                    ordered_dice.append((camel, camel_step))
+
+                    camel_move_result: ResultLookup[CamelPositions] = self._move_camel(
+                        camel,
+                        camel_step,
+                        current_camel_positions,
+                        oasis_positions)
+
+                    if camel_move_result.flag:
+                        current_camel_positions = camel_move_result.value
+                        if self._is_finished(current_camel_positions):
+                            break
+                if current_camel_positions not in result_camel_positions:
+                    result_camel_positions[current_camel_positions]: List[OrderedDice] = []
+                result_camel_positions[current_camel_positions].append(ordered_dice)
+        return result_camel_positions
+
     def _generate_dice_combinations(self) -> Generator[UnorderedDice, None, None]:
         number_of_combinations: int = reduce(lambda x, y: x * y, [len(x) for x in self._camel_dice.values()])
         for i in range(number_of_combinations):
