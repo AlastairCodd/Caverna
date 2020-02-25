@@ -2,7 +2,7 @@ import math
 from enum import Enum, auto
 from functools import reduce
 from itertools import permutations
-from typing import Union, List, Dict, Tuple, Callable, Generator, NewType
+from typing import Union, List, Dict, Tuple, Callable, Generator, NewType, cast
 
 from common.entities.result_lookup import ResultLookup
 from common.forges.list_permutation_forge import ListPermutationForge
@@ -25,6 +25,18 @@ CamelStack = NewType('CamelStack', List[CamelColourEnum])
 CamelPositions = NewType('CamelPosition', Dict[int, CamelStack])
 OrderedDice = NewType('OrderedDice', List[Tuple[CamelColourEnum, int]])
 UnorderedDice = NewType('UnorderedDice', Dict[CamelColourEnum, int])
+
+
+class HashableCamelPositions(Dict[int, CamelStack]):
+    def __key(self) -> Tuple[Tuple[int, Tuple[CamelColourEnum]]]:
+        items: List[Tuple[int, Tuple[CamelColourEnum]]] = [(x, tuple(y)) for x, y in self.items()]
+        return tuple(sorted(items))
+
+    def __hash__(self) -> int:
+        return hash(self.__key())
+
+    def __eq__(self, other) -> bool:
+        return self.__key() == other.__key()
 
 
 class CamelService(object):
@@ -58,7 +70,7 @@ class CamelService(object):
     def get_possible_positions_for_camels(
             self,
             camel_positions: CamelPositions,
-            oasis_positions: Union[Dict[int, OasisTypeEnum], None] = None) -> Dict[CamelPositions, List[OrderedDice]]:
+            oasis_positions: Union[Dict[int, OasisTypeEnum], None] = None) -> Dict[HashableCamelPositions, List[OrderedDice]]:
         """Get all possible end states of camel positions after all dice have been rolled, and the rolls which put the camels in this state
 
         :param camel_positions: A dictionary keyed by position along the track, and a list containing the camels at this position.
@@ -69,12 +81,13 @@ class CamelService(object):
             are placed.
         :returns: A dictionary of resultant camel . This will never be null.
         """
-        result_camel_positions: Dict[CamelPositions, List[OrderedDice]] = {}
+        result_camel_positions: Dict[HashableCamelPositions, List[OrderedDice]] = {}
         camel_dice_order: List[CamelColourEnum]
         for camel_dice_order in permutations([camel for camel in CamelColourEnum], self._number_of_dice_to_roll):
             dice_combination: UnorderedDice
             for dice_combination in self._generate_dice_combinations():
-                current_camel_positions: CamelPositions = CamelPositions({position: list(camel_positions[position]) for position in camel_positions})
+                current_camel_positions: HashableCamelPositions = \
+                    HashableCamelPositions({position: list(camel_positions[position]) for position in camel_positions})
 
                 ordered_dice: OrderedDice = OrderedDice([])
                 for camel in camel_dice_order:
@@ -88,13 +101,28 @@ class CamelService(object):
                         oasis_positions)
 
                     if camel_move_result.flag:
-                        current_camel_positions = camel_move_result.value
+                        current_camel_positions = HashableCamelPositions(camel_move_result.value)
                         if self._is_finished(current_camel_positions):
                             break
                 if current_camel_positions not in result_camel_positions:
                     result_camel_positions[current_camel_positions]: List[OrderedDice] = []
                 result_camel_positions[current_camel_positions].append(ordered_dice)
         return result_camel_positions
+
+    def get_likelihood_of_camel_ending_leg_in_first(
+            self,
+            camel_positions: CamelPositions,
+            oasis_positions: Union[Dict[int, OasisTypeEnum], None] = None) -> Dict[CamelColourEnum, float]:
+        result: Dict[CamelColourEnum, float] = {camel: 0 for camel in CamelColourEnum}
+        positions_and_rolls: Dict[HashableCamelPositions, List[OrderedDice]] = self.get_possible_positions_for_camels(camel_positions, oasis_positions)
+        position: CamelPositions
+        for position, rolls in positions_and_rolls.items():
+            winning_camel: CamelColourEnum = position[max(position)][0]
+            result[winning_camel] += len(rolls)
+        total_rolls: int = reduce(lambda x, y: x + y, [len(a) for a in positions_and_rolls.values()])
+        for camel in result:
+            result[camel] /= total_rolls
+        return result
 
     def _generate_dice_combinations(self) -> Generator[UnorderedDice, None, None]:
         number_of_combinations: int = reduce(lambda x, y: x * y, [len(x) for x in self._camel_dice.values()])

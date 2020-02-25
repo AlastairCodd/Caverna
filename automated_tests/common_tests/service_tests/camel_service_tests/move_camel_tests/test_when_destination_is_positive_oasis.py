@@ -2,16 +2,16 @@ from typing import Dict, List
 
 from automated_tests.common_tests.service_tests.camel_service_tests.given_a_camelservice import Given_A_CamelService
 from common.entities.result_lookup import ResultLookup
-from common.services.camel_service import CamelColourEnum, OasisTypeEnum
+from common.services.camel_service import CamelColourEnum, OasisTypeEnum, CamelStack, CamelPositions
 
 
 class test_when_destination_is_positive_oasis(Given_A_CamelService):
     def because(self) -> None:
-        camel_positions: Dict[int, List[CamelColourEnum]] = {
-            3: [CamelColourEnum.yellow, CamelColourEnum.blue, CamelColourEnum.green],
-            5: [CamelColourEnum.orange],
-            6: [CamelColourEnum.white]
-        }
+        camel_positions: CamelPositions = CamelPositions({
+            3: CamelStack([CamelColourEnum.yellow, CamelColourEnum.blue, CamelColourEnum.green]),
+            5: CamelStack([CamelColourEnum.orange]),
+            6: CamelStack([CamelColourEnum.white])
+        })
 
         oasis_positions: Dict[int, OasisTypeEnum] = {
             4: OasisTypeEnum.positive
