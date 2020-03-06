@@ -115,9 +115,14 @@ class CamelService(object):
             oasis_positions: Union[Dict[int, OasisTypeEnum], None] = None) -> Dict[CamelColourEnum, float]:
         result: Dict[CamelColourEnum, float] = {camel: 0 for camel in CamelColourEnum}
         positions_and_rolls: Dict[HashableCamelPositions, List[OrderedDice]] = self.get_possible_positions_for_camels(camel_positions, oasis_positions)
-        position: CamelPositions
-        for position, rolls in positions_and_rolls.items():
-            winning_camel: CamelColourEnum = position[max(position)][0]
+        positions: CamelPositions
+        for positions, rolls in positions_and_rolls.items():
+            highest_position_with_a_camel: int = min(positions)
+            for position in positions:
+                camel_stack_at_position: CamelStack = positions[position]
+                if position > highest_position_with_a_camel and len(camel_stack_at_position) > 0:
+                    highest_position_with_a_camel = position
+            winning_camel: CamelColourEnum = positions[highest_position_with_a_camel][0]
             result[winning_camel] += len(rolls)
         total_rolls: int = reduce(lambda x, y: x + y, [len(a) for a in positions_and_rolls.values()])
         for camel in result:
