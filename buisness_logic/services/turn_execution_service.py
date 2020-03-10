@@ -1,5 +1,6 @@
 from typing import List
 
+from buisness_logic.services.available_dwarf_service import AvailableDwarfService
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
 from common.entities.result_lookup import ResultLookup
@@ -33,7 +34,7 @@ class TurnExecutionService(object):
         errors: List[str] = []
 
         use_dwarf_out_of_order: bool = False
-        if self._available_dwarf_service.does_player_have_sufficient_resources_to_use_a_dwarf_out_of_order(player):
+        if self._available_dwarf_service.can_player_use_a_dwarf_out_of_order(player):
             dwarf_out_of_order_result: ResultLookup[bool] = player.get_player_choice_use_dwarf_out_of_order()
             if dwarf_out_of_order_result.flag:
                 use_dwarf_out_of_order = dwarf_out_of_order_result.value
@@ -45,8 +46,8 @@ class TurnExecutionService(object):
         if success:
             available_dwarves_result: ResultLookup[List[Dwarf]] = self._available_dwarf_service \
                 .get_available_dwarves(
-                player.dwarves,
-                use_dwarf_out_of_order)
+                    player.dwarves,
+                    use_dwarf_out_of_order)
 
             if not available_dwarves_result.flag:
                 success = False

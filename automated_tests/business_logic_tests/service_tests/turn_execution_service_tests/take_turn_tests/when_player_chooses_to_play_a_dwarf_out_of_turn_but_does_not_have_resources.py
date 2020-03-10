@@ -15,7 +15,7 @@ class Test_When_player_chooses_to_play_a_dwarf_out_of_turn_but_does_not_have_res
         cards: List[BaseCard] = []
 
         player: Player = mock.Mock(spec=Player)
-        player.get_player_choice
+        player.get_player_choice_use_dwarf_out_of_order.return_value = True
         self._result: ResultLookup[Player] = self.SUT.take_turn(player, 4, 2, HarvestTypeEnum.Harvest, cards)
 
     def test_then_result_should_not_be_null(self) -> None:

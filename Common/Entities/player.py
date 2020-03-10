@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
 from typing import Iterable, List, Dict, Union
 from common.entities.dwarf import Dwarf
+from common.entities.result_lookup import ResultLookup
 from common.entities.weapon import Weapon
 from core.baseClasses.base_tile import BaseTile
 from core.containers.resource_container import ResourceContainer
@@ -96,7 +97,7 @@ class Player(TileContainer, ResourceContainer, ABC):
     def get_player_choice_use_dwarf_out_of_order(
             self,
             dwarves: List[Dwarf],
-            resources: Dict[ResourceTypeEnum, int]):
+            resources: Dict[ResourceTypeEnum, int]) -> ResultLookup[Dwarf]:
         """Gets user choice for whether or not to play a dwarf out of turn.
 
         :param dwarves: The dwarves the player has available. This cannot be null, or empty.
