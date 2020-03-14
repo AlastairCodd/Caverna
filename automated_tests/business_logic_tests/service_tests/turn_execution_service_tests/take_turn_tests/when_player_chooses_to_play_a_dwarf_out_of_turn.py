@@ -16,15 +16,17 @@ class when_player_chooses_to_play_a_dwarf_out_of_turn(Given_A_TurnExecutionServi
 
         player: Player = mock.Mock(spec=Player)
 
-        self._dwarf_1: Dwarf = self._initialise_dwarf(dwarf_weapon_level=0)
-        self._dwarf_1.is_active.return_value = False
-        self._dwarf_2: Dwarf = self._initialise_dwarf(dwarf_weapon_level=2)
-        self._dwarf_2.is_active.return_value = True
-        self._dwarf_3: Dwarf = self._initialise_dwarf(dwarf_weapon_level=4)
-        self._dwarf_3.is_active.return_value = False
+        self._dwarf_1: Dwarf = self._initialise_dwarf(dwarf_weapon_level=0, is_active=False)
+        self._dwarf_2: Dwarf = self._initialise_dwarf(dwarf_weapon_level=2, is_active=True)
+        self._dwarf_3: Dwarf = self._initialise_dwarf(dwarf_weapon_level=4, is_active=False)
 
         self._player_dwarves: List[Dwarf] = [self._dwarf_1, self._dwarf_2, self._dwarf_3]
         player.dwarves.return_value = self._player_dwarves
+        self._dwarves_and_active_states: Dict[Dwarf, bool] = {
+            self._dwarf_1: False,
+            self._dwarf_2: True,
+            self._dwarf_3: True,
+        }
 
         self._starting_rubies: int = 4
         player_resources: Dict[ResourceTypeEnum, int] = {ResourceTypeEnum.ruby: self._starting_rubies, ResourceTypeEnum.wood: 3}
@@ -32,8 +34,7 @@ class when_player_chooses_to_play_a_dwarf_out_of_turn(Given_A_TurnExecutionServi
 
         player.get_player_choice_use_dwarf_out_of_order.return_value = ResultLookup(True, self._dwarf_3)
 
-        self._result: ResultLookup[Player] = ResultLookup(errors="false")
-            # self.SUT.take_turn(player, 4, 2, HarvestTypeEnum.Harvest, cards)
+        self._result: ResultLookup[Player] = self.SUT.take_turn(player, 4, 2, HarvestTypeEnum.Harvest, cards)
 
     def test_then_result_should_not_be_null(self) -> None:
         self.assertIsNotNone(self._result)
@@ -50,11 +51,6 @@ class when_player_chooses_to_play_a_dwarf_out_of_turn(Given_A_TurnExecutionServi
     def test_then_errors_should_contain_expected_errors(self) -> None:
         dwarf: Dwarf
         state: bool
-        dwarves_and_active_states: Dict[Dwarf, bool] = {
-            self._dwarf_1: False,
-            self._dwarf_2: True,
-            self._dwarf_3: True,
-        }
-        for dwarf, state in dwarves_and_active_states.items():
+        for dwarf, state in self._dwarves_and_active_states.items():
             with self.subTest(dwarf=dwarf):
-                self.assertEqual(dwarf.is_active(), state)
+                self.assertEqual(dwarf.is_adult, state)
