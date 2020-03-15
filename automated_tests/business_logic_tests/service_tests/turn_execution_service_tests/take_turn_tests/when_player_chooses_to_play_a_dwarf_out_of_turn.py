@@ -1,24 +1,38 @@
 from typing import List, Dict
 from unittest import mock
 
-from automated_tests.business_logic_tests.service_tests.turn_execution_service_tests.given_a_turn_execution_service import Given_A_TurnExecutionService
+from automated_tests.business_logic_tests.service_tests.turn_execution_service_tests.given_a_turn_execution_service import Given_A_TurnExecutionService, FakeCard
+from buisness_logic.actions.receiveAction import ReceiveAction
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
 from common.entities.result_lookup import ResultLookup
+from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class when_player_chooses_to_play_a_dwarf_out_of_turn(Given_A_TurnExecutionService):
+class test_when_player_chooses_to_play_a_dwarf_out_of_turn(Given_A_TurnExecutionService):
     def because(self) -> None:
-        cards: List[BaseCard] = []
+        null_action_card_used_by_dwarf_2: BaseCard = FakeCard(card_id=1)
+        receive_wood_action: BaseAction = ReceiveAction({ResourceTypeEnum.wood: 1})
+        chosen_card: BaseCard = FakeCard(card_id=2, actions=receive_wood_action)
+        unused_null_action_card: BaseCard = FakeCard(card_id=3)
+
+        cards: List[BaseCard] = [null_action_card_used_by_dwarf_2, chosen_card]
 
         player: Player = mock.Mock(spec=Player)
 
-        self._dwarf_1: Dwarf = self._initialise_dwarf(dwarf_weapon_level=0, is_active=False)
-        self._dwarf_2: Dwarf = self._initialise_dwarf(dwarf_weapon_level=2, is_active=True)
-        self._dwarf_3: Dwarf = self._initialise_dwarf(dwarf_weapon_level=4, is_active=False)
+        self._dwarf_1: Dwarf = self._initialise_dwarf(
+            dwarf_weapon_level=0,
+            is_active=False)
+        self._dwarf_2: Dwarf = self._initialise_dwarf(
+            dwarf_weapon_level=2,
+            is_active=True,
+            active_card=null_action_card_used_by_dwarf_2)
+        self._dwarf_3: Dwarf = self._initialise_dwarf(
+            dwarf_weapon_level=4,
+            is_active=False)
 
         self._player_dwarves: List[Dwarf] = [self._dwarf_1, self._dwarf_2, self._dwarf_3]
         player.dwarves.return_value = self._player_dwarves
