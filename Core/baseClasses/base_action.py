@@ -2,7 +2,6 @@ from abc import abstractmethod, ABC
 
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from core.containers.resource_container import ResourceContainer
 
 
 class BaseAction(ABC):
