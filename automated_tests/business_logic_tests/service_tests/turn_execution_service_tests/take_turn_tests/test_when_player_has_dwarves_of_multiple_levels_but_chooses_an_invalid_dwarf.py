@@ -8,13 +8,14 @@ from core.baseClasses.base_card import BaseCard
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class Test_When_player_does_not_have_any_dwarves_remaining(Given_A_TurnExecutionService):
+class test_when_player_has_dwarves_of_multiple_levels_but_chooses_an_invalid_dwarf(Given_A_TurnExecutionService):
     def because(self) -> None:
-        self._expected_errors: List[str] = ["Player has used all dwarves"]
+        self._expected_errors: List[str] = ["Invalid dwarf id "]
 
         cards: List[BaseCard] = []
 
         player: Player = mock.Mock(spec=Player)
+        player.get_player_choice_use_dwarf_out_of_order.return_value = True
         self._result: ResultLookup[Player] = self.SUT.take_turn(player, 4, 2, HarvestTypeEnum.Harvest, cards)
 
     def test_then_result_should_not_be_null(self) -> None:
