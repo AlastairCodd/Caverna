@@ -57,27 +57,13 @@ class CavernaEnv(Env):
             dict: additional debug information"""
         if action is None:
             raise ValueError("action")
+        player_points_at_turn_start: int = self._point_calculation_service.calculate_points(self._current_player)
 
-        # get dwarf from player
-        chosen_dwarf: Dwarf = self._current_player.dwarves[0]
 
-        all_actions: List[Tuple[BaseCard, Action]] = []
 
-        # filter action to get card
-        for card in self._cards:
-            for choice in conditional_service.get_possible_choices(card):
-                all_actions.append((card, choice))
-
-        action_choice_segment: array = action[0:len(all_actions)]
-
-        chosen_card: BaseCard
-        chosen_action: BaseAction
-        chosen_card, chosen_action = all_actions[int(argmax(action_choice_segment))]
-
-        chosen_card.activate_card(self._current_player, chosen_dwarf, chosen_action)
-
-        player_points: int = self._point_calculation_service.calculate_points(self._current_player)
-        return array([]), player_points, False, {}
+        player_points_after_action: int = self._point_calculation_service.calculate_points(self._current_player)
+        reward: int = player_points_after_action - player_points_at_turn_start
+        return array([]), reward, False, {}
 
     def observe(self) -> array:
         observation = array([self._turn_index, self._turn_phase, self._current_player])

@@ -4,7 +4,7 @@ from core.baseClasses.base_card import BaseCard
 
 
 class CardForge(object):
-    
+
     def create_all_cards(self) -> List[BaseCard]:
         """Returns a list containing a single instance of all of the cards"""
         cards = [
@@ -39,5 +39,6 @@ class CardForge(object):
             ore_delivery_card.oreDeliveryCard(),
             adventure_card.adventureCard(),
             ore_trading_card.oreTradingCard(),
-            ruby_mining_2_card.RubyMining2Card() ]
+            ruby_mining_2_card.RubyMining2Card()
+        ]
         return cards
