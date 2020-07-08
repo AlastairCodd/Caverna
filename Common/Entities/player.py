@@ -3,10 +3,12 @@ from typing import Iterable, List, Dict, Union
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.weapon import Weapon
+from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_tile import BaseTile
 from core.containers.resource_container import ResourceContainer
 from core.containers.tile_container import TileContainer
 from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
 class Player(TileContainer, ResourceContainer, ABC):
@@ -97,10 +99,68 @@ class Player(TileContainer, ResourceContainer, ABC):
     def get_player_choice_use_dwarf_out_of_order(
             self,
             dwarves: List[Dwarf],
-            resources: Dict[ResourceTypeEnum, int]) -> ResultLookup[Dwarf]:
+            cards: List['BaseCard'],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[bool]:
         """Gets user choice for whether or not to play a dwarf out of turn.
 
-        :param dwarves: The dwarves the player has available. This cannot be null, or empty.
-        :param resources: The resources the player has. This cannot be null, but may be empty.
+        :param dwarves: The dwarves the player has. This cannot be null, or empty.
+        :param cards: The possible cards that may be chosen. This cannot be null, or empty.
+        :param turn_index: The 0 based index indicating which turn the player is taking.
+        :param round_index: The 0 based index indicating which round the game is in.
+        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
         :returns: True if the player has chosen to play a dwarf out of turn, false if not."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_dwarf_to_use_out_of_order(
+            self,
+            dwarves: List[Dwarf],
+            cards: List['BaseCard'],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[Dwarf]:
+        """Gets user choice for which dwarf to play out of turn.
+
+        :param dwarves: The dwarves the player has. This cannot be null, or empty.
+        :param cards: The possible cards that may be chosen. This cannot be null, or empty.
+        :param turn_index: The 0 based index indicating which turn the player is taking.
+        :param round_index: The 0 based index indicating which round the game is in.
+        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
+        :returns: The dwarf the player has chosen to use out of turn."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_card_to_use(
+            self,
+            available_cards: List['BaseCard'],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup['BaseCard']:
+        """Gets user choice for which card to use.
+
+        :param available_cards: The possible cards that may be chosen. This cannot be null, or empty.
+        :param turn_index: The 0 based index indicating which turn the player is taking.
+        :param round_index: The 0 based index indicating which round the game is in.
+        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
+        :returns: The card the player has chosen to activate."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_expedition_reward(
+            self,
+            possible_expedition_rewards: List[BaseAction],
+            expedition_level: int,
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[List[BaseAction]]:
+        """Gets user choice for which expedition rewards to use.
+
+        :param possible_expedition_rewards: The possible expedition rewards that may be chosen, given the level of the dwarf. This cannot be null, or empty.
+        :param expedition_level: The number of rewards the player must take. This must be positive.
+        :param turn_index: The 0 based index indicating which turn the player is taking.
+        :param round_index: The 0 based index indicating which round the game is in.
+        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
+        :returns: The card the player has chosen to activate."""
         raise NotImplementedError()
