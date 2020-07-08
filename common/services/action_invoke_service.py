@@ -29,7 +29,12 @@ class ActionInvokeService(object):
         if current_dwarf is None:
             raise ValueError
 
-        actions_best_order: ResultLookup[List[BaseAction]] = self._action_ordering_service.calculated_best_order(actions, player, current_card, current_dwarf)
+        actions_best_order: ResultLookup[List[BaseAction]] = self._action_ordering_service\
+            .calculated_best_order(
+            actions,
+            player,
+            current_card,
+            current_dwarf)
 
         success: bool = True
         successful_actions: int = 0
