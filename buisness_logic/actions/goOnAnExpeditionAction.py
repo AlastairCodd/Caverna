@@ -6,15 +6,18 @@ from buisness_logic.actions.receiveAction import ReceiveAction
 from buisness_logic.actions.sowAction import SowAction
 from buisness_logic.actions.upgrade_all_weapons_action import UpgradeAllWeaponsAction
 from buisness_logic.tiles.dwelling import Dwelling
+from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
+from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
+from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class GoOnAnExpeditionAction(BaseAction):
+class GoOnAnExpeditionAction(BasePlayerChoiceAction):
     def __init__(self, level: int):
         if level < 1 or level > 4:
             raise ValueError("level")
@@ -48,10 +51,17 @@ class GoOnAnExpeditionAction(BaseAction):
 
         }
 
-    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
+    def set_player_choice(
+            self,
+            player: Player,
+            dwarf: Dwarf,
+            cards: List[BaseCard],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
         if player is None:
             raise ValueError(str(player))
-        weapon_level = current_dwarf.weapon_level
+        weapon_level = dwarf.weapon_level
 
         possible_expedition_rewards: List[BaseAction] = []
         for level, actions_available_for_level in self._expedition_actions.items():
@@ -59,8 +69,32 @@ class GoOnAnExpeditionAction(BaseAction):
                 for action in actions_available_for_level:
                     possible_expedition_rewards.append(action)
 
-        player_choice: List[BaseAction] = player.get_player_choice_expedition_reward(possible_expedition_rewards)
-        raise NotImplementedError()
+        chosen_expedition_actions: ResultLookup[List[BaseAction]] = player.get_player_choice_expedition_reward(
+            possible_expedition_rewards,
+            self._level,
+            turn_index,
+            round_index,
+            harvest_type)
+
+        result: ResultLookup[ActionChoiceLookup]
+
+        if chosen_expedition_actions.flag:
+            data: ActionChoiceLookup = ActionChoiceLookup(chosen_expedition_actions.value)
+            result = ResultLookup(True, data, chosen_expedition_actions.errors)
+        else:
+            result = ResultLookup(errors=chosen_expedition_actions.errors)
+        return result
+
+    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
+        if current_dwarf is None:
+            raise ValueError("dwarf cannot be none -- should be levelled up")
+
+        result: ResultLookup[int]
+        if current_dwarf.has_weapon:
+            result = current_dwarf.weapon.increase_level()
+        else:
+            result = ResultLookup(True, 0, "Dwarf does not have a weapon")
+        return result
 
     def new_turn_reset(self):
         pass

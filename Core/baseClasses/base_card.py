@@ -1,18 +1,18 @@
 from abc import ABC
 from typing import Union, List
 
-import typing
-
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.multiconditional import Conditional
 from common.entities.player import Player
+from common.services.resettable import Resettable
 from core.baseClasses.base_action import BaseAction
 from common.entities.dwarf import Dwarf
 from common.services.conditional_service import ConditionalService
 from core.containers.resource_container import ResourceContainer
+from core.errors.invalid_operation_error import InvalidOperationError
 
 
-class BaseCard(ABC):
+class BaseCard(ABC, Resettable):
     def __init__(
             self,
             name: str,
@@ -22,7 +22,11 @@ class BaseCard(ABC):
         self._name: str = name
         self._id: int = card_id
         self._level: int = level
+        if actions is None:
+            raise ValueError("Card.__init__ actions cannot be null")
         self._actions: Union[BaseAction, Conditional] = actions
+
+        self._isVisible = True if level < 0 else False
         self._isActive = False
 
     @property
@@ -34,12 +38,24 @@ class BaseCard(ABC):
         return self._level
 
     @property
-    def is_active(self):
+    def is_active(self) -> bool:
         return self._isActive
 
     @property
-    def is_available(self):
-        return not self._isActive
+    def is_available(self) -> bool:
+        return not self._isActive and self._isVisible
+
+    @property
+    def actions(self) -> Union[BaseAction, Conditional]:
+        return self._actions
+
+    def reveal_card(self) -> None:
+        if self._isVisible:
+            raise InvalidOperationError()
+        self._isVisible = True
+
+    def new_turn_reset(self) -> None:
+        self._isActive = False
 
     def activate_card(
             self,
@@ -53,7 +69,7 @@ class BaseCard(ABC):
         if dwarf.is_active:
             raise ValueError("dwarf cannot already be active")
 
-        if self._isActive:
+        if not self.is_available:
             return False
 
         conditional_service: ConditionalService = ConditionalService()
@@ -67,7 +83,6 @@ class BaseCard(ABC):
             for action in action_choice:
                 action.invoke(player, typing.cast(ResourceContainer, self), dwarf)
             dwarf.set_active(self)
+            self._isActive = True
+            
         return success
-
-    def make_available(self):
-        self._isActive = False
