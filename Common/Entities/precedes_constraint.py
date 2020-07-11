@@ -4,7 +4,7 @@ from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_constraint import BaseConstraint
 
 
-class ProceedsConstraint(BaseConstraint):
+class PrecedesConstraint(BaseConstraint):
     def __init__(self, action_one: BaseAction, action_two: BaseAction) -> None:
         if action_one is None:
             raise ValueError
@@ -29,6 +29,8 @@ class ProceedsConstraint(BaseConstraint):
             if action == self._action_two:
                 action_two_location = i
             i += 1
+            if action_one_location != -1 and action_two_location != -1:
+                break
 
         result: bool = action_one_location != -1 and \
             action_two_location != -1 and \
@@ -36,7 +38,7 @@ class ProceedsConstraint(BaseConstraint):
         return result
 
     def __eq__(self, other):
-        if isinstance(other, ProceedsConstraint):
+        if isinstance(other, PrecedesConstraint):
             action_one_equal: bool = other._action_one == self._action_one
             action_two_equal: bool = other._action_two == self._action_two
             result: bool = action_one_equal and action_two_equal
