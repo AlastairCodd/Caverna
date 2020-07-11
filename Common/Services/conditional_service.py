@@ -1,7 +1,7 @@
 from typing import List, Dict, Iterable, Callable, Union
 from buisness_logic.effects.action_effects import ChangeDecisionVerb
 from common.entities.action_choice_lookup import ActionChoiceLookup
-from common.proceeds_constraint import ProceedsConstraint
+from common.entities.precedes_constraint import PrecedesConstraint
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_constraint import BaseConstraint
 from core.containers.tile_container import TileContainer
@@ -27,15 +27,13 @@ class ConditionalService(object):
     def get_possible_choices(
             self,
             conditional: Union[Conditional, BaseAction],
-            tile_container: TileContainer = None) -> List[ActionChoiceLookup]:
+            tile_container: Union[TileContainer, None] = None) -> List[ActionChoiceLookup]:
         """recurse through the conditional tree in order to find which possible action choices the agent may make
 
-        params:
-            conditional. Either a conditional object or an action. This cannot be null
-            player (optional):
+        :param conditional: Either a conditional object or an action. This cannot be null.
+        :param tile_container: (Optional) The player making the choice, who might have tiles which change which action choices they can make.
 
-        returns:
-            a list containing all possible (base) actions which can be take. This will never be null."""
+        :returns: A list containing all possible action choice lookups which may be chosen. This will never be null or empty."""
         if conditional is None:
             raise ValueError("conditional")
         if isinstance(conditional, BaseAction):
@@ -55,17 +53,17 @@ class ConditionalService(object):
         choices: List[ActionChoiceLookup] = self._actionDictionary[combination_type](left, right)
         return choices
 
-    def _combine_and_then(self, left: Iterable[ActionChoiceLookup], right: Iterable[ActionChoiceLookup]) \
-            -> List[ActionChoiceLookup]:
+    def _combine_and_then(
+            self,
+            left: Iterable[ActionChoiceLookup],
+            right: Iterable[ActionChoiceLookup]) -> List[ActionChoiceLookup]:
         """Combine the left and right lists in an and then way. (left or right)
         a AND_THEN b = [ab]
 
-        params:
-            left: an enumerable of base actions. This cannot be null.
-            right: an enumerable of base actions. This cannot be null.
+        :param left: an enumerable of base actions. This cannot be null.
+        :param right: an enumerable of base actions. This cannot be null.
 
-        returns:
-            a list containing the possible combined actions. This will never be null."""
+        :returns: A list containing the possible combined actions. This will never be null."""
         if left is None:
             raise ValueError("left")
         if right is None:
@@ -80,7 +78,7 @@ class ConditionalService(object):
 
                 for l_action in l.actions:
                     for r_action in r.actions:
-                        result_constraint: BaseConstraint = ProceedsConstraint(l_action, r_action)
+                        result_constraint: BaseConstraint = PrecedesConstraint(l_action, r_action)
                         result_constraints.append(result_constraint)
 
                 if any(l.constraints):
@@ -98,12 +96,10 @@ class ConditionalService(object):
         """Combine the left and right lists in an and then way. (left or right)
         a OR b = [a, b]
 
-        params:
-            left: an enumerable of base actions. This cannot be null.
-            right: an enumerable of base actions. This cannot be null.
+        :param left: an enumerable of base actions. This cannot be null.
+        :param right: an enumerable of base actions. This cannot be null.
 
-        returns:
-            a list containing the possible combined actions. This will never be null."""
+        :returns: A list containing the possible combined actions. This will never be null."""
         if left is None:
             raise ValueError("left")
         if right is None:
@@ -124,12 +120,10 @@ class ConditionalService(object):
         """Combine the left and right lists in an and then way. (left or right)
         a AND_THEN_OR b = [ab, b]
 
-        params:
-            left: an enumerable of base actions. This cannot be null.
-            right: an enumerable of base actions. This cannot be null.
+        :param left: an enumerable of base actions. This cannot be null.
+        :param right: an enumerable of base actions. This cannot be null.
 
-        returns:
-            a list containing the possible combined actions. This will never be null."""
+        :returns: A list containing the possible combined actions. This will never be null."""
         if left is None:
             raise ValueError("left")
         if right is None:
@@ -147,12 +141,10 @@ class ConditionalService(object):
         """Combine the left and right lists in an and way. (left or right or left and right)
         a AND_OR b = [a, b, ab]
 
-        params:
-            left: an enumerable of base actions. This cannot be null.
-            right: an enumerable of base actions. This cannot be null.
+        :param left: an enumerable of base actions. This cannot be null.
+        :param right: an enumerable of base actions. This cannot be null.
 
-        returns:
-            a list containing the possible combined actions. This will never be null."""
+        :returns: A list containing the possible combined actions. This will never be null."""
         if left is None:
             raise ValueError("left")
         if right is None:
@@ -181,12 +173,10 @@ class ConditionalService(object):
         """Combine the left and right action choice lookups in an "either or" way. (left or right)
         a EITHER_OR b = [a,b]
 
-        params:
-            left: an enumerable of base actions. This cannot be null.
-            right: an enumerable of base actions. This cannot be null.
+        :param left: an enumerable of base actions. This cannot be null.
+        :param right: an enumerable of base actions. This cannot be null.
 
-        returns:
-            a list containing the possible combined actions. This will never be null."""
+        :returns: A list containing the possible combined actions. This will never be null."""
         if left is None:
             raise ValueError("left")
         if right is None:

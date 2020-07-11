@@ -1,11 +1,11 @@
-from typing import List, Iterable
+from typing import List
 
 from automated_tests.common_tests.service_tests.conditional_service_tests.mockBaseAction import MockBaseAction
 from automated_tests.common_tests.service_tests.conditional_service_tests.test_conditionalService import \
     Given_A_Conditional_Service
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.multiconditional import Conditional
-from common.proceeds_constraint import ProceedsConstraint
+from common.entities.precedes_constraint import PrecedesConstraint
 from core.baseClasses.base_action import BaseAction
 from core.enums.caverna_enums import ActionCombinationEnum
 
@@ -24,7 +24,7 @@ class Test_When_Parameter_Is_AndThen_Conditional(Given_A_Conditional_Service):
         self.combinations: List[ActionChoiceLookup] = [
             ActionChoiceLookup(
                 [self.action1, self.action2],
-                [ProceedsConstraint(self.action1, self.action2)]),
+                [PrecedesConstraint(self.action1, self.action2)]),
         ]
 
         self.result: List[ActionChoiceLookup] = self.SUT.get_possible_choices(self.conditional)
