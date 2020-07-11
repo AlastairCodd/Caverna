@@ -1,5 +1,7 @@
-from abc import abstractmethod, ABC
+from abc import abstractmethod, ABCMeta
 from typing import Iterable, List, Dict, Union
+
+from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.weapon import Weapon
@@ -11,7 +13,7 @@ from core.enums.caverna_enums import ResourceTypeEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class Player(TileContainer, ResourceContainer, ABC):
+class Player(TileContainer, ResourceContainer, metaclass=ABCMeta):
 
     def __init__(self, player_id: int, turn_index: int):
         self._id: int = player_id
@@ -145,6 +147,22 @@ class Player(TileContainer, ResourceContainer, ABC):
         :param round_index: The 0 based index indicating which round the game is in.
         :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
         :returns: The card the player has chosen to activate."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_actions_to_use(
+            self,
+            available_action_choices: List[ActionChoiceLookup],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+        """Gets user choice for which actions to take.
+
+        :param available_action_choices: The possible action choices which may be chosen. This cannot be null, or empty.
+        :param turn_index: The 0 based index indicating which turn the player is taking.
+        :param round_index: The 0 based index indicating which round the game is in.
+        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
+        :returns: The action choice the player has chosen to take."""
         raise NotImplementedError()
 
     @abstractmethod

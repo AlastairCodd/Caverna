@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC
+from abc import abstractmethod, ABCMeta
 from typing import List
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -10,7 +10,7 @@ from core.baseClasses.base_card import BaseCard
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class BasePlayerChoiceAction(ABC, BaseAction):
+class BasePlayerChoiceAction(BaseAction, metaclass=ABCMeta):
 
     @abstractmethod
     def set_player_choice(
