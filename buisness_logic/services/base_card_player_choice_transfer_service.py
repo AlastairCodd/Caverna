@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from typing import List
 
 from common.entities.dwarf import Dwarf
@@ -8,7 +8,7 @@ from core.baseClasses.base_card import BaseCard
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class BaseCardPlayerChoiceTransferService(ABC):
+class BaseCardPlayerChoiceTransferService(metaclass=ABCMeta):
     @abstractmethod
     def get_card(
             self,

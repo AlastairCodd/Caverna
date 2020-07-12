@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from typing import List
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -9,7 +9,7 @@ from core.baseClasses.base_card import BaseCard
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class BaseActionPlayerChoiceTransferService(ABC):
+class BaseActionPlayerChoiceTransferService(metaclass=ABCMeta):
     @abstractmethod
     def get_action(
             self,

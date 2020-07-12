@@ -44,10 +44,11 @@ class Given_A_CompleteDwarfPlayerChoiceTransferService(TestCase, ABC):
 
 
 class FakeCard(BaseCard):
-    def __init__(self,
-                 name: str = "fake card",
-                 card_id: int = -1,
-                 actions: Union[BaseAction, Conditional, None] = None):
+    def __init__(
+            self,
+            name: str = "fake card",
+            card_id: int = -1,
+            actions: Union[BaseAction, Conditional, None] = None):
         if actions is None:
             actions = NullAction()
         super().__init__(name, card_id, actions=actions)

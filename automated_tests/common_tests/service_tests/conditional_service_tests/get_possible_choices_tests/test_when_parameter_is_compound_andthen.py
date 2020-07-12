@@ -4,7 +4,7 @@ from automated_tests.common_tests.service_tests.conditional_service_tests.mockBa
 from automated_tests.common_tests.service_tests.conditional_service_tests.test_conditionalService import Given_A_Conditional_Service
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.multiconditional import Conditional
-from common.proceeds_constraint import ProceedsConstraint
+from common.entities.precedes_constraint import PrecedesConstraint
 from core.baseClasses.base_action import BaseAction
 from core.enums.caverna_enums import ActionCombinationEnum
 
@@ -32,10 +32,10 @@ class Test_When_Parameter_Is_Compound_AndThen(Given_A_Conditional_Service):
             self.conditional2)
 
         self.combinations: List[ActionChoiceLookup] = [
-            ActionChoiceLookup([self.action1, self.action3], [ProceedsConstraint(self.action1, self.action3)]),
-            ActionChoiceLookup([self.action1, self.action4], [ProceedsConstraint(self.action1, self.action4)]),
-            ActionChoiceLookup([self.action2, self.action3], [ProceedsConstraint(self.action2, self.action3)]),
-            ActionChoiceLookup([self.action2, self.action4], [ProceedsConstraint(self.action2, self.action4)]),
+            ActionChoiceLookup([self.action1, self.action3], [PrecedesConstraint(self.action1, self.action3)]),
+            ActionChoiceLookup([self.action1, self.action4], [PrecedesConstraint(self.action1, self.action4)]),
+            ActionChoiceLookup([self.action2, self.action3], [PrecedesConstraint(self.action2, self.action3)]),
+            ActionChoiceLookup([self.action2, self.action4], [PrecedesConstraint(self.action2, self.action4)]),
         ]
 
         self.result: List[ActionChoiceLookup] = self.SUT.get_possible_choices(self.conditional)
