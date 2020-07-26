@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import Iterable, List, Dict, Union
+from typing import Iterable, List, Dict, Union, Tuple, Optional
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -180,5 +180,5 @@ class Player(TileContainer, ResourceContainer, metaclass=ABCMeta):
         :param turn_index: The 0 based index indicating which turn the player is taking.
         :param round_index: The 0 based index indicating which round the game is in.
         :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
-        :returns: The card the player has chosen to activate."""
+        :returns: The expedition rewards the player has chosen to claim. This will never be null."""
         raise NotImplementedError()

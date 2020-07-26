@@ -6,7 +6,10 @@ from common.services.resettable import Resettable
 
 
 class BaseAction(Resettable, metaclass=ABCMeta):
-
     @abstractmethod
-    def invoke(self, player: 'Player', active_card: 'BaseCard', current_dwarf: Dwarf) -> ResultLookup[int]:
+    def invoke(
+            self,
+            player: 'Player',
+            active_card: 'BaseCard',
+            current_dwarf: Dwarf) -> ResultLookup[int]:
         raise NotImplementedError("abstract base action class")

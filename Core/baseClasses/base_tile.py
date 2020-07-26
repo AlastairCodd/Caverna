@@ -1,10 +1,10 @@
-from abc import ABC
+from abc import ABCMeta
 from typing import Dict, List
 from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum
 from core.baseClasses.base_effect import BaseEffect
 
 
-class BaseTile(ABC):
+class BaseTile(metaclass=ABCMeta):
 
     def __init__(
             self,

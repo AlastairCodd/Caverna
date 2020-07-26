@@ -5,7 +5,6 @@ from buisness_logic.actions import *
 
 
 class OreMineConstructionCard(BaseCard):
-
     def __init__(self):
         BaseCard.__init__(
             self, "Ore Mine Construction", 22, 1,
