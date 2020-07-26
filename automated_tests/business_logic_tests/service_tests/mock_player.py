@@ -1,4 +1,4 @@
-from typing import Union, List, Dict, Callable
+from typing import Union, List, Dict, Callable, Tuple, Optional
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -8,7 +8,7 @@ from common.entities.weapon import Weapon
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
@@ -170,4 +170,20 @@ class MockPlayer(Player):
             turn_index: int,
             round_index: int,
             harvest_type: HarvestTypeEnum) -> ResultLookup[List[BaseAction]]:
+        pass
+
+    def get_player_choice_tile_to_build(
+            self,
+            possible_tiles: List[BaseTile],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[BaseTile]:
+        pass
+
+    def get_player_choice_location_to_build(
+            self,
+            tile: BaseTile,
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
         pass

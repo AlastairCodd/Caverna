@@ -11,7 +11,7 @@ from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
 class BasePlayerChoiceAction(BaseAction, metaclass=ABCMeta):
-
+    # TODO: What if this is immitated?
     @abstractmethod
     def set_player_choice(
             self,

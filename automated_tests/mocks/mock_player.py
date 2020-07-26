@@ -1,13 +1,20 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple, Optional
 
+from common.entities.action_choice_lookup import ActionChoiceLookup
+from common.entities.dwarf import Dwarf
 from common.entities.player import Player
+from common.entities.result_lookup import ResultLookup
 from common.entities.tile_entity import TileEntity
 from common.entities.weapon import Weapon
+from core.baseClasses.base_action import BaseAction
+from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
-from core.enums.caverna_enums import ResourceTypeEnum
-
+from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
 
 # TODO: Update this
+from core.enums.harvest_type_enum import HarvestTypeEnum
+
+
 class MockPlayer(Player):
     def __init__(
             self,
@@ -45,4 +52,62 @@ class MockPlayer(Player):
             possible_prices: List[Dict[ResourceTypeEnum, int]],
             target: Union[BaseTile, Weapon]) \
             -> Dict[ResourceTypeEnum, int]:
+        pass
+
+    def get_player_choice_use_dwarf_out_of_order(
+            self,
+            dwarves: List[Dwarf],
+            cards: List[BaseCard],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[bool]:
+        pass
+
+    def get_player_choice_dwarf_to_use_out_of_order(
+            self, dwarves: List[Dwarf],
+            cards: List[BaseCard],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[Dwarf]:
+        pass
+
+    def get_player_choice_card_to_use(
+            self,
+            available_cards: List[BaseCard],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> \
+            ResultLookup[BaseCard]:
+        pass
+
+    def get_player_choice_actions_to_use(
+            self,
+            available_action_choices: List[ActionChoiceLookup],
+            turn_index: int, round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+        pass
+
+    def get_player_choice_expedition_reward(
+            self,
+            possible_expedition_rewards: List[BaseAction],
+            expedition_level: int,
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[List[BaseAction]]:
+        pass
+
+    def get_player_choice_tile_to_build(
+            self,
+            possible_tiles: List[BaseTile],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[BaseTile]:
+        pass
+
+    def get_player_choice_location_to_build(
+            self,
+            tile: BaseTile,
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
         pass

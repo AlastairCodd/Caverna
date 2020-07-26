@@ -9,7 +9,7 @@ from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_tile import BaseTile
 from core.containers.resource_container import ResourceContainer
 from core.containers.tile_container import TileContainer
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
@@ -181,4 +181,36 @@ class Player(TileContainer, ResourceContainer, metaclass=ABCMeta):
         :param round_index: The 0 based index indicating which round the game is in.
         :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
         :returns: The expedition rewards the player has chosen to claim. This will never be null."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_tile_to_build(
+            self,
+            possible_tiles: List[BaseTile],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[BaseTile]:
+        """Gets user choice for which tile to build.
+
+        :param possible_tiles: The possible tiles which may be built. This cannot be null, or empty.
+        :param turn_index: The 0 based index indicating which turn the player is taking.
+        :param round_index: The 0 based index indicating which round the game is in.
+        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
+        :returns: The tile the player has chosen to build. This will never be null."""
+        raise NotImplementedError()
+
+    # TODO: Maybe change the signature of this?
+    def get_player_choice_location_to_build(
+            self,
+            tile: BaseTile,
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
+        """Gets user choice for location to place the given tile.
+
+        :param tile: The tile to be placed. This cannot be null.
+        :param turn_index: The 0 based index indicating which turn the player is taking.
+        :param round_index: The 0 based index indicating which round the game is in.
+        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
+        :returns: The location (and direction, if the tile is a twin-tile) that the place has decided to place this tile. This will never be null."""
         raise NotImplementedError()

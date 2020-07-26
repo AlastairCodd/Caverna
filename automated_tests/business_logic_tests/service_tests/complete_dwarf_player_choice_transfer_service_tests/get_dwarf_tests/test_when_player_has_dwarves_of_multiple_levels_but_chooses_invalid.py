@@ -1,9 +1,7 @@
 from typing import List, Dict
-from unittest import mock
-
-from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests.get_dwarf_tests.mock_player import MockPlayer
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests\
     .given_a_complete_dwarf_player_choice_transfer_service import Given_A_CompleteDwarfPlayerChoiceTransferService
+from automated_tests.business_logic_tests.service_tests.mock_player import MockPlayer
 from common.entities.dwarf import Dwarf
 from common.entities.player import Player
 from common.entities.result_lookup import ResultLookup
