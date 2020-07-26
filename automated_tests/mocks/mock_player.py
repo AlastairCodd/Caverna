@@ -1,11 +1,13 @@
 from typing import Dict, List, Union
 
 from common.entities.player import Player
+from common.entities.tile_entity import TileEntity
 from common.entities.weapon import Weapon
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
+# TODO: Update this
 class MockPlayer(Player):
     def __init__(
             self,
@@ -18,12 +20,6 @@ class MockPlayer(Player):
         self._mock_tiles = tiles
         if resources is not None:
             self._resources = resources
-
-    @property
-    def tiles(self) -> List[BaseTile]:
-        if any(self._mock_tiles):
-            return self._mock_tiles
-        return super().tiles
 
     def get_player_choice(self, action):
         pass
