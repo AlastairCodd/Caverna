@@ -2,7 +2,7 @@ from typing import Union, List, Optional
 
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileColourEnum
-from core.baseClasses.base_tile import BaseTile
+from core.baseClasses.base_tile import BaseTile, BaseSpecificTile
 
 
 class TileEntity(object):
@@ -37,7 +37,7 @@ class TileEntity(object):
     @property
     def colour(self) -> Optional[TileColourEnum]:
         result: Optional[TileColourEnum] = None
-        if self._specific_tile is not None:
+        if self._specific_tile is not None and isinstance(self._specific_tile, BaseSpecificTile):
             result = self._specific_tile.colour
         return result
 

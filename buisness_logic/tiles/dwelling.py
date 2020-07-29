@@ -1,14 +1,14 @@
-from abc import ABC
+from abc import ABCMeta
 from typing import Dict, List
 
 from core.baseClasses.base_effect import BaseEffect
-from core.baseClasses.base_tile import BaseTile
+from core.baseClasses.base_tile import BaseSpecificTile
 from core.constants import tile_ids
-from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum, TileTypeEnum
 from buisness_logic.effects import population_effects, animal_storage_effects
 
 
-class BaseDwelling(BaseTile, ABC):
+class BaseDwelling(BaseSpecificTile, metaclass=ABCMeta):
     def __init__(
             self,
             name: str,
@@ -16,11 +16,11 @@ class BaseDwelling(BaseTile, ABC):
             base_points: int,
             cost: Dict[ResourceTypeEnum, int],
             effects: List[BaseEffect]):
-        BaseTile.__init__(
+        BaseSpecificTile.__init__(
             self,
             name,
             tile_id,
-            True,
+            TileTypeEnum.furnishedDwelling,
             base_points,
             cost,
             effects,

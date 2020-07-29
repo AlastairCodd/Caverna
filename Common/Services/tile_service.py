@@ -80,6 +80,8 @@ class TileService(object):
         :param player: The player who plans to build the tile. They may have tiles which give them effects reducing the building cost. This may not be null.
         :param tile: The tile to be built. This may not be null.
         :returns: The cost to build the tile, for the given player. This will never be null."""
+        # TODO: Implement this
+        tile_base_cost: Dict[ResourceTypeEnum, int] = tile.cost
         pass
 
     def get_available_locations(
@@ -172,8 +174,7 @@ class TileService(object):
             raise ValueError("base tile")
         if location < 0 or location > player.tile_count:
             raise ValueError("location must point to a valid position")
-        # TODO: Implement this
-        if self.is_tile_a_twin_tile(tile.type) and direction is None:
+        if self.is_tile_a_twin_tile(tile.tile_type) and direction is None:
             raise ValueError("Direction cannot be null if tile is a twin tile")
 
         tile_type = TileTypeEnum.furnishedDwelling if tile.is_dwelling else TileTypeEnum.furnishedCavern
