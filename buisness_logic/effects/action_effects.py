@@ -3,11 +3,18 @@ from core.enums.caverna_enums import ActionCombinationEnum
 
 
 class ChangeDecisionVerb(BaseEffect):
-    def __init__(self, change_from: ActionCombinationEnum, change_to: ActionCombinationEnum):
-        self._change_from = change_from
-        self._change_to = change_to
+    def __init__(
+            self,
+            change_from: ActionCombinationEnum,
+            change_to: ActionCombinationEnum):
+        self._change_from: ActionCombinationEnum = change_from
+        self._change_to: ActionCombinationEnum = change_to
+        BaseEffect.__init__(self)
 
-    def invoke(self, combination: ActionCombinationEnum) -> ActionCombinationEnum:
+    def invoke(
+            self,
+            combination: ActionCombinationEnum) -> ActionCombinationEnum:
+        result: ActionCombinationEnum = combination
         if combination == self._change_from:
-            return self._change_to
-        return combination
+            result = self._change_to
+        return result

@@ -1,8 +1,9 @@
-from typing import List, Union, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.repositories.base_player_repository import BasePlayerRepository
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from common.services.tile_service import TileService
 from core.baseClasses.base_card import BaseCard
@@ -16,20 +17,21 @@ class PlaceATileAction(BasePlayerChoiceAction):
     def __init__(
             self,
             tile_type: TileTypeEnum,
-            override_cost: Union[Dict[ResourceTypeEnum, int], None] = None):
+            specific_tile: Optional[BaseTile] = None,
+            override_cost: Optional[Dict[ResourceTypeEnum, int]] = None):
         self._tile_service: TileService = TileService()
 
         self._tile_type: TileTypeEnum = tile_type
 
         self._tile_location: int = -1
-        self._tile_direction: Union[None, TileDirectionEnum] = None
-        self._specific_tile: Union[None, BaseTile] = None
+        self._tile_direction: Optional[TileDirectionEnum] = None
+        self._specific_tile: Optional[BaseTile] = specific_tile
 
-        self._tile_cost_override: Union[Dict[ResourceTypeEnum, int], None] = override_cost
+        self._tile_cost_override: Optional[Dict[ResourceTypeEnum, int]] = override_cost
 
     def set_player_choice(
             self,
-            player: Player,
+            player: BasePlayerService,
             dwarf: Dwarf,
             cards: List[BaseCard],
             turn_index: int,
@@ -41,23 +43,24 @@ class PlaceATileAction(BasePlayerChoiceAction):
         success: bool = True
         errors: List[str] = []
 
-        does_tile_have_unique_type: bool = self._tile_service.does_tile_type_have_unique_tile(self._tile_type)
+        if self._specific_tile is None:
+            does_tile_have_unique_type: bool = self._tile_service.does_tile_type_have_unique_tile(self._tile_type)
 
-        if does_tile_have_unique_type:
-            self._specific_tile = self._tile_service.get_unique_tile(self._tile_type)
-        else:
-            possible_tiles: List[BaseTile] = self._tile_service.get_possible_tiles(self._tile_type)
-            specific_tile_to_build_result: ResultLookup[BaseTile] = player.get_player_choice_tile_to_build(
-                possible_tiles,
-                turn_index,
-                round_index,
-                harvest_type)
+            if does_tile_have_unique_type:
+                self._specific_tile = self._tile_service.get_unique_tile(self._tile_type)
+            else:
+                possible_tiles: List[BaseTile] = self._tile_service.get_possible_tiles(self._tile_type)
+                specific_tile_to_build_result: ResultLookup[BaseTile] = player.get_player_choice_tile_to_build(
+                    possible_tiles,
+                    turn_index,
+                    round_index,
+                    harvest_type)
 
-            success = specific_tile_to_build_result.flag
-            errors.extend(specific_tile_to_build_result.errors)
+                success = specific_tile_to_build_result.flag
+                errors.extend(specific_tile_to_build_result.errors)
 
-            if specific_tile_to_build_result.flag:
-                self._specific_tile = specific_tile_to_build_result.value
+                if specific_tile_to_build_result.flag:
+                    self._specific_tile = specific_tile_to_build_result.value
 
         if success:
             # TODO: Make this value a type
@@ -82,7 +85,7 @@ class PlaceATileAction(BasePlayerChoiceAction):
 
     def invoke(
             self,
-            player: Player,
+            player: BasePlayerRepository,
             active_card: BaseCard,
             current_dwarf: Dwarf) -> ResultLookup[int]:
         if player is None:

@@ -1,8 +1,8 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseTile
-from core.enums.caverna_enums import TileColourEnum, ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 
 
 class MockTile(BaseTile):
@@ -10,9 +10,15 @@ class MockTile(BaseTile):
             self,
             name: str = "Mock",
             tile_id: int = 0,
-            is_dwelling: bool = False,
+            tile_type: TileTypeEnum = TileTypeEnum.furnishedCavern,
             base_points: int = 0,
-            cost: Dict[ResourceTypeEnum, int] = [],
-            effects: List[BaseEffect] = [],
-            colour: TileColourEnum = TileColourEnum.Green):
-        super().__init__(name, tile_id, is_dwelling, base_points, cost, effects, colour)
+            cost: Optional[Dict[ResourceTypeEnum, int]] = None,
+            effects: Optional[List[BaseEffect]] = None):
+        BaseTile.__init__(
+            self,
+            name,
+            tile_id,
+            tile_type,
+            base_points,
+            cost,
+            effects)

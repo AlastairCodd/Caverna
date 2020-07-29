@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from common.entities.player import Player
+from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_permutation_ordering_service import BasePermutationOrderingService
@@ -10,8 +10,8 @@ class MostResourcesPermutationOrderingService(BasePermutationOrderingService):
     def __init__(self):
         self._min_resources: int = 0
 
-    def find_best_permutation(self, successful_permutations: List[Tuple[List[BaseAction], int, Player]]) \
-            -> ResultLookup[List[Tuple[List[BaseAction], int, Player]]]:
+    def find_best_permutation(self, successful_permutations: List[Tuple[List[BaseAction], int, BasePlayerRepository]]) \
+            -> ResultLookup[List[Tuple[List[BaseAction], int, BasePlayerRepository]]]:
         if successful_permutations is None:
             raise ValueError
         if len(successful_permutations) == 0:
@@ -19,9 +19,9 @@ class MostResourcesPermutationOrderingService(BasePermutationOrderingService):
 
         permutation: List[BaseAction]
         successes: int
-        player: Player
+        player: BasePlayerRepository
 
-        best_permutations: List[Tuple[List[BaseAction], int, Player]] = []
+        best_permutations: List[Tuple[List[BaseAction], int, BasePlayerRepository]] = []
         current_max_resources: int = self._min_resources
 
         for (permutation, successes, player) in successful_permutations:
@@ -33,7 +33,7 @@ class MostResourcesPermutationOrderingService(BasePermutationOrderingService):
             elif current_resources == current_max_resources:
                 best_permutations.append((permutation, successes, player))
 
-        result: ResultLookup[List[Tuple[List[BaseAction], int, Player]]]
+        result: ResultLookup[List[Tuple[List[BaseAction], int, BasePlayerRepository]]]
         if len(best_permutations) == 1:
             result = ResultLookup(True, best_permutations)
         elif len(best_permutations) == 0:

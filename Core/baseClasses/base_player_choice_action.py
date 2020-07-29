@@ -3,7 +3,7 @@ from typing import List
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
@@ -15,7 +15,7 @@ class BasePlayerChoiceAction(BaseAction, metaclass=ABCMeta):
     @abstractmethod
     def set_player_choice(
             self,
-            player: Player,
+            player: BasePlayerService,
             dwarf: Dwarf,
             cards: List[BaseCard],
             turn_index: int,

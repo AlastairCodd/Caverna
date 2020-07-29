@@ -1,20 +1,41 @@
 from typing import Dict, List
+
 from buisness_logic.effects.animal_storage_effects import BaseAnimalStorageEffect
+from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
 from common.entities.result_lookup import ResultLookup
-from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
+from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.harvest_type_enum import HarvestTypeEnum
+from core.repositories.base_player_repository import BasePlayerRepository
+from core.services.base_player_service import BasePlayerService
 
 
-class BreedAnimalsAction(BaseAction):
-    def __init__(self, maximum=4):
-        if maximum < 0 or maximum > 4:
-            raise ValueError("maximum")
+class BreedAnimalsAction(BasePlayerChoiceAction):
+    def __init__(self, maximum: int = 4) -> None:
+        if maximum <= 0:
+            raise ValueError("The maximum number of animals to breed must be positive.")
+        if maximum > 4:
+            raise ValueError("The maximum number of animals to breed cannot exceed the number of types of animals.")
         self._maximum = maximum
 
-    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
+    def set_player_choice(
+            self,
+            player: BasePlayerService,
+            dwarf: Dwarf,
+            cards: List[BaseCard],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+        # TODO: Implement this
+        raise NotImplementedError()
+
+    def invoke(
+            self,
+            player: BasePlayerRepository,
+            active_card: BaseCard,
+            current_dwarf: Dwarf) -> ResultLookup[int]:
         """Gives the player an additional farm animal, provided they have at least two and space. 
 
         :param player: The player who will buy things. This may not be null.
@@ -42,8 +63,11 @@ class BreedAnimalsAction(BaseAction):
                 animal_storage_buckets.append(bucket)
 
         animals_to_reproduce: List[ResourceTypeEnum]
+        # TODO: Implement and test this
         if len(animals_which_can_reproduce) > self._maximum:
-            animals_to_reproduce = player.get_player_choice_breed_animals(animals_which_can_reproduce, self._maximum)
+            animals_to_reproduce = player.get_player_choice_breed_animals(
+                animals_which_can_reproduce,
+                self._maximum)
         else:
             animals_to_reproduce = animals_which_can_reproduce
 

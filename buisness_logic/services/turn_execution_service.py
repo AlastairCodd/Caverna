@@ -1,6 +1,5 @@
 from typing import List, NamedTuple, Union
 
-from buisness_logic.services.available_dwarf_service import AvailableDwarfService
 from buisness_logic.services.base_action_player_choice_transfer_service import BaseActionPlayerChoiceTransferService
 from buisness_logic.services.base_card_player_choice_transfer_service import BaseCardPlayerChoiceTransferService
 from buisness_logic.services.base_dwarf_player_choice_transfer_service import BaseDwarfPlayerChoiceTransferService
@@ -10,9 +9,8 @@ from buisness_logic.services.complete_dwarf_player_choice_transfer_service impor
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.dwarf_card_action_combination_lookup import DwarfCardActionCombinationLookup
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
-from common.services.action_invoke_service import ActionInvokeService
 from common.services.conditional_service import ConditionalService
 from core.baseClasses.base_card import BaseCard
 from core.constants import game_constants
@@ -26,7 +24,7 @@ class ChosenDwarfCardActionCombinationAndEquivalentLookup(NamedTuple):
 
 class TurnExecutionService(object):
     def __init__(self):
-        self.number_of_rounds: int = game_constants.number_of_rounds
+        self._number_of_rounds: int = game_constants.number_of_rounds
 
         self._conditional_service: ConditionalService = ConditionalService()
 
@@ -36,7 +34,7 @@ class TurnExecutionService(object):
 
     def take_turn(
             self,
-            player: Player,
+            player: BasePlayerService,
             turn_index: int,
             round_index: int,
             harvest_type: HarvestTypeEnum,
@@ -49,8 +47,8 @@ class TurnExecutionService(object):
             raise IndexError(f"Round index ({round_index}) must be positive.")
         if turn_index >= len(player.dwarves):
             raise IndexError(f"Turn Index ({turn_index}) must be less than number of dwarves ({len(player.dwarves)})")
-        if round_index >= self.number_of_rounds:
-            raise IndexError(f"Round index ({round_index}) must be less than maximum number of rounds ({self.number_of_rounds})")
+        if round_index >= self._number_of_rounds:
+            raise IndexError(f"Round index ({round_index}) must be less than maximum number of rounds ({self._number_of_rounds})")
 
         success: bool = False
         choice: Union[DwarfCardActionCombinationLookup, None] = None
@@ -140,7 +138,7 @@ class TurnExecutionService(object):
 
     def get_equivalent_invalid_dwarves(
             self,
-            player: Player,
+            player: BasePlayerService,
             chosen_dwarf: Dwarf) -> List[Dwarf]:
         result: List[Dwarf]
 
@@ -153,7 +151,8 @@ class TurnExecutionService(object):
 
     def get_equivalent_invalid_cards(
             self,
-            player: Player,
+            player: BasePlayerService,
             dwarf: Dwarf,
             card: BaseCard) -> List[BaseCard]:
+        # TODO: Implement this
         return []

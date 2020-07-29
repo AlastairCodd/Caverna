@@ -3,7 +3,7 @@ from typing import List, Union
 from buisness_logic.services.available_card_service import AvailableCardService
 from buisness_logic.services.base_card_player_choice_transfer_service import BaseCardPlayerChoiceTransferService
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_card import BaseCard
 from core.enums.harvest_type_enum import HarvestTypeEnum
@@ -15,7 +15,7 @@ class CompleteCardPlayerChoiceTransferService(BaseCardPlayerChoiceTransferServic
 
     def get_card(
             self,
-            player: Player,
+            player: BasePlayerService,
             dwarf: Dwarf,
             cards: List[BaseCard],
             turn_index: int,

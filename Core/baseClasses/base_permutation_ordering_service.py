@@ -1,15 +1,17 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from typing import Tuple, List
 
-from common.entities.player import Player
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
+from core.repositories.base_player_repository import BasePlayerRepository
 
 
-class BasePermutationOrderingService(ABC):
+class BasePermutationOrderingService(metaclass=ABCMeta):
     @abstractmethod
-    def find_best_permutation(self, successful_permutations: List[Tuple[List[BaseAction], int, Player]]) \
-            -> ResultLookup[List[Tuple[List[BaseAction], int, Player]]]:
+    def find_best_permutation(
+            self,
+            successful_permutations: List[Tuple[List[BaseAction], int, BasePlayerRepository]]) \
+            -> ResultLookup[List[Tuple[List[BaseAction], int, BasePlayerRepository]]]:
         """Finds the best permutation out of the given successful permutations (successful in that all actions can be performed by a given player)
         :param successful_permutations: A list containing tuples of
             - Ordered Actions (permutations),

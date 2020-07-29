@@ -5,7 +5,7 @@ from unittest import TestCase
 from buisness_logic.services.complete_action_player_choice_transfer_service import CompleteActionPlayerChoiceTransferService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
@@ -24,7 +24,7 @@ class Given_A_CompleteActionPlayerChoiceTransferService(TestCase, ABC):
 class FakeCompoundAction(BasePlayerChoiceAction):
     def __init__(self) -> None:
         self._player_choice_additional_action_choices_func: Callable[
-                [Player,
+                [BasePlayerService,
                  Dwarf,
                  List[BaseCard],
                  int,
@@ -35,7 +35,7 @@ class FakeCompoundAction(BasePlayerChoiceAction):
 
     def set_player_choice(
             self,
-            player: Player,
+            player: BasePlayerService,
             dwarf: Dwarf,
             cards: List[BaseCard],
             turn_index: int,
@@ -52,7 +52,7 @@ class FakeCompoundAction(BasePlayerChoiceAction):
     def set_player_choice_returns(
             self,
             func: Callable[
-                [Player,
+                [BasePlayerService,
                  Dwarf,
                  List[BaseCard],
                  int,
@@ -63,7 +63,7 @@ class FakeCompoundAction(BasePlayerChoiceAction):
 
     def invoke(
             self,
-            player: Player,
+            player: BasePlayerService,
             active_card: BaseCard,
             current_dwarf: Dwarf) -> ResultLookup[int]:
         pass

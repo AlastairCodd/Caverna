@@ -1,14 +1,16 @@
-from abc import abstractmethod, ABC
+from abc import abstractmethod, ABCMeta
 from typing import Dict, Callable
 
-from common.entities.player import Player
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import TriggerStateEnum, ResourceTypeEnum
+from core.repositories.base_player_repository import BasePlayerRepository
 
 
-class BaseResourceEffect(BaseEffect, ABC):
+class BaseResourceEffect(BaseEffect, metaclass=ABCMeta):
     @abstractmethod
-    def invoke(self, player: Player) -> bool:
+    def invoke(
+            self,
+            player: BasePlayerRepository) -> bool:
         raise NotImplementedError("base resource effect class")
 
 
@@ -17,7 +19,8 @@ class Receive(BaseResourceEffect):
         self._output = output
         BaseEffect.__init__(self)
 
-    def invoke(self, player: Player) -> bool:
+    def invoke(self, player: BasePlayerRepository) -> bool:
+        # TODO: Implement
         raise NotImplementedError()
 
 
@@ -25,7 +28,7 @@ class ReceiveConditional(BaseResourceEffect):
     def __init__(
             self,
             received: Dict[ResourceTypeEnum, int],
-            condition: Callable[[Player], int],
+            condition: Callable[[BasePlayerRepository], int],
             trigger_state: TriggerStateEnum = TriggerStateEnum.StartOfTurn) -> None:
         """Receive some input when some condition is true.
 
@@ -39,10 +42,12 @@ class ReceiveConditional(BaseResourceEffect):
         if condition is None:
             raise ValueError("Condition")
         self._received: Dict[ResourceTypeEnum, int] = received
-        self._condition: Callable[[Player], int] = condition
+        self._condition: Callable[[BasePlayerRepository], int] = condition
         BaseEffect.__init__(self, trigger_state=trigger_state)
 
-    def invoke(self, player: Player) -> bool:
+    def invoke(
+            self,
+            player: BasePlayerRepository) -> bool:
         number_of_times_condition_met: int = self._condition(player)
         if number_of_times_condition_met == 0:
             return False

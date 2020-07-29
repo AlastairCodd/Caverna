@@ -3,7 +3,7 @@ from typing import List
 from buisness_logic.services.base_action_player_choice_transfer_service import BaseActionPlayerChoiceTransferService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from common.entities.precedes_constraint import PrecedesConstraint
 from common.services.conditional_service import ConditionalService
@@ -20,7 +20,7 @@ class CompleteActionPlayerChoiceTransferService(BaseActionPlayerChoiceTransferSe
 
     def get_action(
             self,
-            player: Player,
+            player: BasePlayerService,
             dwarf: Dwarf,
             card: BaseCard,
             cards: List[BaseCard],

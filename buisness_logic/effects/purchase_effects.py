@@ -1,19 +1,20 @@
 import math
-from abc import ABC
+from abc import ABCMeta, abstractmethod
 from typing import Dict, Union, Type, List
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.weapon import Weapon
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
-class BasePurchaseEffect(BaseEffect, ABC):
+class BasePurchaseEffect(BaseEffect, metaclass=ABCMeta):
     """Abstract class for purchase effects"""
 
+    @abstractmethod
     def invoke(
             self,
-            player: Player,
+            player: BasePlayerService,
             target: Union[BaseTile, Weapon],
             current_price: Dict[ResourceTypeEnum, int]) \
             -> Dict[ResourceTypeEnum, int]:
@@ -47,7 +48,7 @@ class DecreasePrice(BasePurchaseEffect):
 
     def invoke(
             self,
-            player: Player,
+            player: BasePlayerService,
             target: Union[BaseTile, Weapon],
             current_price: Dict[ResourceTypeEnum, int]) \
             -> Dict[ResourceTypeEnum, int]:
@@ -109,10 +110,10 @@ class AllowSubstitutionForPurchase(BaseEffect):
 
     def invoke(
             self,
-            player: Player,
+            player: BasePlayerService,
+            # TODO: Change this
             target: Union[BaseTile, Weapon],
-            current_price: Dict[ResourceTypeEnum, int]) \
-            -> Dict[ResourceTypeEnum, int]:
+            current_price: Dict[ResourceTypeEnum, int]) -> Dict[ResourceTypeEnum, int]:
         """Returns the new price of the target.
 
         :param player: The player who is attempting to purchase the item. This cannot be null.

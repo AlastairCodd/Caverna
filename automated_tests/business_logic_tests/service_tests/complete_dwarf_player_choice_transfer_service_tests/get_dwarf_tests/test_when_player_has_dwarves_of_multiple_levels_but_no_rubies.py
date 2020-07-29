@@ -4,7 +4,7 @@ from automated_tests.business_logic_tests.service_tests.mock_player import MockP
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests\
     .given_a_complete_dwarf_player_choice_transfer_service import Given_A_CompleteDwarfPlayerChoiceTransferService
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
@@ -28,7 +28,7 @@ class test_when_player_has_dwarves_of_multiple_levels_but_no_rubies(Given_A_Comp
             dwarves=dwarves,
             resources=resources
         )
-        self._player: Player = mock_player
+        self._player: BasePlayerService = mock_player
 
         mock_player.get_player_choice_use_dwarf_out_of_order_returns(
             lambda info_dwarves, info_cards, info_turn_index, info_round_index, info_harvest_type: ResultLookup(True, False)

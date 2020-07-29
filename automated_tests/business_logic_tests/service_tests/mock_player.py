@@ -2,7 +2,7 @@ from typing import Union, List, Dict, Callable, Tuple, Optional
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from common.entities.weapon import Weapon
 from core.baseClasses.base_action import BaseAction
@@ -12,14 +12,14 @@ from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class MockPlayer(Player):
+class MockPlayer(BasePlayerService):
     def __init__(
             self,
             dwarves: Union[List[Dwarf], None] = None,
             resources: Union[Dict[ResourceTypeEnum, int], None] = None,
             player_id: int = 1,
             turn_index: int = 2):
-        Player.__init__(self, player_id, turn_index)
+        BasePlayerService.__init__(self, player_id, turn_index)
 
         if dwarves is not None:
             self._dwarves = dwarves

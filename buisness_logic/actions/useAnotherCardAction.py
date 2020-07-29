@@ -1,30 +1,31 @@
-from typing import Dict
+from typing import Dict, List
 
+from buisness_logic.actions.payAction import PayAction
+from buisness_logic.services.available_card_service import AvailableCardService
+from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
+from core.enums.harvest_type_enum import HarvestTypeEnum
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
-from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
-class UseAnotherCardAction(BaseAction):
-    def __init__(self, cost: Dict[ResourceTypeEnum, int]) -> None:
-        """Allows the player to use another claimed action. 
+class UseAnotherCardAction(BasePlayerChoiceAction, PayAction):
+    def __init__(
+            self,
+            cost: Dict[ResourceTypeEnum, int]) -> None:
+        PayAction.__init__(self, cost)
+        self._available_card_service: AvailableCardService = AvailableCardService()
 
-        :param cost: The cost which must be paid by the player in order to use this action. This cannot be null.
-        """
-
-    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
-        """Allows the player to use an action which has already been claimed by another player.
-
-        :param player: The player. This cannot be null.
-        :param active_card: Unused.
-        :param current_dwarf: The current dwarf. This cannot be null.
-        """
-        if player is None:
-            raise ValueError("player")
+    def set_player_choice(
+            self,
+            player: BasePlayerService,
+            dwarf: Dwarf,
+            cards: List[BaseCard],
+            turn_index: int,
+            round_index: int,
+            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+        # TODO: Implement this
         raise NotImplementedError()
-
-    def new_turn_reset(self):
-        pass

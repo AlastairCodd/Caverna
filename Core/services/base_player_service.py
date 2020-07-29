@@ -1,58 +1,21 @@
 from abc import abstractmethod, ABCMeta
-from typing import Iterable, List, Dict, Union, Tuple, Optional
+from typing import List, Dict, Union, Tuple, Optional
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.weapon import Weapon
+from core.repositories.base_player_repository import BasePlayerRepository
 from core.baseClasses.base_action import BaseAction
+from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
-from core.containers.resource_container import ResourceContainer
-from core.containers.tile_container import TileContainer
 from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class Player(TileContainer, ResourceContainer, metaclass=ABCMeta):
-
+class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
     def __init__(self, player_id: int, turn_index: int):
-        self._id: int = player_id
-        self._turnIndex: int = turn_index
-
-        self._dwarves: List[Dwarf] = [Dwarf(True), Dwarf(True)]
-
-        TileContainer.__init__(self)
-        ResourceContainer.__init__(self)
-
-    @property
-    def id(self) -> int:
-        return self._id
-
-    @property
-    def dwarves(self) -> List[Dwarf]:
-        return list(self._dwarves)
-
-    @property
-    def turn_index(self) -> int:
-        return self._turnIndex
-
-    def set_turn_index(self, turn_index: int):
-        self._turnIndex = turn_index
-
-    def give_baby_dwarf(self):
-        baby_dwarf: Dwarf = Dwarf()
-
-        self._dwarves.append(baby_dwarf)
-
-    @property
-    def can_take_move(self) -> bool:
-        """Determines whether this player can still make a move this turn"""
-        is_dwarf_active: Iterable[bool] = map(lambda x: not x.is_active(), self._dwarves)
-        return any(is_dwarf_active)
-
-    def start_new_turn(self):
-        for dwarf in self._dwarves:
-            dwarf.make_adult()
+        BasePlayerRepository.__init__(self, player_id, turn_index)
 
     @abstractmethod
     def get_player_choice_market_action(
@@ -101,7 +64,7 @@ class Player(TileContainer, ResourceContainer, metaclass=ABCMeta):
     def get_player_choice_use_dwarf_out_of_order(
             self,
             dwarves: List[Dwarf],
-            cards: List['BaseCard'],
+            cards: List[BaseCard],
             turn_index: int,
             round_index: int,
             harvest_type: HarvestTypeEnum) -> ResultLookup[bool]:
@@ -119,7 +82,7 @@ class Player(TileContainer, ResourceContainer, metaclass=ABCMeta):
     def get_player_choice_dwarf_to_use_out_of_order(
             self,
             dwarves: List[Dwarf],
-            cards: List['BaseCard'],
+            cards: List[BaseCard],
             turn_index: int,
             round_index: int,
             harvest_type: HarvestTypeEnum) -> ResultLookup[Dwarf]:
@@ -136,10 +99,10 @@ class Player(TileContainer, ResourceContainer, metaclass=ABCMeta):
     @abstractmethod
     def get_player_choice_card_to_use(
             self,
-            available_cards: List['BaseCard'],
+            available_cards: List[BaseCard],
             turn_index: int,
             round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup['BaseCard']:
+            harvest_type: HarvestTypeEnum) -> ResultLookup[BaseCard]:
         """Gets user choice for which card to use.
 
         :param available_cards: The possible cards that may be chosen. This cannot be null, or empty.

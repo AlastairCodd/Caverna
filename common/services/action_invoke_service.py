@@ -2,7 +2,7 @@ from typing import List
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from common.services.exhaustive_action_ordering_service import ExhaustiveActionOrderingService
 from core.baseClasses.base_action import BaseAction
@@ -17,7 +17,7 @@ class ActionInvokeService(object):
     def invoke(
             self,
             actions: ActionChoiceLookup,
-            player: Player,
+            player: BasePlayerRepository,
             current_card: BaseCard,
             current_dwarf: Dwarf) -> ResultLookup[int]:
         if actions is None:
@@ -29,7 +29,7 @@ class ActionInvokeService(object):
         if current_dwarf is None:
             raise ValueError
 
-        actions_best_order: ResultLookup[List[BaseAction]] = self._action_ordering_service\
+        actions_best_order: ResultLookup[List[BaseAction]] = self._action_ordering_service \
             .calculated_best_order(
             actions,
             player,
@@ -42,7 +42,10 @@ class ActionInvokeService(object):
 
         if actions_best_order.flag:
             for action in actions_best_order.value:
-                invoke_result: ResultLookup[int] = action.invoke(player, current_card, current_dwarf)
+                invoke_result: ResultLookup[int] = action.invoke(
+                    player,
+                    current_card,
+                    current_dwarf)
 
                 if not invoke_result.flag:
                     success = False

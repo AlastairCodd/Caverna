@@ -10,7 +10,7 @@ from buisness_logic.actions.takeAccumulatedItemsAction import TakeAccumulatedIte
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.multiconditional import Conditional
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
@@ -32,7 +32,7 @@ class Test_When_Called_With_Single_Highest_Score_And_No_Constraints(Given_An_Exh
 
         resources: Dict[ResourceTypeEnum, int] = {}
 
-        player: Player = MockPlayer(3,resources=resources)
+        player: BasePlayerService = MockPlayer(3, resources=resources)
         action_conditional: Conditional = Conditional(ActionCombinationEnum.AndOr, action1, Conditional(ActionCombinationEnum.AndOr, action2, action3))
         current_card: BaseCard = MockCard(actions=action_conditional, resources={ResourceTypeEnum.ore: 3})
         current_dwarf: Dwarf = Dwarf()

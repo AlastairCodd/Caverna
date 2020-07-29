@@ -2,9 +2,8 @@ from typing import Dict, List, Union, Tuple, Optional
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_entity import TileEntity
 from common.entities.weapon import Weapon
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
@@ -15,13 +14,13 @@ from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
-class MockPlayer(Player):
+class MockPlayer(BasePlayerService):
     def __init__(
             self,
             player_id: int,
             tiles: List[BaseTile] = None,
             resources: Dict[ResourceTypeEnum, int] = None):
-        Player.__init__(self, player_id, 0)
+        BasePlayerService.__init__(self, player_id, 0)
         if tiles is None:
             tiles = []
         self._mock_tiles = tiles

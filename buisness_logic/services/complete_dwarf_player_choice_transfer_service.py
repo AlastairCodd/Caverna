@@ -1,9 +1,9 @@
-from typing import List, cast, Dict, Union
+from typing import List, Dict, Union
 
 from buisness_logic.services.available_dwarf_service import AvailableDwarfService
 from buisness_logic.services.base_dwarf_player_choice_transfer_service import BaseDwarfPlayerChoiceTransferService
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_card import BaseCard
 from core.enums.harvest_type_enum import HarvestTypeEnum
@@ -15,7 +15,7 @@ class CompleteDwarfPlayerChoiceTransferService(BaseDwarfPlayerChoiceTransferServ
 
     def get_dwarf(
             self,
-            player: Player,
+            player: BasePlayerService,
             cards: List[BaseCard],
             turn_index: int,
             round_index: int,

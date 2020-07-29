@@ -2,7 +2,8 @@ from typing import List
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.repositories.base_player_repository import BasePlayerRepository
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
@@ -14,12 +15,13 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
 
     def set_player_choice(
             self,
-            player: Player,
+            player: BasePlayerService,
             dwarf: Dwarf,
             cards: List[BaseCard],
             turn_index: int,
             round_index: int,
             harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+        # TODO: Implement this
         player.get_effects_of_type()
         max_attainable_level = player.get_resources_of_type(ResourceTypeEnum.ore)
         chosen_weapon_level = player.get_player_choice_weapon_level()
@@ -28,7 +30,7 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
 
     def invoke(
             self,
-            player: Player,
+            player: BasePlayerRepository,
             active_card: BaseCard,
             current_dwarf: Dwarf) -> ResultLookup[int]:
         """Gives the current dwarf a weapon.

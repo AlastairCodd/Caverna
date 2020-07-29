@@ -3,7 +3,7 @@ from typing import List, Union, Dict, Iterable, Tuple, Optional, Callable
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
 from common.defaults.tile_requisite_default import TileRequisiteDefault
 from common.defaults.tile_twin_default import TileTwinDefault
-from common.entities.player import Player
+from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_entity import TileEntity
 from core.baseClasses.base_tile import BaseTile
@@ -73,7 +73,7 @@ class TileService(object):
 
     def get_cost_of_tile(
             self,
-            player: Player,
+            player: BasePlayerRepository,
             tile: BaseTile) -> Dict[ResourceTypeEnum, int]:
         """Gets the cost to the given player to build the given tile.
 

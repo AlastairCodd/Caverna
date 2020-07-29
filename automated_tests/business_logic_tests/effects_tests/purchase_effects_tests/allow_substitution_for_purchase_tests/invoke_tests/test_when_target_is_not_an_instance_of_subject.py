@@ -3,14 +3,14 @@ from typing import Dict
 from automated_tests.business_logic_tests.effects_tests.purchase_effects_tests.allow_substitution_for_purchase_tests\
     .given_a_allowsubstitutionforpurchase import Given_An_AllowSubstitutionForPurchase
 from automated_tests.mocks.mock_player import MockPlayer
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.entities.weapon import Weapon
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
 class Test_When_Target_Is_Not_An_Instance_Of_Subject(Given_An_AllowSubstitutionForPurchase):
     def because(self) -> None:
-        self._player: Player = MockPlayer(5)
+        self._player: BasePlayerService = MockPlayer(5)
         self._weapon: Weapon = Weapon()
         self._given_current_price: Dict[ResourceTypeEnum, int] = {
             ResourceTypeEnum.cow: 3,

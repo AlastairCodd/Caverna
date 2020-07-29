@@ -1,6 +1,6 @@
 from typing import List
 
-from common.entities.player import Player
+from core.repositories.base_player_repository import BasePlayerRepository
 from core.baseClasses.base_card import BaseCard
 
 
@@ -13,8 +13,7 @@ class AvailableCardService(object):
     def get_cards_which_are_used_by_someone_else(
             self,
             cards: List[BaseCard],
-            player: Player,
-            round_index: int) -> List[BaseCard]:
+            player: BasePlayerRepository) -> List[BaseCard]:
         cards_which_are_used_by_someone_else: List[BaseCard] = []
         for card in cards:
             if card.is_active and not self.is_card_used_by_player(card, player):
@@ -22,7 +21,10 @@ class AvailableCardService(object):
 
         return cards_which_are_used_by_someone_else
 
-    def is_card_used_by_player(self, card: BaseCard, player: Player) -> bool:
+    def is_card_used_by_player(
+            self,
+            card: BaseCard,
+            player: BasePlayerRepository) -> bool:
         result: bool
 
         if card.is_active:

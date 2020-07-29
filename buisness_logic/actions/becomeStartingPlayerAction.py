@@ -1,24 +1,29 @@
-from typing import Union
+from typing import Optional
 
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
-from common.entities.player import Player
 from core.baseClasses.base_card import BaseCard
+from core.repositories.base_player_repository import BasePlayerRepository
 
 
 class BecomeStartingPlayerAction(BaseAction):
     def __init__(self):
-        self._starting_player_next_turn: Union[Player, None] = None
+        self._starting_player_next_turn: Optional[BasePlayerRepository] = None
 
-    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
+    def invoke(
+            self,
+            player: BasePlayerRepository,
+            active_card: BaseCard,
+            current_dwarf: Dwarf) -> ResultLookup[int]:
         """Sets a flag which results in the current player becoming the starting player at the start of the next turn.
         The play order continues as normal.
 
         :param player: The player who is now the starting player.
         :param active_card: Unused.
         :param current_dwarf: Unused.
-        :return: True if the
+        :return: A result lookup indicating the success of the action. Flag will be false if this action has already been used this turn.
+            This will never be null.
         """
         if player is None:
             raise ValueError("player")

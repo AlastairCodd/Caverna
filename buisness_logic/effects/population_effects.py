@@ -1,10 +1,9 @@
-from abc import abstractmethod, ABC
+from abc import ABCMeta
 
-from common.entities.player import Player
 from core.baseClasses.base_effect import BaseEffect
 
 
-class BasePopulationEffect(BaseEffect, ABC):
+class BasePopulationEffect(BaseEffect, metaclass=ABCMeta):
     pass
 
 

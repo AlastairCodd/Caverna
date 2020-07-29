@@ -1,6 +1,6 @@
 from buisness_logic.effects.population_effects import *
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
@@ -8,7 +8,11 @@ from core.constants import game_constants
 
 
 class GetABabyDwarfAction(BaseAction):
-    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
+    def invoke(
+            self,
+            player: BasePlayerRepository,
+            active_card: BaseCard,
+            current_dwarf: Dwarf) -> ResultLookup[int]:
         """Gives player a new dwarf, if they have room.
 
         :param player: The player to give the new dwarf to. This may not be none.

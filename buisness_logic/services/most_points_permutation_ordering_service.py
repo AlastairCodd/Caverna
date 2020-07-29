@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from common.entities.player import Player
+from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from common.services.point_calculation_service import PointCalculationService
 from core.baseClasses.base_action import BaseAction
@@ -12,8 +12,10 @@ class MostPointsPermutationOrderingService(BasePermutationOrderingService):
         self._point_scoring_service: PointCalculationService = PointCalculationService()
         self._min_score: int = 0
 
-    def find_best_permutation(self, successful_permutations: List[Tuple[List[BaseAction], int, Player]]) \
-            -> ResultLookup[List[Tuple[List[BaseAction], int, Player]]]:
+    def find_best_permutation(
+            self,
+            successful_permutations: List[Tuple[List[BaseAction], int, BasePlayerRepository]]) \
+            -> ResultLookup[List[Tuple[List[BaseAction], int, BasePlayerRepository]]]:
         if successful_permutations is None:
             raise ValueError
         if len(successful_permutations) == 0:
@@ -21,9 +23,9 @@ class MostPointsPermutationOrderingService(BasePermutationOrderingService):
 
         permutation: List[BaseAction]
         successes: int
-        player: Player
+        player: BasePlayerRepository
 
-        best_permutations: List[Tuple[List[BaseAction], int, Player]] = []
+        best_permutations: List[Tuple[List[BaseAction], int, BasePlayerRepository]] = []
         current_max_points: int = self._min_score
         for (permutation, successes, player) in successful_permutations:
             current_points = self._point_scoring_service.calculate_points(player)
@@ -34,7 +36,7 @@ class MostPointsPermutationOrderingService(BasePermutationOrderingService):
             elif current_points == current_max_points:
                 best_permutations.append((permutation, successes, player))
 
-        result: ResultLookup[List[Tuple[List[BaseAction], int, Player]]]
+        result: ResultLookup[List[Tuple[List[BaseAction], int, BasePlayerRepository]]]
         if len(best_permutations) == 1:
             result = ResultLookup(True, best_permutations)
         elif len(best_permutations) == 0:

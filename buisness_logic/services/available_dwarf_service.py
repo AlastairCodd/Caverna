@@ -1,19 +1,20 @@
 from collections import namedtuple
-from typing import List, Tuple, Dict
+from typing import List, Dict
 
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
 from common.entities.result_lookup import ResultLookup
 from core.enums.caverna_enums import ResourceTypeEnum
-
+from core.repositories.base_player_repository import BasePlayerRepository
 
 DwarvesByLevel = namedtuple("DwarvesByLevel", 'dwarves lowest_level')
 
 
 class AvailableDwarfService(object):
-    def can_player_use_a_dwarf_out_of_order(self, player: Player) -> ResultLookup[bool]:
+    def can_player_use_a_dwarf_out_of_order(
+            self,
+            player: BasePlayerRepository) -> ResultLookup[bool]:
         if player is None:
-            raise ValueError
+            raise ValueError("Player may not be null")
 
         errors: List[str] = []
 
@@ -29,7 +30,7 @@ class AvailableDwarfService(object):
         result: ResultLookup[bool] = ResultLookup(success, success, errors)
         return result
 
-    def get_available_dwarves_by_level(self, player: Player) -> DwarvesByLevel:
+    def get_available_dwarves_by_level(self, player: BasePlayerRepository) -> DwarvesByLevel:
         if player is None:
             raise ValueError("Player cannot be none")
 

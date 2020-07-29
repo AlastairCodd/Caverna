@@ -8,7 +8,8 @@ from buisness_logic.actions.upgrade_all_weapons_action import UpgradeAllWeaponsA
 from buisness_logic.tiles.dwelling import Dwelling
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.repositories.base_player_repository import BasePlayerRepository
+from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
@@ -18,9 +19,9 @@ from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
 class GoOnAnExpeditionAction(BasePlayerChoiceAction):
-    def __init__(self, level: int):
-        if level < 1 or level > 4:
-            raise ValueError("level")
+    def __init__(self, level: int) -> None:
+        if level < 1:
+            raise ValueError(f"Level must be positive: (level={level})")
         self._level = level
         self._expedition_actions: Dict[int, Iterable[BaseAction]] = {
             1: [UpgradeAllWeaponsAction(),
@@ -43,17 +44,17 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
             11: [PlaceATileAction(TileTypeEnum.meadow),
                  PlaceATileAction(TileTypeEnum.furnishedDwelling,
                                   specific_tile=Dwelling(),
-                                  cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1})],
+                                  override_cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1})],
             12: [PlaceATileAction(TileTypeEnum.field),
                  SowAction()],
             14: [PlaceATileAction(TileTypeEnum.cavern),
-                 BreedAnimalsAction(maximum_=2)]
+                 BreedAnimalsAction(maximum=2)]
 
         }
 
     def set_player_choice(
             self,
-            player: Player,
+            player: BasePlayerService,
             dwarf: Dwarf,
             cards: List[BaseCard],
             turn_index: int,
@@ -85,7 +86,11 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
             result = ResultLookup(errors=chosen_expedition_actions.errors)
         return result
 
-    def invoke(self, player: Player, active_card: BaseCard, current_dwarf: Dwarf) -> ResultLookup[int]:
+    def invoke(
+            self,
+            player: BasePlayerRepository,
+            active_card: BaseCard,
+            current_dwarf: Dwarf) -> ResultLookup[int]:
         if current_dwarf is None:
             raise ValueError("dwarf cannot be none -- should be levelled up")
 
