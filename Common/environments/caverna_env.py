@@ -1,10 +1,10 @@
 from typing import Tuple, Dict, List
 from gym import Env
-from numpy import argmax, array, concatenate
+from numpy import array, concatenate
 from common.forges.card_forge import CardForge
 from common.defaults.players_default import PlayersDefault
 from common.entities.dwarf import Dwarf
-from common.entities.player import Player
+from core.services.base_player_service import BasePlayerService
 from common.services.point_calculation_service import PointCalculationService
 from core.baseClasses.base_card import BaseCard
 
@@ -20,11 +20,11 @@ class CavernaEnv(Env):
         self._number_of_players = number_of_players
         self._players_default = PlayersDefault(self._number_of_players)
 
-        self._players: List[Player] = []
+        self._players: List[BasePlayerService] = []
         self._turn_index: int = 0
         self._turn_phase = None
-        self._current_player: Player = self._players[0]
-        self._starting_player: Player = self._players[0]
+        self._current_player: BasePlayerService = self._players[0]
+        self._starting_player: BasePlayerService = self._players[0]
         self._cards: List[BaseCard] = []
 
         self._point_calculation_service = PointCalculationService()
@@ -33,10 +33,10 @@ class CavernaEnv(Env):
         """Resets the environment
         
         Returns: the observation of the game state"""
-        self._players: List[Player] = self._players_default.assign([])
+        self._players: List[BasePlayerService] = self._players_default.assign([])
         self._turn_index: int = 0
         self._turn_phase = None
-        self._current_player: Player = self._players[0]
+        self._current_player: BasePlayerService = self._players[0]
         
         card_creator = CardForge()
         self._cards = card_creator.create_all_cards()
@@ -70,9 +70,9 @@ class CavernaEnv(Env):
         
         return observation
 
-    def _create_player_turn_order(self) -> List[Player]:
+    def _create_player_turn_order(self) -> List[BasePlayerService]:
         player_dwarf_count: Dict[int, int] = {p.id: 0 for p in self._players}
-        player_turn_order: List[Player] = []
+        player_turn_order: List[BasePlayerService] = []
         players_with_more_dwarves: List[bool] = [True for _ in self._players]
         while any(players_with_more_dwarves):
             # for each player, starting at starting player
@@ -89,11 +89,11 @@ class CavernaEnv(Env):
 
         return player_turn_order
     
-    def _get_players_starting_at(self, starting_index: int) -> List[Player]:
+    def _get_players_starting_at(self, starting_index: int) -> List[BasePlayerService]:
         result = self._players[starting_index:] + self._players[:starting_index-1]
         return result
 
-    def _observe_player(self, player: Player) -> array:
+    def _observe_player(self, player: BasePlayerService) -> array:
         player_observation = array(player.resources)
         for i in range(6):
             dwarf = player.dwarves[i] if i <= len(player.dwarves) - 1 else None
