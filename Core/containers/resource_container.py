@@ -57,24 +57,39 @@ class ResourceContainer(object):
             success &= self.give_resource(resource, resources[resource])
         return success
 
-    def take_resource(self, resource_type: ResourceTypeEnum, amount: int) -> bool:
-        if amount < 0:
-            return False
+    def take_resource(self, resource_type: ResourceTypeEnum, amount: int) -> int:
+        if amount <= 0:
+            raise ValueError("Amount must be positive")
 
-        current_amount = self._resources.setdefault(resource_type, 0)
+        current_amount: int = self._resources.setdefault(resource_type, 0)
         if current_amount < amount:
-            return False
+            raise ValueError("Player does not have sufficient resources for this action")
 
-        self._resources[resource_type] = current_amount - amount
-        return True
+        new_amount: int = current_amount - amount
+        self._resources[resource_type] = new_amount
+        return new_amount
+
+    def has_more_resources_than(
+            self,
+            resources: Dict[ResourceTypeEnum, int]) -> bool:
+        if resources is None:
+            raise ValueError("Resources may not be none.")
+        has_more_resources: bool = True
+        for resource in resources:
+            if self._resources.get(resource, 0) < resources[resource]:
+                has_more_resources = False
+                break
+        return has_more_resources
 
     def take_resources(self, resources: Dict[ResourceTypeEnum, int]) -> bool:
         if resources is None:
-            return False
+            raise ValueError("Resources may not be null.")
 
-        success = True
-        for resource in resources:
-            success &= self.give_resource(resource, resources[resource])
+        success: bool = self.has_more_resources_than(resources)
+
+        if success:
+            for resource in resources:
+                self.take_resource(resource, resources[resource])
         return success
 
     def clear_resources(self) -> bool:
