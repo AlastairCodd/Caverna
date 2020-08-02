@@ -4,13 +4,13 @@ from typing import List, Dict, Union, Tuple, Optional
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.entities.weapon import Weapon
-from core.repositories.base_player_repository import BasePlayerRepository
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
-from core.enums.harvest_type_enum import HarvestTypeEnum
+from core.repositories.base_player_repository import BasePlayerRepository
 
 
 class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
@@ -64,68 +64,60 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
     def get_player_choice_use_dwarf_out_of_order(
             self,
             dwarves: List[Dwarf],
-            cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[bool]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[bool]:
         """Gets user choice for whether or not to play a dwarf out of turn.
 
         :param dwarves: The dwarves the player has. This cannot be null, or empty.
-        :param cards: The possible cards that may be chosen. This cannot be null, or empty.
-        :param turn_index: The 0 based index indicating which turn the player is taking.
-        :param round_index: The 0 based index indicating which round the game is in.
-        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
         :returns: True if the player has chosen to play a dwarf out of turn, false if not."""
-        raise NotImplementedError()
-
-    @abstractmethod
-    def get_player_choice_dwarf_to_use_out_of_order(
-            self,
-            dwarves: List[Dwarf],
-            cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[Dwarf]:
-        """Gets user choice for which dwarf to play out of turn.
-
-        :param dwarves: The dwarves the player has. This cannot be null, or empty.
-        :param cards: The possible cards that may be chosen. This cannot be null, or empty.
-        :param turn_index: The 0 based index indicating which turn the player is taking.
-        :param round_index: The 0 based index indicating which round the game is in.
-        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
-        :returns: The dwarf the player has chosen to use out of turn."""
         raise NotImplementedError()
 
     @abstractmethod
     def get_player_choice_card_to_use(
             self,
             available_cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[BaseCard]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[BaseCard]:
         """Gets user choice for which card to use.
 
         :param available_cards: The possible cards that may be chosen. This cannot be null, or empty.
-        :param turn_index: The 0 based index indicating which turn the player is taking.
-        :param round_index: The 0 based index indicating which round the game is in.
-        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
         :returns: The card the player has chosen to activate."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_dwarf_to_use_out_of_order(
+            self,
+            dwarves: List[Dwarf],
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Dwarf]:
+        """Gets user choice for which dwarf to play out of turn.
+
+        :param dwarves: The dwarves the player has. This cannot be null, or empty.
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
+        :returns: The dwarf the player has chosen to use out of turn."""
         raise NotImplementedError()
 
     @abstractmethod
     def get_player_choice_actions_to_use(
             self,
             available_action_choices: List[ActionChoiceLookup],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         """Gets user choice for which actions to take.
 
         :param available_action_choices: The possible action choices which may be chosen. This cannot be null, or empty.
-        :param turn_index: The 0 based index indicating which turn the player is taking.
-        :param round_index: The 0 based index indicating which round the game is in.
-        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
         :returns: The action choice the player has chosen to take."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_tile_to_build(
+            self,
+            possible_tiles: List[BaseTile],
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[BaseTile]:
+        """Gets user choice for which tile to build.
+
+        :param possible_tiles: The possible tiles which may be built. This cannot be null, or empty.
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
+        :returns: The tile the player has chosen to build. This will never be null."""
         raise NotImplementedError()
 
     @abstractmethod
@@ -133,47 +125,23 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
             self,
             possible_expedition_rewards: List[BaseAction],
             expedition_level: int,
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[List[BaseAction]]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
         """Gets user choice for which expedition rewards to use.
 
         :param possible_expedition_rewards: The possible expedition rewards that may be chosen, given the level of the dwarf. This cannot be null, or empty.
         :param expedition_level: The number of rewards the player must take. This must be positive.
-        :param turn_index: The 0 based index indicating which turn the player is taking.
-        :param round_index: The 0 based index indicating which round the game is in.
-        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
         :returns: The expedition rewards the player has chosen to claim. This will never be null."""
-        raise NotImplementedError()
-
-    @abstractmethod
-    def get_player_choice_tile_to_build(
-            self,
-            possible_tiles: List[BaseTile],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[BaseTile]:
-        """Gets user choice for which tile to build.
-
-        :param possible_tiles: The possible tiles which may be built. This cannot be null, or empty.
-        :param turn_index: The 0 based index indicating which turn the player is taking.
-        :param round_index: The 0 based index indicating which round the game is in.
-        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
-        :returns: The tile the player has chosen to build. This will never be null."""
         raise NotImplementedError()
 
     # TODO: Maybe change the signature of this?
     def get_player_choice_location_to_build(
             self,
             tile: BaseTile,
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
         """Gets user choice for location to place the given tile.
 
         :param tile: The tile to be placed. This cannot be null.
-        :param turn_index: The 0 based index indicating which turn the player is taking.
-        :param round_index: The 0 based index indicating which round the game is in.
-        :param harvest_type: The type of the harvest the player will have to undergo at the end of the round.
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
         :returns: The location (and direction, if the tile is a twin-tile) that the place has decided to place this tile. This will never be null."""
         raise NotImplementedError()

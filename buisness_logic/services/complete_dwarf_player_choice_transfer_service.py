@@ -3,10 +3,9 @@ from typing import List, Dict, Union
 from buisness_logic.services.available_dwarf_service import AvailableDwarfService
 from buisness_logic.services.base_dwarf_player_choice_transfer_service import BaseDwarfPlayerChoiceTransferService
 from common.entities.dwarf import Dwarf
-from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
-from core.baseClasses.base_card import BaseCard
-from core.enums.harvest_type_enum import HarvestTypeEnum
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from core.services.base_player_service import BasePlayerService
 
 
 class CompleteDwarfPlayerChoiceTransferService(BaseDwarfPlayerChoiceTransferService):
@@ -16,12 +15,11 @@ class CompleteDwarfPlayerChoiceTransferService(BaseDwarfPlayerChoiceTransferServ
     def get_dwarf(
             self,
             player: BasePlayerService,
-            cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[Dwarf]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Dwarf]:
         if player is None:
-            raise ValueError
+            raise ValueError("Player may not be null.")
+        if turn_descriptor is None:
+            raise ValueError("Turn descriptor may not be null.")
 
         available_dwarves: List[Dwarf] = [dwarf for dwarf in player.dwarves if not dwarf.is_active and dwarf.is_adult]
 
@@ -44,10 +42,7 @@ class CompleteDwarfPlayerChoiceTransferService(BaseDwarfPlayerChoiceTransferServ
                 player_choice_use_dwarf_out_of_order: ResultLookup[bool] = \
                     player.get_player_choice_use_dwarf_out_of_order(
                         available_dwarves,
-                        cards,
-                        turn_index,
-                        round_index,
-                        harvest_type)
+                        turn_descriptor)
 
                 errors.extend(player_choice_use_dwarf_out_of_order.errors)
                 success = player_choice_use_dwarf_out_of_order.flag
@@ -61,10 +56,7 @@ class CompleteDwarfPlayerChoiceTransferService(BaseDwarfPlayerChoiceTransferServ
                 player_choice_use_dwarf_out_of_order: ResultLookup[Dwarf] = \
                     player.get_player_choice_dwarf_to_use_out_of_order(
                         available_dwarves,
-                        cards,
-                        turn_index,
-                        round_index,
-                        harvest_type)
+                        turn_descriptor)
 
                 success = player_choice_use_dwarf_out_of_order.flag
                 errors.extend(player_choice_use_dwarf_out_of_order.errors)

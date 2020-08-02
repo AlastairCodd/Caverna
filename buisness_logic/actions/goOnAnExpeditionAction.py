@@ -8,14 +8,14 @@ from buisness_logic.actions.upgrade_all_weapons_action import UpgradeAllWeaponsA
 from buisness_logic.tiles.dwelling import Dwelling
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from core.repositories.base_player_repository import BasePlayerRepository
-from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
-from core.enums.harvest_type_enum import HarvestTypeEnum
+from core.repositories.base_player_repository import BasePlayerRepository
+from core.services.base_player_service import BasePlayerService
 
 
 class GoOnAnExpeditionAction(BasePlayerChoiceAction):
@@ -56,26 +56,20 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
             self,
             player: BasePlayerService,
             dwarf: Dwarf,
-            cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         if player is None:
             raise ValueError(str(player))
-        weapon_level = dwarf.weapon_level
 
         possible_expedition_rewards: List[BaseAction] = []
+
         for level, actions_available_for_level in self._expedition_actions.items():
-            if level <= weapon_level:
-                for action in actions_available_for_level:
-                    possible_expedition_rewards.append(action)
+            for action in actions_available_for_level:
+                possible_expedition_rewards.append(action)
 
         chosen_expedition_actions: ResultLookup[List[BaseAction]] = player.get_player_choice_expedition_reward(
             possible_expedition_rewards,
             self._level,
-            turn_index,
-            round_index,
-            harvest_type)
+            turn_descriptor)
 
         result: ResultLookup[ActionChoiceLookup]
 

@@ -3,15 +3,15 @@ from typing import List
 from buisness_logic.services.base_action_player_choice_transfer_service import BaseActionPlayerChoiceTransferService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from core.services.base_player_service import BasePlayerService
-from common.entities.result_lookup import ResultLookup
 from common.entities.precedes_constraint import PrecedesConstraint
+from common.entities.result_lookup import ResultLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.conditional_service import ConditionalService
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_constraint import BaseConstraint
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
-from core.enums.harvest_type_enum import HarvestTypeEnum
+from core.services.base_player_service import BasePlayerService
 
 
 class CompleteActionPlayerChoiceTransferService(BaseActionPlayerChoiceTransferService):
@@ -23,24 +23,21 @@ class CompleteActionPlayerChoiceTransferService(BaseActionPlayerChoiceTransferSe
             player: BasePlayerService,
             dwarf: Dwarf,
             card: BaseCard,
-            cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         if player is None:
             raise ValueError("Player may not be None")
         if dwarf is None:
             raise ValueError("Dwarf may not be None")
         if card is None:
             raise ValueError("Card may not be None")
+        if turn_descriptor is None:
+            raise ValueError("Turn descriptor may not be None")
 
         action_choices: List[ActionChoiceLookup] = self._conditionalService.get_possible_choices(card.actions, player)
 
         player_action_choice_result: ResultLookup[ActionChoiceLookup] = player.get_player_choice_actions_to_use(
             action_choices,
-            turn_index,
-            round_index,
-            harvest_type)
+            turn_descriptor)
 
         success: bool = player_action_choice_result.flag
         errors: List[str] = []
@@ -63,10 +60,7 @@ class CompleteActionPlayerChoiceTransferService(BaseActionPlayerChoiceTransferSe
                     set_result: ResultLookup[ActionChoiceLookup] = action.set_player_choice(
                         player,
                         dwarf,
-                        cards,
-                        turn_index,
-                        round_index,
-                        harvest_type)
+                        turn_descriptor)
 
                     success &= set_result.flag
                     errors.extend(set_result.errors)

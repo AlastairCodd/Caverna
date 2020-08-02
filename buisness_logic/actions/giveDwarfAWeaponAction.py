@@ -1,14 +1,12 @@
-from typing import List
-
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from core.repositories.base_player_repository import BasePlayerRepository
-from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.enums.caverna_enums import ResourceTypeEnum
-from core.enums.harvest_type_enum import HarvestTypeEnum
+from core.repositories.base_player_repository import BasePlayerRepository
+from core.services.base_player_service import BasePlayerService
 
 
 class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
@@ -17,10 +15,7 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
             self,
             player: BasePlayerService,
             dwarf: Dwarf,
-            cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         # TODO: Implement this
         player.get_effects_of_type()
         max_attainable_level = player.get_resources_of_type(ResourceTypeEnum.ore)
@@ -44,7 +39,7 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
             :returns: True if the dwarf was given a weapon with the intended level, false if not.
         """
         if player is None:
-            raise ValueError("player")
+            raise ValueError("Player may not be none/")
 
         raise NotImplementedError()
 

@@ -2,15 +2,15 @@ from typing import List, Dict, Tuple, Optional
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from core.repositories.base_player_repository import BasePlayerRepository
-from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.tile_service import TileService
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileDirectionEnum
-from core.enums.harvest_type_enum import HarvestTypeEnum
+from core.repositories.base_player_repository import BasePlayerRepository
+from core.services.base_player_service import BasePlayerService
 
 
 class PlaceATileAction(BasePlayerChoiceAction):
@@ -33,10 +33,7 @@ class PlaceATileAction(BasePlayerChoiceAction):
             self,
             player: BasePlayerService,
             dwarf: Dwarf,
-            cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         if player is None:
             raise ValueError("player cannot be none")
 
@@ -52,9 +49,7 @@ class PlaceATileAction(BasePlayerChoiceAction):
                 possible_tiles: List[BaseTile] = self._tile_service.get_possible_tiles(self._tile_type)
                 specific_tile_to_build_result: ResultLookup[BaseTile] = player.get_player_choice_tile_to_build(
                     possible_tiles,
-                    turn_index,
-                    round_index,
-                    harvest_type)
+                    turn_descriptor)
 
                 success = specific_tile_to_build_result.flag
                 errors.extend(specific_tile_to_build_result.errors)
@@ -66,9 +61,7 @@ class PlaceATileAction(BasePlayerChoiceAction):
             # TODO: Make this value a type
             location_to_build_result: ResultLookup[Tuple[int, TileDirectionEnum]] = player.get_player_choice_location_to_build(
                 self._specific_tile,
-                turn_index,
-                round_index,
-                harvest_type)
+                turn_descriptor)
 
             success = location_to_build_result.flag
             errors.extend(location_to_build_result.errors)

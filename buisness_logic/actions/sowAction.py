@@ -1,14 +1,14 @@
-from typing import Dict, List
+from typing import Dict
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
+from common.entities.result_lookup import ResultLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
-from core.enums.harvest_type_enum import HarvestTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 from core.services.base_player_service import BasePlayerService
-from common.entities.result_lookup import ResultLookup
-from core.baseClasses.base_card import BaseCard
-from core.enums.caverna_enums import ResourceTypeEnum
 
 
 class SowAction(BasePlayerChoiceAction):
@@ -29,10 +29,7 @@ class SowAction(BasePlayerChoiceAction):
             self,
             player: BasePlayerService,
             dwarf: Dwarf,
-            cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         # TODO: Implement this
         raise NotImplementedError()
 

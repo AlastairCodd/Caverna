@@ -1,6 +1,7 @@
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
+from core.baseClasses.base_card import BaseCard
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
@@ -8,7 +9,7 @@ class ActivateDwarfAction(BaseAction):
     def invoke(
             self,
             player: BasePlayerRepository,
-            active_card: 'BaseCard',
+            active_card: BaseCard,
             current_dwarf: Dwarf) -> ResultLookup[int]:
         """Activates the current dwarf at the beginning of a turn.
 

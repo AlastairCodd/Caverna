@@ -1,15 +1,14 @@
-from typing import Dict, List
+from typing import Dict
 
 from buisness_logic.actions.payAction import PayAction
 from buisness_logic.services.available_card_service import AvailableCardService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
-from core.enums.harvest_type_enum import HarvestTypeEnum
-from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
-from core.baseClasses.base_card import BaseCard
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.enums.caverna_enums import ResourceTypeEnum
+from core.services.base_player_service import BasePlayerService
 
 
 class UseAnotherCardAction(BasePlayerChoiceAction, PayAction):
@@ -23,9 +22,6 @@ class UseAnotherCardAction(BasePlayerChoiceAction, PayAction):
             self,
             player: BasePlayerService,
             dwarf: Dwarf,
-            cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         # TODO: Implement this
         raise NotImplementedError()

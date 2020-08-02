@@ -1,9 +1,6 @@
-from abc import ABC
+from abc import ABCMeta
 from typing import Union
-from unittest import TestCase, mock
-
-# noinspection PyPep8Naming
-from unittest.mock import patch, PropertyMock
+from unittest import TestCase
 
 from buisness_logic.services.turn_execution_service import TurnExecutionService
 from common.entities.dwarf import Dwarf
@@ -13,7 +10,10 @@ from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 
 
-class Given_A_TurnExecutionService(TestCase, ABC):
+# noinspection PyPep8Naming
+
+
+class Given_A_TurnExecutionService(TestCase, metaclass=ABCMeta):
     def setUp(self) -> None:
         self.SUT: TurnExecutionService = TurnExecutionService()
         self.because()

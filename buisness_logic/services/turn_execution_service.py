@@ -9,12 +9,11 @@ from buisness_logic.services.complete_dwarf_player_choice_transfer_service impor
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.dwarf_card_action_combination_lookup import DwarfCardActionCombinationLookup
-from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.conditional_service import ConditionalService
 from core.baseClasses.base_card import BaseCard
-from core.constants import game_constants
-from core.enums.harvest_type_enum import HarvestTypeEnum
+from core.services.base_player_service import BasePlayerService
 
 
 class ChosenDwarfCardActionCombinationAndEquivalentLookup(NamedTuple):
@@ -24,8 +23,6 @@ class ChosenDwarfCardActionCombinationAndEquivalentLookup(NamedTuple):
 
 class TurnExecutionService(object):
     def __init__(self):
-        self._number_of_rounds: int = game_constants.number_of_rounds
-
         self._conditional_service: ConditionalService = ConditionalService()
 
         self._dwarf_transfer_service: BaseDwarfPlayerChoiceTransferService = CompleteDwarfPlayerChoiceTransferService()
@@ -35,20 +32,13 @@ class TurnExecutionService(object):
     def take_turn(
             self,
             player: BasePlayerService,
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum,
-            cards: List[BaseCard]) -> ResultLookup[ChosenDwarfCardActionCombinationAndEquivalentLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ChosenDwarfCardActionCombinationAndEquivalentLookup]:
         if player is None:
-            raise ValueError
-        if turn_index < 0:
-            raise IndexError(f"Turn index ({turn_index}) must be positive.")
-        if round_index < 0:
-            raise IndexError(f"Round index ({round_index}) must be positive.")
-        if turn_index >= len(player.dwarves):
-            raise IndexError(f"Turn Index ({turn_index}) must be less than number of dwarves ({len(player.dwarves)})")
-        if round_index >= self._number_of_rounds:
-            raise IndexError(f"Round index ({round_index}) must be less than maximum number of rounds ({self._number_of_rounds})")
+            raise ValueError("Player may not be null.")
+        if turn_descriptor is None:
+            raise ValueError("Turn descriptor may not be null.")
+        if turn_descriptor.turn_index >= len(player.dwarves):
+            raise IndexError(f"Turn Index ({turn_descriptor.turn_index}) must be less than number of dwarves ({len(player.dwarves)})")
 
         success: bool = False
         choice: Union[DwarfCardActionCombinationLookup, None] = None
@@ -58,10 +48,7 @@ class TurnExecutionService(object):
         dwarf_result = self._dwarf_transfer_service \
             .get_dwarf(
                 player,
-                cards,
-                turn_index,
-                round_index,
-                harvest_type)
+                turn_descriptor)
 
         chosen_dwarf: Dwarf = dwarf_result.value
 
@@ -72,10 +59,7 @@ class TurnExecutionService(object):
                 .get_card(
                     player,
                     chosen_dwarf,
-                    cards,
-                    turn_index,
-                    round_index,
-                    harvest_type)
+                    turn_descriptor)
 
             chosen_card: BaseCard = card_result.value
 
@@ -87,10 +71,7 @@ class TurnExecutionService(object):
                         player,
                         chosen_dwarf,
                         chosen_card,
-                        cards,
-                        turn_index,
-                        round_index,
-                        harvest_type)
+                        turn_descriptor)
 
                 errors.extend(action_result.errors)
 
@@ -118,7 +99,7 @@ class TurnExecutionService(object):
             dwarf: Dwarf
             for dwarf in equivalent_dwarves:
                 card: BaseCard
-                for card in cards:
+                for card in turn_descriptor.cards:
                     possible_choices: List[ActionChoiceLookup] = self._conditional_service.get_possible_choices(card.actions)
                     action_choice: ActionChoiceLookup
                     for action_choice in possible_choices:

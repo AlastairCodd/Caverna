@@ -1,15 +1,16 @@
 from typing import List
 
-from automated_tests.business_logic_tests.service_tests.complete_action_player_choice_transfer_service_tests.given_a_complete_action_player_choice_transfer_service import \
-    Given_A_CompleteActionPlayerChoiceTransferService
-from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests.given_a_complete_dwarf_player_choice_transfer_service import NullAction, \
-    FakeCard
+from automated_tests.business_logic_tests.service_tests.complete_action_player_choice_transfer_service_tests. \
+    given_a_complete_action_player_choice_transfer_service import Given_A_CompleteActionPlayerChoiceTransferService
+from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests. \
+    given_a_complete_dwarf_player_choice_transfer_service import NullAction, FakeCard
 from automated_tests.business_logic_tests.service_tests.mock_player import MockPlayer
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.multiconditional import Conditional
 from common.entities.precedes_constraint import PrecedesConstraint
 from common.entities.result_lookup import ResultLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_constraint import BaseConstraint
@@ -50,21 +51,23 @@ class test_when_chosen_actionchoice_has_only_simple_actions(Given_A_CompleteActi
             self._expected_actions,
             self._expected_constraints)
 
-        self._result: ResultLookup[ActionChoiceLookup] = self.SUT.get_action(
-            mock_player,
-            dwarf,
-            card,
+        turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
             cards,
+            [],
             0,
             2,
             HarvestTypeEnum.NoHarvest)
 
+        self._result: ResultLookup[ActionChoiceLookup] = self.SUT.get_action(
+            mock_player,
+            dwarf,
+            card,
+            turn_descriptor)
+
     def action_choice_selection(
             self,
             possible_actions: List[ActionChoiceLookup],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         return ResultLookup(True, possible_actions[0])
 
     def test_then_result_should_not_be_none(self) -> None:

@@ -2,6 +2,7 @@ from typing import Union, List, Dict, Callable, Tuple, Optional
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from common.entities.weapon import Weapon
@@ -9,7 +10,6 @@ from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
-from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
 class MockPlayer(BasePlayerService):
@@ -28,64 +28,45 @@ class MockPlayer(BasePlayerService):
 
         self._use_dwarf_out_of_order_func: Callable[
             [List[Dwarf],
-             List[BaseCard],
-             int,
-             int,
-             HarvestTypeEnum],
+             TurnDescriptorLookup],
             ResultLookup[bool]] \
-            = lambda info_dwarves, info_cards, info_turn_index, info_round_index, info_harvest_type: ResultLookup(errors="Not Implemented")
+            = lambda info_dwarves, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._dwarf_to_use_out_of_order_func: Callable[
             [List[Dwarf],
-             List[BaseCard],
-             int,
-             int,
-             HarvestTypeEnum],
+             TurnDescriptorLookup],
             ResultLookup[Dwarf]] \
-            = lambda info_dwarves, info_cards, info_turn_index, info_round_index, info_harvest_type: ResultLookup(errors="Not Implemented")
+            = lambda info_dwarves, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._action_choice_to_use_func: Callable[
             [List[ActionChoiceLookup],
-             int,
-             int,
-             HarvestTypeEnum],
+             TurnDescriptorLookup],
             ResultLookup[ActionChoiceLookup]] \
-            = lambda info_possible_action_choices, info_turn_index, info_round_index, info_harvest_type: ResultLookup(errors="Not Implemented")
+            = lambda info_possible_action_choices, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._card_choice_to_use_func: Callable[
             [List[BaseCard],
-             int,
-             int,
-             HarvestTypeEnum],
+             TurnDescriptorLookup],
             ResultLookup[BaseCard]] \
-            = lambda info_available_cards, info_turn_index, info_round_index, info_harvest_type: ResultLookup(errors="Not Implemented")
+            = lambda info_available_cards, info_turn_descriptor: ResultLookup(errors="Not Implemented")
 
     def get_player_choice_use_dwarf_out_of_order_returns(
             self,
             func: Callable[
                 [List[Dwarf],
-                 List[BaseCard],
-                 int,
-                 int,
-                 HarvestTypeEnum],
+                 TurnDescriptorLookup],
                 ResultLookup[bool]]) -> None:
         self._use_dwarf_out_of_order_func = func
 
     def get_player_choice_use_dwarf_out_of_order(
             self,
             dwarves: List[Dwarf],
-            cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) \
+            turn_descriptor: TurnDescriptorLookup) \
             -> ResultLookup[Dwarf]:
-        return self._use_dwarf_out_of_order_func(dwarves, cards, turn_index, round_index, harvest_type)
+        return self._use_dwarf_out_of_order_func(dwarves, turn_descriptor)
 
     def get_player_choice_dwarf_to_use_out_of_order_returns(
             self,
             func: Callable[
                 [List[Dwarf],
-                 List[BaseCard],
-                 int,
-                 int,
-                 HarvestTypeEnum],
+                 TurnDescriptorLookup],
                 ResultLookup[Dwarf]]) -> None:
         self._dwarf_to_use_out_of_order_func = func
 
@@ -93,9 +74,7 @@ class MockPlayer(BasePlayerService):
             self,
             func: Callable[
                 [List[ActionChoiceLookup],
-                 int,
-                 int,
-                 HarvestTypeEnum],
+                 TurnDescriptorLookup],
                 ResultLookup[ActionChoiceLookup]]) -> None:
         self._action_choice_to_use_func = func
 
@@ -103,25 +82,15 @@ class MockPlayer(BasePlayerService):
             self,
             func: Callable[
                 [List[BaseCard],
-                 int,
-                 int,
-                 HarvestTypeEnum],
+                 TurnDescriptorLookup],
                 ResultLookup[BaseCard]]) -> None:
         self._card_choice_to_use_func = func
 
     def get_player_choice_dwarf_to_use_out_of_order(
             self,
             dwarves: List[Dwarf],
-            cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[Dwarf]:
-        return self._dwarf_to_use_out_of_order_func(
-            dwarves,
-            cards,
-            turn_index,
-            round_index,
-            harvest_type)
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Dwarf]:
+        return self._dwarf_to_use_out_of_order_func(dwarves, turn_descriptor)
 
     def get_player_choice_discount(
             self,
@@ -143,10 +112,8 @@ class MockPlayer(BasePlayerService):
     def get_player_choice_card_to_use(
             self,
             available_cards: List[BaseCard],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[BaseCard]:
-        pass
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[BaseCard]:
+        return self._card_choice_to_use_func(available_cards, turn_descriptor)
 
     def get_player_choice_weapon_level(self) -> int:
         pass
@@ -154,36 +121,24 @@ class MockPlayer(BasePlayerService):
     def get_player_choice_actions_to_use(
             self,
             available_action_choices: List[ActionChoiceLookup],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[ActionChoiceLookup]:
-        return self._action_choice_to_use_func(
-            available_action_choices,
-            turn_index,
-            round_index,
-            harvest_type)
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
+        return self._action_choice_to_use_func(available_action_choices, turn_descriptor)
 
     def get_player_choice_expedition_reward(
             self,
             possible_expedition_rewards: List[BaseAction],
             expedition_level: int,
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[List[BaseAction]]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
         pass
 
     def get_player_choice_tile_to_build(
             self,
             possible_tiles: List[BaseTile],
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[BaseTile]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[BaseTile]:
         pass
 
     def get_player_choice_location_to_build(
             self,
             tile: BaseTile,
-            turn_index: int,
-            round_index: int,
-            harvest_type: HarvestTypeEnum) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
         pass

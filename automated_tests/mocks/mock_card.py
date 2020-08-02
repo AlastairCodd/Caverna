@@ -1,4 +1,4 @@
-from typing import Union, Dict, List
+from typing import Union, Dict
 
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_action import BaseAction
