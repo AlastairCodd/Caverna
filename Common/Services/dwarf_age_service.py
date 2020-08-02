@@ -1,19 +1,20 @@
 from common.entities.dwarf import Dwarf
 
-class DwarfAgeService(object):
 
+class DwarfAgeService(object):
+    # TODO: Use or delete
     def age_up_dwarf(self, dwarf: Dwarf) -> bool:
-        if not dwarf.IsAdult():
+        if not dwarf.is_adult:
             return False
 
-        dwarf.SetIsAdult(True)
+        dwarf.make_adult()
         return True
-    
+
     def get_food_required_for_dwarf(self, dwarf: Dwarf) -> int:
-        if dwarf None:
-            raise ValueException("dwarf must not be none")
-        
-        if dwarf.IsAdult():
+        if dwarf is None:
+            raise ValueError("dwarf must not be none")
+
+        if dwarf.is_adult:
             return 2
         else:
             return 1

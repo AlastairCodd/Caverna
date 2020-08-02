@@ -1,4 +1,4 @@
-from core.baseClasses.base_prototype import BasePrototype, T
+from core.baseClasses.base_prototype import BasePrototype
 from core.containers.resource_container import ResourceContainer
 
 

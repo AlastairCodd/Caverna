@@ -1,11 +1,10 @@
-from typing import List, Tuple, Dict, TypeVar, Generic, Iterable, cast, Union, Callable, Optional
+from typing import List, Dict, TypeVar, Generic, cast, Optional
 
 from common.defaults.tile_container_default import TileContainerDefault
-from common.defaults.tile_twin_default import TileTwinDefault
 from common.entities.tile_entity import TileEntity
-from core.enums.caverna_enums import TileTypeEnum
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseTile
+from core.enums.caverna_enums import TileTypeEnum
 
 T = TypeVar('T')
 
@@ -60,7 +59,7 @@ class TileContainer(object):
 
     def get_tile_at_location(
             self,
-            tile_index: int) -> BaseTile:
+            tile_index: int) -> Optional[BaseTile]:
         """Get the tile at the given location
 
         :param tile_index: The location to get the tile for. This must be in the range [0, self._tileCount).
@@ -84,4 +83,3 @@ class TileContainer(object):
             raise ValueError("Effect Type may not be none")
         result = [x for x in self.effects if isinstance(x, effect_type)]
         return result
-

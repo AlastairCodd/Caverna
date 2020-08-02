@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 from common.entities.result_lookup import ResultLookup
 from common.entities.weapon import Weapon
@@ -7,8 +7,8 @@ from common.entities.weapon import Weapon
 class Dwarf(object):
     def __init__(self, is_adult: bool = False):
         self._is_adult: bool = is_adult
-        self._weapon: Union[Weapon, None] = None
-        self._current_card: Union['BaseCard', None] = None
+        self._weapon: Optional[Weapon] = None
+        self._current_card: Optional['BaseCard'] = None
 
     @property
     def is_adult(self) -> bool:
@@ -97,7 +97,9 @@ class Dwarf(object):
             result = ResultLookup(True, weapon.level)
         return result
 
-    def set_active(self, new_card: 'BaseCard') -> ResultLookup['BaseCard']:
+    def set_active(
+            self,
+            new_card: 'BaseCard') -> ResultLookup['BaseCard']:
         """Activates the dwarf by placing it on the provided card.
 
         :param new_card: The new card the dwarf is being placed on. This cannot be none.

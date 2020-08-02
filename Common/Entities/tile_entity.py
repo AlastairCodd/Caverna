@@ -1,8 +1,8 @@
-from typing import Union, List, Optional
+from typing import List, Optional
 
 from core.baseClasses.base_effect import BaseEffect
-from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileColourEnum
 from core.baseClasses.base_tile import BaseTile, BaseSpecificTile
+from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileColourEnum
 
 
 class TileEntity(object):

@@ -1,4 +1,5 @@
-from typing import Iterable, List, Callable
+from typing import List
+
 from automated_tests.common_tests.service_tests.conditional_service_tests.mockBaseAction import MockBaseAction
 from automated_tests.common_tests.service_tests.conditional_service_tests.test_conditionalService import \
     Given_A_Conditional_Service

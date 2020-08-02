@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta
 from typing import Dict
 from unittest import TestCase
 
@@ -8,7 +8,7 @@ from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
-class Given_An_AllowSubstitutionForPurchase(TestCase, ABC):
+class Given_An_AllowSubstitutionForPurchase(TestCase, metaclass=ABCMeta):
     def setUp(self) -> None:
         self._subject: BaseTile = MockTile()
         self._substitute_for: Dict[ResourceTypeEnum, int] = {

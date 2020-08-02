@@ -19,10 +19,13 @@ class CardForge(object):
             hardware_rental_card.hardwareRentalCard(),
             housework_card.houseworkCard(),
             imitation_1_card.Imitation1Card(),
+            # TODO: Create card
             imitation_2_card.Imitation2Card(),
             logging_card.loggingCard(),
             ore_mining_card.oreMiningCard(),
+            # TODO: Create card
             ruby_mining_1_card.RubyMining1Card(),
+            # TODO: Create card
             slash_and_burn_card.slashAndBurnCard(),
             starting_player_card.startingPlayerCard(),
             sustenance_card.sustenanceCard(),
@@ -31,14 +34,20 @@ class CardForge(object):
             ore_mine_construction_card.oreMineConstructionCard(),
             sheep_farming_card.sheepFarmingCard(),
             donkey_farming_card.donkeyFarmingCard(),
+            # TODO: Create card
             ruby_mine_construction_card.rubyMineConstructionCard(),
+            # TODO: Create card
             urgent_wish_for_children_card.urgentWishForChildrenCard(),
+            # TODO: Create card
             wish_for_children_card.wishForChildrenCard(),
+            # TODO: Create card
             exploration_card.explorationCard(),
+            # TODO: Create card
             family_life_card.familyLifeCard(),
             ore_delivery_card.oreDeliveryCard(),
             adventure_card.adventureCard(),
             ore_trading_card.oreTradingCard(),
+            # TODO: Create card
             ruby_mining_2_card.RubyMining2Card()
         ]
         return cards

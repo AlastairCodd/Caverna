@@ -20,6 +20,7 @@ class SuccessFailLogger(object):
         self._file_line_count: Dict[str, int] = {self.success: 0, self.failure: 0}
 
         for file in self._file_path:
+            # TODO: Fix investigation
             while path.is_file(f"{self._file_path[file]}_{self._file_count[file]:0<3}.txt"):
                 self._file_line_count[file] += 1
 

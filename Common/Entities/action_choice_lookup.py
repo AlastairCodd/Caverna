@@ -8,7 +8,7 @@ class ActionChoiceLookup(object):
     def __init__(
             self,
             actions: Union[BaseAction, Iterable[BaseAction]],
-            constraints: Union[BaseConstraint, Iterable[BaseConstraint]] = None) -> None:
+            constraints: Union[BaseConstraint, Iterable[BaseConstraint], None] = None) -> None:
         if actions is None:
             raise ValueError
 

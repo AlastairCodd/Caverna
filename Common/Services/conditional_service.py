@@ -1,4 +1,4 @@
-from typing import List, Dict, Iterable, Callable, Union
+from typing import List, Dict, Iterable, Callable, Union, Optional
 from buisness_logic.effects.action_effects import ChangeDecisionVerb
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.precedes_constraint import PrecedesConstraint
@@ -27,7 +27,7 @@ class ConditionalService(object):
     def get_possible_choices(
             self,
             conditional: Union[Conditional, BaseAction],
-            tile_container: Union[TileContainer, None] = None) -> List[ActionChoiceLookup]:
+            tile_container: Optional[TileContainer] = None) -> List[ActionChoiceLookup]:
         """recurse through the conditional tree in order to find which possible action choices the agent may make
 
         :param conditional: Either a conditional object or an action. This cannot be null.

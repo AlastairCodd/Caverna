@@ -1,1 +1,3 @@
-__all__ = ["card_forge.py", "tile_forge.py"]
+__all__ = [
+    "card_forge",
+    "tile_forge"]
