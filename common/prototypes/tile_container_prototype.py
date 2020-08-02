@@ -1,3 +1,5 @@
+from typing import Optional
+
 from common.prototypes.base_tile_prototype import BaseTilePrototype
 from core.baseClasses.base_prototype import BasePrototype, BaseImmutablePrototype
 from core.baseClasses.base_tile import BaseTile
@@ -17,10 +19,11 @@ class TileContainerPrototype(BasePrototype[TileContainer]):
         return target
 
     def assign(self, source: TileContainer, target: TileContainer) -> None:
+        # TODO: Testttt
         if source is None:
-            raise ValueError
+            raise ValueError("Source may not be None")
         if target is None:
-            raise ValueError
+            raise ValueError("Target may not be None")
 
         if source.height != target.height:
             raise ValueError
@@ -28,7 +31,7 @@ class TileContainerPrototype(BasePrototype[TileContainer]):
             raise ValueError
 
         for i in range(source.tile_count):
-            source_tile: BaseTile = source.get_tile_at_location(i)
-            new_tile_clone: BaseTile = self._tile_prototype.clone(source_tile)
-            target.place_tile(new_tile_clone, i)
-
+            source_tile: Optional[BaseTile] = source.get_tile_at_location(i)
+            if source_tile is not None:
+                new_tile_clone: BaseTile = self._tile_prototype.clone(source_tile)
+                target.tiles[i].set_tile(new_tile_clone)
