@@ -2,7 +2,7 @@ from typing import List, Dict
 
 from automated_tests.common_tests.service_tests.exhaustive_action_ordering_service_tests.given_an_exhaustive_action_ordering_service import \
     Given_An_ExhaustiveActionOrderingService
-from automated_tests.mocks.MockCard import MockCard
+from automated_tests.mocks.mock_card import MockCard
 from automated_tests.mocks.mock_player import MockPlayer
 from buisness_logic.actions.giveDwarfAWeaponAction import GiveDwarfAWeaponAction
 from buisness_logic.actions.goOnAnExpeditionAction import GoOnAnExpeditionAction
@@ -10,6 +10,9 @@ from buisness_logic.actions.takeAccumulatedItemsAction import TakeAccumulatedIte
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.multiconditional import Conditional
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
+from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
@@ -20,28 +23,59 @@ from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
 
 class Test_When_Called_With_Single_Highest_Score_And_No_Constraints(Given_An_ExhaustiveActionOrderingService):
     def because(self) -> None:
-        action1: BaseAction = TakeAccumulatedItemsAction()
-        action2: BaseAction = GiveDwarfAWeaponAction()
-        action3: BaseAction = GoOnAnExpeditionAction(level=2)
+        action1_take_items: BaseAction = TakeAccumulatedItemsAction()
+        action2_get_weapon: BasePlayerChoiceAction = GiveDwarfAWeaponAction()
+        action3_expedition: BasePlayerChoiceAction = GoOnAnExpeditionAction(level=2)
 
-        actions: List[BaseAction] = [action1, action2, action3]
+        actions: List[BaseAction] = [action1_take_items, action2_get_weapon, action3_expedition]
         constraints: List[BaseConstraint] = []
         action_choice_lookup: ActionChoiceLookup = ActionChoiceLookup(actions, constraints)
 
-        self._expected_best_ordering: List[BaseAction] = [action1, action2, action3]
+        self._expected_best_ordering: List[BaseAction] = [action1_take_items, action2_get_weapon, action3_expedition]
 
         resources: Dict[ResourceTypeEnum, int] = {}
 
         player: BasePlayerService = MockPlayer(3, resources=resources)
-        action_conditional: Conditional = Conditional(ActionCombinationEnum.AndOr, action1, Conditional(ActionCombinationEnum.AndOr, action2, action3))
+        action_conditional: Conditional = Conditional(
+            ActionCombinationEnum.AndOr,
+            action1_take_items,
+            Conditional(
+                ActionCombinationEnum.AndOr,
+                action2_get_weapon,
+                action3_expedition))
         current_card: BaseCard = MockCard(actions=action_conditional, resources={ResourceTypeEnum.ore: 3})
         current_dwarf: Dwarf = Dwarf()
+
+        self.initialise_actions(
+            player,
+            current_dwarf,
+            actions)
 
         self._result: ResultLookup[List[BaseAction]] = self.SUT.calculated_best_order(
             action_choice_lookup,
             player,
             current_card,
             current_dwarf)
+
+    def initialise_actions(
+            self,
+            player: BasePlayerService,
+            dwarf: Dwarf,
+            actions: List[BaseAction]):
+
+        turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
+            [MockCard(), MockCard()],
+            [],
+            0,
+            0,
+            HarvestTypeEnum.NoHarvest)
+
+        for action in actions:
+            if isinstance(action, BasePlayerChoiceAction):
+                action.set_player_choice(
+                    player,
+                    dwarf,
+                    turn_descriptor)
 
     def test_then_result_should_not_be_null(self) -> None:
         self.assertIsNotNone(self._result)
