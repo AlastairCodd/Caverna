@@ -3,7 +3,7 @@ from typing import Dict
 from unittest import TestCase
 
 from automated_tests.mocks.mock_tile import MockTile
-from buisness_logic.effects.purchase_effects import AllowSubstitutionForPurchase
+from buisness_logic.effects.purchase_effects import AllowSubstitutionForPurchaseEffect
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
 
@@ -20,7 +20,7 @@ class Given_An_AllowSubstitutionForPurchase(TestCase, metaclass=ABCMeta):
             ResourceTypeEnum.coin: 4,
         }
 
-        self.SUT: AllowSubstitutionForPurchase = AllowSubstitutionForPurchase(
+        self.SUT: AllowSubstitutionForPurchaseEffect = AllowSubstitutionForPurchaseEffect(
             self._subject,
             self._substitute_for,
             self._substitute_with,

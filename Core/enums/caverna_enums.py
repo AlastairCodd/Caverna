@@ -40,7 +40,6 @@ class TileTypeEnum(Enum):
     furnishedDwelling = auto()
     oreMineDeepTunnelTwin = auto()
     rubyMine = auto()
-    stable = auto()
 
 
 class TileDimensionEnum(Enum):

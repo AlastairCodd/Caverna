@@ -1,8 +1,11 @@
 from typing import List, Union, Dict, Iterable, Tuple, Optional, Callable
 
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
+from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
+from buisness_logic.tiles.outdoor_tiles import *
 from common.defaults.tile_requisite_default import TileRequisiteDefault
 from common.defaults.tile_twin_default import TileTwinDefault
+from core.baseClasses.base_effect import BaseEffect
 from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_entity import TileEntity
@@ -20,6 +23,13 @@ class TileService(object):
         twin_default: TileTwinDefault = TileTwinDefault()
         self._twinTiles: List[TileTypeEnum] = twin_default.assign([])
 
+        self._unique_tile_funcs: Dict[TileTypeEnum, Callable[[], BaseTile]] = {
+            TileTypeEnum.field: lambda: FieldTile(),
+            TileTypeEnum.meadow: lambda: MeadowTile(),
+            TileTypeEnum.meadowFieldTwin: lambda: MeadowTile(),
+            TileTypeEnum.pasture: lambda: PastureTile(),
+        }
+
     # TODO Implement and test this service
     def is_tile_a_twin_tile(
             self,
@@ -30,30 +40,34 @@ class TileService(object):
     def does_tile_type_have_unique_tile(
             self,
             tile_type: TileTypeEnum) -> bool:
-        pass
+        result: bool = tile_type in self._unique_tile_funcs
+        return result
 
-    def get_unique_tile(
+    def get_unique_tile_generation_method(
             self,
-            tile_type: TileTypeEnum) -> BaseTile:
-        pass
+            tile_type: TileTypeEnum) -> Optional[Callable[[], BaseTile]]:
+        """Gets the unique BaseTile associated with the given TileType, if one exists.
 
-    # TODO: consider how to get this singleton information out
+        :param tile_type: The type of the tile to get the BaseTile for.
+        :returns: The specific base tile associated with the tile type. This may be null, if the tile is not unique."""
+        result: Optional[Callable[[], BaseTile]]
+        if tile_type in self._unique_tile_funcs:
+            result = self._unique_tile_funcs[tile_type]
+        else:
+            result = None
+        return result
+
     def get_possible_tiles(
             self,
+            tiles: List[BaseTile],
             tile_type: TileTypeEnum) -> List[BaseTile]:
-        pass
+        result: List[BaseTile] = [tile for tile in tiles if tile.tile_type == tile_type]
+        return result
 
     # TODO: consider how to get this singleton information out
     def is_tile_available(
             self,
             tile: BaseTile) -> bool:
-        pass
-
-    def can_player_afford_to_build_tile(
-            self,
-            player: ResourceContainer,
-            tile: BaseTile,
-            tile_cost_override: Union[Dict[ResourceTypeEnum, int], None]) -> bool:
         pass
 
     def can_place_tile_at_location(
@@ -73,16 +87,41 @@ class TileService(object):
 
     def get_cost_of_tile(
             self,
-            player: BasePlayerRepository,
-            tile: BaseTile) -> Dict[ResourceTypeEnum, int]:
+            tile: BaseTile,
+            effects_to_use: Optional[Dict[BaseTilePurchaseEffect, int]] = None,
+            cost_override: Optional[Dict[ResourceTypeEnum, int]] = None) -> ResultLookup[Dict[ResourceTypeEnum, int]]:
         """Gets the cost to the given player to build the given tile.
 
-        :param player: The player who plans to build the tile. They may have tiles which give them effects reducing the building cost. This may not be null.
         :param tile: The tile to be built. This may not be null.
-        :returns: The cost to build the tile, for the given player. This will never be null."""
-        # TODO: Implement this
-        tile_base_cost: Dict[ResourceTypeEnum, int] = tile.cost
-        pass
+        :param effects_to_use: The effects that the player who aims to build the tile may use, which could reduce the building cost. If null, no effects will be used.
+        :param cost_override: The cost to use in place of the default tile cost. This may be null.
+        :returns: The cost to build the tile. This will never be null."""
+        if tile is None:
+            raise ValueError("Tile may not be null")
+
+        tile_cost: Dict[ResourceTypeEnum, int]
+        if cost_override is None:
+            tile_cost = dict(tile.cost)
+        else:
+            tile_cost = dict(cost_override)
+
+        result: ResultLookup[Dict[ResourceTypeEnum, int]]
+
+        if effects_to_use is not None:
+            effect: BaseTilePurchaseEffect
+            for effect in effects_to_use:
+                for _ in range(effects_to_use[effect]):
+                    tile_cost = effect.invoke(tile_cost)
+
+            errors: List[str] = []
+            for resource in tile_cost:
+                if tile_cost[resource] < 0:
+                    errors.append(f"Reduced cost of {resource} too much (resultant cost was less than zero)")
+            result = ResultLookup(len(errors) == 0, tile_cost, errors)
+        else:
+            result = ResultLookup(True, tile_cost)
+
+        return result
 
     def get_available_locations(
             self,

@@ -31,7 +31,7 @@ class TileContainerPrototype(BasePrototype[TileContainer]):
             raise ValueError
 
         for i in range(source.tile_count):
-            source_tile: Optional[BaseTile] = source.get_tile_at_location(i)
+            source_tile: Optional[BaseTile] = source.get_specific_tile_at_location(i)
             if source_tile is not None:
                 new_tile_clone: BaseTile = self._tile_prototype.clone(source_tile)
                 target.tiles[i].set_tile(new_tile_clone)

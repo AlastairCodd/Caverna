@@ -1,5 +1,6 @@
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Callable
 
+from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
@@ -17,17 +18,19 @@ class PlaceATileAction(BasePlayerChoiceAction):
     def __init__(
             self,
             tile_type: TileTypeEnum,
-            specific_tile: Optional[BaseTile] = None,
+            specific_tile_generation_method: Optional[Callable[[], BaseTile]] = None,
             override_cost: Optional[Dict[ResourceTypeEnum, int]] = None):
-        self._tile_service: TileService = TileService()
-
         self._tile_type: TileTypeEnum = tile_type
+        self._specific_tile_generation_method: Optional[Callable[[], BaseTile]] = specific_tile_generation_method
+        if specific_tile_generation_method is None and override_cost is not None:
+            raise ValueError("Cannot override cost of unknown specific tile.")
+        self._tile_cost_override: Optional[Dict[ResourceTypeEnum, int]] = override_cost
+
+        self._tile_service: TileService = TileService()
 
         self._tile_location: int = -1
         self._tile_direction: Optional[TileDirectionEnum] = None
-        self._specific_tile: Optional[BaseTile] = specific_tile
-
-        self._tile_cost_override: Optional[Dict[ResourceTypeEnum, int]] = override_cost
+        self._effects_to_use: Dict[BaseTilePurchaseEffect, int] = {}
 
     def set_player_choice(
             self,
@@ -40,13 +43,13 @@ class PlaceATileAction(BasePlayerChoiceAction):
         success: bool = True
         errors: List[str] = []
 
-        if self._specific_tile is None:
+        if self._specific_tile_generation_method is None:
             does_tile_have_unique_type: bool = self._tile_service.does_tile_type_have_unique_tile(self._tile_type)
 
             if does_tile_have_unique_type:
-                self._specific_tile = self._tile_service.get_unique_tile(self._tile_type)
+                self._specific_tile_generation_method = self._tile_service.get_unique_tile_generation_method(self._tile_type)
             else:
-                possible_tiles: List[BaseTile] = self._tile_service.get_possible_tiles(self._tile_type)
+                possible_tiles: List[BaseTile] = self._tile_service.get_possible_tiles(turn_descriptor.tiles, self._tile_type)
                 specific_tile_to_build_result: ResultLookup[BaseTile] = player.get_player_choice_tile_to_build(
                     possible_tiles,
                     turn_descriptor)
@@ -55,12 +58,13 @@ class PlaceATileAction(BasePlayerChoiceAction):
                 errors.extend(specific_tile_to_build_result.errors)
 
                 if specific_tile_to_build_result.flag:
-                    self._specific_tile = specific_tile_to_build_result.value
+                    # That this returns the same instance as in turn_descriptor.tiles is not an issue, since that item will be removed when it is placed
+                    self._specific_tile_generation_method = lambda: specific_tile_to_build_result.value
 
         if success:
             # TODO: Make this value a type
             location_to_build_result: ResultLookup[Tuple[int, TileDirectionEnum]] = player.get_player_choice_location_to_build(
-                self._specific_tile,
+                self._specific_tile_generation_method(),
                 turn_descriptor)
 
             success = location_to_build_result.flag
@@ -69,6 +73,11 @@ class PlaceATileAction(BasePlayerChoiceAction):
             if location_to_build_result.flag:
                 self._tile_location = location_to_build_result.value[0]
                 self._tile_direction = location_to_build_result.value[1]
+
+        if success:
+            self._effects_to_use: Dict[BaseTilePurchaseEffect, int] = player.get_player_choice_effects_to_use_for_cost_discount(
+                self._specific_tile_generation_method(),
+                turn_descriptor)
 
         result: ResultLookup[ActionChoiceLookup] = ResultLookup(
             success,
@@ -85,34 +94,37 @@ class PlaceATileAction(BasePlayerChoiceAction):
             raise ValueError("Player may not be none")
         if self._tile_location < 0 or self._tile_location > player.tile_count:
             raise IndexError(f"Tile must be placed within bounds (0<={self._tile_location}<={player.tile_count})")
-        if self._specific_tile is None:
+        if self._specific_tile_generation_method is None:
             raise ValueError("Must choose a tile to place")
 
-        is_tile_available: bool = self._tile_service.is_tile_available(self._specific_tile)
-        can_player_afford_tile: bool = self._tile_service.can_player_afford_to_build_tile(
-            player,
-            self._specific_tile,
-            self._tile_cost_override)
+        specific_tile: BaseTile = self._specific_tile_generation_method()
+        is_tile_available: bool = self._tile_service.is_tile_available(specific_tile)
         can_place_tile_at_chosen_location: bool = self._tile_service.can_place_tile_at_location(
             player,
-            self._specific_tile,
+            specific_tile,
             self._tile_location,
             self._tile_direction)
 
         errors: List[str] = []
 
+        has_effects_result: ResultLookup[bool] = self.does_player_have_effects(player)
+
+        errors.extend(has_effects_result.errors)
+
         if not is_tile_available:
             errors.append("Tile has already been built")
-        if not can_player_afford_tile:
-            cost_of_tile: Dict[ResourceTypeEnum, int]
-            if self._tile_cost_override is not None:
-                cost_of_tile = self._tile_cost_override
-            else:
-                cost_of_tile = self._tile_service.get_cost_of_tile(
-                    player,
-                    self._specific_tile)
 
-            errors.append(f"Player cannot afford tile (cost: {cost_of_tile}, player resources: {player.resources})")
+        actual_cost_of_tile_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service.get_cost_of_tile(
+            specific_tile,
+            self._effects_to_use,
+            self._tile_cost_override)
+        errors.extend(actual_cost_of_tile_result.errors)
+
+        if actual_cost_of_tile_result.flag:
+            can_player_afford_tile: bool = player.has_more_resources_than(actual_cost_of_tile_result.value)
+            if not can_player_afford_tile:
+                errors.append(f"Player cannot afford tile (cost: {actual_cost_of_tile_result.value}, player resources: {player.resources})")
+
         if not can_place_tile_at_chosen_location:
             errors.append(f"Chosen location {self._tile_location} is invalid")
 
@@ -121,17 +133,48 @@ class PlaceATileAction(BasePlayerChoiceAction):
         if success:
             was_tile_placed_successfully_result: ResultLookup[bool] = self._tile_service.place_tile(
                 player,
-                self._specific_tile,
+                specific_tile,
                 self._tile_location,
                 self._tile_direction)
 
             success = was_tile_placed_successfully_result.flag
             errors.extend(was_tile_placed_successfully_result.errors)
 
+            if success:
+                player.take_resources(actual_cost_of_tile_result.value)
+
+                for effect in specific_tile.effects:
+                    if isinstance(effect, BaseReceive)
+
         result: ResultLookup[int] = ResultLookup(success, 1 if success else 0, errors)
         return result
 
+    def does_player_have_effects(
+            self,
+            player: BasePlayerRepository) -> ResultLookup[bool]:
+        effects_player_has: List[BaseTilePurchaseEffect] = player.get_effects_of_type(BaseTilePurchaseEffect)
+
+        errors: List[str] = []
+        effect: BaseTilePurchaseEffect
+        for effect in self._effects_to_use:
+            number_of_times_wants_to_use: int = self._effects_to_use[effect]
+            number_of_times_cant_use: int = number_of_times_wants_to_use
+
+            effect_player_has: BaseTilePurchaseEffect
+            for effect_player_has in effects_player_has:
+                if effect_player_has == effect:
+                    if effect.can_be_used_only_once:
+                        number_of_times_cant_use -= 1
+                    else:
+                        number_of_times_wants_to_use = 0
+            if number_of_times_cant_use > 0:
+                warning: str = f"Player wanted to use effect {effect} {number_of_times_wants_to_use} times, can only use {number_of_times_cant_use}"
+                errors.append(warning)
+
+        success: bool = len(errors) == 0
+        return ResultLookup(success, success, errors)
+
     def new_turn_reset(self) -> None:
         self._tile_location = -1
-        self._specific_tile = None
         self._tile_direction = None
+        self._effects_to_use = {}

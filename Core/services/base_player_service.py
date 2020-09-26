@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABCMeta
 from typing import List, Dict, Union, Tuple, Optional
 
+from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
@@ -135,6 +136,7 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         raise NotImplementedError()
 
     # TODO: Maybe change the signature of this?
+    @abstractmethod
     def get_player_choice_location_to_build(
             self,
             tile: BaseTile,
@@ -145,3 +147,10 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         :param turn_descriptor: The description of game state. This cannot be null, or empty.
         :returns: The location (and direction, if the tile is a twin-tile) that the place has decided to place this tile. This will never be null."""
         raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_effects_to_use_for_cost_discount(
+            self,
+            specific_tile: BaseTile,
+            turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
+        pass

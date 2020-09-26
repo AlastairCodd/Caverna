@@ -86,7 +86,7 @@ class StateParlorTile(BaseConditionalPointTile):
 
         extraction_method: Callable[[Tuple[int, TileDirectionEnum]], int] = lambda location_direction_pair: location_direction_pair[0]
         adjacent_tiles = [
-            player.get_tile_at_location(t)
+            player.get_specific_tile_at_location(t)
             for t
             in map(extraction_method, adjacent_tile_locations)]
         number_of_adjacent_dwellings = len([d for d in adjacent_tiles if d.is_dwelling])

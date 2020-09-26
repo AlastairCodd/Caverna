@@ -50,6 +50,11 @@ class TileContainer(object):
         """Get the tiles contained in this container"""
         return self._tiles
 
+    def get_tile_at_location(self, tile_index: int) -> TileEntity:
+        if 0 < tile_index or self._tileCount >= tile_index:
+            raise IndexError(f"Tile Index {tile_index} is outside range {self._tileCount}")
+        return self._tiles[tile_index]
+
     def get_tiles_of_type(
             self,
             base_tile_type: Generic[T]) -> List[T]:
@@ -57,7 +62,7 @@ class TileContainer(object):
         result = [cast(base_tile_type, x.tile) for x in self._tiles.values() if isinstance(x.tile, base_tile_type)]
         return result
 
-    def get_tile_at_location(
+    def get_specific_tile_at_location(
             self,
             tile_index: int) -> Optional[BaseTile]:
         """Get the tile at the given location

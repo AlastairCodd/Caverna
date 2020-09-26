@@ -1,5 +1,6 @@
 from typing import Union, List, Dict, Callable, Tuple, Optional
 
+from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
@@ -46,6 +47,16 @@ class MockPlayer(BasePlayerService):
              TurnDescriptorLookup],
             ResultLookup[BaseCard]] \
             = lambda info_available_cards, info_turn_descriptor: ResultLookup(errors="Not Implemented")
+        self._location_to_build_func: Callable[
+            [BaseTile,
+             TurnDescriptorLookup],
+            ResultLookup[int]] \
+            = lambda info_tile, info_turn_descriptor: ResultLookup(errors="Not Implemented")
+        self._effects_to_use_for_cost_discount: Callable[
+            [BaseTile,
+             TurnDescriptorLookup],
+            List[BaseTilePurchaseEffect]] \
+            = lambda info_tile, info_turn_descriptor: []
 
     def get_player_choice_use_dwarf_out_of_order_returns(
             self,
@@ -85,6 +96,22 @@ class MockPlayer(BasePlayerService):
                  TurnDescriptorLookup],
                 ResultLookup[BaseCard]]) -> None:
         self._card_choice_to_use_func = func
+
+    def get_player_choice_location_to_build_returns(
+            self,
+            func: Callable[
+                [BaseTile,
+                 TurnDescriptorLookup],
+                ResultLookup[int]]) -> None:
+        self._location_to_build_func = func
+
+    def get_player_choice_effects_to_use_for_cost_discount_returns(
+            self,
+            func: Callable[
+                [BaseTile,
+                 TurnDescriptorLookup],
+                List[BaseTilePurchaseEffect]]) -> None:
+        self._effects_to_use_for_cost_discount = func
 
     def get_player_choice_dwarf_to_use_out_of_order(
             self,
@@ -141,4 +168,4 @@ class MockPlayer(BasePlayerService):
             self,
             tile: BaseTile,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
-        pass
+        return self._location_to_build_func(tile, turn_descriptor)

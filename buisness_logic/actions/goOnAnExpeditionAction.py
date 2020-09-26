@@ -2,6 +2,7 @@ from typing import List, Iterable, Dict
 
 from buisness_logic.actions.breed_animals_action import BreedAnimalsAction
 from buisness_logic.actions.placeATileAction import PlaceATileAction
+from buisness_logic.actions.place_a_stable_action import PlaceAStableAction
 from buisness_logic.actions.receiveAction import ReceiveAction
 from buisness_logic.actions.sowAction import SowAction
 from buisness_logic.actions.upgrade_all_weapons_action import UpgradeAllWeaponsAction
@@ -36,7 +37,7 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
             5: [ReceiveAction({ResourceTypeEnum.boar: 1})],
             6: [ReceiveAction({ResourceTypeEnum.coin: 2})],
             7: [PlaceATileAction(TileTypeEnum.furnishedCavern)],
-            8: [PlaceATileAction(TileTypeEnum.stable)],
+            8: [PlaceAStableAction()],
             9: [PlaceATileAction(TileTypeEnum.tunnel),
                 PlaceATileAction(TileTypeEnum.pasture)],
             10: [PlaceATileAction(TileTypeEnum.pastureTwin),

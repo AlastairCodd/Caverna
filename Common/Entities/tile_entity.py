@@ -19,7 +19,7 @@ class TileEntity(object):
         self._specific_tile: Optional[BaseTile] = base_tile
         self._animalType: Optional[ResourceTypeEnum] = animal_type
         self._animalQuantity: int = animal_quantity
-        self._hasStable: bool = has_stable
+        self._has_stable: bool = has_stable
 
     @property
     def tile(self) -> Optional[BaseTile]:
@@ -45,9 +45,21 @@ class TileEntity(object):
     def tile_type(self) -> TileTypeEnum:
         return self._tile_type
 
+    @property
+    def has_stable(self) -> bool:
+        return self._has_stable
+
     def set_tile(
             self,
-            base_tile: BaseTile):
+            base_tile: BaseTile) -> None:
         if self._specific_tile is not None:
             raise ValueError("Cannot set specific tile; already has a tile")
         self._specific_tile = base_tile
+
+    def give_stable(self) -> bool:
+        result: bool = False
+        if not self._has_stable:
+            self._has_stable = True
+            result = True
+
+        return result
