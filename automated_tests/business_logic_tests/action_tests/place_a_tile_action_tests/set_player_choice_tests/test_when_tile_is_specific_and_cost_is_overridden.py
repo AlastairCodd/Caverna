@@ -1,6 +1,8 @@
 from typing import List, Dict
 
 from automated_tests.business_logic_tests.action_tests.place_a_tile_action_tests.given_a_place_a_tile_action import Given_A_PlaceATileAction
+from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests\
+    .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
 from automated_tests.business_logic_tests.service_tests.mock_player import MockPlayer
 from automated_tests.mocks.mock_card import MockCard
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -19,7 +21,7 @@ class test_when_tile_is_specific_and_cost_is_overridden(Given_A_PlaceATileAction
         self._player: BasePlayerService = self.initialise_player()
 
         turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
-            [],
+            [FakeCard()],
             [],
             1,
             2,
@@ -60,8 +62,8 @@ class test_when_tile_is_specific_and_cost_is_overridden(Given_A_PlaceATileAction
 
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
         self._location_to_place_tile: int = 28
-        player.get_player_choice_location_to_build_returns(lambda _, __: ResultLookup(True, self._location_to_place_tile))
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: [])
+        player.get_player_choice_location_to_build_returns(lambda _, __: ResultLookup(True, (self._location_to_place_tile, None)))
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: {})
         return player
 
     def test_then_result_should_not_be_none(self) -> None:

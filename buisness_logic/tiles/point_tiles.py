@@ -44,9 +44,9 @@ class WeavingParlorTile(BaseConditionalPointTile):
         BaseConditionalPointTile.__init__(
             self, "Weaving Parlor", tile_ids.WeavingParlorTileId,
             cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1},
-            effects=[resource_effects.ReceiveProportional(
-                received={ResourceTypeEnum.food: 1},
-                proportionalTo={ResourceTypeEnum.sheep: 1})])
+            effects=[resource_effects.ReceiveProportionalOnPurchaseEffect(
+                receive={ResourceTypeEnum.food: 1},
+                proportional_to={ResourceTypeEnum.sheep: 1})])
 
     def get_conditional_point(self, player: BasePlayerRepository) -> PointLookup:
         if player is None:
@@ -59,9 +59,9 @@ class MilkingParlorTile(BaseConditionalPointTile):
         BaseConditionalPointTile.__init__(
             self, "Milking Parlor", tile_ids.MilkingParlorTileId,
             cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 2},
-            effects=[resource_effects.ReceiveProportional(
-                {ResourceTypeEnum.food: 1},
-                {ResourceTypeEnum.cow: 1})])
+            effects=[resource_effects.ReceiveProportionalOnPurchaseEffect(
+                receive={ResourceTypeEnum.food: 1},
+                proportional_to={ResourceTypeEnum.cow: 1})])
 
     def get_conditional_point(self, player: BasePlayerRepository) -> PointLookup:
         if player is None:
@@ -74,7 +74,9 @@ class StateParlorTile(BaseConditionalPointTile):
         self._tile_service: TileService = TileService()
         BaseConditionalPointTile.__init__(
             self, "State Parlor", tile_ids.StateParlorTileId,
-            cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.coin: 5}, effects=[])
+            cost={ResourceTypeEnum.wood: 3, ResourceTypeEnum.coin: 5}, effects=[
+                # TODO
+            ])
 
     def get_conditional_point(self, player: BasePlayerRepository) -> PointLookup:
         if player is None:

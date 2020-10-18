@@ -20,7 +20,7 @@ class MeadowTile(BaseTile):
 class PastureTile(BaseTile):
     def __init__(self):
         BaseTile.__init__(
-            self, "Pasture", 102,
+            self, "Pasture", 103,
             TileTypeEnum.pasture,
             base_points=2,
             effects=[animal_storage_effects.StoreAny(2)])
@@ -29,7 +29,7 @@ class PastureTile(BaseTile):
 class PastureTwinTile(BaseTile):
     def __init__(self):
         BaseTile.__init__(
-            self, "Large Pasture", 103,
+            self, "Large Pasture", 104,
             TileTypeEnum.pastureTwin,
             base_points=4,
             effects=[animal_storage_effects.StoreAny(4)])

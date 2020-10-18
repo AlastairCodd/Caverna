@@ -7,3 +7,4 @@ venv/
 *failure_[0-9][0-9][0-9].txt
 *.blend1
 *.blend2
+venv9/

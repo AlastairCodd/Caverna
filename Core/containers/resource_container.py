@@ -17,6 +17,18 @@ class ResourceContainer(object):
 
         return result
 
+    def has_more_resources_than(
+            self,
+            resources: Dict[ResourceTypeEnum, int]) -> bool:
+        if resources is None:
+            raise ValueError("Resources may not be none.")
+        has_more_resources: bool = True
+        for resource in resources:
+            if self._resources.get(resource, 0) < resources[resource]:
+                has_more_resources = False
+                break
+        return has_more_resources
+
     @property
     def resources(self) -> Dict[ResourceTypeEnum, int]:
         result = {
@@ -68,18 +80,6 @@ class ResourceContainer(object):
         new_amount: int = current_amount - amount
         self._resources[resource_type] = new_amount
         return new_amount
-
-    def has_more_resources_than(
-            self,
-            resources: Dict[ResourceTypeEnum, int]) -> bool:
-        if resources is None:
-            raise ValueError("Resources may not be none.")
-        has_more_resources: bool = True
-        for resource in resources:
-            if self._resources.get(resource, 0) < resources[resource]:
-                has_more_resources = False
-                break
-        return has_more_resources
 
     def take_resources(self, resources: Dict[ResourceTypeEnum, int]) -> bool:
         if resources is None:

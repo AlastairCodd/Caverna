@@ -20,7 +20,7 @@ class StoneCarverTile(BaseSpecificTile):
             base_points=1,
             cost={ResourceTypeEnum.wood: 1},
             effects=[
-                resource_effects.Receive({ResourceTypeEnum.stone: 2}),
+                resource_effects.ReceiveOnPurchaseEffect({ResourceTypeEnum.stone: 2}),
                 purchase_effects.DecreasePriceOfTileEffect({ResourceTypeEnum.stone: 1})])
 
 
@@ -31,7 +31,7 @@ class BlacksmithTile(BaseSpecificTile):
             base_points=3,
             cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.stone: 2},
             effects=[
-                resource_effects.Receive({ResourceTypeEnum.ore: 2}),
+                resource_effects.ReceiveOnPurchaseEffect({ResourceTypeEnum.ore: 2}),
                 purchase_effects.DecreasePriceOfWeapon({ResourceTypeEnum.ore: 2})])
 
 

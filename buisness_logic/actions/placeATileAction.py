@@ -1,5 +1,6 @@
 from typing import List, Dict, Tuple, Optional, Callable
 
+from buisness_logic.effects.base_effects import BaseOnPurchaseEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -144,7 +145,8 @@ class PlaceATileAction(BasePlayerChoiceAction):
                 player.take_resources(actual_cost_of_tile_result.value)
 
                 for effect in specific_tile.effects:
-                    if isinstance(effect, BaseReceive)
+                    if isinstance(effect, BaseOnPurchaseEffect):
+                        success &= effect.invoke(player)
 
         result: ResultLookup[int] = ResultLookup(success, 1 if success else 0, errors)
         return result

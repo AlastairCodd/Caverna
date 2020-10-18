@@ -50,13 +50,13 @@ class MockPlayer(BasePlayerService):
         self._location_to_build_func: Callable[
             [BaseTile,
              TurnDescriptorLookup],
-            ResultLookup[int]] \
+            ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]] \
             = lambda info_tile, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._effects_to_use_for_cost_discount: Callable[
             [BaseTile,
              TurnDescriptorLookup],
-            List[BaseTilePurchaseEffect]] \
-            = lambda info_tile, info_turn_descriptor: []
+            Dict[BaseTilePurchaseEffect, int]] \
+            = lambda info_tile, info_turn_descriptor: {}
 
     def get_player_choice_use_dwarf_out_of_order_returns(
             self,
@@ -102,7 +102,7 @@ class MockPlayer(BasePlayerService):
             func: Callable[
                 [BaseTile,
                  TurnDescriptorLookup],
-                ResultLookup[int]]) -> None:
+                ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]]) -> None:
         self._location_to_build_func = func
 
     def get_player_choice_effects_to_use_for_cost_discount_returns(
@@ -110,7 +110,7 @@ class MockPlayer(BasePlayerService):
             func: Callable[
                 [BaseTile,
                  TurnDescriptorLookup],
-                List[BaseTilePurchaseEffect]]) -> None:
+                Dict[BaseTilePurchaseEffect, int]]) -> None:
         self._effects_to_use_for_cost_discount = func
 
     def get_player_choice_dwarf_to_use_out_of_order(
@@ -169,3 +169,9 @@ class MockPlayer(BasePlayerService):
             tile: BaseTile,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
         return self._location_to_build_func(tile, turn_descriptor)
+
+    def get_player_choice_effects_to_use_for_cost_discount(
+            self,
+            action_choices: List[ActionChoiceLookup],
+            turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
+        return self._effects_to_use_for_cost_discount(action_choices, turn_descriptor)

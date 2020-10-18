@@ -9,5 +9,5 @@ class test_when_tile_is_not_specific_but_cost_is_overridden(Given_A_PlaceATileAc
             TileTypeEnum.furnishedCavern,
             override_cost={ResourceTypeEnum.stone: 1})
 
-    def test_then_a_value_error_should_be_raise(self) -> None:
-        self.assertRaises(ValueError, self.initialise_invalid_sut())
+    def test_then_a_value_error_should_be_raised(self) -> None:
+        self.assertRaises(ValueError, self.initialise_invalid_sut)

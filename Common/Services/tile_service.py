@@ -83,6 +83,7 @@ class TileService(object):
         :param location: The location to query whether the tile can be placed on. This must be positive, and less than the max size of the player's board.
         :param direction: The direction of the tile, if it is a twin tile. Iff the tile is a twin tile, this may not be null.
         :returns: True if the tile may be placed at this location, false if not."""
+        # TODO: implement this
         pass
 
     def get_cost_of_tile(
