@@ -1,8 +1,8 @@
-from typing import List, Dict
+from typing import Dict, List, cast
 
 from automated_tests.business_logic_tests.action_tests.place_a_tile_action_tests.given_a_place_a_tile_action import Given_A_PlaceATileAction
-from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests\
-    .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
+from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests.given_a_complete_dwarf_player_choice_transfer_service import \
+    FakeCard
 from automated_tests.business_logic_tests.service_tests.mock_player import MockPlayer
 from automated_tests.mocks.mock_card import MockCard
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -14,9 +14,9 @@ from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
-class test_when_tile_is_specific_and_cost_is_overridden(Given_A_PlaceATileAction):
+class test_when_tile_is_specific_and_cost_is_default(Given_A_PlaceATileAction):
     def because(self) -> None:
-        self.initialise_sut_with_specific_tile({ResourceTypeEnum.ruby: 1})
+        self.initialise_sut_with_specific_tile()
 
         self._player: BasePlayerService = self.initialise_player()
 
@@ -34,13 +34,13 @@ class test_when_tile_is_specific_and_cost_is_overridden(Given_A_PlaceATileAction
         )
 
         self._expected_resources: Dict[ResourceTypeEnum, int] = {
-            ResourceTypeEnum.wood: 2,
+            ResourceTypeEnum.wood: 1,
             ResourceTypeEnum.ruby: 1,
         }
 
         self._action_invoked_result: ResultLookup[int] = self.SUT.invoke(
             self._player,
-            None,  # Unused for this action
+            None,               # Unused for this action
             self._dwarf_to_use  # Unused for this action
         )
 
@@ -57,7 +57,7 @@ class test_when_tile_is_specific_and_cost_is_overridden(Given_A_PlaceATileAction
 
         starting_resources: Dict[ResourceTypeEnum, int] = {
             ResourceTypeEnum.wood: 2,
-            ResourceTypeEnum.ruby: 2,
+            ResourceTypeEnum.ruby: 1,
         }
 
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
@@ -93,6 +93,9 @@ class test_when_tile_is_specific_and_cost_is_overridden(Given_A_PlaceATileAction
     def test_then_invoked_result_value_should_be_expected(self) -> None:
         self.assertEqual(self._action_invoked_result.value, 1)
 
+    def test_then_invoked_result_errors_should_be_empty(self) -> None:
+        self.assertListEqual([], cast(List, self._action_invoked_result.errors))
+
     def test_then_player_should_have_tile_at_set_location(self) -> None:
         self.assertIsNotNone(self._player.tiles[self._location_to_place_tile].tile)
 
@@ -100,3 +103,6 @@ class test_when_tile_is_specific_and_cost_is_overridden(Given_A_PlaceATileAction
         for resource in self._expected_resources:
             with self.subTest(resource=resource):
                 self.assertEqual(self._player.resources[resource], self._expected_resources[resource])
+
+    def test_then_tile_service_should_report_tile_is_not_available(self) -> None:
+        self.assertFalse(True)
