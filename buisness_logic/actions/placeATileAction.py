@@ -168,7 +168,7 @@ class PlaceATileAction(BasePlayerChoiceAction):
                     if effect.can_be_used_only_once:
                         number_of_times_cant_use -= 1
                     else:
-                        number_of_times_wants_to_use = 0
+                        number_of_times_cant_use = 0
             if number_of_times_cant_use > 0:
                 warning: str = f"Player wanted to use effect {effect} {number_of_times_wants_to_use} times, can only use {number_of_times_cant_use}"
                 errors.append(warning)

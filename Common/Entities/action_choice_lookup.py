@@ -31,6 +31,23 @@ class ActionChoiceLookup(object):
         constraints_string: str = "" if len(self._constraints) == 0 else f", {self._constraints}"
         return f"ActionChoiceLookup({self._actions}{constraints_string})"
 
+    def __repr__(self) -> str:
+        list_of_strings: List[str] = ["ActionChoiceLookup("]
+
+        if len(self._actions) > 0:
+            for action in self._actions:
+                list_of_strings.append(str(action))
+        else:
+            list_of_strings.append("[]")
+
+        if len(self._constraints) > 0:
+            list_of_strings.append(",")
+            for constraint in self._constraints:
+                list_of_strings.append(str(constraint))
+        list_of_strings.append(")")
+
+        return ''.join(list_of_strings)
+
     def __eq__(self, other) -> bool:
         result: bool = isinstance(other, ActionChoiceLookup)
 

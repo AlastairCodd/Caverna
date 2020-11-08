@@ -2,15 +2,13 @@ from typing import List, Union, Dict, Iterable, Tuple, Optional, Callable
 
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
+from buisness_logic.tiles.mine_tiles import OreMineTile, RubyMineTile
 from buisness_logic.tiles.outdoor_tiles import *
 from common.defaults.tile_requisite_default import TileRequisiteDefault
 from common.defaults.tile_twin_default import TileTwinDefault
-from core.baseClasses.base_effect import BaseEffect
-from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_entity import TileEntity
 from core.baseClasses.base_tile import BaseTile
-from core.containers.resource_container import ResourceContainer
 from core.containers.tile_container import TileContainer
 from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileDirectionEnum
 
@@ -18,23 +16,32 @@ from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileDirecti
 class TileService(object):
     def __init__(self):
         requisite_default: TileRequisiteDefault = TileRequisiteDefault()
-        self._tileRequisites: Dict[TileTypeEnum, List[TileTypeEnum]] = requisite_default.assign({})
+        self._tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = {}
+        requisite_default.assign(self._tile_requisites)
 
         twin_default: TileTwinDefault = TileTwinDefault()
-        self._twinTiles: List[TileTypeEnum] = twin_default.assign([])
+        self._twin_tile_types: List[TileTypeEnum] = []
+        twin_default.assign(self._twin_tile_types)
 
         self._unique_tile_funcs: Dict[TileTypeEnum, Callable[[], BaseTile]] = {
             TileTypeEnum.field: lambda: FieldTile(),
             TileTypeEnum.meadow: lambda: MeadowTile(),
             TileTypeEnum.meadowFieldTwin: lambda: MeadowTile(),
             TileTypeEnum.pasture: lambda: PastureTile(),
+            TileTypeEnum.cavern: lambda: CavernTile(),
+            TileTypeEnum.tunnel: lambda: TunnelTile(),
+            TileTypeEnum.deepTunnel: lambda: DeepTunnelTile(),
+            TileTypeEnum.cavernCavernTwin: lambda: CavernTile(),
+            TileTypeEnum.cavernTunnelTwin: lambda: CavernTile(),
+            TileTypeEnum.oreMineDeepTunnelTwin: lambda: OreMineTile(),
+            TileTypeEnum.rubyMine: lambda: RubyMineTile(),
         }
 
     # TODO Implement and test this service
     def is_tile_a_twin_tile(
             self,
             tile_type: TileTypeEnum) -> bool:
-        result: bool = tile_type in self._twinTiles
+        result: bool = tile_type in self._twin_tile_types
         return result
 
     def does_tile_type_have_unique_tile(
@@ -68,7 +75,9 @@ class TileService(object):
     def is_tile_available(
             self,
             tile: BaseTile) -> bool:
-        pass
+        if tile is None:
+            raise ValueError("Tile may not be None")
+        return True
 
     def can_place_tile_at_location(
             self,
@@ -83,8 +92,31 @@ class TileService(object):
         :param location: The location to query whether the tile can be placed on. This must be positive, and less than the max size of the player's board.
         :param direction: The direction of the tile, if it is a twin tile. Iff the tile is a twin tile, this may not be null.
         :returns: True if the tile may be placed at this location, false if not."""
-        # TODO: implement this
-        pass
+        if player is None:
+            raise ValueError("Player may not be None")
+        if tile is None:
+            raise ValueError("Tile may not be None")
+        if location < 0 or location >= player.tile_count:
+            raise IndexError(f"Location index ({location}) must be in range [0, Number of Tiles owned by Player: {player.tile_count})")
+        target_tile_type: TileTypeEnum = tile.tile_type
+        is_tile_a_twin_tile = self.is_tile_a_twin_tile(target_tile_type)
+        if is_tile_a_twin_tile and direction is None:
+            raise ValueError(f"Direction may not be None, as Target Tile {target_tile_type} is a twin tile.")
+
+        result: bool
+        if is_tile_a_twin_tile:
+            # TODO: Implement
+            raise NotImplementedError()
+        else:
+            if target_tile_type in self._tile_requisites:
+                requisites_for_tile_type: List[TileTypeEnum] = self._tile_requisites[target_tile_type]
+                tile_type_at_target_location: TileEntity = player.get_tile_at_location(location)
+                result = tile_type_at_target_location in requisites_for_tile_type
+            else:
+                # TODO: Implement? Could not find requisite tile type for given
+                raise IndexError(f"Tile Type {target_tile_type} did not have any requisists")
+
+        return result
 
     def get_cost_of_tile(
             self,
@@ -94,7 +126,8 @@ class TileService(object):
         """Gets the cost to the given player to build the given tile.
 
         :param tile: The tile to be built. This may not be null.
-        :param effects_to_use: The effects that the player who aims to build the tile may use, which could reduce the building cost. If null, no effects will be used.
+        :param effects_to_use: The effects that the player who aims to build the tile may use, which could reduce the building cost.
+            If null, no effects will be used.
         :param cost_override: The cost to use in place of the default tile cost. This may be null.
         :returns: The cost to build the tile. This will never be null."""
         if tile is None:
@@ -137,7 +170,7 @@ class TileService(object):
         effects: Iterable[ChangeRequisiteEffect] = player.get_effects_of_type(ChangeRequisiteEffect)
 
         # gotta clone dictionary
-        all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = dict(self._tileRequisites)
+        all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = dict(self._tile_requisites)
 
         for effect in effects:
             effect.invoke(all_tile_requisites)

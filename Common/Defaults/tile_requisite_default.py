@@ -1,12 +1,16 @@
 from typing import List, Dict
 from core.enums.caverna_enums import TileTypeEnum
 
+
 class TileRequisiteDefault(object):
-    def assign(self, currentRequisites: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
-        if currentRequisites is None: raise ValueError("currentRequisites")
-        
-        currentRequisites.clear()
-        currentRequisites.update(
+    def assign(
+            self,
+            source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
+        if source is None:
+            raise ValueError("Source cannot be None")
+
+        source.clear()
+        source.update(
             {
                 TileTypeEnum.unavailable: [],
                 TileTypeEnum.forest: [],
@@ -24,7 +28,7 @@ class TileRequisiteDefault(object):
                 TileTypeEnum.furnishedCavern: [TileTypeEnum.cavern],
                 TileTypeEnum.furnishedDwelling: [TileTypeEnum.cavern],
                 TileTypeEnum.oreMineDeepTunnelTwin: [TileTypeEnum.tunnel],
-                TileTypeEnum.rubyMine: [TileTypeEnum.tunnel, TileTypeEnum.deepTunnel] }
-            )
-            
-        return currentRequisites
+                TileTypeEnum.rubyMine: [TileTypeEnum.tunnel, TileTypeEnum.deepTunnel]}
+        )
+
+        return source

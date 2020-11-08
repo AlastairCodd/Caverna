@@ -51,8 +51,8 @@ class TileContainer(object):
         return self._tiles
 
     def get_tile_at_location(self, tile_index: int) -> TileEntity:
-        if 0 < tile_index or self._tileCount >= tile_index:
-            raise IndexError(f"Tile Index {tile_index} is outside range {self._tileCount}")
+        if tile_index < 0 or tile_index >= self._tileCount:
+            raise IndexError(f"Tile Index ({tile_index}) must be in range [0, Number of Tiles: {self._tileCount})")
         return self._tiles[tile_index]
 
     def get_tiles_of_type(
