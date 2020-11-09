@@ -2,7 +2,7 @@ from typing import List, Union, Dict, Iterable, Tuple, Optional, Callable
 
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
-from buisness_logic.tiles.mine_tiles import OreMineTile, RubyMineTile
+from buisness_logic.tiles.mine_tiles import *
 from buisness_logic.tiles.outdoor_tiles import *
 from common.defaults.tile_requisite_default import TileRequisiteDefault
 from common.defaults.tile_twin_default import TileTwinDefault
@@ -26,15 +26,18 @@ class TileService(object):
         self._unique_tile_funcs: Dict[TileTypeEnum, Callable[[], BaseTile]] = {
             TileTypeEnum.field: lambda: FieldTile(),
             TileTypeEnum.meadow: lambda: MeadowTile(),
-            TileTypeEnum.meadowFieldTwin: lambda: MeadowTile(),
             TileTypeEnum.pasture: lambda: PastureTile(),
             TileTypeEnum.cavern: lambda: CavernTile(),
             TileTypeEnum.tunnel: lambda: TunnelTile(),
             TileTypeEnum.deepTunnel: lambda: DeepTunnelTile(),
-            TileTypeEnum.cavernCavernTwin: lambda: CavernTile(),
-            TileTypeEnum.cavernTunnelTwin: lambda: CavernTile(),
-            TileTypeEnum.oreMineDeepTunnelTwin: lambda: OreMineTile(),
             TileTypeEnum.rubyMine: lambda: RubyMineTile(),
+        }
+
+        self._twin_tile_primary_funcs: Dict[TileTypeEnum, Callable[[], Tuple[BaseTile, BaseTile]]] = {
+            TileTypeEnum.meadowFieldTwin: lambda: (MeadowTile(), FieldTile()),
+            TileTypeEnum.cavernCavernTwin: lambda: (CavernTile(), CavernTile()),
+            TileTypeEnum.cavernTunnelTwin: lambda: (CavernTile(), TunnelTile()),
+            TileTypeEnum.oreMineDeepTunnelTwin: lambda: (OreMineTile(), DeepTunnelTile()),
         }
 
     # TODO Implement and test this service
@@ -111,10 +114,10 @@ class TileService(object):
             if target_tile_type in self._tile_requisites:
                 requisites_for_tile_type: List[TileTypeEnum] = self._tile_requisites[target_tile_type]
                 tile_type_at_target_location: TileEntity = player.get_tile_at_location(location)
-                result = tile_type_at_target_location in requisites_for_tile_type
+                result = tile_type_at_target_location.tile_type in requisites_for_tile_type
             else:
                 # TODO: Implement? Could not find requisite tile type for given
-                raise IndexError(f"Tile Type {target_tile_type} did not have any requisists")
+                raise IndexError(f"Tile Type {target_tile_type} did not have any requisites")
 
         return result
 

@@ -13,14 +13,18 @@ from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
-class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction):
+class test_when_tile_is_twin_and_cost_is_overridden(Given_A_PlaceATileAction):
     def because(self) -> None:
-        self.initialise_sut_with_specific_tile()
+        self.initialise_sut_with_twin_tile(
+            override_cost={
+                ResourceTypeEnum.wood: 4,
+                ResourceTypeEnum.stone: 3,
+            })
 
         self._player: BasePlayerService = self.initialise_player()
 
@@ -102,10 +106,29 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
         player.tiles[1].set_tile(allow_substitution_tile)
         player.tiles[2].set_tile(decrease_price_tile)
-        self._location_to_place_tile: int = 28
+        # _ 1 2 _ | _ _ _ 7
+        # 8 x x x | x x x _
+        # _ x x x |20 x x _
+        # _ x x x |28 x x _
+        # _ x x x | x x x _
+        # _ _ _ _ | _ _ _ _
+        location_to_place_primary_tile: int = 28
+        direction_to_place_secondary_tile: TileDirectionEnum = TileDirectionEnum.up
+        width: int = 8
+        location_to_place_secondary_tile: int = location_to_place_primary_tile - width
 
-        player.tiles[self._location_to_place_tile].set_tile(cavern_for_building)
-        player.get_player_choice_location_to_build_returns(lambda _, __: ResultLookup(True, (self._location_to_place_tile, None)))
+        player.tiles[location_to_place_primary_tile].set_tile(cavern_for_building)
+        player.get_player_choice_location_to_build_returns(lambda _, __: ResultLookup(
+            True,
+            (
+                location_to_place_primary_tile,
+                direction_to_place_secondary_tile
+            )))
+
+        self._new_tile_locations: List[int] = [
+            location_to_place_primary_tile,
+            location_to_place_secondary_tile
+        ]
 
         player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: effects_to_use)
         return player
@@ -140,8 +163,10 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
     def test_then_invoked_result_errors_should_be_empty(self) -> None:
         self.assertListEqual([], cast(List, self._action_invoked_result.errors))
 
-    def test_then_player_should_have_tile_at_set_location(self) -> None:
-        self.assertIsNotNone(self._player.tiles[self._location_to_place_tile].tile)
+    def test_then_player_should_have_tiles_at_expected_locations(self) -> None:
+        for new_tile_location in self._new_tile_locations:
+            with self.subTest(location=new_tile_location):
+                self.assertIsNotNone(self._player.tiles[new_tile_location].tile)
 
     def test_then_player_should_have_expected_amount_of_resources(self) -> None:
         for resource in self._expected_resources:

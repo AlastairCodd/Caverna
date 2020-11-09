@@ -20,5 +20,10 @@ class Given_A_PlaceATileAction(TestCase, metaclass=ABCMeta):
             override_cost: Optional[Dict[ResourceTypeEnum, int]] = None) -> None:
         self.SUT = PlaceATileAction(TileTypeEnum.furnishedCavern, Dwelling, override_cost)
 
+    def initialise_sut_with_twin_tile(
+            self,
+            override_cost: Optional[Dict[ResourceTypeEnum, int]] = None) -> None:
+        self.SUT = PlaceATileAction(TileTypeEnum.oreMineDeepTunnelTwin, override_cost=override_cost)
+
     def because(self) -> None:
         pass
