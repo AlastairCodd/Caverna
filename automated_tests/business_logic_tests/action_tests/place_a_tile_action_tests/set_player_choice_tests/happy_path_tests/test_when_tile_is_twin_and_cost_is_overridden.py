@@ -7,7 +7,7 @@ from automated_tests.mocks.mock_player import MockPlayer
 from automated_tests.mocks.mock_card import MockCard
 from automated_tests.mocks.mock_tile import MockTile
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect, AllowSubstitutionForPurchaseEffect, DecreasePriceOfTileEffect
-from buisness_logic.tiles.mine_tiles import CavernTile
+from buisness_logic.tiles.mine_tiles import TunnelTile, DeepTunnelTile, OreMineTile
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
@@ -92,8 +92,6 @@ class test_when_tile_is_twin_and_cost_is_overridden(Given_A_PlaceATileAction):
             2,
             effects=[allow_substitution_for_purchase_effect])
 
-        cavern_for_building: BaseTile = CavernTile()
-
         # starting cost:      wood 4, stone 3
         # after substitution: wood 2, stone 0, ore 2
         # after decrease:     wood 2, stone 0, ore 0
@@ -108,29 +106,33 @@ class test_when_tile_is_twin_and_cost_is_overridden(Given_A_PlaceATileAction):
         player.tiles[2].set_tile(decrease_price_tile)
         # _ 1 2 _ | _ _ _ 7
         # 8 x x x | x x x _
-        # _ x x x |20 x x _
-        # _ x x x |28 x x _
-        # _ x x x | x x x _
+        # _ x x x | x21 x _
+        # _ x x x | C29 x _
+        # _ x x x | D x x _
         # _ _ _ _ | _ _ _ _
-        location_to_place_primary_tile: int = 28
+        location_to_place_primary_tile: int = 29
         direction_to_place_secondary_tile: TileDirectionEnum = TileDirectionEnum.up
         width: int = 8
         location_to_place_secondary_tile: int = location_to_place_primary_tile - width
 
-        player.tiles[location_to_place_primary_tile].set_tile(cavern_for_building)
-        player.get_player_choice_location_to_build_returns(lambda _, __: ResultLookup(
+        primary_tunnel_for_building: BaseTile = TunnelTile()
+        secondary_tunnel_for_building: BaseTile = TunnelTile()
+
+        player.tiles[location_to_place_primary_tile].set_tile(primary_tunnel_for_building)
+        player.tiles[location_to_place_secondary_tile].set_tile(secondary_tunnel_for_building)
+        player.get_player_choice_location_to_build_returns(lambda _, __, ___: ResultLookup(
             True,
             (
                 location_to_place_primary_tile,
                 direction_to_place_secondary_tile
             )))
 
-        self._new_tile_locations: List[int] = [
-            location_to_place_primary_tile,
-            location_to_place_secondary_tile
-        ]
+        self._expected_tiles: Dict[int, type] = {
+            location_to_place_primary_tile: OreMineTile,
+            location_to_place_secondary_tile: DeepTunnelTile
+        }
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: effects_to_use)
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: effects_to_use)
         return player
 
     def test_then_result_should_not_be_none(self) -> None:
@@ -164,9 +166,10 @@ class test_when_tile_is_twin_and_cost_is_overridden(Given_A_PlaceATileAction):
         self.assertListEqual([], cast(List, self._action_invoked_result.errors))
 
     def test_then_player_should_have_tiles_at_expected_locations(self) -> None:
-        for new_tile_location in self._new_tile_locations:
-            with self.subTest(location=new_tile_location):
-                self.assertIsNotNone(self._player.tiles[new_tile_location].tile)
+        for tile_location in self._expected_tiles:
+            with self.subTest(location=tile_location):
+                expected_tile_type: type = self._expected_tiles[tile_location]
+                self.assertIsInstance(self._player.tiles[tile_location].tile, expected_tile_type)
 
     def test_then_player_should_have_expected_amount_of_resources(self) -> None:
         for resource in self._expected_resources:

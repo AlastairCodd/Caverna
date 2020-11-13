@@ -4,6 +4,8 @@ SimpleDwellingWoodTileId: int = 2
 MixedDwellingTileId: int = 3
 CoupleDwellingTileId: int = 4
 AdditionalDwellingTileId: int = 5
+EntryLevelDwellingTileId: int = 99
+
 CuddleRoomTileId: int = 6
 BreakfastRoomTileId: int = 7
 StubbleRoomTileId: int = 8

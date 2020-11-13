@@ -82,8 +82,8 @@ class test_when_effects_chosen_for_purchase_are_unavailable(Given_A_PlaceATileAc
 
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
         self._location_to_place_tile: int = 28
-        player.get_player_choice_location_to_build_returns(lambda _, __: ResultLookup(True, (self._location_to_place_tile, None)))
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: effects_to_use)
+        player.get_player_choice_location_to_build_returns(lambda _, __, ___: ResultLookup(True, (self._location_to_place_tile, None)))
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: effects_to_use)
         return player
 
     def test_then_result_should_not_be_none(self) -> None:

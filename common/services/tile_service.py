@@ -33,11 +33,11 @@ class TileService(object):
             TileTypeEnum.rubyMine: lambda: RubyMineTile(),
         }
 
-        self._twin_tile_primary_funcs: Dict[TileTypeEnum, Callable[[], Tuple[BaseTile, BaseTile]]] = {
-            TileTypeEnum.meadowFieldTwin: lambda: (MeadowTile(), FieldTile()),
-            TileTypeEnum.cavernCavernTwin: lambda: (CavernTile(), CavernTile()),
-            TileTypeEnum.cavernTunnelTwin: lambda: (CavernTile(), TunnelTile()),
-            TileTypeEnum.oreMineDeepTunnelTwin: lambda: (OreMineTile(), DeepTunnelTile()),
+        self._twin_tile_funcs: Dict[TileTypeEnum, Tuple[Callable[[], BaseTile], Callable[[], BaseTile]]] = {
+            TileTypeEnum.meadowFieldTwin: (MeadowTile, FieldTile),
+            TileTypeEnum.cavernCavernTwin: (CavernTile, CavernTile),
+            TileTypeEnum.cavernTunnelTwin: (CavernTile, TunnelTile),
+            TileTypeEnum.oreMineDeepTunnelTwin: (OreMineTile, DeepTunnelTile),
         }
 
     # TODO Implement and test this service
@@ -65,6 +65,14 @@ class TileService(object):
             result = self._unique_tile_funcs[tile_type]
         else:
             result = None
+        return result
+
+    def get_twin_tile_generation_methods(
+            self,
+            tile_type: TileTypeEnum) -> Tuple[Callable[[], BaseTile], Callable[[], BaseTile]]:
+        if tile_type not in self._twin_tile_funcs:
+            raise ValueError(f"Tile with type {tile_type} does not have twin generation methods")
+        result: Tuple[Callable[[], BaseTile], Callable[[], BaseTile]] = self._twin_tile_funcs[tile_type]
         return result
 
     def get_possible_tiles(
@@ -260,7 +268,7 @@ class TileService(object):
         success: bool = False
         errors: List[str] = []
 
-        if location in available_locations:
+        if (location, direction) in available_locations:
             player.tiles[location].set_tile(tile)
             success = True
 

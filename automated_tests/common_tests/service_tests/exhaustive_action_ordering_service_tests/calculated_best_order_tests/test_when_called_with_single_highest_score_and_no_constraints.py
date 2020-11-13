@@ -35,7 +35,7 @@ class Test_When_Called_With_Single_Highest_Score_And_No_Constraints(Given_An_Exh
 
         resources: Dict[ResourceTypeEnum, int] = {}
 
-        player: BasePlayerService = MockPlayer(3, resources=resources)
+        player: BasePlayerService = MockPlayer(resources=resources)
         action_conditional: Conditional = Conditional(
             ActionCombinationEnum.AndOr,
             action1_take_items,

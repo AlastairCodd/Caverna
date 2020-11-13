@@ -75,3 +75,11 @@ class AdditionalDwelling(BaseDwelling):
             {ResourceTypeEnum.wood: 4, ResourceTypeEnum.stone: 3},
             [population_effects.IncreasePopulationMaximumEffect(),
              population_effects.IncreasePopulationCapacityEffect(1)])
+
+
+class EntryLevelDwelling(BaseDwelling):
+    def __init__(self) -> None:
+        BaseDwelling.__init__(
+            self, "Entry Level Dwelling", tile_ids.EntryLevelDwellingTileId, 0, {},
+            [population_effects.IncreasePopulationCapacityEffect(2),
+             animal_storage_effects.StoreAny(2)])

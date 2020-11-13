@@ -62,8 +62,8 @@ class test_when_tile_is_specific_and_cost_is_default(Given_A_PlaceATileAction):
 
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
         self._location_to_place_tile: int = 28
-        player.get_player_choice_location_to_build_returns(lambda _, __: ResultLookup(True, (self._location_to_place_tile, None)))
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: {})
+        player.get_player_choice_location_to_build_returns(lambda _, __, ___: ResultLookup(True, (self._location_to_place_tile, None)))
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
         return player
 
     def test_then_result_should_not_be_none(self) -> None:

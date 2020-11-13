@@ -1,18 +1,21 @@
 from typing import Dict, List
+
+from buisness_logic.tiles.dwelling import EntryLevelDwelling
+from buisness_logic.tiles.mine_tiles import CavernTile
+from core.baseClasses.base_tile_container_default import BaseTileContainerDefault
 from core.enums.caverna_enums import TileTypeEnum
 from common.entities.tile_entity import TileEntity
 
 
-class TileContainerDefault(object):
-
+class TileContainerDefault(BaseTileContainerDefault):
     def assign(
             self,
-            current_tiles: Dict[int, TileEntity]) -> Dict[int, TileEntity]:
+            tile_collection: Dict[int, TileEntity]) -> Dict[int, TileEntity]:
         """Fills the given dictionary with the default tile layout"""
-        if current_tiles is None:
+        if tile_collection is None:
             raise ValueError("currentTiles")
 
-        current_tiles.clear()
+        tile_collection.clear()
 
         tiles_types: List[TileTypeEnum] = []
 
@@ -27,25 +30,24 @@ class TileContainerDefault(object):
 
             tiles_types.append(tile_type)
 
-        overridden_tiles_types = self._specific_initial_tile_overrides(tiles_types)
+        tiles: Dict[int, TileEntity] = {tile_id: TileEntity(tile_id, tiles_types[tile_id])
+                                        for tile_id in range(len(tiles_types))}
+        self._assign_specific_initial_tile_overrides(tiles)
 
-        tiles = {tile_id: TileEntity(tile_id, overridden_tiles_types[tile_id])
-                 for tile_id in range(len(overridden_tiles_types))}
-        current_tiles.update(tiles)
+        tile_collection.update(tiles)
 
-        return current_tiles
+        return tile_collection
 
-    def _specific_initial_tile_overrides(
+    def _assign_specific_initial_tile_overrides(
             self,
-            current_tile_type: List[TileTypeEnum]) -> List[TileTypeEnum]:
+            tiles: Dict[int, TileEntity]) -> Dict[int, TileEntity]:
         """Overrides specific current tiles
 
-        currentTiles: a dictionary of int to TileTypeEnum. This cannot be null
-        returns: currentTiles"""
-        if current_tile_type is None:
-            raise ValueError("currentTiles")
-        current_tile_type[28] = TileTypeEnum.cavern
-        # TODO: Change this so that it places the particular tile it needs to
-        current_tile_type[36] = TileTypeEnum.furnishedDwelling
+        :param tiles: A dictionary of int to tile entity. This cannot be null
+        :returns: tiles. This will never be null."""
+        if tiles is None:
+            raise ValueError("empty_default_tiles may not be null")
+        tiles[28].set_tile(CavernTile())
+        tiles[36].set_tile(EntryLevelDwelling())
 
-        return current_tile_type
+        return tiles

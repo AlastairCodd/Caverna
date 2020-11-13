@@ -10,13 +10,18 @@ from common.entities.weapon import Weapon
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
+from core.baseClasses.base_tile_container_default import BaseTileContainerDefault
 from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
 class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
-    def __init__(self, player_id: int, turn_index: int):
-        BasePlayerRepository.__init__(self, player_id, turn_index)
+    def __init__(
+            self,
+            player_id: int,
+            turn_index: int,
+            tile_container_default: BaseTileContainerDefault) -> None:
+        BasePlayerRepository.__init__(self, player_id, turn_index, tile_container_default)
 
     @abstractmethod
     def get_player_choice_market_action(
@@ -140,11 +145,13 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
     def get_player_choice_location_to_build(
             self,
             tile: BaseTile,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
+            turn_descriptor: TurnDescriptorLookup,
+            secondary_tile: Optional[BaseTile] = None) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
         """Gets user choice for location to place the given tile.
 
         :param tile: The tile to be placed. This cannot be null.
         :param turn_descriptor: The description of game state. This cannot be null, or empty.
+        :param secondary_tile: The secondary tile to be placed, if the specified tile type is twin. This cannot be null, or empty.
         :returns: The location (and direction, if the tile is a twin-tile) that the place has decided to place this tile. This will never be null."""
         raise NotImplementedError()
 
@@ -152,5 +159,6 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
     def get_player_choice_effects_to_use_for_cost_discount(
             self,
             specific_tile: BaseTile,
-            turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
+            turn_descriptor: TurnDescriptorLookup,
+            secondary_tile: Optional[BaseTile] = None) -> Dict[BaseTilePurchaseEffect, int]:
         pass

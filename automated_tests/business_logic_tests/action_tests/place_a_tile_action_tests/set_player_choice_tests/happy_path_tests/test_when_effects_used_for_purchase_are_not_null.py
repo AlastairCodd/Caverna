@@ -1,4 +1,4 @@
-from typing import Dict, List, cast
+from typing import Dict, List, cast, Optional
 
 from automated_tests.business_logic_tests.action_tests.place_a_tile_action_tests.given_a_place_a_tile_action import Given_A_PlaceATileAction
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests \
@@ -7,7 +7,6 @@ from automated_tests.mocks.mock_player import MockPlayer
 from automated_tests.mocks.mock_card import MockCard
 from automated_tests.mocks.mock_tile import MockTile
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect, AllowSubstitutionForPurchaseEffect, DecreasePriceOfTileEffect
-from buisness_logic.tiles.mine_tiles import CavernTile
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
@@ -88,8 +87,6 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
             2,
             effects=[allow_substitution_for_purchase_effect])
 
-        cavern_for_building: BaseTile = CavernTile()
-
         # starting cost:      wood 4, stone 3
         # after substitution: wood 2, stone 0, ore 2
         # after decrease:     wood 2, stone 0, ore 0
@@ -102,12 +99,20 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
         player.tiles[1].set_tile(allow_substitution_tile)
         player.tiles[2].set_tile(decrease_price_tile)
-        self._location_to_place_tile: int = 28
+        location_to_place_tile: int = 28
 
-        player.tiles[self._location_to_place_tile].set_tile(cavern_for_building)
-        player.get_player_choice_location_to_build_returns(lambda _, __: ResultLookup(True, (self._location_to_place_tile, None)))
+        player.get_player_choice_location_to_build_returns(
+            lambda _, __, ___: ResultLookup(
+                True,
+                (location_to_place_tile, None)
+            ))
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(
+            lambda _, __, ___: effects_to_use)
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: effects_to_use)
+        self._expected_tiles: Dict[int, Optional[BaseTile]] = {
+            location_to_place_tile: self._specific_tile
+        }
+
         return player
 
     def test_then_result_should_not_be_none(self) -> None:
@@ -140,8 +145,14 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
     def test_then_invoked_result_errors_should_be_empty(self) -> None:
         self.assertListEqual([], cast(List, self._action_invoked_result.errors))
 
-    def test_then_player_should_have_tile_at_set_location(self) -> None:
-        self.assertIsNotNone(self._player.tiles[self._location_to_place_tile].tile)
+    def test_then_player_should_have_tiles_at_expected_locations(self) -> None:
+        for tile_location in self._expected_tiles:
+            with self.subTest(location=tile_location):
+                expected_tile: Optional[BaseTile] = self._expected_tiles[tile_location]
+                if expected_tile is not None:
+                    self.assertIs(self._player.tiles[tile_location].tile, expected_tile)
+                else:
+                    self.assertIsNone(self._player.tiles[tile_location].tile)
 
     def test_then_player_should_have_expected_amount_of_resources(self) -> None:
         for resource in self._expected_resources:
@@ -149,4 +160,4 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
                 self.assertEqual(self._player.resources[resource], self._expected_resources[resource])
 
     def test_then_tile_service_should_report_tile_is_not_available(self) -> None:
-        self.assertFalse(True)
+        self.assertFalse(True, "Not Implemented")

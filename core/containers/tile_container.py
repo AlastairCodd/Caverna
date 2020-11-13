@@ -1,9 +1,9 @@
 from typing import List, Dict, TypeVar, Generic, cast, Optional
 
-from common.defaults.tile_container_default import TileContainerDefault
 from common.entities.tile_entity import TileEntity
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseTile
+from core.baseClasses.base_tile_container_default import BaseTileContainerDefault
 from core.enums.caverna_enums import TileTypeEnum
 
 T = TypeVar('T')
@@ -12,8 +12,11 @@ T = TypeVar('T')
 class TileContainer(object):
     def __init__(
             self,
+            tile_container_default: BaseTileContainerDefault,
             height: int = 6,
             width: int = 8):
+        if tile_container_default is None:
+            raise ValueError("Tile Container Default cannot be null")
         if height < 0:
             raise ValueError("height must be greater than 0")
         if width < 0:
@@ -24,11 +27,7 @@ class TileContainer(object):
         self._tileCount: int = height * width
 
         self._tiles: Dict[int, TileEntity] = {}
-        if height == 6 and width == 8:
-            default: TileContainerDefault = TileContainerDefault()
-            default.assign(self._tiles)
-        else:
-            print("Unknown board dimensions")
+        tile_container_default.assign(self._tiles)
 
     def get_number_of_tiles_of_type(self, tile_type: TileTypeEnum) -> int:
         return len([t for t in self._tiles.values() if t.tile_type == tile_type])

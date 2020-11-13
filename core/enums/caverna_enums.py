@@ -38,6 +38,7 @@ class TileTypeEnum(Enum):
     pastureTwin = auto()
     furnishedCavern = auto()
     furnishedDwelling = auto()
+    oreMine = auto()
     oreMineDeepTunnelTwin = auto()
     rubyMine = auto()
 

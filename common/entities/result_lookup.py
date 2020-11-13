@@ -39,3 +39,16 @@ class ResultLookup(Generic[T]):
     @property
     def errors(self) -> Iterable[str]:
         return self._errors
+
+    def __str__(self) -> str:
+        errors_str: str = ""
+        number_of_errors = len(self._errors)
+        for i in range(number_of_errors):
+            if i == number_of_errors - 1:
+                errors_str += f"{self._errors[i]}"
+            else:
+                errors_str += f"{self._errors[i]}, "
+
+        result: str = f"ResultLookup({self._flag}, {self._value}, errors=[{errors_str}])"
+
+        return result

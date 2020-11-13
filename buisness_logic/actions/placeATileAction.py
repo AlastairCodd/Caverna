@@ -21,15 +21,26 @@ class PlaceATileAction(BasePlayerChoiceAction):
             tile_type: TileTypeEnum,
             specific_tile_generation_method: Optional[Callable[[], BaseTile]] = None,
             override_cost: Optional[Dict[ResourceTypeEnum, int]] = None):
-        self._tile_type: TileTypeEnum = tile_type
-        self._specific_tile_generation_method: Optional[Callable[[], BaseTile]] = specific_tile_generation_method
-        if specific_tile_generation_method is None and override_cost is not None:
-            raise ValueError("Cannot override cost of unknown specific tile.")
-        self._tile_cost_override: Optional[Dict[ResourceTypeEnum, int]] = override_cost
-
         self._tile_service: TileService = TileService()
-        # TODO: Consider splitting into a different place a tile action?
+
+        self._tile_type: TileTypeEnum = tile_type
         self._tile_is_twin: bool = self._tile_service.is_tile_a_twin_tile(self._tile_type)
+
+        # if tile is not twin, _specific_tile_generation_method should be referenced
+        self._specific_tile_generation_method: Optional[Callable[[], BaseTile]]
+        # otherwise the _primary/secondary_twin_tile_generation methods will be populated
+        self._primary_twin_tile_generation_method: Optional[Callable[[], BaseTile]] = None
+        self._secondary_twin_tile_generation_method: Optional[Callable[[], BaseTile]] = None
+
+        if self._tile_is_twin:
+            if specific_tile_generation_method is not None:
+                raise ValueError("Specific tile is not valid for twin tiles.")
+            self._specific_tile_generation_method = None
+        else:
+            if specific_tile_generation_method is None and override_cost is not None:
+                raise ValueError("Cannot override cost of unknown specific tile.")
+            self._specific_tile_generation_method = specific_tile_generation_method
+        self._tile_cost_override: Optional[Dict[ResourceTypeEnum, int]] = override_cost
 
         self._tile_location: int = -1
         self._tile_direction: Optional[TileDirectionEnum] = None
@@ -46,41 +57,81 @@ class PlaceATileAction(BasePlayerChoiceAction):
         success: bool = True
         errors: List[str] = []
 
-        if self._specific_tile_generation_method is None:
-            does_tile_have_unique_type: bool = self._tile_service.does_tile_type_have_unique_tile(self._tile_type)
+        if self._tile_is_twin:
+            self._primary_twin_tile_generation_method, self._secondary_twin_tile_generation_method \
+                = self._tile_service.get_twin_tile_generation_methods(self._tile_type)
+        else:
+            if self._specific_tile_generation_method is None:
+                does_tile_have_unique_type: bool = self._tile_service.does_tile_type_have_unique_tile(self._tile_type)
 
-            if does_tile_have_unique_type:
-                self._specific_tile_generation_method = self._tile_service.get_unique_tile_generation_method(self._tile_type)
-            else:
-                possible_tiles: List[BaseTile] = self._tile_service.get_possible_tiles(turn_descriptor.tiles, self._tile_type)
-                specific_tile_to_build_result: ResultLookup[BaseTile] = player.get_player_choice_tile_to_build(
-                    possible_tiles,
-                    turn_descriptor)
+                if does_tile_have_unique_type:
+                    self._specific_tile_generation_method = self._tile_service\
+                        .get_unique_tile_generation_method(self._tile_type)
+                else:
+                    possible_tiles: List[BaseTile] = self._tile_service\
+                        .get_possible_tiles(turn_descriptor.tiles, self._tile_type)
+                    specific_tile_to_build_result: ResultLookup[BaseTile] = player.get_player_choice_tile_to_build(
+                        possible_tiles,
+                        turn_descriptor)
 
-                success = specific_tile_to_build_result.flag
-                errors.extend(specific_tile_to_build_result.errors)
+                    success = specific_tile_to_build_result.flag
+                    errors.extend(specific_tile_to_build_result.errors)
 
-                if specific_tile_to_build_result.flag:
-                    # That this returns the same instance as in turn_descriptor.tiles is not an issue, since that item will be removed when it is placed
-                    self._specific_tile_generation_method = lambda: specific_tile_to_build_result.value
+                    if specific_tile_to_build_result.flag:
+                        # That this returns the same instance as in turn_descriptor.tiles is not an issue,
+                        # since that item will be removed when it is placed
+                        # TODO: Do what this comment says
+                        self._specific_tile_generation_method = lambda: specific_tile_to_build_result.value
+
+        primary_tile: BaseTile
+        secondary_tile: Optional[BaseTile]
+
+        if self._tile_is_twin:
+            primary_tile = self._primary_twin_tile_generation_method()
+            secondary_tile = self._secondary_twin_tile_generation_method()
+        else:
+            primary_tile = self._specific_tile_generation_method()
+            secondary_tile = None
 
         if success:
             # TODO: Make this value a type
-            location_to_build_result: ResultLookup[Tuple[int, TileDirectionEnum]] = player.get_player_choice_location_to_build(
-                self._specific_tile_generation_method(),
-                turn_descriptor)
+            location_to_build_result: ResultLookup[Tuple[int, TileDirectionEnum]] = player \
+                .get_player_choice_location_to_build(
+                primary_tile,
+                turn_descriptor,
+                secondary_tile)
 
             success = location_to_build_result.flag
             errors.extend(location_to_build_result.errors)
 
             if location_to_build_result.flag:
                 self._tile_location = location_to_build_result.value[0]
-                self._tile_direction = location_to_build_result.value[1]
+
+                if self._tile_is_twin:
+                    if location_to_build_result.value[1] is None:
+                        success = False
+                        errors.append("Must have direction when placing twin tile")
+                    else:
+                        self._tile_direction = location_to_build_result.value[1]
+                elif location_to_build_result.value[1] is not None:
+                    self._tile_direction = location_to_build_result.value[1]
+                    error: str = \
+                        f"Warning: direction to place tile is meaningless when placing single tile {self._tile_type}"
+                    errors.append(error)
 
         if success:
-            self._effects_to_use: Dict[BaseTilePurchaseEffect, int] = player.get_player_choice_effects_to_use_for_cost_discount(
-                self._specific_tile_generation_method(),
-                turn_descriptor)
+            should_get_effects_to_use_on_cost: bool = self._should_get_effects_to_use_on_cost(
+                primary_tile,
+                secondary_tile)
+
+            if should_get_effects_to_use_on_cost:
+                self._effects_to_use = player\
+                    .get_player_choice_effects_to_use_for_cost_discount(
+                        primary_tile,
+                        turn_descriptor,
+                        secondary_tile)
+            else:
+                self._effects_to_use = {}
 
         result: ResultLookup[ActionChoiceLookup] = ResultLookup(
             success,
@@ -97,8 +148,14 @@ class PlaceATileAction(BasePlayerChoiceAction):
             raise ValueError("Player may not be none")
         if self._tile_location < 0 or self._tile_location > player.tile_count:
             raise IndexError(f"Tile must be placed within bounds (0<={self._tile_location}<={player.tile_count})")
-        if self._specific_tile_generation_method is None:
-            raise ValueError("Must choose a tile to place")
+        if self._tile_is_twin:
+            if self._primary_twin_tile_generation_method is None:
+                raise ValueError("Must choose a tile to place (_primary_twin_tile_generation_method)")
+            if self._secondary_twin_tile_generation_method is None:
+                raise ValueError("Must choose a tile to place (_secondary_twin_tile_generation_method)")
+        else:
+            if self._specific_tile_generation_method is None:
+                raise ValueError("Must choose a tile to place (_specific_tile_generation_method)")
 
         result: ResultLookup[int]
 
@@ -115,7 +172,7 @@ class PlaceATileAction(BasePlayerChoiceAction):
 
             errors: List[str] = []
 
-            has_effects_result: ResultLookup[bool] = self.does_player_have_effects(player)
+            has_effects_result: ResultLookup[bool] = self._does_player_have_effects(player)
 
             errors.extend(has_effects_result.errors)
 
@@ -131,7 +188,8 @@ class PlaceATileAction(BasePlayerChoiceAction):
             if actual_cost_of_tile_result.flag:
                 can_player_afford_tile: bool = player.has_more_resources_than(actual_cost_of_tile_result.value)
                 if not can_player_afford_tile:
-                    errors.append(f"Player cannot afford tile (cost: {actual_cost_of_tile_result.value}, player resources: {player.resources})")
+                    errors.append(f"Player cannot afford tile (cost: {actual_cost_of_tile_result.value}," +
+                                  f" player resources: {player.resources})")
 
             if not can_place_tile_at_chosen_location:
                 errors.append(f"Chosen location {self._tile_location} is invalid")
@@ -158,7 +216,30 @@ class PlaceATileAction(BasePlayerChoiceAction):
             result = ResultLookup(success, 1 if success else 0, errors)
         return result
 
-    def does_player_have_effects(
+    def new_turn_reset(self) -> None:
+        self._tile_location = -1
+        self._tile_direction = None
+        self._effects_to_use = {}
+
+    def _should_get_effects_to_use_on_cost(
+            self,
+            primary_tile: BaseTile,
+            secondary_tile: Optional[BaseTile]) -> bool:
+        primary_tile_cost_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service \
+            .get_cost_of_tile(primary_tile)
+        # Since we are not providing any effects, the flag will always be true
+        primary_tile_cost: Dict[ResourceTypeEnum, int] = primary_tile_cost_result.value
+        do_tiles_have_cost: bool = any(primary_tile_cost[resource] for resource in primary_tile_cost)
+
+        if not do_tiles_have_cost and secondary_tile is not None:
+            secondary_tile_cost_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service \
+                .get_cost_of_tile(secondary_tile)
+            # Since we are not providing any effects, the flag will always be true
+            secondary_tile_cost: Dict[ResourceTypeEnum, int] = secondary_tile_cost_result.value
+            do_tiles_have_cost = any(secondary_tile_cost[resource] for resource in secondary_tile_cost)
+        return do_tiles_have_cost
+
+    def _does_player_have_effects(
             self,
             player: BasePlayerRepository) -> ResultLookup[bool]:
         effects_player_has: List[BaseTilePurchaseEffect] = player.get_effects_of_type(BaseTilePurchaseEffect)
@@ -177,13 +258,9 @@ class PlaceATileAction(BasePlayerChoiceAction):
                     else:
                         number_of_times_cant_use = 0
             if number_of_times_cant_use > 0:
-                warning: str = f"Player wanted to use effect {effect} {number_of_times_wants_to_use} times, can only use {number_of_times_cant_use}"
+                warning: str = f"Player wanted to use effect {effect} {number_of_times_wants_to_use} times," \
+                               + f" can only use {number_of_times_cant_use}"
                 errors.append(warning)
 
         success: bool = len(errors) == 0
         return ResultLookup(success, success, errors)
-
-    def new_turn_reset(self) -> None:
-        self._tile_location = -1
-        self._tile_direction = None
-        self._effects_to_use = {}

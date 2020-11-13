@@ -2,6 +2,7 @@ from abc import ABCMeta
 from typing import List, Iterable
 
 from common.entities.dwarf import Dwarf
+from core.baseClasses.base_tile_container_default import BaseTileContainerDefault
 from core.containers.resource_container import ResourceContainer
 from core.containers.tile_container import TileContainer
 
@@ -10,13 +11,14 @@ class BasePlayerRepository(TileContainer, ResourceContainer, metaclass=ABCMeta):
     def __init__(
             self,
             player_id: int,
-            turn_index: int) -> None:
+            turn_index: int,
+            tile_container: BaseTileContainerDefault) -> None:
         self._id: int = player_id
         self._turnIndex: int = turn_index
 
         self._dwarves: List[Dwarf] = [Dwarf(True), Dwarf(True)]
 
-        TileContainer.__init__(self)
+        TileContainer.__init__(self, tile_container)
         ResourceContainer.__init__(self)
 
     @property
