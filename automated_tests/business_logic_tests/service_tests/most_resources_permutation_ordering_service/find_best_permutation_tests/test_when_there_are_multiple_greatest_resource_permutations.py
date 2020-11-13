@@ -12,10 +12,10 @@ from core.enums.caverna_enums import ResourceTypeEnum
 
 class Test_When_There_Are_Multiple_Greatest_Resource_Permutations(Given_A_MostResourcesPermutationOrderingService):
     def because(self) -> None:
-        player0: BasePlayerRepository = MockPlayer(3, resources={ResourceTypeEnum.coin: 3})
-        player1: BasePlayerRepository = MockPlayer(3, resources={ResourceTypeEnum.coin: 3, ResourceTypeEnum.stone: 4})
-        player2: BasePlayerRepository = MockPlayer(3, resources={ResourceTypeEnum.coin: 3, ResourceTypeEnum.cow: 2, ResourceTypeEnum.sheep: 2})
-        player3: BasePlayerRepository = MockPlayer(3, resources={ResourceTypeEnum.coin: 2, ResourceTypeEnum.wood: 1})
+        player0: BasePlayerRepository = MockPlayer(resources={ResourceTypeEnum.coin: 3})
+        player1: BasePlayerRepository = MockPlayer(resources={ResourceTypeEnum.coin: 3, ResourceTypeEnum.stone: 4})
+        player2: BasePlayerRepository = MockPlayer(resources={ResourceTypeEnum.coin: 3, ResourceTypeEnum.cow: 2, ResourceTypeEnum.sheep: 2})
+        player3: BasePlayerRepository = MockPlayer(resources={ResourceTypeEnum.coin: 2, ResourceTypeEnum.wood: 1})
 
         permutation0: Tuple[List[BaseAction], int, BasePlayerRepository] = ([MockAction()], 3, player0)
         permutation1: Tuple[List[BaseAction], int, BasePlayerRepository] = ([MockAction()], 3, player1)

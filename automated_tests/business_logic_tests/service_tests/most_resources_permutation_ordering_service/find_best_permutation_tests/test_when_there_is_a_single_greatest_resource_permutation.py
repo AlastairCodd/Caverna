@@ -12,10 +12,10 @@ from core.repositories.base_player_repository import BasePlayerRepository
 
 class Test_When_There_Is_A_Single_Greatest_Resource_Permutation(Given_A_MostResourcesPermutationOrderingService):
     def because(self) -> None:
-        player0: BasePlayerRepository = MockPlayer(3, resources={ResourceTypeEnum.coin: 3})
-        player1: BasePlayerRepository = MockPlayer(3, resources={ResourceTypeEnum.coin: 3, ResourceTypeEnum.stone: 4})
-        player2: BasePlayerRepository = MockPlayer(3, resources={ResourceTypeEnum.coin: 3})
-        player3: BasePlayerRepository = MockPlayer(3, resources={ResourceTypeEnum.coin: 2, ResourceTypeEnum.wood: 1})
+        player0: BasePlayerRepository = MockPlayer(resources={ResourceTypeEnum.coin: 3})
+        player1: BasePlayerRepository = MockPlayer(resources={ResourceTypeEnum.coin: 3, ResourceTypeEnum.stone: 4})
+        player2: BasePlayerRepository = MockPlayer(resources={ResourceTypeEnum.coin: 3})
+        player3: BasePlayerRepository = MockPlayer(resources={ResourceTypeEnum.coin: 2, ResourceTypeEnum.wood: 1})
 
         permutation0: Tuple[List[BaseAction], int, BasePlayerRepository] = ([MockAction()], 3, player0)
         permutation1: Tuple[List[BaseAction], int, BasePlayerRepository] = ([MockAction()], 3, player1)

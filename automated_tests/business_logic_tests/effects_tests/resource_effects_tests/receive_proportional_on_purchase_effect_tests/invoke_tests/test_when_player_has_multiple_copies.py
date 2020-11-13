@@ -2,7 +2,7 @@ from typing import Dict
 
 from automated_tests.business_logic_tests.effects_tests.resource_effects_tests.receive_proportional_on_purchase_effect_tests \
     .given_a_ReceiveProportionalOnPurchaseEffect import Given_A_ReceiveProportionalOnPurchaseEffect
-from automated_tests.business_logic_tests.service_tests.mock_player import MockPlayer
+from automated_tests.mocks.mock_player import MockPlayer
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 

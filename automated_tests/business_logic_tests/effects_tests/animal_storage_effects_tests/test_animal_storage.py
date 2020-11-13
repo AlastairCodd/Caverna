@@ -1,6 +1,6 @@
 from datetime import datetime
 from math import floor
-from sys import path
+from os import path
 from typing import List, Generator, Union, Dict, Iterable, Tuple, TextIO
 from buisness_logic.validators.partition_resource_validator import PartitionResourceValidator
 from common.forges.integer_partition_forge import IntegerPartitionForge
@@ -21,7 +21,7 @@ class SuccessFailLogger(object):
 
         for file in self._file_path:
             # TODO: Fix investigation
-            while path.is_file(f"{self._file_path[file]}_{self._file_count[file]:0<3}.txt"):
+            while path.isfile(f"{self._file_path[file]}_{self._file_count[file]:0<3}.txt"):
                 self._file_line_count[file] += 1
 
         success_file: TextIO = open(f"{success_file_path}_{self._file_count[self.success]:0<3}.txt", "a")

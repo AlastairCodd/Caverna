@@ -3,7 +3,6 @@ from automated_tests.business_logic_tests.cards_tests.weekly_market_card_tests.t
     Given_A_WeeklyMarketCard
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.services.conditional_service import ConditionalService
-from core.baseClasses.base_action import BaseAction
 
 
 # noinspection PyPep8Naming

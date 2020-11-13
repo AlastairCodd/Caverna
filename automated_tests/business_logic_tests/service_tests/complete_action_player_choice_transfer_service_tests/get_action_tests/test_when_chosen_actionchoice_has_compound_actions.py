@@ -4,7 +4,7 @@ from automated_tests.business_logic_tests.service_tests.complete_action_player_c
     given_a_complete_action_player_choice_transfer_service import Given_A_CompleteActionPlayerChoiceTransferService, FakeCompoundAction
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests. \
     given_a_complete_dwarf_player_choice_transfer_service import NullAction, FakeCard
-from automated_tests.business_logic_tests.service_tests.mock_player import MockPlayer
+from automated_tests.mocks.mock_player import MockPlayer
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.multiconditional import Conditional
