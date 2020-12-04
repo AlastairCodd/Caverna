@@ -10,6 +10,7 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect, Allo
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
@@ -19,7 +20,7 @@ from core.services.base_player_service import BasePlayerService
 
 class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction):
     def because(self) -> None:
-        self.initialise_sut_with_specific_tile()
+        self.initialise_sut_as_tile_type_which_is_not_specific()
 
         self._player: BasePlayerService = self.initialise_player()
 
@@ -102,13 +103,13 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
         location_to_place_tile: int = 28
 
         # TODO: Return real but invalid tile -- fix exception
-        player.get_player_choice_tile_to_build_returns(lambda _, __: ResultLookup(errors="This will cause an exception"))
+        player.get_player_choice_tile_to_build_returns(lambda _, __: [][0])
 
         cavern_for_building: BaseTile = player.tiles[location_to_place_tile].tile
         player.get_player_choice_location_to_build_returns(
             lambda _, __, ___: ResultLookup(
                 True,
-                (location_to_place_tile, None)
+                TileUnknownPlacementLookup(location_to_place_tile, None)
             ))
 
         player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: effects_to_use)

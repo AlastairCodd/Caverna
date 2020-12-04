@@ -38,6 +38,15 @@ class TileEntity(object):
         return self._specific_tile
 
     @property
+    def has_effects(self) -> bool:
+        result: bool
+        if self._specific_tile is None:
+            result = False
+        else:
+            result = len(self._specific_tile.effects) > 0
+        return result
+
+    @property
     def effects(self) -> List[BaseEffect]:
         result: List[BaseEffect]
         if self._specific_tile is not None:
@@ -72,9 +81,10 @@ class TileEntity(object):
     def set_tile(
             self,
             base_tile: BaseTile) -> None:
-        if self._specific_tile is not None:
-            raise ValueError("Cannot set specific tile; already has a tile")
+        # if self._specific_tile is not None:
+        #     raise ValueError("Cannot set specific tile; already has a tile")
         self._specific_tile = base_tile
+        self._tile_type = base_tile.tile_type
 
     def give_stable(self) -> bool:
         result: bool = False

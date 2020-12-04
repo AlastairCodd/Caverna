@@ -9,6 +9,7 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect, Allo
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
@@ -37,7 +38,7 @@ class Test_When_Location_Chosen_Is_Invalid(Given_A_PlaceATileAction):
 
         self._expected_resources: Dict[ResourceTypeEnum, int] = {
             ResourceTypeEnum.wood: 2,
-            ResourceTypeEnum.ruby: 1,
+            ResourceTypeEnum.ruby: 12,
         }
 
         self._action_invoked_result: ResultLookup[int] = self.SUT.invoke(
@@ -86,14 +87,14 @@ class Test_When_Location_Chosen_Is_Invalid(Given_A_PlaceATileAction):
         player.get_player_choice_location_to_build_returns(
             lambda _, __, ___: ResultLookup(
                 True,
-                (location_to_place, None)
+                TileUnknownPlacementLookup(location_to_place, None)
             ))
+
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: effects_to_use)
 
         self._expected_tiles: Dict[int, Optional[BaseTile]] = {
             location_to_place: player.tiles[location_to_place].tile
         }
-
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: effects_to_use)
         return player
 
     def test_then_result_should_not_be_none(self) -> None:
@@ -114,27 +115,32 @@ class Test_When_Location_Chosen_Is_Invalid(Given_A_PlaceATileAction):
     def test_then_invoked_result_should_not_be_none(self) -> None:
         self.assertIsNotNone(self._action_invoked_result)
 
-    def test_then_invoked_result_flag_should_be_false(self) -> None:
-        self.assertFalse(self._action_invoked_result.flag)
+    def test_then_invoked_result_flag_should_be_true(self) -> None:
+        self.assertTrue(self._action_invoked_result.flag)
 
     def test_then_invoked_result_value_should_not_be_none(self) -> None:
         self.assertIsNotNone(self._action_invoked_result.value)
 
     def test_then_invoked_result_value_should_be_expected(self) -> None:
-        self.assertEqual(self._action_invoked_result.value, 1)
+        self.assertEqual(self._action_invoked_result.value, 2)
 
-    def test_then_invoked_result_errors_should_not_be_empty(self) -> None:
-        self.shouldNotBeEmpty(self._action_invoked_result.errors)
+    def test_then_invoked_result_errors_should_be_empty(self) -> None:
+        self.assertListEqual([], cast(List, self._action_invoked_result.errors))
 
-    def test_then_player_should_not_have_tiles_at_expected_locations(self) -> None:
+    def test_then_player_should_have_tiles_at_expected_locations(self) -> None:
         for tile_location in self._expected_tiles:
             with self.subTest(location=tile_location):
-                expected_tile: Optional[BaseTile] = self._expected_tiles[tile_location]
-                if expected_tile is not None:
-                    self.assertIs(self._player.tiles[tile_location].tile, expected_tile)
-                else:
-                    self.assertIsNone(self._player.tiles[tile_location].tile)
+                expected_tile_type: type = self._expected_tiles[tile_location]
+                self.assertIsInstance(self._player.tiles[tile_location].tile, expected_tile_type)
+
     def test_then_player_should_have_expected_amount_of_resources(self) -> None:
         for resource in self._expected_resources:
             with self.subTest(resource=resource):
-                self.assertEqual(self._player.resources[resource], self._expected_resources[resource])
+                expected_amount: int = self._expected_resources[resource]
+                if expected_amount == 0:
+                    self.assertNotIn(resource, self._player.resources)
+                else:
+                    self.assertEqual(self._player.resources[resource], expected_amount)
+
+    def test_then_tile_service_should_report_tile_is_not_available(self) -> None:
+        self.assertFalse(True)

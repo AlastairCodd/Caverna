@@ -18,6 +18,9 @@ class Given_A_PlaceATileAction(TestCase, metaclass=ABCMeta):
     def initialise_sut_as_tile_type_which_is_specific(self) -> None:
         self.SUT = PlaceATileAction(TileTypeEnum.meadow)
 
+    def initialise_sut_as_tile_type_which_is_not_specific(self) -> None:
+        self.SUT = PlaceATileAction(TileTypeEnum.furnishedDwelling)
+
     def initialise_sut_with_specific_tile(
             self,
             override_cost: Optional[Dict[ResourceTypeEnum, int]] = None) -> None:

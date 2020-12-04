@@ -34,7 +34,7 @@ class GenericSpecificTile(BaseSpecificTile):
             cost: Dict[ResourceTypeEnum, int],
             effects: List[BaseEffect],
             colour: TileColourEnum):
-        BaseTile.__init__(
+        BaseSpecificTile.__init__(
             self,
             name,
             tile_id,

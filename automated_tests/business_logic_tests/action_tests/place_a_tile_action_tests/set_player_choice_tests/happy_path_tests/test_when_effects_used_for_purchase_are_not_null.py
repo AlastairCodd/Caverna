@@ -10,6 +10,7 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect, Allo
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
@@ -37,8 +38,8 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
         )
 
         self._expected_resources: Dict[ResourceTypeEnum, int] = {
-            ResourceTypeEnum.wood: 2,
-            ResourceTypeEnum.ruby: 1,
+            ResourceTypeEnum.wood: 0,
+            ResourceTypeEnum.ruby: 2,
         }
 
         self._action_invoked_result: ResultLookup[int] = self.SUT.invoke(
@@ -90,6 +91,7 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
         # starting cost:      wood 4, stone 3
         # after substitution: wood 2, stone 0, ore 2
         # after decrease:     wood 2, stone 0, ore 0
+        # starting resouces:  wood 2, stone 0, ore 0, ruby 2
         # final resources:    wood 0, stone 0, ore 0, ruby 2
         effects_to_use: Dict[BaseTilePurchaseEffect, int] = {
             decrease_price_of_tile_effect: 1,
@@ -104,7 +106,7 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
         player.get_player_choice_location_to_build_returns(
             lambda _, __, ___: ResultLookup(
                 True,
-                (location_to_place_tile, None)
+                TileUnknownPlacementLookup(location_to_place_tile, None)
             ))
         player.get_player_choice_effects_to_use_for_cost_discount_returns(
             lambda _, __, ___: effects_to_use)
@@ -157,7 +159,11 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
     def test_then_player_should_have_expected_amount_of_resources(self) -> None:
         for resource in self._expected_resources:
             with self.subTest(resource=resource):
-                self.assertEqual(self._player.resources[resource], self._expected_resources[resource])
+                expected_amount: int = self._expected_resources[resource]
+                if expected_amount == 0:
+                    self.assertNotIn(resource, self._player.resources)
+                else:
+                    self.assertEqual(self._player.resources[resource], expected_amount)
 
     def test_then_tile_service_should_report_tile_is_not_available(self) -> None:
         self.assertFalse(True, "Not Implemented")

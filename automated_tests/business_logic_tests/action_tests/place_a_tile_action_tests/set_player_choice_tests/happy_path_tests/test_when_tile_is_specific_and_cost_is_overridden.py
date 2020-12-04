@@ -8,6 +8,7 @@ from automated_tests.mocks.mock_card import MockCard
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
@@ -66,7 +67,7 @@ class test_when_tile_is_specific_and_cost_is_overridden(Given_A_PlaceATileAction
         player.get_player_choice_location_to_build_returns(
             lambda _, __, ___: ResultLookup(
                 True,
-                (location_to_place_tile, None)
+                TileUnknownPlacementLookup(location_to_place_tile, None)
             ))
         player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
 

@@ -8,6 +8,7 @@ from automated_tests.mocks.mock_card import MockCard
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
@@ -34,7 +35,8 @@ class test_when_tile_is_specific_and_cost_is_default(Given_A_PlaceATileAction):
         )
 
         self._expected_resources: Dict[ResourceTypeEnum, int] = {
-            ResourceTypeEnum.wood: 1,
+            ResourceTypeEnum.wood: 0,
+            ResourceTypeEnum.stone: 0,
             ResourceTypeEnum.ruby: 1,
         }
 
@@ -56,14 +58,20 @@ class test_when_tile_is_specific_and_cost_is_default(Given_A_PlaceATileAction):
         dwarves: List[Dwarf] = [active_dwarf_1, self._dwarf_to_use, active_dwarf_2]
 
         starting_resources: Dict[ResourceTypeEnum, int] = {
-            ResourceTypeEnum.wood: 2,
+            ResourceTypeEnum.wood: 4,
+            ResourceTypeEnum.stone: 3,
             ResourceTypeEnum.ruby: 1,
         }
 
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
         self._location_to_place_tile: int = 28
-        player.get_player_choice_location_to_build_returns(lambda _, __, ___: ResultLookup(True, (self._location_to_place_tile, None)))
+        player.get_player_choice_location_to_build_returns(
+            lambda _, __, ___: ResultLookup(
+                True,
+                TileUnknownPlacementLookup(self._location_to_place_tile, None)))
+
         player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
+
         return player
 
     def test_then_result_should_not_be_none(self) -> None:
@@ -102,7 +110,11 @@ class test_when_tile_is_specific_and_cost_is_default(Given_A_PlaceATileAction):
     def test_then_player_should_have_expected_amount_of_resources(self) -> None:
         for resource in self._expected_resources:
             with self.subTest(resource=resource):
-                self.assertEqual(self._player.resources[resource], self._expected_resources[resource])
+                expected_amount: int = self._expected_resources[resource]
+                if expected_amount == 0:
+                    self.assertNotIn(resource, self._player.resources)
+                else:
+                    self.assertEqual(self._player.resources[resource], expected_amount)
 
     def test_then_tile_service_should_report_tile_is_not_available(self) -> None:
         self.assertFalse(True)

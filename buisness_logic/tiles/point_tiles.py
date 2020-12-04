@@ -1,13 +1,14 @@
 from abc import ABCMeta, abstractmethod
-from typing import Dict, List, Tuple, Callable
+from typing import Dict, List, Callable
 import math
 
 from common.entities.point_lookup import PointLookup
+from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.services.tile_service import TileService
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseSpecificTile
 from core.constants import resource_types, tile_ids
-from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum, TileDirectionEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 from buisness_logic.effects import *
 
@@ -82,11 +83,11 @@ class StateParlorTile(BaseConditionalPointTile):
         if player is None:
             raise ValueError(str(player))
 
-        adjacent_tile_locations: List[Tuple[int, TileDirectionEnum]] = self._tile_service.get_adjacent_tiles(
+        adjacent_tile_locations: List[TileTwinPlacementLookup] = self._tile_service.get_adjacent_tiles(
             player,
             self.location)
 
-        extraction_method: Callable[[Tuple[int, TileDirectionEnum]], int] = lambda location_direction_pair: location_direction_pair[0]
+        extraction_method: Callable[[TileTwinPlacementLookup], int] = lambda location_direction_pair: location_direction_pair[0]
         adjacent_tiles = [
             player.get_specific_tile_at_location(t)
             for t

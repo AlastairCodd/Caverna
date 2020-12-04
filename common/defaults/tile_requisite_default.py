@@ -27,6 +27,7 @@ class TileRequisiteDefault(object):
                 TileTypeEnum.pastureTwin: [TileTypeEnum.field],
                 TileTypeEnum.furnishedCavern: [TileTypeEnum.cavern],
                 TileTypeEnum.furnishedDwelling: [TileTypeEnum.cavern],
+                TileTypeEnum.oreMine: [TileTypeEnum.tunnel],
                 TileTypeEnum.oreMineDeepTunnelTwin: [TileTypeEnum.tunnel],
                 TileTypeEnum.rubyMine: [TileTypeEnum.tunnel, TileTypeEnum.deepTunnel]}
         )

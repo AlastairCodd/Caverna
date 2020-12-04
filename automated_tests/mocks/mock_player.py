@@ -1,9 +1,10 @@
-from typing import Union, List, Dict, Callable, Tuple, Optional
+from typing import Union, List, Dict, Callable, Optional
 
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.defaults.tile_container_default import TileContainerDefault
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
+from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
@@ -11,7 +12,7 @@ from common.entities.weapon import Weapon
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
-from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
+from core.enums.caverna_enums import ResourceTypeEnum
 
 
 class MockPlayer(BasePlayerService):
@@ -52,7 +53,7 @@ class MockPlayer(BasePlayerService):
             [BaseTile,
              TurnDescriptorLookup,
              Optional[BaseTile]],
-            ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]] \
+            ResultLookup[TileUnknownPlacementLookup]] \
             = lambda info_tile, info_turn_descriptor, info_secondary_tile: ResultLookup(errors="Not Implemented")
         self._tile_to_build_func: Callable[
             [List[BaseTile],
@@ -111,7 +112,7 @@ class MockPlayer(BasePlayerService):
                 [BaseTile,
                  TurnDescriptorLookup,
                  Optional[BaseTile]],
-                ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]]) -> None:
+                ResultLookup[TileUnknownPlacementLookup]]) -> None:
         self._location_to_build_func = func
 
     def get_player_choice_tile_to_build_returns(
@@ -186,7 +187,7 @@ class MockPlayer(BasePlayerService):
             self,
             tile: BaseTile,
             turn_descriptor: TurnDescriptorLookup,
-            secondary_tile: Optional[BaseTile] = None) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
+            secondary_tile: Optional[BaseTile] = None) -> ResultLookup[TileUnknownPlacementLookup]:
         return self._location_to_build_func(tile, turn_descriptor, secondary_tile)
 
     def get_player_choice_effects_to_use_for_cost_discount(

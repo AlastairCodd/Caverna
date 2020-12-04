@@ -10,6 +10,7 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect, Allo
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
@@ -113,18 +114,17 @@ class test_when_tile_is_twin_and_cost_is_overridden(Given_A_PlaceATileAction):
         direction_to_place_secondary_tile: Optional[TileDirectionEnum] = None
 
         cavern_for_building: BaseTile = player.tiles[location_to_place_primary_tile].tile
-        player.get_player_choice_location_to_build_returns(lambda _, __, ___: ResultLookup(
-            True,
-            (
-                location_to_place_primary_tile,
-                direction_to_place_secondary_tile
-            )))
+        player.get_player_choice_location_to_build_returns(
+            lambda _, __, ___: ResultLookup(
+                True,
+                TileUnknownPlacementLookup(location_to_place_primary_tile, direction_to_place_secondary_tile)
+            ))
+
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: effects_to_use)
 
         self._expected_tiles: Dict[int, Optional[BaseTile]] = {
             location_to_place_primary_tile: cavern_for_building
         }
-
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: effects_to_use)
         return player
 
     def test_then_result_should_not_be_none(self) -> None:

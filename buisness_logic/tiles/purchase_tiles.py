@@ -2,7 +2,6 @@ from buisness_logic.effects import purchase_effects, resource_effects
 from core.constants import tile_ids
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.baseClasses.base_tile import BaseSpecificTile
-from common.entities import weapon
 
 
 class CarpenterTile(BaseSpecificTile):

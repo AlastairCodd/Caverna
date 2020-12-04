@@ -1,17 +1,18 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Dict, Union, Tuple, Optional
+from typing import List, Dict, Union, Optional
 
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.entities.weapon import Weapon
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
 from core.baseClasses.base_tile_container_default import BaseTileContainerDefault
-from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
+from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
@@ -140,13 +141,12 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         :returns: The expedition rewards the player has chosen to claim. This will never be null."""
         raise NotImplementedError()
 
-    # TODO: Maybe change the signature of this?
     @abstractmethod
     def get_player_choice_location_to_build(
             self,
             tile: BaseTile,
             turn_descriptor: TurnDescriptorLookup,
-            secondary_tile: Optional[BaseTile] = None) -> ResultLookup[Tuple[int, Optional[TileDirectionEnum]]]:
+            secondary_tile: Optional[BaseTile] = None) -> ResultLookup[TileUnknownPlacementLookup]:
         """Gets user choice for location to place the given tile.
 
         :param tile: The tile to be placed. This cannot be null.

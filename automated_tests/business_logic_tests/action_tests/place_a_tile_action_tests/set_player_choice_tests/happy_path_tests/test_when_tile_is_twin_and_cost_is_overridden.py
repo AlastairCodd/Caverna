@@ -11,6 +11,7 @@ from buisness_logic.tiles.mine_tiles import TunnelTile, DeepTunnelTile, OreMineT
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
@@ -20,6 +21,8 @@ from core.services.base_player_service import BasePlayerService
 
 class test_when_tile_is_twin_and_cost_is_overridden(Given_A_PlaceATileAction):
     def because(self) -> None:
+        self.maxDiff = None
+
         self.initialise_sut_with_twin_tile(
             override_cost={
                 ResourceTypeEnum.wood: 4,
@@ -42,8 +45,9 @@ class test_when_tile_is_twin_and_cost_is_overridden(Given_A_PlaceATileAction):
         )
 
         self._expected_resources: Dict[ResourceTypeEnum, int] = {
-            ResourceTypeEnum.wood: 2,
-            ResourceTypeEnum.ruby: 1,
+            ResourceTypeEnum.wood: 0,
+            ResourceTypeEnum.stone: 0,
+            ResourceTypeEnum.ruby: 2,
         }
 
         self._action_invoked_result: ResultLookup[int] = self.SUT.invoke(
@@ -118,14 +122,16 @@ class test_when_tile_is_twin_and_cost_is_overridden(Given_A_PlaceATileAction):
         primary_tunnel_for_building: BaseTile = TunnelTile()
         secondary_tunnel_for_building: BaseTile = TunnelTile()
 
+        player.tiles[1].set_tile(allow_substitution_tile)
+        player.tiles[2].set_tile(decrease_price_tile)
+
         player.tiles[location_to_place_primary_tile].set_tile(primary_tunnel_for_building)
         player.tiles[location_to_place_secondary_tile].set_tile(secondary_tunnel_for_building)
-        player.get_player_choice_location_to_build_returns(lambda _, __, ___: ResultLookup(
-            True,
-            (
-                location_to_place_primary_tile,
-                direction_to_place_secondary_tile
-            )))
+        player.get_player_choice_location_to_build_returns(
+            lambda _, __, ___: ResultLookup(
+                True,
+                TileUnknownPlacementLookup(location_to_place_primary_tile,direction_to_place_secondary_tile)
+            ))
 
         self._expected_tiles: Dict[int, type] = {
             location_to_place_primary_tile: OreMineTile,
@@ -160,7 +166,7 @@ class test_when_tile_is_twin_and_cost_is_overridden(Given_A_PlaceATileAction):
         self.assertIsNotNone(self._action_invoked_result.value)
 
     def test_then_invoked_result_value_should_be_expected(self) -> None:
-        self.assertEqual(self._action_invoked_result.value, 1)
+        self.assertEqual(self._action_invoked_result.value, 2)
 
     def test_then_invoked_result_errors_should_be_empty(self) -> None:
         self.assertListEqual([], cast(List, self._action_invoked_result.errors))
@@ -174,7 +180,11 @@ class test_when_tile_is_twin_and_cost_is_overridden(Given_A_PlaceATileAction):
     def test_then_player_should_have_expected_amount_of_resources(self) -> None:
         for resource in self._expected_resources:
             with self.subTest(resource=resource):
-                self.assertEqual(self._player.resources[resource], self._expected_resources[resource])
+                expected_amount: int = self._expected_resources[resource]
+                if expected_amount == 0:
+                    self.assertNotIn(resource, self._player.resources)
+                else:
+                    self.assertEqual(self._player.resources[resource], expected_amount)
 
     def test_then_tile_service_should_report_tile_is_not_available(self) -> None:
         self.assertFalse(True)
