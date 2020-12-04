@@ -1,8 +1,12 @@
+from typing import List
+
+from buisness_logic.effects.purchase_effects import DecreasePriceOfWeapon
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_card import BaseCard
+from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
@@ -17,11 +21,11 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
             dwarf: Dwarf,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         # TODO: Implement this
-        player.get_effects_of_type()
+        effects: List[BaseEffect] = player.get_effects_of_type(DecreasePriceOfWeapon)
         max_attainable_level = player.get_resources_of_type(ResourceTypeEnum.ore)
         chosen_weapon_level = player.get_player_choice_weapon_level()
 
-        raise NotImplementedError()
+        return ResultLookup(errors="Not Implemented")
 
     def invoke(
             self,
@@ -41,7 +45,7 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
         if player is None:
             raise ValueError("Player may not be none/")
 
-        raise NotImplementedError()
+        return ResultLookup(errors="Not Implemented")
 
     def new_turn_reset(self):
         pass
