@@ -76,7 +76,6 @@ class TileContainer(object):
     def effects(self) -> List[BaseEffect]:
         """Get a list of all the effects held by any tile in this container"""
         effects = [effect for tile in self._tiles.values() for effect in tile.effects]
-
         return effects
 
     def get_effects_of_type(
@@ -85,5 +84,5 @@ class TileContainer(object):
         """Get a list of all of the effects which extend a certain base effect in this container"""
         if effect_type is None:
             raise ValueError("Effect Type may not be none")
-        result = [x for x in self.effects if isinstance(x, effect_type)]
+        result = [effect for tile in self._tiles.values() if tile.has_effects for effect in tile.effects if isinstance(effect, effect_type)]
         return result
