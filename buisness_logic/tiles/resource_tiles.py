@@ -56,3 +56,23 @@ class RubySupplierTile(BaseSpecificTile):
             base_points=2,
             cost={ResourceTypeEnum.stone: 2, ResourceTypeEnum.wood: 2},
             effects=[resource_effects.ReceiveForTurnsEffect({ResourceTypeEnum.ruby: 1}, 4)])
+
+
+class DogSchoolTile(BaseSpecificTile):
+    def __init__(self):
+        BaseSpecificTile.__init__(
+            self, "Dog School", tile_ids.DogSchoolTileId,
+            effects=[resource_effects.ReceiveWhenReceivingEffect(
+                {ResourceTypeEnum.wood: 1},
+                {ResourceTypeEnum.dog: 1})])
+
+
+class SeamTile(BaseSpecificTile):
+    def __init__(self):
+        BaseSpecificTile.__init__(
+            self, "Seam", tile_ids.SeamTileId,
+            base_points=1,
+            cost={ResourceTypeEnum.stone: 2},
+            effects=[resource_effects.ReceiveWhenReceivingEffect(
+                {ResourceTypeEnum.ore: 1},
+                {ResourceTypeEnum.stone: 1})])

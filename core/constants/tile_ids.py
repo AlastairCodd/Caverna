@@ -24,9 +24,9 @@ StoneSupplierTileId: int = 19
 RubySupplierTileId: int = 20
 
 # TODO: Implement missing types
-#DogSchoolTileId: int = 21
+DogSchoolTileId: int = 21
 #QuarryTileId: int = 22
-#SeamTileId: int = 23
+SeamTileId: int = 23
 SlaughteringCaveTileId: int = 24
 CookingCaveTileId: int = 25
 #WorkingCaveTileId: int = 26

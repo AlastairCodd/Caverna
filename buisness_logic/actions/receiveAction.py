@@ -1,18 +1,18 @@
 from typing import Dict
 
+from buisness_logic.actions.base_receive_action import BaseReceiveAction
 from common.entities.dwarf import Dwarf
 from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
-from core.baseClasses.base_action import BaseAction
 
 
-class ReceiveAction(BaseAction):
+class ReceiveAction(BaseReceiveAction):
     def __init__(self, receive_items: Dict[ResourceTypeEnum, int]):
         if receive_items is None:
-            raise ValueError("receiveItems")
-        self._receiveItems: Dict[ResourceTypeEnum, int] = receive_items
+            raise ValueError("Receive items cannot be none")
+        self._receive_items: Dict[ResourceTypeEnum, int] = receive_items
 
     def invoke(
             self,
@@ -28,13 +28,9 @@ class ReceiveAction(BaseAction):
             This will never be null.
         """
         if player is None:
-            raise ValueError("player")
+            raise ValueError("Player cannot be none")
 
-        result: ResultLookup[int]
-        if player.give_resources(self._receiveItems):
-            result = ResultLookup(True, sum(self._receiveItems.values()))
-        else:
-            result = ResultLookup(False, 0)
+        result: ResultLookup[int] = self._give_player_resources(player, self._receive_items)
         return result
 
     def new_turn_reset(self):
@@ -43,10 +39,10 @@ class ReceiveAction(BaseAction):
     def __str__(self) -> str:
         result = "ReceiveAction("
         count = 0
-        for resource in self._receiveItems:
-            result += f"{resource.name}: {self._receiveItems[resource]}"
+        for resource in self._receive_items:
+            result += f"{resource.name}: {self._receive_items[resource]}"
             count += 1
-            if count != len(self._receiveItems):
+            if count != len(self._receive_items):
                 result += ", "
         result += ")"
 

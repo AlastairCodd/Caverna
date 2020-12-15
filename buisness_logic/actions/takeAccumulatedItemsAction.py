@@ -1,14 +1,14 @@
 from __future__ import annotations
 
+from buisness_logic.actions.base_receive_action import BaseReceiveAction
 from common.entities.dwarf import Dwarf
 from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
-from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.containers.resource_container import ResourceContainer
 
 
-class TakeAccumulatedItemsAction(BaseAction):
+class TakeAccumulatedItemsAction(BaseReceiveAction):
     def invoke(
             self,
             player: BasePlayerRepository,
@@ -29,11 +29,9 @@ class TakeAccumulatedItemsAction(BaseAction):
         if not isinstance(active_card, ResourceContainer):
             raise ValueError("Active Card must be a resource container")
 
-        amount: int = sum(active_card.resources.values())
-        success: bool = player.give_resources(active_card.resources)
+        result: ResultLookup[int] = self._give_player_resources(player, active_card.resources)
         active_card.clear_resources()
 
-        result: ResultLookup[int] = ResultLookup(success, amount)
         return result
 
     def new_turn_reset(self):

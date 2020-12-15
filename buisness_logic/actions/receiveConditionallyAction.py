@@ -1,22 +1,26 @@
 from typing import Dict, Callable, List
 
+from buisness_logic.actions.base_receive_action import BaseReceiveAction
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
-from buisness_logic.actions.receiveAction import ReceiveAction
 
 
-class ReceiveConditionallyAction(ReceiveAction):
+class ReceiveConditionallyAction(BaseReceiveAction):
     def __init__(
             self,
             condition: Callable[[BasePlayerRepository], int],
             receive_items: Dict[ResourceTypeEnum, int]) -> None:
         if condition is None:
-            raise ValueError("condition")
+            raise ValueError("Condition cannot be null")
+        if receive_items is None:
+            raise ValueError("Receive Items cannot be none")
+
         self._condition: Callable[[BasePlayerRepository], int] = condition
-        ReceiveAction.__init__(self, receive_items)
+        self._receive_items: Dict[ResourceTypeEnum, int] = receive_items
+        BaseReceiveAction.__init__(self)
 
     def invoke(
             self,
@@ -35,16 +39,24 @@ class ReceiveConditionallyAction(ReceiveAction):
             raise ValueError("player")
 
         number_of_times_to_give: int = self._condition(player)
-        success: bool = True
-        count: int = 0
-        errors: List[str] = []
 
-        for _ in range(number_of_times_to_give):
-            received_result: ResultLookup[int] = super().invoke(player, active_card, current_dwarf)
-            success &= received_result.flag
-            count += received_result.value
-            for error in received_result.errors:
-                errors.append(error)
+        resources_to_give: Dict[ResourceTypeEnum, int] = {r: self._receive_items[r] * number_of_times_to_give for r in self._receive_items}
 
-        result: ResultLookup[int] = ResultLookup(success, count, errors)
+        result: ResultLookup[int] = self._give_player_resources(player, resources_to_give)
         return result
+
+    def new_turn_reset(self) -> None:
+        pass
+
+    def __str__(self) -> str:
+        result = "ReceiveAction("
+        count = 0
+        for resource in self._receive_items:
+            result += f"{resource.name}: {self._receive_items[resource]}"
+            count += 1
+            if count != len(self._receive_items):
+                result += ", "
+        result += ")"
+
+        return result
+
