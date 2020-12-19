@@ -101,12 +101,14 @@ class TileService(object):
             self,
             player: TileContainer,
             tile: BaseTile,
-            location: int) -> bool:
+            location: int,
+            requisites_override: Optional[List[TileTypeEnum]] = None) -> bool:
         """Gets whether or not a the given tile may be placed at the given location (and in the given direction) on the given player's board.
 
         :param player: The board where the tile will be placed. This may not be null.
         :param tile: The tile to be placed. This may not be null.
         :param location: The location to query whether the tile can be placed on. This must be positive, and less than the max size of the player's board.
+        :param requisites_override: The requisites that the tile must be placed on. If this is null, the default will be used.
         :returns: True if the tile may be placed at this location, false if not."""
         if player is None:
             raise ValueError("Player may not be None")
@@ -120,7 +122,10 @@ class TileService(object):
             raise ValueError(f"Tile {target_tile_type} is a twin tile.")
 
         result: bool
-        if target_tile_type in self._tile_requisites:
+        if requisites_override is not None:
+            tile_type_at_target_location: TileEntity = player.get_tile_at_location(location)
+            result = tile_type_at_target_location.tile_type in requisites_override
+        elif target_tile_type in self._tile_requisites:
             requisites_for_tile_type: List[TileTypeEnum] = self._tile_requisites[target_tile_type]
             tile_type_at_target_location: TileEntity = player.get_tile_at_location(location)
             result = tile_type_at_target_location.tile_type in requisites_for_tile_type
@@ -207,11 +212,13 @@ class TileService(object):
     def get_available_locations_for_single(
             self,
             player: TileContainer,
-            tile_type: TileTypeEnum) -> List[int]:
+            tile_type: TileTypeEnum,
+            requisites_override: Optional[List[TileTypeEnum]] = None) -> List[int]:
         """Get all locations available for a tile with the given type
 
         :param player: The player where the tile will be placed. This may not be null.
         :param tile_type: The type of the tile to be placed.
+        :param requisites_override: The requisites that the tile must be placed on. If this is null, the default will be used.
         :returns: A list of locations. This will never be null.
         """
         if player is None:
@@ -219,8 +226,12 @@ class TileService(object):
         if self.is_tile_a_twin_tile(tile_type):
             raise ValueError("Tile is twin tile -- cannot be placed as single")
 
-        all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
-        tile_requisites: List[TileTypeEnum] = all_tile_requisites[tile_type]
+        tile_requisites: List[TileTypeEnum]
+        if requisites_override is not None:
+            tile_requisites = requisites_override
+        else:
+            all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
+            tile_requisites = all_tile_requisites[tile_type]
         valid_positions: List[int] = [location for location in player.tiles if player.tiles[location].tile_type in tile_requisites]
 
         return valid_positions
@@ -290,13 +301,15 @@ class TileService(object):
             self,
             player: TileContainer,
             tile: BaseTile,
-            location: int) -> ResultLookup[bool]:
+            location: int,
+            requisites_override: Optional[List[TileTypeEnum]] = None) -> ResultLookup[bool]:
         """Place a tile in this container
 
-            :param player: The player who's board the tile will be placed on. This cannot be null.
-            :param tile: The tile to be placed. This cannot be null.
-            :param location: The location the tile should be placed. This cannot be null.
-            :returns: A result lookup indicating if the tile was successfully placed. This will never be null.
+        :param player: The player who's board the tile will be placed on. This cannot be null.
+        :param tile: The tile to be placed. This cannot be null.
+        :param location: The location the tile should be placed. This cannot be null.
+        :param requisites_override: The requisites that the tile must be placed on. If this is null, the default will be used.
+        :returns: A result lookup indicating if the tile was successfully placed. This will never be null.
         """
         if player is None:
             raise ValueError("Player may not be null.")
@@ -305,7 +318,7 @@ class TileService(object):
         if location < 0 or location > player.tile_count:
             raise ValueError("location must point to a valid position")
 
-        available_locations: List[int] = self.get_available_locations_for_single(player, tile.tile_type)
+        available_locations: List[int] = self.get_available_locations_for_single(player, tile.tile_type, requisites_override)
 
         success: bool = False
         errors: List[str] = []

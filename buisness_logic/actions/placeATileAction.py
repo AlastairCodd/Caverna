@@ -21,7 +21,8 @@ class PlaceATileAction(BasePlayerChoiceAction):
             self,
             tile_type: TileTypeEnum,
             specific_tile_generation_method: Optional[Callable[[], BaseTile]] = None,
-            override_cost: Optional[Dict[ResourceTypeEnum, int]] = None):
+            override_cost: Optional[Dict[ResourceTypeEnum, int]] = None,
+            override_requisite: Optional[List[TileTypeEnum]] = None):
         self._tile_service: TileService = TileService()
 
         self._tile_type: TileTypeEnum = tile_type
@@ -37,10 +38,15 @@ class PlaceATileAction(BasePlayerChoiceAction):
             if specific_tile_generation_method is not None:
                 raise ValueError("Specific tile is not valid for twin tiles.")
             self._specific_tile_generation_method = None
+
+            if override_requisite is not None:
+                raise ValueError("Cannot override requisites for twin tiles.")
         else:
             if specific_tile_generation_method is None and override_cost is not None:
                 raise ValueError("Cannot override cost of unknown specific tile.")
             self._specific_tile_generation_method = specific_tile_generation_method
+
+            self._tile_requisites_override: Optional[List[TileTypeEnum]] = override_requisite
         self._tile_cost_override: Optional[Dict[ResourceTypeEnum, int]] = override_cost
 
         self._tile_location: int = -1
@@ -282,7 +288,8 @@ class PlaceATileAction(BasePlayerChoiceAction):
         can_place_tile_at_chosen_location: bool = self._tile_service.can_place_tile_at_location(
             player,
             specific_tile,
-            self._tile_location)
+            self._tile_location,
+            self._tile_requisites_override)
 
         if not is_tile_available:
             errors.append(f"Tile ({specific_tile.name}) has already been built")
@@ -308,7 +315,8 @@ class PlaceATileAction(BasePlayerChoiceAction):
             was_tile_placed_successfully_result: ResultLookup[bool] = self._tile_service.place_single_tile(
                 player,
                 specific_tile,
-                self._tile_location)
+                self._tile_location,
+                self._tile_requisites_override)
 
             success = was_tile_placed_successfully_result.flag
             errors.extend(was_tile_placed_successfully_result.errors)
