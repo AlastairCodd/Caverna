@@ -49,6 +49,12 @@ class MockPlayer(BasePlayerService):
              TurnDescriptorLookup],
             ResultLookup[BaseCard]] \
             = lambda info_available_cards, info_turn_descriptor: ResultLookup(errors="Not Implemented")
+        self._expedition_rewards_func: Callable[
+            [List[BaseAction],
+             int,
+             TurnDescriptorLookup],
+            ResultLookup[List[BaseAction]]] \
+            = lambda info_available_actions, info_expedition_level, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._location_to_build_func: Callable[
             [BaseTile,
              TurnDescriptorLookup,
@@ -105,6 +111,15 @@ class MockPlayer(BasePlayerService):
                  TurnDescriptorLookup],
                 ResultLookup[BaseCard]]) -> None:
         self._card_choice_to_use_func = func
+
+    def get_player_choice_expedition_rewards_returns(
+            self,
+            func: Callable[
+                [List[BaseAction],
+                 int,
+                 TurnDescriptorLookup],
+                ResultLookup[List[BaseAction]]]) -> None:
+        self._expedition_rewards_func = func
 
     def get_player_choice_location_to_build_returns(
             self,
@@ -175,7 +190,7 @@ class MockPlayer(BasePlayerService):
             possible_expedition_rewards: List[BaseAction],
             expedition_level: int,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
-        pass
+        return self._expedition_rewards_func(possible_expedition_rewards, expedition_level, turn_descriptor)
 
     def get_player_choice_tile_to_build(
             self,

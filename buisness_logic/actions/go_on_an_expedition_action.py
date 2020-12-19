@@ -3,7 +3,7 @@ from typing import List, Iterable, Dict
 from buisness_logic.actions.breed_animals_action import BreedAnimalsAction
 from buisness_logic.actions.placeATileAction import PlaceATileAction
 from buisness_logic.actions.place_a_stable_action import PlaceAStableAction
-from buisness_logic.actions.receiveAction import ReceiveAction
+from buisness_logic.actions.receive_action import ReceiveAction
 from buisness_logic.actions.sowAction import SowAction
 from buisness_logic.actions.upgrade_all_weapons_action import UpgradeAllWeaponsAction
 from buisness_logic.actions.upgrade_dwarf_weapon_action import UpgradeDwarfWeaponAction
