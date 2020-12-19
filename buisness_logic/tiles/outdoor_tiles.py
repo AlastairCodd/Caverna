@@ -1,4 +1,5 @@
-from buisness_logic.effects import animal_storage_effects
+from buisness_logic.effects.animal_storage_effects import StoreAnyAnimalEffect
+from buisness_logic.effects.allow_farming_effect import AllowFarmingEffect
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum
 
@@ -7,7 +8,8 @@ class FieldTile(BaseTile):
     def __init__(self):
         BaseTile.__init__(
             self, "Field", 100,
-            TileTypeEnum.field)
+            TileTypeEnum.field,
+            effects=[AllowFarmingEffect()])
 
 
 class MeadowTile(BaseTile):
@@ -24,7 +26,7 @@ class PastureTile(BaseTile):
             TileTypeEnum.pasture,
             base_points=2,
             cost={ResourceTypeEnum.wood: 2},
-            effects=[animal_storage_effects.StoreAny(2)])
+            effects=[StoreAnyAnimalEffect(2)])
 
 
 class PastureTwinTile(BaseTile):
@@ -34,4 +36,4 @@ class PastureTwinTile(BaseTile):
             TileTypeEnum.pastureTwin,
             base_points=4,
             cost={ResourceTypeEnum.wood: 4},
-            effects=[animal_storage_effects.StoreAny(4)])
+            effects=[StoreAnyAnimalEffect(4)])

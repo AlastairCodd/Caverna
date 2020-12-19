@@ -7,6 +7,8 @@ __all__ = [
     "drift_mining_2_card",
     "drift_mining_card",
     "excavation_card",
+    "exploration_card",
+    "family_life_card",
     "fence_building_card",
     "forest_exploration_card",
     "growth_card",
@@ -18,9 +20,13 @@ __all__ = [
     "ore_mining_card",
     "ore_mine_construction_card",
     "ore_trading_card",
+    "ruby_delivery_card",
+    "ruby_mine_construction_card",
     "ruby_mining_card",
     "sheep_farming_card",
+    "slash_and_burn_card",
     "starting_player_card",
     "supplies_card",
     "sustenance_card",
-    "weekly_market_card"]
+    "weekly_market_card",
+    "wish_for_children_card"]
