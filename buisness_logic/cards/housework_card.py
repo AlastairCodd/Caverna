@@ -11,5 +11,5 @@ class HouseworkCard(BaseCard):
             self, "Housework", 8, -1,
             Conditional(
                 ActionCombinationEnum.AndOr,
-                receiveAction.ReceiveAction({ResourceTypeEnum.dog: 1}),
+                receive_action.ReceiveAction({ResourceTypeEnum.dog: 1}),
                 placeATileAction.PlaceATileAction(TileTypeEnum.furnishedCavern)))

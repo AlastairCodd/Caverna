@@ -36,7 +36,7 @@ class BasePlayerRepository(TileContainer, ResourceContainer, metaclass=ABCMeta):
     def set_turn_index(self, turn_index: int):
         self._turnIndex = turn_index
 
-    def give_baby_dwarf(self):
+    def give_baby_dwarf(self) -> None:
         baby_dwarf: Dwarf = Dwarf()
 
         self._dwarves.append(baby_dwarf)

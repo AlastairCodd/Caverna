@@ -4,9 +4,9 @@ from automated_tests.common_tests.service_tests.exhaustive_action_ordering_servi
     Given_An_ExhaustiveActionOrderingService
 from automated_tests.mocks.mock_card import MockCard
 from automated_tests.mocks.mock_player import MockPlayer
-from buisness_logic.actions.giveDwarfAWeaponAction import GiveDwarfAWeaponAction
-from buisness_logic.actions.goOnAnExpeditionAction import GoOnAnExpeditionAction
-from buisness_logic.actions.takeAccumulatedItemsAction import TakeAccumulatedItemsAction
+from buisness_logic.actions.give_dwarf_a_weapon_action import GiveDwarfAWeaponAction
+from buisness_logic.actions.go_on_an_expedition_action import GoOnAnExpeditionAction
+from buisness_logic.actions.take_accumulated_items_action import TakeAccumulatedItemsAction
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.multiconditional import Conditional

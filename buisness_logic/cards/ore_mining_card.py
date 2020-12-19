@@ -16,8 +16,8 @@ class OreMiningCard(BaseCard, ResourceContainer):
             self, "Ore Mining", 14,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
-                receiveConditionallyAction.ReceiveConditionallyAction(
+                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                receive_conditionally_action.ReceiveConditionallyAction(
                     self._condition,
                     {ResourceTypeEnum.ore: 1})))
         ResourceContainer.__init__(self)

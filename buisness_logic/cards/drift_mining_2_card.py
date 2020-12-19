@@ -13,7 +13,7 @@ class DriftMining2Card(BaseCard, ResourceContainer):
             self, "Drift Mining 2", 3,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 placeATileAction.PlaceATileAction(TileTypeEnum.cavernTunnelTwin)))
         ResourceContainer.__init__(self)
 

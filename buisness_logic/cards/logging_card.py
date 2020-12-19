@@ -14,8 +14,8 @@ class LoggingCard(BaseCard, ResourceContainer):
             self, "Logging", 13,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
-                goOnAnExpeditionAction.GoOnAnExpeditionAction(1)))
+                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                go_on_an_expedition_action.GoOnAnExpeditionAction(1)))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         self.give_resource(ResourceTypeEnum.wood, 3)

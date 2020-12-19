@@ -57,7 +57,7 @@ class MixedDwelling(BaseDwelling):
         BaseDwelling.__init__(
             self, "Mixed Dwelling", tile_ids.MixedDwellingTileId, 4,
             {ResourceTypeEnum.wood: 5, ResourceTypeEnum.stone: 4},
-            [population_effects.IncreasePopulationCapacityEffect(1), animal_storage_effects.StoreAny(2)])
+            [population_effects.IncreasePopulationCapacityEffect(1), animal_storage_effects.StoreAnyAnimalEffect(2)])
 
 
 class CoupleDwelling(BaseDwelling):
@@ -82,4 +82,4 @@ class EntryLevelDwelling(BaseDwelling):
         BaseDwelling.__init__(
             self, "Entry Level Dwelling", tile_ids.EntryLevelDwellingTileId, 0, {},
             [population_effects.IncreasePopulationCapacityEffect(2),
-             animal_storage_effects.StoreAny(2)])
+             animal_storage_effects.StoreAnyAnimalEffect(2)])

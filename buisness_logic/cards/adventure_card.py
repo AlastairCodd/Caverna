@@ -11,8 +11,8 @@ class AdventureCard(BaseCard):
             self, "Adventure", 31, 4,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                giveDwarfAWeaponAction.GiveDwarfAWeaponAction(),
+                give_dwarf_a_weapon_action.GiveDwarfAWeaponAction(),
                 Conditional(
                     ActionCombinationEnum.AndThen,
-                    goOnAnExpeditionAction.GoOnAnExpeditionAction(1),
-                    goOnAnExpeditionAction.GoOnAnExpeditionAction(1))))
+                    go_on_an_expedition_action.GoOnAnExpeditionAction(1),
+                    go_on_an_expedition_action.GoOnAnExpeditionAction(1))))

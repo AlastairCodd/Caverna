@@ -10,7 +10,7 @@ class DepotCard(BaseCard, ResourceContainer):
     def __init__(self):
         BaseCard.__init__(
             self, "Depot", 1,
-            actions=takeAccumulatedItemsAction.TakeAccumulatedItemsAction())
+            actions=take_accumulated_items_action.TakeAccumulatedItemsAction())
         ResourceContainer.__init__(self)
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

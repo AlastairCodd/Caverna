@@ -11,5 +11,5 @@ class BlacksmithCard(BaseCard):
             self, "Blacksmith", 21, 1,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                giveDwarfAWeaponAction.GiveDwarfAWeaponAction(),
-                goOnAnExpeditionAction.GoOnAnExpeditionAction(3)))
+                give_dwarf_a_weapon_action.GiveDwarfAWeaponAction(),
+                go_on_an_expedition_action.GoOnAnExpeditionAction(3)))

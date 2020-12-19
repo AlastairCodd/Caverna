@@ -1,6 +1,6 @@
 from typing import Dict
 
-from buisness_logic.actions import takeAccumulatedItemsAction, placeATileAction
+from buisness_logic.actions import take_accumulated_items_action, placeATileAction
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_card import BaseCard
 from core.containers.resource_container import ResourceContainer
@@ -14,7 +14,7 @@ class SustenanceCard(BaseCard, ResourceContainer):
             self, "Sustenance", 19,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 placeATileAction.PlaceATileAction(TileTypeEnum.meadowFieldTwin)))
         ResourceContainer.__init__(self)
 

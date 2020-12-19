@@ -113,7 +113,7 @@ class BaseWeaponPurchaseEffect(BaseEffect, metaclass=ABCMeta):
         pass
 
 
-class DecreasePriceOfWeapon(BaseWeaponPurchaseEffect):
+class DecreasePriceOfWeaponEffect(BaseWeaponPurchaseEffect):
     def __init__(
             self,
             decrease_by: Dict[ResourceTypeEnum, int]) -> None:

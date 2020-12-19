@@ -11,8 +11,8 @@ class HardwareRentalCard(BaseCard):
             self, "Hardware Rental", 9, -1,
             Conditional(
                 ActionCombinationEnum.AndThenOr,
-                receiveAction.ReceiveAction({ResourceTypeEnum.wood: 2}),
+                receive_action.ReceiveAction({ResourceTypeEnum.wood: 2}),
                 Conditional(
                     ActionCombinationEnum.AndThenOr,
-                    goOnAnExpeditionAction.GoOnAnExpeditionAction(2),
+                    go_on_an_expedition_action.GoOnAnExpeditionAction(2),
                     sowAction.SowAction())))

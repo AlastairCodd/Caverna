@@ -14,11 +14,11 @@ class StartingPlayerCard(BaseCard, ResourceContainer):
             self, "Starting Player", 17,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 Conditional(
                     ActionCombinationEnum.AndThen,
-                    becomeStartingPlayerAction.BecomeStartingPlayerAction(),
-                    receiveAction.ReceiveAction({ResourceTypeEnum.ruby: 1}))))
+                    become_starting_player_action.BecomeStartingPlayerAction(),
+                    receive_action.ReceiveAction({ResourceTypeEnum.ruby: 1}))))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         self.give_resource(ResourceTypeEnum.food, 1)

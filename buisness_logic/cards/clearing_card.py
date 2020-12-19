@@ -13,7 +13,7 @@ class ClearingCard(BaseCard, ResourceContainer):
             self, "Clearing", 0,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 placeATileAction.PlaceATileAction(TileTypeEnum.meadowFieldTwin)))
         ResourceContainer.__init__(self)
 

@@ -1,6 +1,6 @@
 from typing import Dict
 
-from buisness_logic.actions import placeATileAction, takeAccumulatedItemsAction
+from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_card import BaseCard
 from core.containers.resource_container import ResourceContainer
@@ -20,8 +20,8 @@ class DonkeyFarmingCard(BaseCard, ResourceContainer):
                         ActionCombinationEnum.AndOr,
                         placeATileAction.PlaceATileAction(TileTypeEnum.pasture),
                         placeATileAction.PlaceATileAction(TileTypeEnum.pastureTwin)),
-                    placeATileAction.PlaceAStableAction()),
-                takeAccumulatedItemsAction.TakeAccumulatedItemsAction()))
+                    place_a_stable_action.PlaceAStableAction()),
+                take_accumulated_items_action.TakeAccumulatedItemsAction()))
         ResourceContainer.__init__(self)
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

@@ -11,10 +11,10 @@ class GrowthCard(BaseCard):
             self, "Growth", 7,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                receiveAction.ReceiveAction({
+                receive_action.ReceiveAction({
                     ResourceTypeEnum.wood: 1,
                     ResourceTypeEnum.stone: 1,
                     ResourceTypeEnum.ore: 1,
                     ResourceTypeEnum.food: 1,
                     ResourceTypeEnum.coin: 2}),
-                getABabyDwarfAction.GetABabyDwarfAction()))
+                get_a_baby_dwarf_action.GetABabyDwarfAction()))

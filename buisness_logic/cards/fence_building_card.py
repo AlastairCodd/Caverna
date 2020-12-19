@@ -14,7 +14,7 @@ class FenceBuildingCard(BaseCard, ResourceContainer):
             self, "Fence Building", 5,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 Conditional(
                     ActionCombinationEnum.AndOr,
                     placeATileAction.PlaceATileAction(TileTypeEnum.pasture),

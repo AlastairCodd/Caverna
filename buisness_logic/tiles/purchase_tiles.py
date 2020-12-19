@@ -31,7 +31,7 @@ class BlacksmithTile(BaseSpecificTile):
             cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.stone: 2},
             effects=[
                 resource_effects.ReceiveOnPurchaseEffect({ResourceTypeEnum.ore: 2}),
-                purchase_effects.DecreasePriceOfWeapon({ResourceTypeEnum.ore: 2})])
+                purchase_effects.DecreasePriceOfWeaponEffect({ResourceTypeEnum.ore: 2})])
 
 
 class BuilderTile(BaseSpecificTile):

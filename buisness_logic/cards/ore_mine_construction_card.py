@@ -13,5 +13,5 @@ class OreMineConstructionCard(BaseCard):
                 Conditional(
                     ActionCombinationEnum.AndThen,
                     placeATileAction.PlaceATileAction(TileTypeEnum.oreMineDeepTunnelTwin),
-                    receiveAction.ReceiveAction({ResourceTypeEnum.ore: 3})),
-                goOnAnExpeditionAction.GoOnAnExpeditionAction(3)))
+                    receive_action.ReceiveAction({ResourceTypeEnum.ore: 3})),
+                go_on_an_expedition_action.GoOnAnExpeditionAction(3)))

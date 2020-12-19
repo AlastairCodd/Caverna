@@ -14,8 +14,8 @@ class ForestExplorationCard(BaseCard, ResourceContainer):
             self, "Forest Exploration", 6, -1,
             Conditional(
                 ActionCombinationEnum.AndThen,
-                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
-                receiveAction.ReceiveAction({ResourceTypeEnum.food: 2})))
+                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                receive_action.ReceiveAction({ResourceTypeEnum.food: 2})))
         ResourceContainer.__init__(self)
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

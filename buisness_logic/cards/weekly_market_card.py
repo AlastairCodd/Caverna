@@ -11,7 +11,7 @@ class WeeklyMarketCard(BaseCard):
             self, "Weekly Market", 20,
             actions=Conditional(
                 ActionCombinationEnum.AndOr,
-                receiveAction.ReceiveAction({ResourceTypeEnum.coin: 4}),
+                receive_action.ReceiveAction({ResourceTypeEnum.coin: 4}),
                 Conditional(  # 9
                     ActionCombinationEnum.AndOr,
                     Conditional(  # 8
@@ -22,26 +22,26 @@ class WeeklyMarketCard(BaseCard):
                                 ActionCombinationEnum.AndOr,
                                 Conditional(  # dog
                                     ActionCombinationEnum.AndThen,
-                                    payAction.PayAction({ResourceTypeEnum.coin: 2}),
-                                    receiveAction.ReceiveAction({ResourceTypeEnum.dog: 1})
+                                    pay_action.PayAction({ResourceTypeEnum.coin: 2}),
+                                    receive_action.ReceiveAction({ResourceTypeEnum.dog: 1})
                                 ),
                                 Conditional(  # sheep
                                     ActionCombinationEnum.AndThen,
-                                    payAction.PayAction({ResourceTypeEnum.coin: 1}),
-                                    receiveAction.ReceiveAction({ResourceTypeEnum.sheep: 1})
+                                    pay_action.PayAction({ResourceTypeEnum.coin: 1}),
+                                    receive_action.ReceiveAction({ResourceTypeEnum.sheep: 1})
                                 )
                             ),
                             Conditional(  # 2
                                 ActionCombinationEnum.AndOr,
                                 Conditional(  # donkey
                                     ActionCombinationEnum.AndThen,
-                                    payAction.PayAction({ResourceTypeEnum.coin: 1}),
-                                    receiveAction.ReceiveAction({ResourceTypeEnum.donkey: 1})
+                                    pay_action.PayAction({ResourceTypeEnum.coin: 1}),
+                                    receive_action.ReceiveAction({ResourceTypeEnum.donkey: 1})
                                 ),
                                 Conditional(  # boar
                                     ActionCombinationEnum.AndThen,
-                                    payAction.PayAction({ResourceTypeEnum.coin: 2}),
-                                    receiveAction.ReceiveAction({ResourceTypeEnum.boar: 1})
+                                    pay_action.PayAction({ResourceTypeEnum.coin: 2}),
+                                    receive_action.ReceiveAction({ResourceTypeEnum.boar: 1})
                                 )
                             )
                         ),
@@ -51,26 +51,26 @@ class WeeklyMarketCard(BaseCard):
                                 ActionCombinationEnum.AndOr,
                                 Conditional(  # cow
                                     ActionCombinationEnum.AndThen,
-                                    payAction.PayAction({ResourceTypeEnum.coin: 3}),
-                                    receiveAction.ReceiveAction({ResourceTypeEnum.cow: 1})
+                                    pay_action.PayAction({ResourceTypeEnum.coin: 3}),
+                                    receive_action.ReceiveAction({ResourceTypeEnum.cow: 1})
                                 ),
                                 Conditional(  # wood
                                     ActionCombinationEnum.AndThen,
-                                    payAction.PayAction({ResourceTypeEnum.coin: 1}),
-                                    receiveAction.ReceiveAction({ResourceTypeEnum.wood: 1})
+                                    pay_action.PayAction({ResourceTypeEnum.coin: 1}),
+                                    receive_action.ReceiveAction({ResourceTypeEnum.wood: 1})
                                 )
                             ),
                             Conditional(  # 4
                                 ActionCombinationEnum.AndOr,
                                 Conditional(  # stone
                                     ActionCombinationEnum.AndThen,
-                                    payAction.PayAction({ResourceTypeEnum.coin: 1}),
-                                    receiveAction.ReceiveAction({ResourceTypeEnum.stone: 1})
+                                    pay_action.PayAction({ResourceTypeEnum.coin: 1}),
+                                    receive_action.ReceiveAction({ResourceTypeEnum.stone: 1})
                                 ),
                                 Conditional(  # ore
                                     ActionCombinationEnum.AndThen,
-                                    payAction.PayAction({ResourceTypeEnum.coin: 2}),
-                                    receiveAction.ReceiveAction({ResourceTypeEnum.ore: 1})
+                                    pay_action.PayAction({ResourceTypeEnum.coin: 2}),
+                                    receive_action.ReceiveAction({ResourceTypeEnum.ore: 1})
                                 )
                             )
                         ),
@@ -79,13 +79,13 @@ class WeeklyMarketCard(BaseCard):
                         ActionCombinationEnum.AndOr,
                         Conditional(  # grain
                             ActionCombinationEnum.AndThen,
-                            payAction.PayAction({ResourceTypeEnum.coin: 1}),
-                            receiveAction.ReceiveAction({ResourceTypeEnum.grain: 1})
+                            pay_action.PayAction({ResourceTypeEnum.coin: 1}),
+                            receive_action.ReceiveAction({ResourceTypeEnum.grain: 1})
                         ),
                         Conditional(  # veg
                             ActionCombinationEnum.AndThen,
-                            payAction.PayAction({ResourceTypeEnum.coin: 2}),
-                            receiveAction.ReceiveAction({ResourceTypeEnum.veg: 1})
+                            pay_action.PayAction({ResourceTypeEnum.coin: 2}),
+                            receive_action.ReceiveAction({ResourceTypeEnum.veg: 1})
                         )
                     )
                 )))

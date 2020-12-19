@@ -21,7 +21,7 @@ class BaseAnimalStorageEffect(BaseEffect, metaclass=ABCMeta):
         raise NotImplementedError("base population effect class")
 
 
-class StoreAny(BaseAnimalStorageEffect):
+class StoreAnyAnimalEffect(BaseAnimalStorageEffect):
     """Add storage capacity for some number of any type of animal"""
 
     def __init__(
@@ -36,8 +36,8 @@ class StoreAny(BaseAnimalStorageEffect):
         return result
 
 
-class StoreSpecific(BaseAnimalStorageEffect):
-    def  __init__(
+class StoreSpecificAnimalEffect(BaseAnimalStorageEffect):
+    def __init__(
             self,
             animals: Dict[ResourceTypeEnum, int]):
         """Add storage capacity for some number of a specific type of animal
@@ -52,7 +52,7 @@ class StoreSpecific(BaseAnimalStorageEffect):
         return [self._animals]
 
 
-class StoreConditional(BaseAnimalStorageEffect):
+class StoreConditionalAnimalEffect(BaseAnimalStorageEffect):
     def __init__(self, animal_type: ResourceTypeEnum, condition: Callable[[BasePlayerRepository], int]):
         """Add a conditional amount of storage capacity for a specific type of animal
     
@@ -73,8 +73,7 @@ class StoreConditional(BaseAnimalStorageEffect):
         return result
 
 
-class ChangeAnimalStorageBase(BaseAnimalStorageEffect):
-
+class ChangeAnimalStorageBaseEffect(BaseAnimalStorageEffect):
     def __init__(self, tiles: List[TileTypeEnum], quantity: int):
         """Change where animals can be stored on base tiles
     
@@ -90,3 +89,4 @@ class ChangeAnimalStorageBase(BaseAnimalStorageEffect):
 
     def get_animal_storage_buckets(self, player: BasePlayerRepository) -> bool:
         raise NotImplementedError()
+        # TODO: Implement this

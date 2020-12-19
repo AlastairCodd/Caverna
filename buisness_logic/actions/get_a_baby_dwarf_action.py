@@ -1,3 +1,5 @@
+from typing import List
+
 from buisness_logic.effects.population_effects import *
 from common.entities.dwarf import Dwarf
 from core.repositories.base_player_repository import BasePlayerRepository
@@ -23,21 +25,21 @@ class GetABabyDwarfAction(BaseAction):
         if player is None:
             raise ValueError("player")
 
-        numberOfDwarves: int = len(player.dwarves)
+        number_of_dwarves: int = len(player.dwarves)
 
-        increase_population_maximum_effects = player.get_effects_of_type(IncreasePopulationMaximumEffect)
+        increase_population_maximum_effects: List[IncreasePopulationMaximumEffect] = player.get_effects_of_type(IncreasePopulationMaximumEffect)
         maximum_population: int = game_constants.soft_maximum_number_of_dwarves + sum(map(
             lambda effect: effect.raise_maximum_population_by,
             increase_population_maximum_effects))
 
-        increase_population_capacity_effects = player.get_effects_of_type(IncreasePopulationCapacityEffect)
+        increase_population_capacity_effects: List[IncreasePopulationCapacityEffect] = player.get_effects_of_type(IncreasePopulationCapacityEffect)
         player_population_capacity: int = sum(map(
             lambda effect: effect.capacity,
             increase_population_capacity_effects))
 
         result: ResultLookup[int]
-        if numberOfDwarves < maximum_population:
-            if numberOfDwarves < player_population_capacity:
+        if number_of_dwarves < maximum_population:
+            if number_of_dwarves < player_population_capacity:
                 player.give_baby_dwarf()
                 result = ResultLookup(True, 1)
             else:

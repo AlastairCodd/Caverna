@@ -14,7 +14,7 @@ class ExcavationCard(BaseCard, ResourceContainer):
             self, "Excavation", 4,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                takeAccumulatedItemsAction.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 Conditional(
                     ActionCombinationEnum.Or,
                     placeATileAction.PlaceATileAction(TileTypeEnum.cavernTunnelTwin),

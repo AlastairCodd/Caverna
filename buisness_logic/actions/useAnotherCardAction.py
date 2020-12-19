@@ -1,6 +1,6 @@
 from typing import Dict
 
-from buisness_logic.actions.payAction import PayAction
+from buisness_logic.actions.pay_action import PayAction
 from buisness_logic.services.available_card_service import AvailableCardService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf

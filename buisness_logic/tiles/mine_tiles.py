@@ -30,7 +30,7 @@ class OreMineTile(BaseTile):
             self, "Ore Mine", 221,
             TileTypeEnum.oreMine,
             base_points=3,
-            effects=[animal_storage_effects.StoreSpecific({ResourceTypeEnum.donkey: 1})])
+            effects=[animal_storage_effects.StoreSpecificAnimalEffect({ResourceTypeEnum.donkey: 1})])
 
 
 class RubyMineTile(BaseTile):
@@ -39,4 +39,4 @@ class RubyMineTile(BaseTile):
             self, "Ruby Mine", 222,
             TileTypeEnum.rubyMine,
             base_points=4,
-            effects=[animal_storage_effects.StoreSpecific({ResourceTypeEnum.donkey: 1})])
+            effects=[animal_storage_effects.StoreSpecificAnimalEffect({ResourceTypeEnum.donkey: 1})])
