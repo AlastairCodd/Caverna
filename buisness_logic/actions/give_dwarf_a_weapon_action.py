@@ -24,11 +24,13 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         chosen_weapon_level: int = player.get_player_choice_weapon_level()
 
-        is_chosen_weapon_level_within_bounds = 0 < chosen_weapon_level <= 8
+        is_chosen_weapon_level_within_bounds: bool = 0 < chosen_weapon_level <= 8
 
-        result: ResultLookup[ActionChoiceLookup] = ResultLookup(True, ActionChoiceLookup([], [])) \
-            if is_chosen_weapon_level_within_bounds \
-            else ResultLookup(errors=f"Chosen weapon level ({chosen_weapon_level}) is not in bounds")
+        if is_chosen_weapon_level_within_bounds:
+            result = ResultLookup(True, ActionChoiceLookup([], []))
+            self._level_of_weapon = chosen_weapon_level
+        else:
+            result = ResultLookup(errors=f"Chosen weapon level ({chosen_weapon_level}) is not in bounds")
         return result
 
     def invoke(
