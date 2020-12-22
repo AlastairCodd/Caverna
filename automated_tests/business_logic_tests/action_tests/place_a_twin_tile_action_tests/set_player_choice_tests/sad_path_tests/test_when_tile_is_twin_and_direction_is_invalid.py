@@ -1,6 +1,7 @@
 from typing import Dict, List, cast, Optional
 
-from automated_tests.business_logic_tests.action_tests.place_a_tile_action_tests.given_a_place_a_tile_action import Given_A_PlaceATileAction
+from automated_tests.business_logic_tests.action_tests.place_a_twin_tile_action_tests.given_a_place_a_twin_tile_action \
+    import Given_A_PlaceATwinTileAction
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests \
     .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
 from automated_tests.mocks.mock_player import MockPlayer
@@ -13,14 +14,18 @@ from common.entities.result_lookup import ResultLookup
 from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
-class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction):
+class test_when_tile_is_twin_and_cost_is_overridden(Given_A_PlaceATwinTileAction):
     def because(self) -> None:
-        self.initialise_sut_as_tile_type_which_is_not_specific()
+        self.initialise_sut_with_twin_tile(
+            override_cost={
+                ResourceTypeEnum.wood: 4,
+                ResourceTypeEnum.stone: 3,
+            })
 
         self._player: BasePlayerService = self.initialise_player()
 
@@ -100,22 +105,28 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
         player.tiles[1].set_tile(allow_substitution_tile)
         player.tiles[2].set_tile(decrease_price_tile)
-        location_to_place_tile: int = 28
+        # _ 1 2 _ | _ _ _ 7
+        # 8 x x x | x x x _
+        # _ x x x | x x x _
+        # _ x x 27|28 x x _
+        # _ x x x | x x x _
+        # _ _ _ _ | _ _ _ _
+        location_to_place_primary_tile: int = 28
+        direction_to_place_secondary_tile: TileDirectionEnum = TileDirectionEnum.left
+        location_to_place_secondary_tile: int = location_to_place_primary_tile - 1
 
-        # TODO: Return real but invalid tile -- fix exception
-        player.get_player_choice_tile_to_build_returns(lambda _, __: [][0])
-
-        cavern_for_building: BaseTile = player.tiles[location_to_place_tile].tile
+        cavern_for_building: BaseTile = player.tiles[location_to_place_primary_tile].tile
         player.get_player_choice_location_to_build_returns(
             lambda _, __, ___: ResultLookup(
                 True,
-                TileUnknownPlacementLookup(location_to_place_tile, None)
+                TileUnknownPlacementLookup(location_to_place_primary_tile, direction_to_place_secondary_tile)
             ))
 
         player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: effects_to_use)
 
         self._expected_tiles: Dict[int, Optional[BaseTile]] = {
-            location_to_place_tile: cavern_for_building
+            location_to_place_primary_tile: cavern_for_building,
+            location_to_place_secondary_tile: None
         }
 
         return player
@@ -138,8 +149,8 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
     def test_then_invoked_result_should_not_be_none(self) -> None:
         self.assertIsNotNone(self._action_invoked_result)
 
-    def test_then_invoked_result_flag_should_be_false(self) -> None:
-        self.assertFalse(self._action_invoked_result.flag)
+    def test_then_invoked_result_flag_should_be_true(self) -> None:
+        self.assertTrue(self._action_invoked_result.flag)
 
     def test_then_invoked_result_value_should_not_be_none(self) -> None:
         self.assertIsNotNone(self._action_invoked_result.value)
@@ -155,7 +166,7 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
             with self.subTest(location=tile_location):
                 expected_tile: Optional[BaseTile] = self._expected_tiles[tile_location]
                 if expected_tile is not None:
-                    self.assertIsNotNone(self._player.tiles[tile_location].tile, expected_tile)
+                    self.assertIs(self._player.tiles[tile_location].tile, expected_tile)
                 else:
                     self.assertIsNone(self._player.tiles[tile_location].tile)
 
@@ -165,4 +176,4 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceATileAction)
                 self.assertEqual(self._player.resources[resource], self._expected_resources[resource])
 
     def test_then_tile_service_should_report_tile_is_available(self) -> None:
-        self.assertFalse(True, "Not Implemented")
+        self.assertFalse(True)

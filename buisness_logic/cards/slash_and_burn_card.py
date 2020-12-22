@@ -10,6 +10,6 @@ class SlashAndBurnCard(BaseCard):
             self, "Slash and Burn", 15,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                placeATileAction.PlaceATileAction(TileTypeEnum.meadowFieldTwin),
+                place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.meadowFieldTwin),
                 sowAction.SowAction()
             ))

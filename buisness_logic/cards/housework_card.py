@@ -12,4 +12,4 @@ class HouseworkCard(BaseCard):
             Conditional(
                 ActionCombinationEnum.AndOr,
                 receive_action.ReceiveAction({ResourceTypeEnum.dog: 1}),
-                placeATileAction.PlaceATileAction(TileTypeEnum.furnishedCavern)))
+                place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.furnishedCavern)))

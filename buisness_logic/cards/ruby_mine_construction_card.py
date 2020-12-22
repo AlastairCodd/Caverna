@@ -1,5 +1,4 @@
-from buisness_logic.actions.placeATileAction import PlaceATileAction
-from buisness_logic.actions.receive_action import ReceiveAction
+from buisness_logic.actions import *
 from buisness_logic.tiles.mine_tiles import RubyMineTile
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_card import BaseCard
@@ -12,17 +11,17 @@ class RubyMineConstructionCard(BaseCard):
             self, "Ruby Mine Construction", 25, 2,
             Conditional(
                 ActionCombinationEnum.EitherOr,
-                PlaceATileAction(
+                place_a_single_tile_action.PlaceASingleTileAction(
                     TileTypeEnum.rubyMine,
                     RubyMineTile,
                     override_requisite=[TileTypeEnum.tunnel]),
                 Conditional(
                     ActionCombinationEnum.AndThen,
-                    PlaceATileAction(
+                    place_a_single_tile_action.PlaceASingleTileAction(
                         TileTypeEnum.rubyMine,
                         RubyMineTile,
                         override_requisite=[TileTypeEnum.deepTunnel]),
-                    ReceiveAction({ResourceTypeEnum.ruby: 1})
+                    receive_action.ReceiveAction({ResourceTypeEnum.ruby: 1})
                 )
             )
         )

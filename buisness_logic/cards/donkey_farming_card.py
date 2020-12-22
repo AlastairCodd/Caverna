@@ -18,8 +18,8 @@ class DonkeyFarmingCard(BaseCard, ResourceContainer):
                     ActionCombinationEnum.AndOr,
                     Conditional(
                         ActionCombinationEnum.AndOr,
-                        placeATileAction.PlaceATileAction(TileTypeEnum.pasture),
-                        placeATileAction.PlaceATileAction(TileTypeEnum.pastureTwin)),
+                        place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.pasture),
+                        place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.pastureTwin)),
                     place_a_stable_action.PlaceAStableAction()),
                 take_accumulated_items_action.TakeAccumulatedItemsAction()))
         ResourceContainer.__init__(self)

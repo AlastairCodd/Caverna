@@ -17,8 +17,8 @@ class ExcavationCard(BaseCard, ResourceContainer):
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 Conditional(
                     ActionCombinationEnum.Or,
-                    placeATileAction.PlaceATileAction(TileTypeEnum.cavernTunnelTwin),
-                    placeATileAction.PlaceATileAction(TileTypeEnum.cavernCavernTwin))))
+                    place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.cavernTunnelTwin),
+                    place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.cavernCavernTwin))))
         ResourceContainer.__init__(self)
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

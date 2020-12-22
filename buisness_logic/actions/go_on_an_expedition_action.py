@@ -1,8 +1,9 @@
 from typing import List, Iterable, Dict
 
 from buisness_logic.actions.breed_animals_action import BreedAnimalsAction
-from buisness_logic.actions.placeATileAction import PlaceATileAction
+from buisness_logic.actions.place_a_single_tile_action import PlaceASingleTileAction
 from buisness_logic.actions.place_a_stable_action import PlaceAStableAction
+from buisness_logic.actions.place_a_twin_tile_action import PlaceATwinTileAction
 from buisness_logic.actions.receive_action import ReceiveAction
 from buisness_logic.actions.sowAction import SowAction
 from buisness_logic.actions.upgrade_all_weapons_action import UpgradeAllWeaponsAction
@@ -41,19 +42,19 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
                 ReceiveAction({ResourceTypeEnum.ore: 2})],
             5: [ReceiveAction({ResourceTypeEnum.boar: 1})],
             6: [ReceiveAction({ResourceTypeEnum.coin: 2})],
-            7: [PlaceATileAction(TileTypeEnum.furnishedCavern)],
+            7: [PlaceASingleTileAction(TileTypeEnum.furnishedCavern)],
             8: [PlaceAStableAction()],
-            9: [PlaceATileAction(TileTypeEnum.tunnel),
-                PlaceATileAction(TileTypeEnum.pasture)],
-            10: [PlaceATileAction(TileTypeEnum.pastureTwin),
+            9: [PlaceASingleTileAction(TileTypeEnum.tunnel),
+                PlaceASingleTileAction(TileTypeEnum.pasture)],
+            10: [PlaceATwinTileAction(TileTypeEnum.pastureTwin),
                  ReceiveAction({ResourceTypeEnum.cow: 1})],
-            11: [PlaceATileAction(TileTypeEnum.meadow),
-                 PlaceATileAction(TileTypeEnum.furnishedDwelling,
-                                  specific_tile_generation_method=Dwelling,
-                                  override_cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1})],
-            12: [PlaceATileAction(TileTypeEnum.field),
+            11: [PlaceASingleTileAction(TileTypeEnum.meadow),
+                 PlaceASingleTileAction(TileTypeEnum.furnishedDwelling,
+                                        specific_tile_generation_method=Dwelling,
+                                        override_cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.stone: 1})],
+            12: [PlaceASingleTileAction(TileTypeEnum.field),
                  SowAction()],
-            14: [PlaceATileAction(TileTypeEnum.cavern),
+            14: [PlaceASingleTileAction(TileTypeEnum.cavern),
                  BreedAnimalsAction(maximum=2)]}
 
         self._upgrade_dwarf_weapon_action: BaseAction = UpgradeDwarfWeaponAction()
@@ -121,7 +122,7 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
         if current_dwarf is None:
             raise ValueError("Current dwarf may not be none")
         if len(self._chosen_actions_and_levels) == 0:
-            raise ValueError("Must choose ")
+            raise ValueError("Must have made choice for actions to perform")
 
         errors: List[str] = []
 

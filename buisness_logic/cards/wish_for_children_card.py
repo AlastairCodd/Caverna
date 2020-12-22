@@ -1,6 +1,4 @@
-from buisness_logic.actions.get_a_baby_dwarf_action import GetABabyDwarfAction
-from buisness_logic.actions.placeATileAction import PlaceATileAction
-from buisness_logic.actions.receive_action import ReceiveAction
+from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ActionCombinationEnum, TileTypeEnum, ResourceTypeEnum
@@ -12,8 +10,8 @@ class WishForChildrenCard(BaseCard):
             self, "Wish For Children", 27, 2,
             Conditional(
                 ActionCombinationEnum.EitherOr,
-                GetABabyDwarfAction(),
-                PlaceATileAction(TileTypeEnum.furnishedDwelling)
+                get_a_baby_dwarf_action.GetABabyDwarfAction(),
+                place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.furnishedDwelling)
             )
         )
 
@@ -26,8 +24,8 @@ class UrgentWishForChildrenCard(BaseCard):
                 ActionCombinationEnum.EitherOr,
                 Conditional(
                     ActionCombinationEnum.AndThen,
-                    GetABabyDwarfAction(),
-                    PlaceATileAction(TileTypeEnum.furnishedDwelling)),
-                ReceiveAction({ResourceTypeEnum.coin: 3})
+                    get_a_baby_dwarf_action.GetABabyDwarfAction(),
+                    place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.furnishedDwelling)),
+                receive_action.ReceiveAction({ResourceTypeEnum.coin: 3})
             )
         )

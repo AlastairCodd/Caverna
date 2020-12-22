@@ -17,8 +17,8 @@ class FenceBuildingCard(BaseCard, ResourceContainer):
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 Conditional(
                     ActionCombinationEnum.AndOr,
-                    placeATileAction.PlaceATileAction(TileTypeEnum.pasture),
-                    placeATileAction.PlaceATileAction(TileTypeEnum.pastureTwin))))
+                    place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.pasture),
+                    place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.pastureTwin))))
         ResourceContainer.__init__(self)
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

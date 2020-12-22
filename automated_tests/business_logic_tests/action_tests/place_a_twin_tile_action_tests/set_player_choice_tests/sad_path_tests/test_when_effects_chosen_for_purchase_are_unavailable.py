@@ -1,6 +1,7 @@
 from typing import Dict, List, cast
 
-from automated_tests.business_logic_tests.action_tests.place_a_tile_action_tests.given_a_place_a_tile_action import Given_A_PlaceATileAction
+from automated_tests.business_logic_tests.action_tests.place_a_twin_tile_action_tests.given_a_place_a_twin_tile_action \
+    import Given_A_PlaceATwinTileAction
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests\
     .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
 from automated_tests.mocks.mock_player import MockPlayer
@@ -16,9 +17,9 @@ from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
-class test_when_effects_chosen_for_purchase_are_unavailable(Given_A_PlaceATileAction):
+class test_when_effects_chosen_for_purchase_are_unavailable(Given_A_PlaceATwinTileAction):
     def because(self) -> None:
-        self.initialise_sut_with_specific_tile()
+        self.initialise_sut_with_twin_tile()
 
         self._player: BasePlayerService = self.initialise_player()
 

@@ -14,7 +14,7 @@ class DriftMining2Card(BaseCard, ResourceContainer):
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
-                placeATileAction.PlaceATileAction(TileTypeEnum.cavernTunnelTwin)))
+                place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.cavernTunnelTwin)))
         ResourceContainer.__init__(self)
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

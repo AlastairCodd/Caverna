@@ -1,39 +1,36 @@
 from abc import ABCMeta
-from typing import Optional, Dict, cast
+from typing import Optional, Dict, cast, List
 from unittest import TestCase
 
-from buisness_logic.actions.placeATileAction import PlaceATileAction
+from buisness_logic.actions.place_a_single_tile_action import PlaceASingleTileAction
 from buisness_logic.tiles.dwelling import Dwelling
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum
 
 
-class Given_A_PlaceATileAction(TestCase, metaclass=ABCMeta):
+class Given_A_PlaceASingleTileAction(TestCase, metaclass=ABCMeta):
     def setUp(self) -> None:
-        self.SUT: PlaceATileAction
+        self.SUT: PlaceASingleTileAction
         self._specific_tile: Optional[BaseTile]
 
         self.because()
 
     def initialise_sut_as_tile_type_which_is_specific(self) -> None:
-        self.SUT = PlaceATileAction(TileTypeEnum.meadow)
+        self.SUT = PlaceASingleTileAction(TileTypeEnum.meadow)
 
-    def initialise_sut_as_tile_type_which_is_not_specific(self) -> None:
-        self.SUT = PlaceATileAction(TileTypeEnum.furnishedDwelling)
+    def initialise_sut_as_tile_type_which_is_not_specific(
+            self,
+            override_requisite: Optional[List[TileTypeEnum]] = None) -> None:
+        self.SUT = PlaceASingleTileAction(TileTypeEnum.furnishedDwelling, override_requisite=override_requisite)
 
     def initialise_sut_with_specific_tile(
             self,
             override_cost: Optional[Dict[ResourceTypeEnum, int]] = None) -> None:
         self._specific_tile = Dwelling()
-        self.SUT = PlaceATileAction(
+        self.SUT = PlaceASingleTileAction(
             TileTypeEnum.furnishedCavern,
             lambda: self._specific_tile,
             override_cost)
-
-    def initialise_sut_with_twin_tile(
-            self,
-            override_cost: Optional[Dict[ResourceTypeEnum, int]] = None) -> None:
-        self.SUT = PlaceATileAction(TileTypeEnum.oreMineDeepTunnelTwin, override_cost=override_cost)
 
     def because(self) -> None:
         pass
