@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, cast
 
 from automated_tests.common_tests.service_tests.exhaustive_action_ordering_service_tests.given_an_exhaustive_action_ordering_service import \
     Given_An_ExhaustiveActionOrderingService
@@ -21,7 +21,7 @@ from core.baseClasses.base_constraint import BaseConstraint
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
 
 
-class Test_When_Called_With_Single_Highest_Score_And_No_Constraints(Given_An_ExhaustiveActionOrderingService):
+class test_when_called_with_single_highest_score_and_no_constraints(Given_An_ExhaustiveActionOrderingService):
     def because(self) -> None:
         action1_take_items: BaseAction = TakeAccumulatedItemsAction()
         action2_get_weapon: BasePlayerChoiceAction = GiveDwarfAWeaponAction()
@@ -35,7 +35,7 @@ class Test_When_Called_With_Single_Highest_Score_And_No_Constraints(Given_An_Exh
 
         resources: Dict[ResourceTypeEnum, int] = {}
 
-        player: BasePlayerService = MockPlayer(resources=resources)
+        player: MockPlayer = MockPlayer(resources=resources)
         action_conditional: Conditional = Conditional(
             ActionCombinationEnum.AndOr,
             action1_take_items,
@@ -59,9 +59,13 @@ class Test_When_Called_With_Single_Highest_Score_And_No_Constraints(Given_An_Exh
 
     def initialise_actions(
             self,
-            player: BasePlayerService,
+            player: MockPlayer,
             dwarf: Dwarf,
             actions: List[BaseAction]):
+
+        player.get_player_choice_expedition_rewards_returns(
+            lambda info_actions, info_expedition_level, info_turn_descriptor: ResultLookup(True, [info_actions[i] for i in range(info_expedition_level)])
+        )
 
         turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
             [MockCard(), MockCard()],
@@ -85,3 +89,6 @@ class Test_When_Called_With_Single_Highest_Score_And_No_Constraints(Given_An_Exh
 
     def test_then_result_value_should_be_in_expected_order(self) -> None:
         self.assertListEqual(self._result.value, self._expected_best_ordering)
+
+    def test_then_result_errors_should_be_empty(self) -> None:
+        self.assertListEqual(cast(list, self._result.errors), [])

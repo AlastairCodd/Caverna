@@ -12,13 +12,13 @@ class BasePlayerRepository(TileContainer, ResourceContainer, metaclass=ABCMeta):
             self,
             player_id: int,
             turn_index: int,
-            tile_container: BaseTileContainerDefault) -> None:
+            tile_container_default: BaseTileContainerDefault) -> None:
         self._id: int = player_id
         self._turnIndex: int = turn_index
 
         self._dwarves: List[Dwarf] = [Dwarf(True), Dwarf(True)]
 
-        TileContainer.__init__(self, tile_container)
+        TileContainer.__init__(self, tile_container_default)
         ResourceContainer.__init__(self)
 
     @property

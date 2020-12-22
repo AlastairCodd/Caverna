@@ -6,5 +6,7 @@ from common.entities.tile_entity import TileEntity
 
 class BaseTileContainerDefault(metaclass=ABCMeta):
     @abstractmethod
-    def assign(self, tile_collection: Dict[int, TileEntity]) -> TileEntity:
+    def assign(
+            self,
+            tile_collection: Dict[int, TileEntity]) -> Dict[int, TileEntity]:
         pass

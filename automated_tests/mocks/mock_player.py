@@ -177,7 +177,7 @@ class MockPlayer(BasePlayerService):
         return self._card_choice_to_use_func(available_cards, turn_descriptor)
 
     def get_player_choice_weapon_level(self) -> int:
-        pass
+        return 1
 
     def get_player_choice_actions_to_use(
             self,

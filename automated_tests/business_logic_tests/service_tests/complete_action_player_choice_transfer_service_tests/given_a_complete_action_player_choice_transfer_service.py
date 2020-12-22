@@ -2,8 +2,8 @@ from abc import ABCMeta
 from typing import Callable
 from unittest import TestCase
 
-from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests.given_a_complete_dwarf_player_choice_transfer_service import \
-    FakeCard
+from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests\
+    .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
 from buisness_logic.services.complete_action_player_choice_transfer_service import CompleteActionPlayerChoiceTransferService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
