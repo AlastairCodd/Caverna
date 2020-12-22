@@ -83,7 +83,7 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
             if not success:
                 errors.append("Failed to take resources from player")
 
-        result: ResultLookup[int] = ResultLookup(errors="Not Implemented")
+        result: ResultLookup[int] = ResultLookup(True, 1) if success else ResultLookup(errors=errors)
         return result
 
     def new_turn_reset(self):
