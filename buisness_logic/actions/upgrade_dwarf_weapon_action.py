@@ -42,3 +42,12 @@ class UpgradeDwarfWeaponAction(BaseAction):
 
     def new_turn_reset(self):
         pass
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, UpgradeDwarfWeaponAction)
+
+    def __hash__(self) -> int:
+        return 1
+
+    def __str__(self) -> str:
+        return "UpgradeDwarfWeaponAction()"

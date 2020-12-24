@@ -22,6 +22,8 @@ class test_when_dwarf_weapon_level_is_not_sufficient(Given_A_GoOnAnExpeditionAct
         player: BasePlayerService = self.initialise_player()
 
         dwarf: Dwarf = Dwarf(True)
+        weapon: Weapon = self.get_weapon(14)
+        dwarf.give_weapon(weapon)
 
         turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
             [FakeCard()],
@@ -45,6 +47,13 @@ class test_when_dwarf_weapon_level_is_not_sufficient(Given_A_GoOnAnExpeditionAct
         player: MockPlayer = MockPlayer()
         player.get_player_choice_expedition_rewards_returns(self._expedition_reward_func)
         return player
+
+    def get_weapon(self, weapon_level: int) -> Weapon:
+        weapon: Weapon = Weapon(8) if weapon_level >= 8 else Weapon(weapon_level)
+        while weapon.level < weapon_level:
+            weapon.increase_level()
+
+        return weapon
 
     def _expedition_reward_func(
             self,
@@ -107,11 +116,14 @@ class test_when_dwarf_weapon_level_is_not_sufficient(Given_A_GoOnAnExpeditionAct
     def test_then_action_invoke_result_should_not_be_none(self) -> None:
         self.assertIsNotNone(self._action_invoke_result)
 
-    def test_then_action_invoke_result_flag_should_be_false(self) -> None:
-        self.assertFalse(self._action_invoke_result.flag)
+    def test_then_action_invoke_result_flag_should_be_true(self) -> None:
+        self.assertTrue(self._action_invoke_result.flag)
 
-    def test_then_action_invoke_result_value_should_be_none(self) -> None:
-        self.assertIsNone(self._action_invoke_result.value)
+    def test_then_action_invoke_result_value_should_not_be_none(self) -> None:
+        self.assertIsNotNone(self._action_invoke_result.value)
+
+    def test_then_action_invoke_result_value_should_be_expected(self) -> None:
+        self.assertEqual(self._action_invoke_result.value, 1)
 
     def test_then_action_invoke_result_errors_should_not_be_empty(self) -> None:
         self.assertGreater(len(cast(list, self._action_invoke_result.errors)), 0)

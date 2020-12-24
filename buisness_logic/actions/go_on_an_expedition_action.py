@@ -132,6 +132,8 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
                 if dwarf_level_required_for_action > current_dwarf.weapon_level:
                     errors.append(f"Tried to perform expedition {action} of level {dwarf_level_required_for_action}, but dwarf weapon was of level "
                                   f"{current_dwarf.weapon_level}")
+        else:
+            errors.append("Attempted to go on expedition with dwarf, but dwarf does not have a weapon")
 
         result: ResultLookup[int] = ResultLookup(True, 1) if len(errors) == 0 else ResultLookup(errors=errors)
         return result
