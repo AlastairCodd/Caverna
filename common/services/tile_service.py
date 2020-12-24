@@ -9,6 +9,7 @@ from common.defaults.tile_twin_default import TileTwinDefault
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_entity import TileEntity
 from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.containers.tile_container import TileContainer
 from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileDirectionEnum
@@ -92,10 +93,11 @@ class TileService(object):
     # TODO: consider how to get this singleton information out
     def is_tile_available(
             self,
+            turn_descriptor: TurnDescriptorLookup,
             tile: BaseTile) -> bool:
         if tile is None:
             raise ValueError("Tile may not be None")
-        return True
+        return any(map(lambda x: x.id == tile.id, turn_descriptor.tiles))
 
     def can_place_tile_at_location(
             self,
@@ -121,13 +123,13 @@ class TileService(object):
         if is_tile_a_twin_tile:
             raise ValueError(f"Tile {target_tile_type} is a twin tile.")
 
+        tile_type_at_target_location: TileEntity = player.get_tile_at_location(location)
+
         result: bool
         if requisites_override is not None:
-            tile_type_at_target_location: TileEntity = player.get_tile_at_location(location)
             result = tile_type_at_target_location.tile_type in requisites_override
         elif target_tile_type in self._tile_requisites:
             requisites_for_tile_type: List[TileTypeEnum] = self._tile_requisites[target_tile_type]
-            tile_type_at_target_location: TileEntity = player.get_tile_at_location(location)
             result = tile_type_at_target_location.tile_type in requisites_for_tile_type
         else:
             # TODO: Implement? Could not find requisite tile type for given
@@ -232,6 +234,7 @@ class TileService(object):
         else:
             all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
             tile_requisites = all_tile_requisites[tile_type]
+
         valid_positions: List[int] = [location for location in player.tiles if player.tiles[location].tile_type in tile_requisites]
 
         return valid_positions

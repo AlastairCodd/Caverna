@@ -21,7 +21,7 @@ class PlaceAStableAction(BasePlayerChoiceAction):
         # TODO: Potentially include this.
         # self._tile_service: TileService = TileService()
 
-        self._location_to_place_tile: Optional[int] = None
+        self._location_to_place_stable: Optional[int] = None
         self._cost_for_stable: Optional[Dict[ResourceTypeEnum, int]] = None
         self._effects_to_use: List[BaseEffect] = []
 
@@ -31,7 +31,7 @@ class PlaceAStableAction(BasePlayerChoiceAction):
             dwarf: Dwarf,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         # TODO: Implement this
-        self._location_to_place_tile = 1
+        self._location_to_place_stable = 1
         self._cost_for_stable = self._override_cost if self._override_cost is not None else {ResourceTypeEnum.stone: 1}
         pass
 
@@ -42,7 +42,7 @@ class PlaceAStableAction(BasePlayerChoiceAction):
             current_dwarf: Dwarf) -> ResultLookup[int]:
         if player is None:
             raise ValueError("Player may not be null")
-        if self._location_to_place_tile is None:
+        if self._location_to_place_stable is None:
             raise ValueError("Must chose valid place for stable")
 
         successes: int = 0
@@ -53,9 +53,9 @@ class PlaceAStableAction(BasePlayerChoiceAction):
             if not does_player_have_effect:
                 errors.append("Player does not have access to effect")
 
-        tile_at_location: TileEntity = player.get_tile_at_location(self._location_to_place_tile)
+        tile_at_location: TileEntity = player.get_tile_at_location(self._location_to_place_stable)
         if tile_at_location.has_stable:
-            errors.append(f"Tile at location {self._location_to_place_tile} already has a stable.")
+            errors.append(f"Tile at location {self._location_to_place_stable} already has a stable.")
         else:
             can_player_afford_tile: int = player.has_more_resources_than(self._cost_for_stable)
             if can_player_afford_tile:
@@ -79,5 +79,5 @@ class PlaceAStableAction(BasePlayerChoiceAction):
 
     def new_turn_reset(self) -> None:
         self._cost_for_stable = None
-        self._location_to_place_tile = None
+        self._location_to_place_stable = None
         self._effects_to_use = []
