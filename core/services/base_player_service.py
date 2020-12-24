@@ -32,7 +32,9 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_player_choice_weapon_level(self) -> int:
+    def get_player_choice_weapon_level(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> int:
         """Gets user choice for how strong a weapon to give to the current dwarf."""
         raise NotImplementedError()
 

@@ -22,7 +22,7 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
             player: BasePlayerService,
             dwarf: Dwarf,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
-        chosen_weapon_level: int = player.get_player_choice_weapon_level()
+        chosen_weapon_level: int = player.get_player_choice_weapon_level(turn_descriptor)
 
         is_chosen_weapon_level_within_bounds: bool = 0 < chosen_weapon_level <= 8
 

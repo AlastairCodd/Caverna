@@ -49,6 +49,7 @@ class MockPlayer(BasePlayerService):
              TurnDescriptorLookup],
             ResultLookup[BaseCard]] \
             = lambda info_available_cards, info_turn_descriptor: ResultLookup(errors="Not Implemented")
+        self._weapon_level_func: Callable[[TurnDescriptorLookup], int] = lambda info_turn_descriptor: 0
         self._expedition_rewards_func: Callable[
             [List[BaseAction],
              int,
@@ -147,6 +148,11 @@ class MockPlayer(BasePlayerService):
                 Dict[BaseTilePurchaseEffect, int]]) -> None:
         self._effects_to_use_for_cost_discount = func
 
+    def get_player_choice_weapon_level_returns(
+            self,
+            func: Callable[[TurnDescriptorLookup], int]) -> None:
+        self._weapon_level_func = func
+
     def get_player_choice_dwarf_to_use_out_of_order(
             self,
             dwarves: List[Dwarf],
@@ -176,8 +182,10 @@ class MockPlayer(BasePlayerService):
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[BaseCard]:
         return self._card_choice_to_use_func(available_cards, turn_descriptor)
 
-    def get_player_choice_weapon_level(self) -> int:
-        return 1
+    def get_player_choice_weapon_level(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> int:
+        return self._weapon_level_func(turn_descriptor)
 
     def get_player_choice_actions_to_use(
             self,
