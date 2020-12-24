@@ -18,15 +18,15 @@ from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
-class Test_When_Location_Chosen_Is_Invalid(Given_A_PlaceASingleTileAction):
+class test_when_location_chosen_is_invalid(Given_A_PlaceASingleTileAction):
     def because(self) -> None:
         self.initialise_sut_with_specific_tile()
 
         self._player: BasePlayerService = self.initialise_player()
 
-        turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
+        self._turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
             [FakeCard()],
-            [],
+            [self._specific_tile],
             1,
             2,
             HarvestTypeEnum.Harvest)
@@ -34,13 +34,8 @@ class Test_When_Location_Chosen_Is_Invalid(Given_A_PlaceASingleTileAction):
         self._result: ResultLookup[ActionChoiceLookup] = self.SUT.set_player_choice(
             self._player,
             self._dwarf_to_use,
-            turn_descriptor
+            self._turn_descriptor
         )
-
-        self._expected_resources: Dict[ResourceTypeEnum, int] = {
-            ResourceTypeEnum.wood: 3,
-            ResourceTypeEnum.stone: 3,
-        }
 
         self._action_invoked_result: ResultLookup[int] = self.SUT.invoke(
             self._player,
@@ -59,7 +54,7 @@ class Test_When_Location_Chosen_Is_Invalid(Given_A_PlaceASingleTileAction):
 
         dwarves: List[Dwarf] = [active_dwarf_1, self._dwarf_to_use, active_dwarf_2]
 
-        starting_resources: Dict[ResourceTypeEnum, int] = {
+        self._starting_resources: Dict[ResourceTypeEnum, int] = {
             ResourceTypeEnum.wood: 3,
             ResourceTypeEnum.stone: 3,
         }
@@ -67,12 +62,12 @@ class Test_When_Location_Chosen_Is_Invalid(Given_A_PlaceASingleTileAction):
         # starting cost:      wood 4, stone 3
         effects_to_use: Dict[BaseTilePurchaseEffect, int] = {}
 
-        player: MockPlayer = MockPlayer(dwarves, starting_resources)
+        player: MockPlayer = MockPlayer(dwarves, self._starting_resources)
         # _ _ _ _ | _ _ _ 7
         # 8 x x x | x x x _
         # _ x x x | x x x _
         # _ x x x |28 x x _
-        # _ x x x | x x x _
+        # _ x x x | d x x _
         # _ _ _ _ | _ _ _ _
         location_to_place: int = 28
 
@@ -126,9 +121,13 @@ class Test_When_Location_Chosen_Is_Invalid(Given_A_PlaceASingleTileAction):
                     self.assertIsNone(self._player.tiles[tile_location].tile)
 
     def test_then_player_should_have_expected_amount_of_resources(self) -> None:
-        for resource in self._expected_resources:
+        for resource in self._starting_resources:
             with self.subTest(resource=resource):
-                self.assertEqual(self._player.resources[resource], self._expected_resources[resource])
+                self.assertEqual(self._player.resources[resource], self._starting_resources[resource])
 
     def test_then_tile_service_should_report_tile_is_available(self) -> None:
-        self.assertFalse(True, "Needs implementing")
+        self.assertTrue(
+            self.SUT._tile_service.is_tile_available(
+                self._turn_descriptor,
+                self._specific_tile)
+        )

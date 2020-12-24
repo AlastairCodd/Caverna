@@ -23,9 +23,9 @@ class test_when_location_chosen_is_invalid(Given_A_PlaceASingleTileAction):
 
         self._player: BasePlayerService = self.initialise_player()
 
-        turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
+        self._turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
             [FakeCard()],
-            [],
+            [self._specific_tile],
             1,
             2,
             HarvestTypeEnum.Harvest)
@@ -33,13 +33,8 @@ class test_when_location_chosen_is_invalid(Given_A_PlaceASingleTileAction):
         self._result: ResultLookup[ActionChoiceLookup] = self.SUT.set_player_choice(
             self._player,
             self._dwarf_to_use,
-            turn_descriptor
+            self._turn_descriptor
         )
-
-        self._expected_resources: Dict[ResourceTypeEnum, int] = {
-            ResourceTypeEnum.wood: 2,
-            ResourceTypeEnum.ruby: 12,
-        }
 
         self._action_invoked_result: ResultLookup[int] = self.SUT.invoke(
             self._player,
@@ -58,7 +53,7 @@ class test_when_location_chosen_is_invalid(Given_A_PlaceASingleTileAction):
 
         dwarves: List[Dwarf] = [active_dwarf_1, self._dwarf_to_use, active_dwarf_2]
 
-        starting_resources: Dict[ResourceTypeEnum, int] = {
+        self._starting_resources: Dict[ResourceTypeEnum, int] = {
             ResourceTypeEnum.wood: 2,
             ResourceTypeEnum.ruby: 2,
         }
@@ -82,7 +77,7 @@ class test_when_location_chosen_is_invalid(Given_A_PlaceASingleTileAction):
                 }): 1,
         }
 
-        player: MockPlayer = MockPlayer(dwarves, starting_resources)
+        player: MockPlayer = MockPlayer(dwarves, self._starting_resources)
 
         # _ 1 2 _ | _ _ _ 7
         # 8 x x x | x x x _
@@ -122,17 +117,17 @@ class test_when_location_chosen_is_invalid(Given_A_PlaceASingleTileAction):
     def test_then_invoked_result_should_not_be_none(self) -> None:
         self.assertIsNotNone(self._action_invoked_result)
 
-    def test_then_invoked_result_flag_should_be_true(self) -> None:
-        self.assertTrue(self._action_invoked_result.flag)
+    def test_then_invoked_result_flag_should_be_false(self) -> None:
+        self.assertFalse(self._action_invoked_result.flag)
 
     def test_then_invoked_result_value_should_not_be_none(self) -> None:
         self.assertIsNotNone(self._action_invoked_result.value)
 
     def test_then_invoked_result_value_should_be_expected(self) -> None:
-        self.assertEqual(self._action_invoked_result.value, 2)
-
-    def test_then_invoked_result_errors_should_be_empty(self) -> None:
-        self.assertListEqual([], cast(List, self._action_invoked_result.errors))
+        self.assertEqual(self._action_invoked_result.value, 0)
+    
+    def test_then_invoked_result_errors_should_not_be_empty(self) -> None:
+        self.assertGreater(len(cast(List, self._action_invoked_result.errors)), 0)
 
     def test_then_player_should_not_have_tiles_at_expected_locations(self) -> None:
         for tile_location in self._expected_tiles:
@@ -144,13 +139,17 @@ class test_when_location_chosen_is_invalid(Given_A_PlaceASingleTileAction):
                     self.assertIsNone(self._player.tiles[tile_location].tile)
 
     def test_then_player_should_have_expected_amount_of_resources(self) -> None:
-        for resource in self._expected_resources:
+        for resource in self._starting_resources:
             with self.subTest(resource=resource):
-                expected_amount: int = self._expected_resources[resource]
+                expected_amount: int = self._starting_resources[resource]
                 if expected_amount == 0:
                     self.assertNotIn(resource, self._player.resources)
                 else:
                     self.assertEqual(self._player.resources[resource], expected_amount)
 
-    def test_then_tile_service_should_report_tile_is_not_available(self) -> None:
-        self.assertFalse(True)
+    def test_then_tile_service_should_report_tile_is_available(self) -> None:
+        self.assertTrue(
+            self.SUT._tile_service.is_tile_available(
+                self._turn_descriptor,
+                self._specific_tile)
+        )

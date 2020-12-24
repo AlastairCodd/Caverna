@@ -196,7 +196,7 @@ class FoodChamberTile(BaseConditionalPointTile):
     def __init__(self):
         BaseConditionalPointTile.__init__(
             self, "Food Chamber", tile_ids.FoodChamberTileId,
-            cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.vegetable: 2})
+            cost={ResourceTypeEnum.wood: 2, ResourceTypeEnum.veg: 2})
 
     def get_conditional_point(self, player: BasePlayerRepository) -> PointLookup:
         if player is None:
