@@ -5,7 +5,6 @@ from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_ch
     FakeCard
 from automated_tests.mocks.mock_player import MockPlayer
 from automated_tests.mocks.mock_card import MockCard
-from buisness_logic.tiles.dwelling import Dwelling
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
@@ -22,9 +21,9 @@ class test_when_tile_is_specific_and_cost_is_default(Given_A_PlaceASingleTileAct
 
         self._player: BasePlayerService = self.initialise_player()
 
-        turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
+        self._turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
             [FakeCard()],
-            [Dwelling()],
+            [self._specific_tile],
             1,
             2,
             HarvestTypeEnum.Harvest)
@@ -32,7 +31,7 @@ class test_when_tile_is_specific_and_cost_is_default(Given_A_PlaceASingleTileAct
         self._result: ResultLookup[ActionChoiceLookup] = self.SUT.set_player_choice(
             self._player,
             self._dwarf_to_use,
-            turn_descriptor
+            self._turn_descriptor
         )
 
         self._expected_resources: Dict[ResourceTypeEnum, int] = {
@@ -118,4 +117,6 @@ class test_when_tile_is_specific_and_cost_is_default(Given_A_PlaceASingleTileAct
                     self.assertEqual(self._player.resources[resource], expected_amount)
 
     def test_then_tile_service_should_report_tile_is_not_available(self) -> None:
-        self.assertFalse(True)
+        self.assertFalse(self.SUT._tile_service.is_tile_available(
+            self._turn_descriptor,
+            self._specific_tile))

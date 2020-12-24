@@ -27,7 +27,7 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceASingleTileA
 
         self._turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
             [FakeCard()],
-            [Dwelling()],
+            [self._specific_tile],
             1,
             2,
             HarvestTypeEnum.Harvest)

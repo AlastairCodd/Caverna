@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, cast
 
 from automated_tests.business_logic_tests.action_tests.place_a_single_tile_action_tests.given_a_place_a_single_tile_action import Given_A_PlaceASingleTileAction
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests\
@@ -17,7 +17,7 @@ from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
-class Test_When_Location_Chosen_Is_Invalid(Given_A_PlaceASingleTileAction):
+class test_when_location_chosen_is_invalid(Given_A_PlaceASingleTileAction):
     def because(self) -> None:
         self.initialise_sut_with_specific_tile()
 
@@ -83,6 +83,13 @@ class Test_When_Location_Chosen_Is_Invalid(Given_A_PlaceASingleTileAction):
         }
 
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
+
+        # _ 1 2 _ | _ _ _ 7
+        # 8 x x x | x x x _
+        # _ x x x | x _ x _
+        # _ x x x |28 _ x _
+        # _ x x x | D x x _
+        # _ _ _ _ | _ _ _ _
         location_to_place: int = 28
         player.get_player_choice_location_to_build_returns(
             lambda _, __, ___: ResultLookup(
@@ -127,11 +134,14 @@ class Test_When_Location_Chosen_Is_Invalid(Given_A_PlaceASingleTileAction):
     def test_then_invoked_result_errors_should_be_empty(self) -> None:
         self.assertListEqual([], cast(List, self._action_invoked_result.errors))
 
-    def test_then_player_should_have_tiles_at_expected_locations(self) -> None:
+    def test_then_player_should_not_have_tiles_at_expected_locations(self) -> None:
         for tile_location in self._expected_tiles:
             with self.subTest(location=tile_location):
-                expected_tile_type: type = self._expected_tiles[tile_location]
-                self.assertIsInstance(self._player.tiles[tile_location].tile, expected_tile_type)
+                expected_tile: Optional[BaseTile] = self._expected_tiles[tile_location]
+                if expected_tile is not None:
+                    self.assertIs(self._player.tiles[tile_location].tile, expected_tile)
+                else:
+                    self.assertIsNone(self._player.tiles[tile_location].tile)
 
     def test_then_player_should_have_expected_amount_of_resources(self) -> None:
         for resource in self._expected_resources:
