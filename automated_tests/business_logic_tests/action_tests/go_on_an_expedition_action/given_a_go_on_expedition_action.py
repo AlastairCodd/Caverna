@@ -1,6 +1,6 @@
 from abc import ABCMeta
+from typing import cast
 from unittest import TestCase
-
 
 # noinspection PyPep8Naming
 from buisness_logic.actions.go_on_an_expedition_action import GoOnAnExpeditionAction

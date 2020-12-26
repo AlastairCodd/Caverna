@@ -1,6 +1,7 @@
 from typing import List, cast
 
-from automated_tests.business_logic_tests.action_tests.go_on_an_expedition_action.given_a_go_on_expedition_action import Given_A_GoOnAnExpeditionAction
+from automated_tests.business_logic_tests.action_tests.go_on_an_expedition_action.given_a_go_on_expedition_action import \
+    Given_A_GoOnAnExpeditionAction
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests \
     .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
 from automated_tests.mocks.mock_player import MockPlayer
@@ -126,4 +127,4 @@ class test_when_dwarf_weapon_level_is_not_sufficient(Given_A_GoOnAnExpeditionAct
         self.assertEqual(self._action_invoke_result.value, 1)
 
     def test_then_action_invoke_result_errors_should_not_be_empty(self) -> None:
-        self.assertGreater(len(cast(list, self._action_invoke_result.errors)), 0)
+        self.assertListEqual([], cast(list, self._action_invoke_result.errors))

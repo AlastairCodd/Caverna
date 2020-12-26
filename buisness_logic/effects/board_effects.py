@@ -2,7 +2,6 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, List
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import TileTypeEnum
-from common.defaults.tile_twin_default import TileTwinDefault
 
 
 class BaseBoardEffect(BaseEffect, metaclass=ABCMeta):
@@ -49,8 +48,11 @@ class FurnishTunnelsEffect(ChangeRequisiteEffect):
 
 class TwinTilesOverhangEffect(ChangeRequisiteEffect):
     def __init__(self):
-        twin_default = TileTwinDefault()
-        twin_tiles = twin_default.assign([])
+        twin_tiles: List[TileTypeEnum] = [
+            TileTypeEnum.cavernCavernTwin,
+            TileTypeEnum.cavernTunnelTwin,
+            TileTypeEnum.meadowFieldTwin,
+        ]
         super().__init__(
             twin_tiles,
             [TileTypeEnum.unavailable])

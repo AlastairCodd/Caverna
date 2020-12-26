@@ -1,6 +1,7 @@
 from typing import List, Dict, cast, Optional
 
-from automated_tests.business_logic_tests.action_tests.place_a_single_tile_action_tests.given_a_place_a_single_tile_action import Given_A_PlaceASingleTileAction
+from automated_tests.business_logic_tests.action_tests.place_a_single_tile_action_tests.given_a_place_a_single_tile_action import \
+    Given_A_PlaceASingleTileAction
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests \
     .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
 from automated_tests.mocks.mock_card import MockCard

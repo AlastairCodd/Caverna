@@ -1,15 +1,17 @@
-from typing import Dict, List, cast
+from typing import Dict, List, cast, Optional
 
-from automated_tests.business_logic_tests.action_tests.place_a_single_tile_action_tests.given_a_place_a_single_tile_action import Given_A_PlaceASingleTileAction
+from automated_tests.business_logic_tests.action_tests.place_a_single_tile_action_tests.given_a_place_a_single_tile_action import \
+    Given_A_PlaceASingleTileAction
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests.given_a_complete_dwarf_player_choice_transfer_service import \
     FakeCard
-from automated_tests.mocks.mock_player import MockPlayer
 from automated_tests.mocks.mock_card import MockCard
+from automated_tests.mocks.mock_player import MockPlayer
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
@@ -64,13 +66,17 @@ class test_when_tile_is_specific_and_cost_is_default(Given_A_PlaceASingleTileAct
         }
 
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
-        self._location_to_place_tile: int = 28
+        location_to_place_tile: int = 28
         player.get_player_choice_location_to_build_returns(
             lambda _, __, ___: ResultLookup(
                 True,
-                TileUnknownPlacementLookup(self._location_to_place_tile, None)))
+                TileUnknownPlacementLookup(location_to_place_tile, None)))
 
         player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
+
+        self._expected_tiles: Dict[int, BaseTile] = {
+            location_to_place_tile: self._specific_tile
+        }
 
         return player
 
@@ -104,8 +110,14 @@ class test_when_tile_is_specific_and_cost_is_default(Given_A_PlaceASingleTileAct
     def test_then_invoked_result_errors_should_be_empty(self) -> None:
         self.assertListEqual([], cast(List, self._action_invoked_result.errors))
 
-    def test_then_player_should_have_tile_at_set_location(self) -> None:
-        self.assertIsNotNone(self._player.tiles[self._location_to_place_tile].tile)
+    def test_then_player_should_have_tiles_at_expected_locations(self) -> None:
+        for tile_location in self._expected_tiles:
+            with self.subTest(location=tile_location):
+                expected_tile: Optional[BaseTile] = self._expected_tiles[tile_location]
+                if expected_tile is not None:
+                    self.assertIs(self._player.tiles[tile_location].tile, expected_tile)
+                else:
+                    self.assertIsNone(self._player.tiles[tile_location].tile)
 
     def test_then_player_should_have_expected_amount_of_resources(self) -> None:
         for resource in self._expected_resources:

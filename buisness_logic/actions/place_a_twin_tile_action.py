@@ -123,8 +123,7 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
 
         can_place_tiles_at_chosen_location: bool = self._tile_service.can_place_twin_tile_at_location(
             player,
-            primary_tile,
-            secondary_tile,
+            self._tile_type,
             self._tile_location,
             self._tile_direction)
 
@@ -137,7 +136,7 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         if not is_primary_tile_available:
             errors.append(f"Primary Tile in Twin Tile ({primary_tile.name}) has already been built")
         if not is_secondary_tile_available:
-            errors.append(f"secondary Tile in Twin Tile ({secondary_tile.name}) has already been built")
+            errors.append(f"Secondary Tile in Twin Tile ({secondary_tile.name}) has already been built")
 
         cost: Dict[ResourceTypeEnum, int] = {}
         was_cost_calculated_successfully: bool = False
@@ -184,6 +183,7 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         if success:
             was_tile_placed_successfully_result: ResultLookup[bool] = self._tile_service.place_twin_tile(
                 player,
+                self._tile_type,
                 primary_tile,
                 secondary_tile,
                 self._tile_location,

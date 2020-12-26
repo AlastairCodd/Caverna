@@ -1,13 +1,14 @@
 from typing import Dict, List, cast, Optional
 
-from automated_tests.business_logic_tests.action_tests.place_a_single_tile_action_tests.given_a_place_a_single_tile_action import Given_A_PlaceASingleTileAction
+from automated_tests.business_logic_tests.action_tests.place_a_single_tile_action_tests.given_a_place_a_single_tile_action import \
+    Given_A_PlaceASingleTileAction
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests \
     .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
-from automated_tests.mocks.mock_player import MockPlayer
 from automated_tests.mocks.mock_card import MockCard
+from automated_tests.mocks.mock_player import MockPlayer
 from automated_tests.mocks.mock_tile import MockTile
-from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect, AllowSubstitutionForPurchaseEffect, DecreasePriceOfTileEffect
-from buisness_logic.tiles.dwelling import Dwelling
+from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect, AllowSubstitutionForPurchaseEffect, \
+    DecreasePriceOfTileEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
@@ -89,11 +90,11 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceASingleTileA
             2,
             effects=[allow_substitution_for_purchase_effect])
 
-        # starting cost:      wood 4, stone 3
-        # after substitution: wood 2, stone 0, ore 2
-        # after decrease:     wood 2, stone 0, ore 0
-        # starting resouces:  wood 2, stone 0, ore 0, ruby 2
-        # final resources:    wood 0, stone 0, ore 0, ruby 2
+        # starting cost:       wood 4, stone 3
+        # after substitution:  wood 2, stone 0, ore 2
+        # after decrease:      wood 2, stone 0, ore 0
+        # starting resources:  wood 2, stone 0, ore 0, ruby 2
+        # final resources:     wood 0, stone 0, ore 0, ruby 2
         effects_to_use: Dict[BaseTilePurchaseEffect, int] = {
             decrease_price_of_tile_effect: 1,
             allow_substitution_for_purchase_effect: 1,

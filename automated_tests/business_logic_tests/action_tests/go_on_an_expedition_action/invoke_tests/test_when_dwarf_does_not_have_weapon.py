@@ -1,6 +1,7 @@
 from typing import List, cast
 
-from automated_tests.business_logic_tests.action_tests.go_on_an_expedition_action.given_a_go_on_expedition_action import Given_A_GoOnAnExpeditionAction
+from automated_tests.business_logic_tests.action_tests.go_on_an_expedition_action.given_a_go_on_expedition_action import \
+    Given_A_GoOnAnExpeditionAction
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests \
     .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
 from automated_tests.mocks.mock_player import MockPlayer
@@ -10,7 +11,6 @@ from common.entities.dwarf import Dwarf
 from common.entities.precedes_constraint import PrecedesConstraint
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from common.entities.weapon import Weapon
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_constraint import BaseConstraint
 from core.enums.harvest_type_enum import HarvestTypeEnum

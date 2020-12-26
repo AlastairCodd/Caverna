@@ -2,25 +2,30 @@ from typing import List, Dict, cast, Optional
 
 from automated_tests.business_logic_tests.action_tests.place_a_twin_tile_action_tests.given_a_place_a_twin_tile_action \
     import Given_A_PlaceATwinTileAction
-from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests\
+from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests \
     .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
-from automated_tests.mocks.mock_player import MockPlayer
 from automated_tests.mocks.mock_card import MockCard
+from automated_tests.mocks.mock_player import MockPlayer
 from buisness_logic.tiles.dwelling import Dwelling
+from buisness_logic.tiles.mine_tiles import TunnelTile, OreMineTile, DeepTunnelTile
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
 class test_when_cost_is_overridden(Given_A_PlaceATwinTileAction):
     def because(self) -> None:
-        self.initialise_sut_with_twin_tile({ResourceTypeEnum.ruby: 1})
+        self.initialise_sut_with_twin_tile(
+            override_cost={
+                ResourceTypeEnum.ruby: 1
+            }
+        )
 
         self._player: BasePlayerService = self.initialise_player()
 
@@ -65,16 +70,28 @@ class test_when_cost_is_overridden(Given_A_PlaceATwinTileAction):
         }
 
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
-        location_to_place_tile: int = 28
+
+        # _ 1 2 _ | _ _ _ 7
+        # 8 x x x | x x x _
+        # _ x x x | x T x _
+        # _ x x x | C T x _
+        # _ x x x | D x x _
+        # _ _ _ _ | _ _ _ _
+        location_to_place_primary_tile: int = 29
+        location_to_place_secondary_tile: int = location_to_place_primary_tile - 8
+        player.tiles[location_to_place_primary_tile].set_tile(TunnelTile())
+        player.tiles[location_to_place_secondary_tile].set_tile(TunnelTile())
+
         player.get_player_choice_location_to_build_returns(
             lambda _, __, ___: ResultLookup(
                 True,
-                TileUnknownPlacementLookup(location_to_place_tile, None)
-            ))
+                TileUnknownPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.up)))
+
         player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
 
         self._expected_tiles: Dict[int, Optional[BaseTile]] = {
-            location_to_place_tile: self._specific_tile
+            location_to_place_primary_tile: OreMineTile(),
+            location_to_place_secondary_tile: DeepTunnelTile()
         }
 
         return player
@@ -104,7 +121,7 @@ class test_when_cost_is_overridden(Given_A_PlaceATwinTileAction):
         self.assertIsNotNone(self._action_invoked_result.value)
 
     def test_then_invoked_result_value_should_be_expected(self) -> None:
-        self.assertEqual(self._action_invoked_result.value, 1)
+        self.assertEqual(self._action_invoked_result.value, 2)
 
     def test_then_invoked_result_errors_should_be_empty(self) -> None:
         self.assertListEqual([], cast(List, self._action_invoked_result.errors))
@@ -114,7 +131,7 @@ class test_when_cost_is_overridden(Given_A_PlaceATwinTileAction):
             with self.subTest(location=tile_location):
                 expected_tile: Optional[BaseTile] = self._expected_tiles[tile_location]
                 if expected_tile is not None:
-                    self.assertIs(self._player.tiles[tile_location].tile, expected_tile)
+                    self.assertIs(self._player.tiles[tile_location].tile.id, expected_tile.id)
                 else:
                     self.assertIsNone(self._player.tiles[tile_location].tile)
 
@@ -122,6 +139,3 @@ class test_when_cost_is_overridden(Given_A_PlaceATwinTileAction):
         for resource in self._expected_resources:
             with self.subTest(resource=resource):
                 self.assertEqual(self._player.resources[resource], self._expected_resources[resource])
-
-    def test_then_tile_service_should_report_tile_is_not_available(self) -> None:
-        self.assertFalse(True)

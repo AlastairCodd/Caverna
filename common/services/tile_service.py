@@ -1,4 +1,4 @@
-from typing import List, Union, Dict, Iterable, Tuple, Optional, Callable
+from typing import List, Dict, Iterable, Tuple, Optional, Callable
 
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
@@ -32,6 +32,7 @@ class TileService(object):
             TileTypeEnum.cavern: lambda: CavernTile(),
             TileTypeEnum.tunnel: lambda: TunnelTile(),
             TileTypeEnum.deepTunnel: lambda: DeepTunnelTile(),
+            TileTypeEnum.oreMine: lambda: RubyMineTile(),
             TileTypeEnum.rubyMine: lambda: RubyMineTile(),
         }
 
@@ -90,14 +91,16 @@ class TileService(object):
         result: List[BaseTile] = [tile for tile in tiles if tile.tile_type == tile_type]
         return result
 
-    # TODO: consider how to get this singleton information out
     def is_tile_available(
             self,
             turn_descriptor: TurnDescriptorLookup,
             tile: BaseTile) -> bool:
         if tile is None:
             raise ValueError("Tile may not be None")
-        return any(map(lambda x: x.id == tile.id, turn_descriptor.tiles))
+        result: bool = tile.tile_type in self._unique_tile_funcs
+        if not result:
+            result = any(map(lambda x: x.id == tile.id, turn_descriptor.tiles))
+        return result
 
     def can_place_tile_at_location(
             self,
@@ -140,28 +143,27 @@ class TileService(object):
     def can_place_twin_tile_at_location(
             self,
             player: TileContainer,
-            primary_tile: BaseTile,
-            secondary_tile: BaseTile,
+            twin_tile_type: TileTypeEnum,
             location: int,
             direction: TileDirectionEnum) -> bool:
         """Gets whether or not a the given tiles may be placed at the given location, and in the given direction, on the given player's board.
 
         :param player: The board where the tile will be placed. This may not be null.
-        :param primary_tile: The tile to be placed at the location. This may not be null.
-        :param secondary_tile: The tile to be placed, offset from the location in the given direction. This may not be null.
+        :param twin_tile_type: The type of the twin to be placed at the location. This may not be null.
         :param location: The location to query whether the tile can be placed on. This must be positive, and less than the max size of the player's board.
         :param direction: The direction to offset the section tile in.
         :returns: True if the tile may be placed at this location, false if not."""
         if player is None:
             raise ValueError("Player may not be None")
-        if primary_tile is None:
-            raise ValueError("Primary Tile may not be None")
-        if secondary_tile is None:
-            raise ValueError("Seconday Tile may not be None")
+        if twin_tile_type not in self._twin_tile_types:
+            raise ValueError("Tile type must be twin")
         if location < 0 or location >= player.tile_count:
             raise IndexError(f"Location index ({location}) must be in range [0, Number of Tiles owned by Player: {player.tile_count})")
 
-        possible_locations: List[TileTwinPlacementLookup] = self.get_available_locations_for_twin(player, primary_tile.tile_type, secondary_tile.tile_type)
+        possible_locations: List[TileTwinPlacementLookup] = self\
+            .get_available_locations_for_twin(
+            player,
+            twin_tile_type)
         result: bool = TileTwinPlacementLookup(location, direction) in possible_locations
         return result
 
@@ -242,13 +244,11 @@ class TileService(object):
     def get_available_locations_for_twin(
             self,
             player: TileContainer,
-            primary_tile_type: TileTypeEnum,
-            secondary_tile_type: TileTypeEnum) -> List[TileTwinPlacementLookup]:
+            twin_tile_type: TileTypeEnum) -> List[TileTwinPlacementLookup]:
         """Get all locations available for a tile with the given type
 
         :param player: The player where the tile will be placed. This may not be null.
-        :param primary_tile_type: The type of the tile to be placed.
-        :param secondary_tile_type: The type of the tile to be placed.
+        :param twin_tile_type: The type of the twin tile to be placed.
         :returns: A list of locations and directions. This will never be null.
         """
         if player is None:
@@ -256,18 +256,23 @@ class TileService(object):
         all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
 
         # get the correct requisites -- if adjacent, allow unavailable
-        primary_tile_requisites: List[TileTypeEnum] = all_tile_requisites[primary_tile_type]
-        secondary_tile_requisites: List[TileTypeEnum] = all_tile_requisites[secondary_tile_type]
+        tile_requisites: List[TileTypeEnum] = all_tile_requisites[twin_tile_type]
 
         valid_positions_with_adjacent: List[TileTwinPlacementLookup] = []
 
         for location in player.tiles:
-            if player.tiles[location].tile_type in primary_tile_requisites:
+            primary_location_tile_type = player.tiles[location].tile_type
+            if primary_location_tile_type in tile_requisites:
                 adjacent_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(player, location)
-                for adjacentTile in adjacent_tile_locations:
-                    adjacent_tile_type: TileTypeEnum = player.tiles[adjacentTile[0]].tile_type
-                    if adjacent_tile_type in secondary_tile_requisites:
-                        valid_positions_with_adjacent.append(TileTwinPlacementLookup(location, adjacentTile[1]))
+                for adjacent_tile_location in adjacent_tile_locations:
+                    secondary_location_tile_type: TileTypeEnum = player.tiles[adjacent_tile_location.location].tile_type
+                    if secondary_location_tile_type in tile_requisites and \
+                            not (primary_location_tile_type == TileTypeEnum.unavailable
+                                 and secondary_location_tile_type == TileTypeEnum.unavailable):
+                        valid_positions_with_adjacent.append(
+                            TileTwinPlacementLookup(
+                                location,
+                                adjacent_tile_location.direction))
                         break
 
         return valid_positions_with_adjacent
@@ -338,6 +343,7 @@ class TileService(object):
     def place_twin_tile(
             self,
             player: TileContainer,
+            twin_tile_type: TileTypeEnum,
             primary_tile: BaseTile,
             secondary_tile: BaseTile,
             location: int,
@@ -347,11 +353,13 @@ class TileService(object):
         if primary_tile is None:
             raise ValueError("Primary Tile may not be None")
         if secondary_tile is None:
-            raise ValueError("Seconday Tile may not be None")
+            raise ValueError("Secondary Tile may not be None")
         if location < 0 or location >= player.tile_count:
             raise IndexError(f"Location index ({location}) must be in range [0, Number of Tiles owned by Player: {player.tile_count})")
 
-        possible_locations: List[TileTwinPlacementLookup] = self.get_available_locations_for_twin(player, primary_tile.tile_type, secondary_tile.tile_type)
+        possible_locations: List[TileTwinPlacementLookup] = self.get_available_locations_for_twin(
+            player,
+            twin_tile_type)
 
         result: ResultLookup[bool]
 
