@@ -1,14 +1,15 @@
-from typing import Dict, Callable, List
+from typing import Dict, Callable
 
-from buisness_logic.actions.base_receive_action import BaseReceiveAction
+from buisness_logic.services.base_receive_event_service import BaseReceiveEventService
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
-class ReceiveConditionallyAction(BaseReceiveAction):
+class ReceiveConditionallyAction(BaseReceiveEventService, BaseAction):
     def __init__(
             self,
             condition: Callable[[BasePlayerRepository], int],
@@ -20,7 +21,7 @@ class ReceiveConditionallyAction(BaseReceiveAction):
 
         self._condition: Callable[[BasePlayerRepository], int] = condition
         self._receive_items: Dict[ResourceTypeEnum, int] = receive_items
-        BaseReceiveAction.__init__(self)
+        BaseReceiveEventService.__init__(self)
 
     def invoke(
             self,

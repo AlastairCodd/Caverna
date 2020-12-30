@@ -3,12 +3,11 @@ from typing import Dict, List
 
 from buisness_logic.effects.receive_when_receiving_effect import ReceiveWhenReceivingEffect
 from common.entities.result_lookup import ResultLookup
-from core.baseClasses.base_action import BaseAction
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
-class BaseReceiveAction(BaseAction, metaclass=ABCMeta):
+class BaseReceiveEventService(metaclass=ABCMeta):
     def _give_player_resources(
             self,
             player: BasePlayerRepository,

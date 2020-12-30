@@ -1,9 +1,9 @@
-from math import floor
 from abc import abstractmethod, ABCMeta
-from typing import Dict, Callable, List, Optional
+from math import floor
+from typing import Dict, Callable, List
 
-from buisness_logic.actions.receive_action import ReceiveAction
 from buisness_logic.effects.base_effects import BaseOnPurchaseEffect
+from buisness_logic.services.base_receive_event_service import BaseReceiveEventService
 from common.entities.result_lookup import ResultLookup
 from common.services.resettable import Resettable
 from core.baseClasses.base_effect import BaseEffect
@@ -11,7 +11,10 @@ from core.enums.caverna_enums import TriggerStateEnum, ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
-class BaseResourceEffect(BaseEffect, metaclass=ABCMeta):
+class BaseResourceEffect(
+        BaseEffect,
+        BaseReceiveEventService,
+        metaclass=ABCMeta):
     @abstractmethod
     def invoke(
             self,
@@ -19,7 +22,10 @@ class BaseResourceEffect(BaseEffect, metaclass=ABCMeta):
         raise NotImplementedError("base resource effect class")
 
 
-class BaseOccursForSeveralTurnsEffect(BaseEffect, Resettable, metaclass=ABCMeta):
+class BaseOccursForSeveralTurnsEffect(
+        BaseEffect,
+        Resettable,
+        metaclass=ABCMeta):
     def __init__(
             self,
             number_of_turns: int):
@@ -38,7 +44,9 @@ class BaseOccursForSeveralTurnsEffect(BaseEffect, Resettable, metaclass=ABCMeta)
         return result
 
 
-class ReceiveOnPurchaseEffect(BaseResourceEffect, BaseOnPurchaseEffect):
+class ReceiveOnPurchaseEffect(
+        BaseResourceEffect,
+        BaseOnPurchaseEffect):
     def __init__(self, output):
         self._output = output
         BaseEffect.__init__(self)
@@ -50,7 +58,9 @@ class ReceiveOnPurchaseEffect(BaseResourceEffect, BaseOnPurchaseEffect):
         return result
 
 
-class ReceiveProportionalOnPurchaseEffect(BaseResourceEffect, BaseOnPurchaseEffect):
+class ReceiveProportionalOnPurchaseEffect(
+        BaseResourceEffect,
+        BaseOnPurchaseEffect):
     def __init__(
             self,
             receive: Dict[ResourceTypeEnum, int],
@@ -74,13 +84,15 @@ class ReceiveProportionalOnPurchaseEffect(BaseResourceEffect, BaseOnPurchaseEffe
             [floor(player.resources.get(r, 0) / self._proportional_to[r]) for r in self._proportional_to]
         amount_to_receive_multiplier: int = min(number_of_resources_proportional_to)
         if amount_to_receive_multiplier > 0:
-            resources_to_give: Dict[ResourceTypeEnum, int] = {r: amount_to_receive_multiplier * self._receive[r] for r in self._receive}
-            return player.give_resources(resources_to_give)
+            resources_to_give: Dict[ResourceTypeEnum, int] = {r: amount_to_receive_multiplier * self._receive[r] for r
+                                                              in self._receive}
+            return self._give_player_resources(player, resources_to_give).flag
         else:
             return True
 
 
-class ReceiveConditionallyAtStartOfTurnEffect(BaseResourceEffect):
+class ReceiveConditionallyAtStartOfTurnEffect(
+        BaseResourceEffect):
     def __init__(
             self,
             received: Dict[ResourceTypeEnum, int],
@@ -111,7 +123,9 @@ class ReceiveConditionallyAtStartOfTurnEffect(BaseResourceEffect):
         return player.give_resources(resources)
 
 
-class ReceiveForTurnsEffect(BaseOccursForSeveralTurnsEffect):
+class ReceiveForTurnsEffect(
+        BaseOccursForSeveralTurnsEffect,
+        BaseReceiveEventService):
     def __init__(
             self,
             resources: Dict[ResourceTypeEnum, int],
@@ -129,9 +143,37 @@ class ReceiveForTurnsEffect(BaseOccursForSeveralTurnsEffect):
 
         result: ResultLookup[int]
         if self._is_still_active():
-            resources_given_successfully: bool = player.give_resources(self._resources)
-            result = ResultLookup(resources_given_successfully, len(self._resources))
+            result = self._give_player_resources(player, self._resources)
         else:
             result = ResultLookup(True, 0, f"Action has been used for {self._number_of_turns} turns, and is exhausted.")
         return result
 
+
+class ReceiveWhenBreedingEffect(
+        BaseEffect,
+        BaseReceiveEventService):
+    def __init__(
+            self,
+            conditional: Callable[[List[ResourceTypeEnum]], Dict[ResourceTypeEnum, int]]) -> None:
+        if conditional is None:
+            raise ValueError("Conditional cannot be None")
+        self._conditional: Callable[[List[ResourceTypeEnum]], Dict[ResourceTypeEnum, int]] = conditional
+        BaseEffect.__init__(self)
+
+    def invoke(
+            self,
+            player: BasePlayerRepository,
+            newborn_animals: List[ResourceTypeEnum]) -> ResultLookup[int]:
+        if player is None:
+            raise ValueError("Player cannot be none")
+        if newborn_animals is None:
+            raise ValueError("Newborn animals cannot be none")
+
+        resources_to_receive: Dict[ResourceTypeEnum, int] = self._conditional(newborn_animals)
+        result: ResultLookup[int]
+        if any(map(lambda v: v > 0, resources_to_receive.values())):
+            result = self._give_player_resources(player, resources_to_receive)
+        else:
+            result = ResultLookup(True, 0)
+
+        return result

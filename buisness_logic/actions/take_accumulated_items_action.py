@@ -1,14 +1,13 @@
-from __future__ import annotations
-
-from buisness_logic.actions.base_receive_action import BaseReceiveAction
+from buisness_logic.services.base_receive_event_service import BaseReceiveEventService
 from common.entities.dwarf import Dwarf
+from core.baseClasses.base_action import BaseAction
 from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_card import BaseCard
 from core.containers.resource_container import ResourceContainer
 
 
-class TakeAccumulatedItemsAction(BaseReceiveAction):
+class TakeAccumulatedItemsAction(BaseReceiveEventService, BaseAction):
     def invoke(
             self,
             player: BasePlayerRepository,

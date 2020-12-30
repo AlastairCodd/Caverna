@@ -1,14 +1,15 @@
 from typing import Dict
 
-from buisness_logic.actions.base_receive_action import BaseReceiveAction
+from buisness_logic.services.base_receive_event_service import BaseReceiveEventService
 from common.entities.dwarf import Dwarf
+from core.baseClasses.base_action import BaseAction
 from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
-class ReceiveAction(BaseReceiveAction):
+class ReceiveAction(BaseReceiveEventService, BaseAction):
     def __init__(self, receive_items: Dict[ResourceTypeEnum, int]):
         if receive_items is None:
             raise ValueError("Receive items cannot be none")

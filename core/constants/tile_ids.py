@@ -25,14 +25,14 @@ RubySupplierTileId: int = 20
 
 # TODO: Implement missing types
 DogSchoolTileId: int = 21
-#QuarryTileId: int = 22
+QuarryTileId: int = 22
 SeamTileId: int = 23
 SlaughteringCaveTileId: int = 24
 CookingCaveTileId: int = 25
 #WorkingCaveTileId: int = 26
 #MiningCaveTileId: int = 27
-#BreedingCaveTildId: int = 28
-PeacefulCaveTileId: int = 29
+BreedingCaveTileId: int = 28
+# PeacefulCaveTileId: int = 29
 WeavingParlorTileId: int = 30
 
 MilkingParlorTileId: int = 31
