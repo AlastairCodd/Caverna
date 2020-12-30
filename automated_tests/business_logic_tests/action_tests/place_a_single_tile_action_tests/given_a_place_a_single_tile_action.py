@@ -25,8 +25,12 @@ class Given_A_PlaceASingleTileAction(TestCase, metaclass=ABCMeta):
 
     def initialise_sut_with_specific_tile(
             self,
-            override_cost: Optional[Dict[ResourceTypeEnum, int]] = None) -> None:
-        self._specific_tile = Dwelling()
+            override_cost: Optional[Dict[ResourceTypeEnum, int]] = None,
+            specific_tile: Optional[BaseTile] = None) -> None:
+        if specific_tile is None:
+            self._specific_tile = Dwelling()
+        else:
+            self._specific_tile = specific_tile
         self.SUT = PlaceASingleTileAction(
             TileTypeEnum.furnishedCavern,
             lambda: self._specific_tile,

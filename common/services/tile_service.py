@@ -36,11 +36,15 @@ class TileService(object):
             TileTypeEnum.rubyMine: lambda: RubyMineTile(),
         }
 
-        self._twin_tile_funcs: Dict[TileTypeEnum, Tuple[Callable[[], BaseTile], Callable[[], BaseTile]]] = {
+        self._separable_twin_tile_funcs: Dict[TileTypeEnum, Tuple[Callable[[], BaseTile], Callable[[], BaseTile]]] = {
             TileTypeEnum.meadowFieldTwin: (MeadowTile, FieldTile),
             TileTypeEnum.cavernCavernTwin: (CavernTile, CavernTile),
             TileTypeEnum.cavernTunnelTwin: (CavernTile, TunnelTile),
             TileTypeEnum.oreMineDeepTunnelTwin: (OreMineTile, DeepTunnelTile),
+        }
+
+        self._inseparable_twin_tile_funcs: Dict[TileTypeEnum, Callable[[], BaseTile]] = {
+            TileTypeEnum.pastureTwin: PastureTwinTile
         }
 
         self._direction_offset: Dict[TileDirectionEnum, Callable[[TileContainer], int]] = {
@@ -79,9 +83,15 @@ class TileService(object):
     def get_twin_tile_generation_methods(
             self,
             tile_type: TileTypeEnum) -> Tuple[Callable[[], BaseTile], Callable[[], BaseTile]]:
-        if tile_type not in self._twin_tile_funcs:
+        result: Tuple[Callable[[], BaseTile], Callable[[], BaseTile]]
+        if tile_type in self._separable_twin_tile_funcs:
+            result = self._separable_twin_tile_funcs[tile_type]
+        elif tile_type in self._inseparable_twin_tile_funcs:
+            inseparable_tile_to_build: BaseTile = self._inseparable_twin_tile_funcs[tile_type]()
+            result = (lambda: inseparable_tile_to_build, lambda: inseparable_tile_to_build)
+        else:
             raise ValueError(f"Tile with type {tile_type} does not have twin generation methods")
-        result: Tuple[Callable[[], BaseTile], Callable[[], BaseTile]] = self._twin_tile_funcs[tile_type]
+
         return result
 
     def get_possible_tiles(
@@ -98,6 +108,8 @@ class TileService(object):
         if tile is None:
             raise ValueError("Tile may not be None")
         result: bool = tile.tile_type in self._unique_tile_funcs
+        if not result:
+            result = tile.tile_type in self._inseparable_twin_tile_funcs
         if not result:
             result = any(map(lambda x: x.id == tile.id, turn_descriptor.tiles))
         return result

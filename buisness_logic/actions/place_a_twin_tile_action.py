@@ -120,6 +120,7 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
 
         primary_tile: BaseTile = self._primary_twin_tile_generation_method()
         secondary_tile: BaseTile = self._secondary_twin_tile_generation_method()
+        is_twin_tile_inseparable: bool = primary_tile is secondary_tile
 
         can_place_tiles_at_chosen_location: bool = self._tile_service.can_place_twin_tile_at_location(
             player,
@@ -146,11 +147,16 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
                 primary_tile,
                 self._tile_cost_override,
                 self._effects_to_use)
-            actual_cost_of_secondary_tile_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service.get_cost_of_tile(
-                secondary_tile,
-                self._tile_cost_override,
-                self._effects_to_use)
             errors.extend(actual_cost_of_primary_tile_result.errors)
+
+            actual_cost_of_secondary_tile_result: ResultLookup[Dict[ResourceTypeEnum, int]]
+            if not is_twin_tile_inseparable:
+                actual_cost_of_secondary_tile_result = self._tile_service.get_cost_of_tile(
+                    secondary_tile,
+                    self._tile_cost_override,
+                    self._effects_to_use)
+            else:
+                actual_cost_of_secondary_tile_result = ResultLookup(True, {})
             errors.extend(actual_cost_of_secondary_tile_result.errors)
 
             if actual_cost_of_primary_tile_result.flag and actual_cost_of_secondary_tile_result.flag:
@@ -159,7 +165,7 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
                 for resource in actual_cost_of_primary_tile_result.value:
                     cost.setdefault(resource, 0)
                     cost[resource] += actual_cost_of_primary_tile_result.value[resource]
-                for resource in actual_cost_of_primary_tile_result.value:
+                for resource in actual_cost_of_secondary_tile_result.value:
                     cost.setdefault(resource, 0)
                     cost[resource] += actual_cost_of_primary_tile_result.value[resource]
         else:
@@ -198,9 +204,10 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
                 for effect in primary_tile.effects:
                     if isinstance(effect, BaseOnPurchaseEffect):
                         success &= effect.invoke(player)
-                for effect in secondary_tile.effects:
-                    if isinstance(effect, BaseOnPurchaseEffect):
-                        success &= effect.invoke(player)
+                if not is_twin_tile_inseparable:
+                    for effect in secondary_tile.effects:
+                        if isinstance(effect, BaseOnPurchaseEffect):
+                            success &= effect.invoke(player)
 
         result: ResultLookup[int] = ResultLookup(success, 2 if success else 0, errors)
         return result
@@ -236,25 +243,27 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
     def _does_player_have_effects(
             self,
             player: BasePlayerRepository) -> ResultLookup[bool]:
-        effects_player_has: List[BaseTilePurchaseEffect] = player.get_effects_of_type(BaseTilePurchaseEffect)
-
         errors: List[str] = []
-        effect: BaseTilePurchaseEffect
-        for effect in self._effects_to_use:
-            number_of_times_wants_to_use: int = self._effects_to_use[effect]
-            number_of_times_cant_use: int = number_of_times_wants_to_use
 
-            effect_player_has: BaseTilePurchaseEffect
-            for effect_player_has in effects_player_has:
-                if effect_player_has == effect:
-                    if effect.can_be_used_only_once:
-                        number_of_times_cant_use -= 1
-                    else:
-                        number_of_times_cant_use = 0
-            if number_of_times_cant_use > 0:
-                warning: str = f"Player wanted to use effect {effect} {number_of_times_wants_to_use} times," \
-                               + f" can only use {number_of_times_cant_use}"
-                errors.append(warning)
+        if len(self._effects_to_use) > 0:
+            effects_player_has: List[BaseTilePurchaseEffect] = player.get_effects_of_type(BaseTilePurchaseEffect)
+
+            effect: BaseTilePurchaseEffect
+            for effect in self._effects_to_use:
+                number_of_times_wants_to_use: int = self._effects_to_use[effect]
+                number_of_times_cant_use: int = number_of_times_wants_to_use
+
+                effect_player_has: BaseTilePurchaseEffect
+                for effect_player_has in effects_player_has:
+                    if effect_player_has == effect:
+                        if effect.can_be_used_only_once:
+                            number_of_times_cant_use -= 1
+                        else:
+                            number_of_times_cant_use = 0
+                if number_of_times_cant_use > 0:
+                    warning: str = f"Player wanted to use effect {effect} {number_of_times_wants_to_use} times," \
+                                   + f" can only use {number_of_times_cant_use}"
+                    errors.append(warning)
 
         success: bool = len(errors) == 0
         return ResultLookup(success, success, errors)

@@ -3,6 +3,7 @@ from typing import List, Callable
 
 from buisness_logic.tiles.point_tiles import BaseConditionalPointTile
 from common.entities.point_lookup import PointLookup
+from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
@@ -56,8 +57,15 @@ class PointCalculationService(object):
         return total_score
 
     def _calculate_conditional_points(self, player: BasePlayerRepository) -> List[PointLookup]:
-        conditional_point_tiles: List[BaseConditionalPointTile] = player.get_tiles_of_type(BaseConditionalPointTile)
-        conditional_points: List[PointLookup] = [t.get_conditional_point(player) for t in conditional_point_tiles]
+        conditional_points: List[PointLookup] = []
+        for tile_location, tile_entity in player.tiles.items():
+            tile: BaseTile = tile_entity.tile
+            if tile is not None and isinstance(tile, BaseConditionalPointTile):
+                conditional_point: PointLookup = tile.get_conditional_point(
+                    player,
+                    tile_entity)
+                conditional_points.append(conditional_point)
+
         return conditional_points
 
     def _point_per_resource(self, resource_type: ResourceTypeEnum, player: BasePlayerRepository) -> PointLookup:

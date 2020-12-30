@@ -35,7 +35,6 @@ class BaseTile(metaclass=ABCMeta):
         if effects is None:
             effects = []
         self._effects: List[BaseEffect] = effects
-        self.location: int = -1
 
     @property
     def is_dwelling(self) -> bool:

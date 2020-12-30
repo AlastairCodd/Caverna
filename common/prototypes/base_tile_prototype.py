@@ -30,6 +30,4 @@ class BaseTilePrototype(BaseImmutablePrototype[BaseTile]):
                 source.cost,
                 source.effects)
 
-        target.location = source.location
-
         return target
