@@ -1,4 +1,4 @@
-from typing import Dict, List, Iterable, Tuple, Union
+from typing import Dict, List, Iterable, Tuple, Optional
 
 from buisness_logic.validators.partition_resource_validator import PartitionResourceValidator
 from common.forges.set_partition_forge import SetPartitionForge
@@ -8,14 +8,25 @@ from core.enums.caverna_enums import ResourceTypeEnum
 class ResourceLayoutExhaustiveChecker(object):
 
     def __init__(self):
-        self._partitionResourceValidator: PartitionResourceValidator = PartitionResourceValidator()
-        self._setPartitionForge: SetPartitionForge = SetPartitionForge()
+        self._partition_resource_validator: PartitionResourceValidator = PartitionResourceValidator()
+        self._set_partition_forge: SetPartitionForge = SetPartitionForge()
+        self._animals_or_none: List[Optional[ResourceTypeEnum]] = [
+            None,
+            ResourceTypeEnum.sheep,
+            ResourceTypeEnum.donkey,
+            ResourceTypeEnum.cow,
+            ResourceTypeEnum.boar]
 
     def check_resource_layout_against_possible_set_partitions(
             self,
             resource_layout: List[Dict[ResourceTypeEnum, int]],
             current_resources: Dict[ResourceTypeEnum, int]) \
-            -> Iterable[Tuple[bool, List[Union[ResourceTypeEnum, None]], Dict[ResourceTypeEnum, int], Dict[ResourceTypeEnum, int]]]:
+            -> Iterable[Tuple[
+                    bool,
+                    List[Optional[ResourceTypeEnum]],
+                    Dict[ResourceTypeEnum, int],
+                    Dict[ResourceTypeEnum, int]
+                ]]:
         """Checks the provided resource layout against all possible set partitions,
         and returns the ones which are able to store the provided resources.
 
@@ -24,9 +35,12 @@ class ResourceLayoutExhaustiveChecker(object):
         :returns: A list containing all set partitions (list with same length as resource layout, with entries matching which resource type holds this
         partition. This will never be null, but may be empty.
         """
-        animals_or_none: List[ResourceTypeEnum, None] = [None, ResourceTypeEnum.sheep, ResourceTypeEnum.donkey, ResourceTypeEnum.cow, ResourceTypeEnum.boar]
+        for partition in self._set_partition_forge.generate_set_partitions(len(resource_layout), self._animals_or_none):
+            remaining, excess = self._partition_resource_validator\
+                .get_resource_remaining_and_excess(
+                    resource_layout,
+                    current_resources,
+                    partition)
 
-        for partition in self._setPartitionForge.generate_set_partitions(len(resource_layout), animals_or_none):
-            remaining, excess = self._partitionResourceValidator.get_resource_remaining_and_excess(resource_layout, current_resources, partition)
             success: bool = all([x == 0 for x in remaining.values()])
             yield success, partition, remaining, excess

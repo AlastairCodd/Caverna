@@ -141,8 +141,17 @@ class Investigation(object):
                 logger.log(resource_line, True, True, True)
 
                 for resource_layout in self.generate_resource_layouts(resources_per_animal, max_per_tile, number_of_tiles):
-                    evaluated_partitions: Iterable[Tuple[bool, List[Union[ResourceTypeEnum, None]], Dict[ResourceTypeEnum, int], Dict[ResourceTypeEnum, int]]] = \
-                        self._resourceLayoutExhaustiveChecker.check_resource_layout_against_possible_set_partitions(resource_layout, resources_per_animal)
+                    evaluated_partitions: Iterable[
+                        Tuple[
+                            bool,
+                            List[Union[ResourceTypeEnum, None]],
+                            Dict[ResourceTypeEnum, int],
+                            Dict[ResourceTypeEnum, int]
+                        ]
+                    ] = self._resourceLayoutExhaustiveChecker\
+                            .check_resource_layout_against_possible_set_partitions(
+                                resource_layout,
+                                resources_per_animal)
 
                     has_header_been_added_to_successful_output: bool = False
                     has_header_been_added_to_failure_output: bool = False

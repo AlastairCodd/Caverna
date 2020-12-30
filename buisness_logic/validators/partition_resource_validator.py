@@ -1,4 +1,4 @@
-from typing import List, Dict, Union, TypeVar, Tuple
+from typing import List, Dict, Optional, TypeVar, Tuple
 from core.exceptions.ArgumentOutOfRangeError import ArgumentOutOfRangeError
 
 T = TypeVar('T')
@@ -10,7 +10,7 @@ class PartitionResourceValidator:
             self,
             resource_layout: List[Dict[T, int]],
             current_resources: Dict[T, int],
-            partition: List[Union[T, None]]) -> bool:
+            partition: List[Optional[T]]) -> bool:
         if resource_layout is None:
             raise ValueError("resource layout may not be null")
         if current_resources is None:
@@ -30,7 +30,7 @@ class PartitionResourceValidator:
             self,
             resource_layout: List[Dict[T, int]],
             current_resources: Dict[T, int],
-            partition: List[Union[T, None]]) -> Tuple[Dict[T, int], Dict[T, int]]:
+            partition: List[Optional[T]]) -> Tuple[Dict[T, int], Dict[T, int]]:
         if resource_layout is None:
             raise ValueError("resource layout may not be null")
         if current_resources is None:
@@ -43,7 +43,7 @@ class PartitionResourceValidator:
         remaining_resources: Dict[T, int] = dict(current_resources)
         excess_resources: Dict[T, int] = {t: 0 for t in current_resources}
         for i in range(len(partition)):
-            object_stored_in_current: Union[T, None] = partition[i]
+            object_stored_in_current: Optional[T] = partition[i]
             if object_stored_in_current is not None:
                 amount_of_resources_allowed_in_current: int = resource_layout[i][object_stored_in_current]
                 if object_stored_in_current in remaining_resources:
