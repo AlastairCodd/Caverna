@@ -285,7 +285,6 @@ class TileService(object):
                             TileTwinPlacementLookup(
                                 location,
                                 adjacent_tile_location.direction))
-                        break
 
         return valid_positions_with_adjacent
 

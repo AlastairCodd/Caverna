@@ -6,8 +6,6 @@ from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_ch
     .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
 from automated_tests.mocks.mock_card import MockCard
 from automated_tests.mocks.mock_player import MockPlayer
-from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect, DecreasePriceOfTileEffect, \
-    AllowSubstitutionForPurchaseEffect
 from buisness_logic.tiles.dwelling import Dwelling
 from buisness_logic.tiles.mine_tiles import TunnelTile
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -21,14 +19,9 @@ from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
-class test_when_location_chosen_is_invalid(Given_A_PlaceATwinTileAction):
+class test_when_location_does_not_have_requisites(Given_A_PlaceATwinTileAction):
     def because(self) -> None:
-        self.initialise_sut_with_twin_tile(
-            override_cost={
-                ResourceTypeEnum.wood: 4,
-                ResourceTypeEnum.stone: 3
-            }
-        )
+        self.initialise_sut_with_twin_tile()
 
         self._player: BasePlayerService = self.initialise_player()
 
@@ -67,30 +60,6 @@ class test_when_location_chosen_is_invalid(Given_A_PlaceATwinTileAction):
             ResourceTypeEnum.ruby: 2,
         }
 
-        decrease_price_of_tile_effect: BaseTilePurchaseEffect = DecreasePriceOfTileEffect(
-            {
-                ResourceTypeEnum.ore: 2
-            })
-
-        allow_substitution_for_purchase_effect: BaseTilePurchaseEffect = AllowSubstitutionForPurchaseEffect(
-            {
-                ResourceTypeEnum.stone: 3,
-                ResourceTypeEnum.wood: 2
-            },
-            {
-                ResourceTypeEnum.ore: 2
-            })
-
-        # starting cost:       wood 4, stone 3
-        # after substitution:  wood 2, stone 0, ore 2
-        # after decrease:      wood 2, stone 0, ore 0
-        # starting resources:  wood 2, stone 0, ore 0, ruby 2
-        # final resources:     wood 0, stone 0, ore 0, ruby 2
-        effects_to_use: Dict[BaseTilePurchaseEffect, int] = {
-            decrease_price_of_tile_effect: 1,
-            allow_substitution_for_purchase_effect: 1,
-        }
-
         player: MockPlayer = MockPlayer(dwarves, self._starting_resources)
 
         # _ 1 2 _ | _ _ _ 7
@@ -108,7 +77,7 @@ class test_when_location_chosen_is_invalid(Given_A_PlaceATwinTileAction):
                 True,
                 TileUnknownPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.up)))
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: effects_to_use)
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
 
         self._expected_tiles: Dict[int, Optional[BaseTile]] = {
             location_to_place_primary_tile: None,

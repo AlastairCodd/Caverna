@@ -56,20 +56,6 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_player_choice_discount(
-            self,
-            possible_prices: List[Dict[ResourceTypeEnum, int]],
-            target: Union[BaseTile, Weapon]) \
-            -> Dict[ResourceTypeEnum, int]:
-        """Gets user choice for which discount level to apply.
-
-        :param possible_prices: A list of possible costs for some item (either a tile or a weapon). This cannot be null.
-        :param target: The item which is to be purchased. This cannot be null.
-        :returns: The chosen cost of the item. This will never be null, and will be an element of possible_prices.
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
     def get_player_choice_use_dwarf_out_of_order(
             self,
             dwarves: List[Dwarf],
