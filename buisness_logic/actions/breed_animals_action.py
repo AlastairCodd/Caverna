@@ -42,17 +42,24 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         if player is None:
             raise ValueError("Player cannot be none")
+        if turn_descriptor is None:
+            raise ValueError("Turn descriptor cannot be none")
 
-        animals_to_reproduce = player.get_player_choice_breed_animals(
+        animals_to_reproduce_result: ResultLookup[List[ResourceTypeEnum]] = player.get_player_choice_animals_to_breed(
             self._animals_which_can_reproduce,
-            self._maximum_number_of_animals_to_reproduce)
+            self._maximum_number_of_animals_to_reproduce,
+            turn_descriptor)
 
         result: ResultLookup[ActionChoiceLookup]
-        if len(animals_to_reproduce) > self._maximum_number_of_animals_to_reproduce:
-            result = ResultLookup(
-                errors=f"Attempted to breed more than {self._maximum_number_of_animals_to_reproduce} animals")
+        if animals_to_reproduce_result.flag:
+            if len(animals_to_reproduce_result.value) > self._maximum_number_of_animals_to_reproduce:
+                result = ResultLookup(
+                    errors=f"Attempted to breed more than {self._maximum_number_of_animals_to_reproduce} animals")
+            else:
+                self._animals_to_reproduce = animals_to_reproduce_result.value
+                result = ResultLookup(True, ActionChoiceLookup([], []))
         else:
-            result = ResultLookup(True, ActionChoiceLookup([], []))
+            result = ResultLookup(errors=animals_to_reproduce_result.errors)
         return result
 
     def invoke(
@@ -82,7 +89,9 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
 
         if success:
             increase_number_of_animals_result: ResultLookup[int] = self._increase_number_of_animals_player_has(player)
+
             success &= increase_number_of_animals_result.flag
+            value = increase_number_of_animals_result.value
             errors.extend(increase_number_of_animals_result.errors)
 
         if success:
@@ -186,7 +195,44 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
         if success:
             result = ResultLookup(True, True)
         else:
-            # TODO: Consider Dogs
+            result = self._does_player_have_space_for_animals_with_dogs(
+                player,
+                player_animals,
+                animal_storage_buckets)
+        return result
+
+    def _does_player_have_space_for_animals_with_dogs(
+            self,
+            player: BasePlayerRepository,
+            player_animals: Dict[ResourceTypeEnum, int],
+            dogless_layout: Dict[int, Dict[ResourceTypeEnum, int]]) -> ResultLookup[bool]:
+        # self._get_tiles_which_dogs_have_effect_on()
+
+        animal_storage_buckets: List[Dict[ResourceTypeEnum, int]] = self._get_animal_storage_buckets_for_player(player)
+        player_animals: Dict[ResourceTypeEnum, int] = {
+            animal: player.get_resources_of_type(animal)
+            for animal
+            in self._animals_which_can_reproduce
+            if player.get_resources_of_type(animal) > 0}
+        evaluated_partitions: Iterable[
+            Tuple[
+                bool,
+                List[Optional[ResourceTypeEnum]],
+                Dict[ResourceTypeEnum, int],
+                Dict[ResourceTypeEnum, int]
+            ]
+        ] = self._resource_layout_checker \
+            .check_resource_layout_against_possible_set_partitions(
+            animal_storage_buckets,
+            player_animals)
+        success: bool = False
+        for (did_partition_store_all_animals, partition, remaining, excess) in evaluated_partitions:
+            if did_partition_store_all_animals:
+                success = True
+                break
+        if success:
+            result = ResultLookup(True, True)
+        else:
             result = ResultLookup(errors="Player does not have enough space to store all animals")
         return result
 

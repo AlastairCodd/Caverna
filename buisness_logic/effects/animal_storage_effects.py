@@ -3,6 +3,7 @@ from typing import Dict, List, Callable
 
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_entity import TileEntity
+from core.constants import resource_types
 from core.repositories.base_player_repository import BasePlayerRepository
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
@@ -10,11 +11,6 @@ from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 
 class BaseAnimalStorageEffect(BaseEffect, metaclass=ABCMeta):
     def __init(self):
-        self._farm_animals: List[ResourceTypeEnum] = [
-            ResourceTypeEnum.sheep,
-            ResourceTypeEnum.donkey,
-            ResourceTypeEnum.boar,
-            ResourceTypeEnum.cow]
         BaseEffect.__init__(self)
 
     @abstractmethod
@@ -37,7 +33,7 @@ class StoreAnyAnimalEffect(BaseAnimalStorageEffect):
             player: BasePlayerRepository) -> Dict[ResourceTypeEnum, int]:
         if player is None:
             raise ValueError("Player")
-        result: Dict[ResourceTypeEnum, int] = {farm_animal: self._quantity for farm_animal in self._farm_animals}
+        result: Dict[ResourceTypeEnum, int] = {farm_animal: self._quantity for farm_animal in resource_types.farm_animals}
         return result
 
 

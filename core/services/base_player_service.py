@@ -39,17 +39,19 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_player_choice_breed_animals(
+    def get_player_choice_animals_to_breed(
             self,
             animals_which_can_reproduce: List[ResourceTypeEnum],
-            possible_number_of_animals_to_reproduce: int) \
-            -> List[ResourceTypeEnum]:
+            possible_number_of_animals_to_reproduce: int,
+            turn_descriptor: TurnDescriptorLookup) \
+            -> ResultLookup[List[ResourceTypeEnum]]:
         """Get user choice for which animals to breed.
 
         :param animals_which_can_reproduce: List of possible animals which can reproduce at the moment.
             This cannot be null.
         :param possible_number_of_animals_to_reproduce: Number of animals to choose.
             This will be in the range [0, len(animals_which_can_reproduce)].
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
         :returns: A list of animals which will be bred this turn. This will never be null, and length will match
             possible_number_of_animals_to_reproduce.
         """

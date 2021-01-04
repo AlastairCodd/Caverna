@@ -50,6 +50,12 @@ class MockPlayer(BasePlayerService):
             ResultLookup[BaseCard]] \
             = lambda info_available_cards, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._weapon_level_func: Callable[[TurnDescriptorLookup], int] = lambda info_turn_descriptor: 0
+        self._animals_to_breed_func: Callable[
+            [List[ResourceTypeEnum],
+             int,
+             TurnDescriptorLookup],
+            ResultLookup[List[ResourceTypeEnum]]
+        ] = lambda info_available_actions, info_expedition_level, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._expedition_rewards_func: Callable[
             [List[BaseAction],
              int,
@@ -148,6 +154,15 @@ class MockPlayer(BasePlayerService):
                 Dict[BaseTilePurchaseEffect, int]]) -> None:
         self._effects_to_use_for_cost_discount = func
 
+    def get_player_choice_animals_to_breed_returns(
+        self,
+        func: Callable[
+            [List[ResourceTypeEnum],
+             int,
+             TurnDescriptorLookup],
+            ResultLookup[List[ResourceTypeEnum]]]) -> None:
+        self._animals_to_breed_func = func
+
     def get_player_choice_weapon_level_returns(
             self,
             func: Callable[[TurnDescriptorLookup], int]) -> None:
@@ -159,17 +174,15 @@ class MockPlayer(BasePlayerService):
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Dwarf]:
         return self._dwarf_to_use_out_of_order_func(dwarves, turn_descriptor)
 
-    def get_player_choice_discount(
-            self,
-            possible_prices: List[Dict[ResourceTypeEnum, int]],
-            target: Union[BaseTile, Weapon]) -> Dict[ResourceTypeEnum, int]:
-        pass
-
-    def get_player_choice_breed_animals(
+    def get_player_choice_animals_to_breed(
             self,
             animals_which_can_reproduce: List[ResourceTypeEnum],
-            possible_number_of_animals_to_reproduce: int) -> List[ResourceTypeEnum]:
-        pass
+            possible_number_of_animals_to_reproduce: int,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
+        return self._animals_to_breed_func(
+            animals_which_can_reproduce,
+            possible_number_of_animals_to_reproduce,
+            turn_descriptor)
 
     def get_player_choice_market_action(
             self,
