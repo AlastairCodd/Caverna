@@ -19,11 +19,11 @@ class ResourceLayoutExhaustiveChecker(object):
 
     def check_resource_layout_against_possible_set_partitions(
             self,
-            resource_layout: List[Dict[ResourceTypeEnum, int]],
+            resource_layout: Dict[int, Dict[ResourceTypeEnum, int]],
             current_resources: Dict[ResourceTypeEnum, int]) \
             -> Iterable[Tuple[
                     bool,
-                    List[Optional[ResourceTypeEnum]],
+                    Dict[int, Optional[ResourceTypeEnum]],
                     Dict[ResourceTypeEnum, int],
                     Dict[ResourceTypeEnum, int]
                 ]]:
@@ -35,7 +35,9 @@ class ResourceLayoutExhaustiveChecker(object):
         :returns: A list containing all set partitions (list with same length as resource layout, with entries matching which resource type holds this
         partition. This will never be null, but may be empty.
         """
-        for partition in self._set_partition_forge.generate_set_partitions(len(resource_layout), self._animals_or_none):
+        for partition in self._set_partition_forge.generate_set_partitions(
+                list(resource_layout.keys()),
+                self._animals_or_none):
             remaining, excess = self._partition_resource_validator\
                 .get_resource_remaining_and_excess(
                     resource_layout,
@@ -43,4 +45,10 @@ class ResourceLayoutExhaustiveChecker(object):
                     partition)
 
             success: bool = all([x == 0 for x in remaining.values()])
-            yield success, partition, remaining, excess
+            result: Tuple[
+                    bool,
+                    Dict[int, Optional[ResourceTypeEnum]],
+                    Dict[ResourceTypeEnum, int],
+                    Dict[ResourceTypeEnum, int]
+                ] = success, partition, remaining, excess
+            yield result

@@ -8,7 +8,7 @@ class PartitionResourceValidator:
 
     def does_partition_store_all_resources(
             self,
-            resource_layout: List[Dict[T, int]],
+            resource_layout: Dict[int, Dict[T, int]],
             current_resources: Dict[T, int],
             partition: List[Optional[T]]) -> bool:
         if resource_layout is None:
@@ -28,9 +28,16 @@ class PartitionResourceValidator:
 
     def get_resource_remaining_and_excess(
             self,
-            resource_layout: List[Dict[T, int]],
+            resource_layout: Dict[int, Dict[T, int]],
             current_resources: Dict[T, int],
-            partition: List[Optional[T]]) -> Tuple[Dict[T, int], Dict[T, int]]:
+            partition: Dict[int, Optional[T]]) -> Tuple[Dict[T, int], Dict[T, int]]:
+        """
+
+        :param resource_layout: A dictionary, keyed off tile positions, containing the T which may be stored on this tile.
+        :param current_resources: The current resources that must be stored.
+        :param partition: The
+        :return:
+        """
         if resource_layout is None:
             raise ValueError("resource layout may not be null")
         if current_resources is None:
@@ -42,10 +49,13 @@ class PartitionResourceValidator:
 
         remaining_resources: Dict[T, int] = dict(current_resources)
         excess_resources: Dict[T, int] = {t: 0 for t in current_resources}
-        for i in range(len(partition)):
-            object_stored_in_current: Optional[T] = partition[i]
+        for key in partition:
+            object_stored_in_current: Optional[T] = partition[key]
+
             if object_stored_in_current is not None:
-                amount_of_resources_allowed_in_current: int = resource_layout[i][object_stored_in_current]
+                current_tile: Dict[T, int] = resource_layout[key]
+                amount_of_resources_allowed_in_current: int = current_tile[object_stored_in_current]
+
                 if object_stored_in_current in remaining_resources:
                     if remaining_resources[object_stored_in_current] < amount_of_resources_allowed_in_current:
                         excess_resources[object_stored_in_current] += amount_of_resources_allowed_in_current - remaining_resources[object_stored_in_current]

@@ -110,7 +110,7 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
             # dog in meadow	            number of dogs on tile +1	sheep	dog effect
             # dog in pasture	        number of dogs on tile +1	sheep	dog effect
             # dog on tile with stable	number of dogs on tile +1	sheep	dog effect
-            does_player_have_space_for_animals_result: ResultLookup[bool] = self\
+            does_player_have_space_for_animals_result: ResultLookup[bool] = self \
                 ._does_player_have_space_for_animals(player)
             success &= does_player_have_space_for_animals_result.flag
             errors.extend(does_player_have_space_for_animals_result.errors)
@@ -166,24 +166,22 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
     def _does_player_have_space_for_animals(
             self,
             player: BasePlayerRepository) -> ResultLookup[bool]:
-        animal_storage_buckets: List[Dict[ResourceTypeEnum, int]] = self._get_animal_storage_buckets_for_player(player)
+        animal_storage_buckets: Dict[int, Dict[ResourceTypeEnum, int]] = self._get_animal_storage_buckets_for_player(player)
         player_animals: Dict[ResourceTypeEnum, int] = {
             animal: player.get_resources_of_type(animal)
             for animal
             in self._animals_which_can_reproduce
             if player.get_resources_of_type(animal) > 0}
 
-        evaluated_partitions: Iterable[
-            Tuple[
-                bool,
-                List[Optional[ResourceTypeEnum]],
-                Dict[ResourceTypeEnum, int],
-                Dict[ResourceTypeEnum, int]
-            ]
-        ] = self._resource_layout_checker \
+        evaluated_partitions: Iterable[Tuple[
+            bool,
+            Dict[int, Optional[ResourceTypeEnum]],
+            Dict[ResourceTypeEnum, int],
+            Dict[ResourceTypeEnum, int]
+        ]] = self._resource_layout_checker \
             .check_resource_layout_against_possible_set_partitions(
-                animal_storage_buckets,
-                player_animals)
+            animal_storage_buckets,
+            player_animals)
 
         success: bool = False
         for (did_partition_store_all_animals, partition, remaining, excess) in evaluated_partitions:
@@ -208,20 +206,18 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
             dogless_layout: Dict[int, Dict[ResourceTypeEnum, int]]) -> ResultLookup[bool]:
         # self._get_tiles_which_dogs_have_effect_on()
 
-        animal_storage_buckets: List[Dict[ResourceTypeEnum, int]] = self._get_animal_storage_buckets_for_player(player)
+        animal_storage_buckets: Dict[int, Dict[ResourceTypeEnum, int]] = self._get_animal_storage_buckets_for_player(player)
         player_animals: Dict[ResourceTypeEnum, int] = {
             animal: player.get_resources_of_type(animal)
             for animal
             in self._animals_which_can_reproduce
             if player.get_resources_of_type(animal) > 0}
-        evaluated_partitions: Iterable[
-            Tuple[
-                bool,
-                List[Optional[ResourceTypeEnum]],
-                Dict[ResourceTypeEnum, int],
-                Dict[ResourceTypeEnum, int]
-            ]
-        ] = self._resource_layout_checker \
+        evaluated_partitions: Iterable[Tuple[
+            bool,
+            Dict[int, Optional[ResourceTypeEnum]],
+            Dict[ResourceTypeEnum, int],
+            Dict[ResourceTypeEnum, int]
+        ]] = self._resource_layout_checker \
             .check_resource_layout_against_possible_set_partitions(
             animal_storage_buckets,
             player_animals)
@@ -238,22 +234,22 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
 
     def _get_animal_storage_buckets_for_player(
             self,
-            player: BasePlayerRepository) -> List[Dict[ResourceTypeEnum, int]]:
+            player: BasePlayerRepository) -> Dict[int, Dict[ResourceTypeEnum, int]]:
         if player is None:
             raise ValueError("Player cannot be none")
 
-        base_animal_storage_effects: List[ChangeAnimalStorageBaseEffect] = player\
+        base_animal_storage_effects: List[ChangeAnimalStorageBaseEffect] = player \
             .get_effects_of_type(ChangeAnimalStorageBaseEffect)
 
-        buckets: List[Dict[ResourceTypeEnum, int]] = []
+        buckets: Dict[int, Dict[ResourceTypeEnum, int]] = {}
 
-        for tile in player.tiles.values():
+        for location, tile in player.tiles.items():
             bucket_for_tile: Dict[ResourceTypeEnum, int] = self._get_animal_storage_buckets_for_tile(
                 base_animal_storage_effects,
                 player,
                 tile)
             if any(bucket_for_tile.values()):
-                buckets.append(bucket_for_tile)
+                buckets[location] = bucket_for_tile
 
         return buckets
 
@@ -285,10 +281,10 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
                     storage_for_tile[animal] *= 2
         else:
             for effect in base_animal_storage_effects:
-                new_buckets_result: ResultLookup[Dict[ResourceTypeEnum, int]] = effect\
+                new_buckets_result: ResultLookup[Dict[ResourceTypeEnum, int]] = effect \
                     .get_animal_storage_buckets_for_tile(
-                        player,
-                        tile)
+                    player,
+                    tile)
 
                 if new_buckets_result:
                     new_buckets: Dict[ResourceTypeEnum, int] = new_buckets_result.value
