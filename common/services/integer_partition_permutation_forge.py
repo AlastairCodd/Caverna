@@ -2,7 +2,10 @@ from typing import List, Generator, Dict, Iterable, Tuple, cast
 
 
 class IntegerPartitionPermutationForge(object):
-    def generate_permutation(self, partition: List[int], number_of_tiles: int) -> Generator[List[int], None, None]:
+    def generate_permutation(
+            self,
+            partition: List[int],
+            number_of_tiles: int) -> Generator[List[int], None, None]:
         """Permutes the given partition across "number_of_tiles" spaces.
 
         :param partition: The partition of some integer to be permuted. This cannot be null, and its length must be less than "number_of_tiles"

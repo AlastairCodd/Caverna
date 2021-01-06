@@ -11,7 +11,13 @@ class Test_When_Called(Given_An_IntegerPartitionForge):
         self.assertFalse(len(self.result) == 0)
 
     def test_then_result_should_contain_expected(self) -> None:
-        self.assertListEqual([[5], [4, 1], [3, 2], [3, 1, 1], [2, 2, 1], [2, 1, 1, 1], [1, 1, 1, 1, 1]], self.result)
+        expected_result = [
+            [5],
+            [4, 1],
+            [3, 2], [3, 1, 1],
+            [2, 2, 1], [2, 1, 1, 1],
+            [1, 1, 1, 1, 1]]
+        self.assertListEqual(expected_result, self.result)
 
 
 class Test_When_Integer_Is_6(Given_An_IntegerPartitionForge):

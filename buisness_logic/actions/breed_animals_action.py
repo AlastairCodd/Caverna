@@ -8,10 +8,12 @@ from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_entity import TileEntity
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from common.forges.integer_partition_forge import IntegerPartitionForge
+from common.services.integer_partition_permutation_forge import IntegerPartitionPermutationForge
 from common.services.resource_layout_exhaustive_checker import ResourceLayoutExhaustiveChecker
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 from core.services.base_player_service import BasePlayerService
 
@@ -25,12 +27,19 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
         self._maximum_number_of_animals_to_reproduce = maximum
 
         self._resource_layout_checker: ResourceLayoutExhaustiveChecker = ResourceLayoutExhaustiveChecker()
+        self._integer_partition_forge: IntegerPartitionForge = IntegerPartitionForge()
+        self._integer_partition_permutation_forge: IntegerPartitionPermutationForge = IntegerPartitionPermutationForge()
 
         self._animals_which_can_reproduce: List[ResourceTypeEnum] = [
             ResourceTypeEnum.sheep,
             ResourceTypeEnum.donkey,
             ResourceTypeEnum.boar,
             ResourceTypeEnum.cow,
+        ]
+
+        self._tile_types_dogs_can_effect: List[TileTypeEnum] = [
+            TileTypeEnum.meadow,
+            TileTypeEnum.pasture,
         ]
 
         self._animals_to_reproduce: Optional[List[ResourceTypeEnum]] = None
@@ -183,53 +192,29 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
             animal_storage_buckets,
             player_animals)
 
+        player_has_sheep: bool = ResourceTypeEnum.sheep in player_animals
+        minimal_missing_sheep: int = player.get_resources_of_type(ResourceTypeEnum.sheep)
         success: bool = False
         for (did_partition_store_all_animals, partition, remaining, excess) in evaluated_partitions:
             if did_partition_store_all_animals:
                 success = True
                 break
+            if player_has_sheep \
+                    and not any(remaining[animal] > 0 for animal in remaining if not animal == ResourceTypeEnum.sheep)\
+                    and remaining[ResourceTypeEnum.sheep] < minimal_missing_sheep:
+                minimal_missing_sheep = remaining[ResourceTypeEnum.sheep]
 
         result: ResultLookup[bool]
         if success:
             result = ResultLookup(True, True)
-        else:
+        elif minimal_missing_sheep <= player.get_resources_of_type(ResourceTypeEnum.dog) * 2:
             result = self._does_player_have_space_for_animals_with_dogs(
                 player,
                 player_animals,
                 animal_storage_buckets)
-        return result
-
-    def _does_player_have_space_for_animals_with_dogs(
-            self,
-            player: BasePlayerRepository,
-            player_animals: Dict[ResourceTypeEnum, int],
-            dogless_layout: Dict[int, Dict[ResourceTypeEnum, int]]) -> ResultLookup[bool]:
-        # self._get_tiles_which_dogs_have_effect_on()
-
-        animal_storage_buckets: Dict[int, Dict[ResourceTypeEnum, int]] = self._get_animal_storage_buckets_for_player(player)
-        player_animals: Dict[ResourceTypeEnum, int] = {
-            animal: player.get_resources_of_type(animal)
-            for animal
-            in self._animals_which_can_reproduce
-            if player.get_resources_of_type(animal) > 0}
-        evaluated_partitions: Iterable[Tuple[
-            bool,
-            Dict[int, Optional[ResourceTypeEnum]],
-            Dict[ResourceTypeEnum, int],
-            Dict[ResourceTypeEnum, int]
-        ]] = self._resource_layout_checker \
-            .check_resource_layout_against_possible_set_partitions(
-            animal_storage_buckets,
-            player_animals)
-        success: bool = False
-        for (did_partition_store_all_animals, partition, remaining, excess) in evaluated_partitions:
-            if did_partition_store_all_animals:
-                success = True
-                break
-        if success:
-            result = ResultLookup(True, True)
         else:
             result = ResultLookup(errors="Player does not have enough space to store all animals")
+
         return result
 
     def _get_animal_storage_buckets_for_player(
@@ -258,7 +243,6 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
             base_animal_storage_effects: List[ChangeAnimalStorageBaseEffect],
             player: BasePlayerRepository,
             tile: TileEntity,
-            number_of_dogs_on_tile: int = 0) -> Dict[ResourceTypeEnum, int]:
         if base_animal_storage_effects is None:
             raise ValueError("Base storage effects cannot be none")
         if player is None:
@@ -292,20 +276,102 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
                         new_buckets,
                         storage_for_tile)
 
-        if number_of_dogs_on_tile > storage_for_tile[ResourceTypeEnum.sheep]:
-            storage_for_tile[ResourceTypeEnum.sheep] = number_of_dogs_on_tile
-
         return storage_for_tile
 
     def _update_storage_for_tile(
             self,
-            new_buckets,
-            storage_for_tile):
+            new_buckets: Dict[ResourceTypeEnum, int],
+            storage_for_tile: Dict[ResourceTypeEnum, int]) -> None:
         for animal in new_buckets:
             current_storage_for_animal: int = storage_for_tile[animal]
             new_storage_for_animal: int = new_buckets[animal]
             if new_storage_for_animal > current_storage_for_animal:
                 storage_for_tile[animal] = new_storage_for_animal
+
+    def _does_player_have_space_for_animals_with_dogs(
+            self,
+            player: BasePlayerRepository,
+            player_animals: Dict[ResourceTypeEnum, int],
+            animal_storage_buckets_without_dogs: Dict[int, Dict[ResourceTypeEnum, int]]) -> ResultLookup[bool]:
+        success: bool = False
+
+        positions_of_dogs: Iterable[Dict[int, Dict[ResourceTypeEnum, int]]] = self._get_animal_storage_buckets_for_player_accounting_for_dogs(
+            player,
+            animal_storage_buckets_without_dogs)
+
+        for animal_storage_buckets_with_dogs in positions_of_dogs:
+            if success:
+                break
+
+            evaluated_partitions: Iterable[Tuple[
+                bool,
+                Dict[int, Optional[ResourceTypeEnum]],
+                Dict[ResourceTypeEnum, int],
+                Dict[ResourceTypeEnum, int]
+            ]] = self._resource_layout_checker \
+                .check_resource_layout_against_possible_set_partitions(
+                animal_storage_buckets_with_dogs,
+                player_animals)
+
+            for (did_partition_store_all_animals, partition, remaining, excess) in evaluated_partitions:
+                if did_partition_store_all_animals:
+                    success = True
+                    break
+
+        if success:
+            result = ResultLookup(True, True)
+        else:
+            result = ResultLookup(errors="Player does not have enough space to store all animals")
+        return result
+
+    def _get_animal_storage_buckets_for_player_accounting_for_dogs(
+            self,
+            player: BasePlayerRepository,
+            animal_storage_buckets_without_dogs: Dict[int, Dict[ResourceTypeEnum, int]]) -> Iterable[Dict[int, Dict[ResourceTypeEnum, int]]]:
+        ids_of_tiles_which_dogs_can_affect: List[int] = self._get_tiles_which_dogs_have_effect_on(player)
+        number_of_tiles_which_dogs_can_affect: int = len(ids_of_tiles_which_dogs_can_affect)
+
+        number_of_dogs: int = player.get_resources_of_type(ResourceTypeEnum.dog)
+
+        for dog_partition in self._integer_partition_forge.generate_integer_partitions(number_of_dogs):
+            if len(dog_partition) > number_of_tiles_which_dogs_can_affect:
+                continue
+
+            for permutation in self._integer_partition_permutation_forge.generate_permutation(
+                    dog_partition,
+                    number_of_tiles_which_dogs_can_affect):
+                animal_storage_buckets_with_dogs: Dict[int, Dict[ResourceTypeEnum, int]] = animal_storage_buckets_without_dogs.copy()
+
+                for i in range(number_of_tiles_which_dogs_can_affect):
+                    tile_id: int = ids_of_tiles_which_dogs_can_affect[i]
+                    number_of_dogs: int = permutation[i]
+
+                    new_number_of_sheep_which_may_be_stored: int = number_of_dogs + 1
+
+                    if tile_id in animal_storage_buckets_with_dogs:
+                        current_number_of_sheep_which_may_be_stored: int = animal_storage_buckets_without_dogs[tile_id][ResourceTypeEnum.sheep]
+
+                        if new_number_of_sheep_which_may_be_stored > current_number_of_sheep_which_may_be_stored:
+                            animal_storage_buckets_with_dogs[tile_id][ResourceTypeEnum.sheep] = new_number_of_sheep_which_may_be_stored
+                    else:
+                        animal_storage_buckets_without_dogs[tile_id] = {
+                            ResourceTypeEnum.sheep: new_number_of_sheep_which_may_be_stored,
+                            ResourceTypeEnum.donkey: 0,
+                            ResourceTypeEnum.boar: 0,
+                            ResourceTypeEnum.cow: 0
+                        }
+
+                yield animal_storage_buckets_with_dogs
+
+    def _get_tiles_which_dogs_have_effect_on(
+            self,
+            player: BasePlayerRepository) -> List[int]:
+        result: List[int] = []
+        for location, tile_entity in player.tiles.items():
+            if tile_entity.tile_type in self._tile_types_dogs_can_effect:
+                result.append(location)
+
+        return result
 
     def new_turn_reset(self):
         self._animals_to_reproduce = None

@@ -2,7 +2,10 @@ from typing import Generator, List, Union
 
 
 class IntegerPartitionForge:
-    def generate_integer_partitions(self, integer: int, max_value: Union[int, None] = None) -> Generator[List[int], None, None]:
+    def generate_integer_partitions(
+            self,
+            integer: int,
+            max_value: Union[int, None] = None) -> Generator[List[int], None, None]:
         """Generate the partitions of an integer
 
         :param integer: The integer. This must be greater than zero.
