@@ -1,6 +1,6 @@
-from buisness_logic.effects.animal_storage_effects import StoreAnyAnimalEffect
 from buisness_logic.effects.allow_farming_effect import AllowFarmingEffect
-from core.baseClasses.base_tile import BaseTile
+from buisness_logic.effects.animal_storage_effects import StoreAnyAnimalEffect
+from core.baseClasses.base_tile import BaseTile, BaseTwinTile
 from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum
 
 
@@ -29,9 +29,9 @@ class PastureTile(BaseTile):
             effects=[StoreAnyAnimalEffect(2)])
 
 
-class PastureTwinTile(BaseTile):
+class PastureTwinTile(BaseTwinTile):
     def __init__(self):
-        BaseTile.__init__(
+        BaseTwinTile.__init__(
             self, "Large Pasture", 104,
             TileTypeEnum.pastureTwin,
             base_points=4,

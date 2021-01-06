@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum, TileTypeEnum
 from core.baseClasses.base_effect import BaseEffect
 
@@ -96,3 +96,51 @@ class BaseSpecificTile(BaseTile, metaclass=ABCMeta):
     @property
     def colour(self) -> TileColourEnum:
         return self._colour
+
+
+class BaseTwinTile(BaseTile):
+    def __init__(
+            self,
+            name: str,
+            tile_id: int,
+            tile_type: TileTypeEnum,
+            base_points: int = 0,
+            cost: Optional[Dict[ResourceTypeEnum, int]] = None,
+            effects: Optional[List[BaseEffect]] = None) -> None:
+        BaseTile.__init__(
+            self,
+            name,
+            tile_id,
+            tile_type,
+            base_points,
+            cost,
+            effects)
+        self._location: Optional[Tuple[int, int]] = None
+
+    @property
+    def is_placed(self) -> bool:
+        return self._location is not None
+
+    @property
+    def primary_tile_id(self) -> Optional[int]:
+        if self.is_placed:
+            return self._location[0]
+        else:
+            return None
+
+    @property
+    def secondary_tile_id(self) -> Optional[int]:
+        if self.is_placed:
+            return self._location[0]
+        else:
+            return None
+
+    def place_tile(
+            self,
+            primary_location_id: int,
+            secondary_location_id: int) -> bool:
+        if self.is_placed:
+            return False
+        else:
+            self._location = (primary_location_id, secondary_location_id)
+            return True

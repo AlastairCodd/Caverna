@@ -1,4 +1,4 @@
-from typing import List, Dict, Iterable, Tuple, Optional, Callable
+from typing import List, Dict, Iterable, Tuple, Optional, Callable, cast
 
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
@@ -379,6 +379,11 @@ class TileService(object):
 
             location_of_secondary_tile: int = location + self._direction_offset[direction](player)
             player.tiles[location_of_secondary_tile].set_tile(secondary_tile)
+
+            if twin_tile_type in self._inseparable_twin_tile_funcs:
+                tile_as_twin: BaseTwinTile = cast(BaseTwinTile, primary_tile)
+                tile_as_twin.place_tile(location, location_of_secondary_tile)
+
             result = ResultLookup(True, True)
         else:
             result = ResultLookup(errors=f"Chosen position ({location}, {direction.name}) are invalid")
