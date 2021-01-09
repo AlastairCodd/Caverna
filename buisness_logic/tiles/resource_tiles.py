@@ -1,8 +1,6 @@
 from typing import List, Dict
 
-from buisness_logic.actions.breed_animals_action import BreedAnimalsAction
-from buisness_logic.effects import *
-from common.entities.tile_entity import TileEntity
+from buisness_logic.effects import resource_effects
 from core.baseClasses.base_tile import BaseSpecificTile
 from core.constants import tile_ids
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
@@ -25,14 +23,10 @@ class MinerTile(BaseSpecificTile):
         if player is None:
             raise ValueError("Player may not be null")
 
-        # TODO: apply animal resource calculation for this step
+        number_of_donkeys: int = player.get_resources_of_type(ResourceTypeEnum.donkey)
+        number_of_mines: int = player.get_number_of_tiles_of_type(TileTypeEnum.oreMine) + player.get_number_of_tiles_of_type(TileTypeEnum.rubyMine)
 
-        number_of_donkeys_in_mines: int = 0
-        # tile: TileEntity
-        # for tile in player.tiles:
-        #     if tile.tile_type == TileTypeEnum.oreMineDeepTunnelTwin and \
-        #             tile.animal_type == ResourceTypeEnum.donkey:
-        #         number_of_donkeys_in_mines += tile.number_of_animals
+        number_of_donkeys_in_mines: int = min(number_of_mines, number_of_donkeys)
         return number_of_donkeys_in_mines
 
 
