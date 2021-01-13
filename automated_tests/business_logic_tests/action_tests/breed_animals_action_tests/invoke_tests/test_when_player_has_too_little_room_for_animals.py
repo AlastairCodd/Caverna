@@ -15,7 +15,7 @@ from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
-class test_when_too_little_space_for_animals(Given_A_BreedAnimalsAction):
+class test_when_player_has_too_little_room_for_animals(Given_A_BreedAnimalsAction):
     # noinspection PyTypeChecker
     def because(self) -> None:
         self._player: BasePlayerService = self._initialise_player()

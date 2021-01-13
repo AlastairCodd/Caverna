@@ -3,21 +3,20 @@ from typing import Dict, List, Iterable, Tuple, Optional
 from buisness_logic.validators.partition_resource_validator import PartitionResourceValidator
 from common.forges.set_partition_forge import SetPartitionForge
 from core.enums.caverna_enums import ResourceTypeEnum
+from core.services.resource_layout_check_service import ResourceLayoutCheckService
 
 
-class ResourceLayoutExhaustiveChecker(object):
-
+class ResourceLayoutExhaustiveChecker(ResourceLayoutCheckService):
     def __init__(self):
         self._partition_resource_validator: PartitionResourceValidator = PartitionResourceValidator()
         self._set_partition_forge: SetPartitionForge = SetPartitionForge()
         self._animals_or_none: List[Optional[ResourceTypeEnum]] = [
-            None,
             ResourceTypeEnum.sheep,
             ResourceTypeEnum.donkey,
             ResourceTypeEnum.cow,
             ResourceTypeEnum.boar]
 
-    def check_resource_layout_against_possible_set_partitions(
+    def check_resource_layout(
             self,
             resource_layout: Dict[int, Dict[ResourceTypeEnum, int]],
             current_resources: Dict[ResourceTypeEnum, int]) \

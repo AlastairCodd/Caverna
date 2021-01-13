@@ -149,7 +149,7 @@ class Investigation(object):
                             Dict[ResourceTypeEnum, int]
                         ]
                     ] = self._resourceLayoutExhaustiveChecker\
-                            .check_resource_layout_against_possible_set_partitions(
+                            .check_resource_layout(
                                 resource_layout,
                                 resources_per_animal)
 

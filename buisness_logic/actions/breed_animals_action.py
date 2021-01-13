@@ -17,6 +17,7 @@ from core.baseClasses.base_tile import BaseTwinTile
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 from core.services.base_player_service import BasePlayerService
+from core.services.resource_layout_check_service import ResourceLayoutCheckService
 
 
 class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
@@ -27,7 +28,7 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
             raise ValueError("The maximum number of animals to breed cannot exceed the number of types of animals.")
         self._maximum_number_of_animals_to_reproduce = maximum
 
-        self._resource_layout_checker: ResourceLayoutExhaustiveChecker = ResourceLayoutExhaustiveChecker()
+        self._resource_layout_checker: ResourceLayoutCheckService = ResourceLayoutExhaustiveChecker()
         self._integer_partition_forge: IntegerPartitionForge = IntegerPartitionForge()
         self._integer_partition_permutation_forge: IntegerPartitionPermutationForge = IntegerPartitionPermutationForge()
 
@@ -189,14 +190,15 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
             Dict[ResourceTypeEnum, int],
             Dict[ResourceTypeEnum, int]
         ]] = self._resource_layout_checker \
-            .check_resource_layout_against_possible_set_partitions(
+            .check_resource_layout(
             animal_storage_buckets,
             player_animals)
 
         player_has_sheep: bool = ResourceTypeEnum.sheep in player_animals
         minimal_missing_sheep: int = player.get_resources_of_type(ResourceTypeEnum.sheep)
         success: bool = False
-        for (did_partition_store_all_animals, partition, remaining, excess) in evaluated_partitions:
+
+        for (did_partition_store_all_animals, _, remaining, excess) in evaluated_partitions:
             if did_partition_store_all_animals:
                 success = True
                 break
@@ -319,7 +321,7 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
                 Dict[ResourceTypeEnum, int],
                 Dict[ResourceTypeEnum, int]
             ]] = self._resource_layout_checker \
-                .check_resource_layout_against_possible_set_partitions(
+                .check_resource_layout(
                 animal_storage_buckets_with_dogs,
                 player_animals)
 
