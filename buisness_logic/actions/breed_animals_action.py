@@ -11,6 +11,7 @@ from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.forges.integer_partition_forge import IntegerPartitionForge
 from common.services.integer_partition_permutation_forge import IntegerPartitionPermutationForge
 from common.services.resource_layout_exhaustive_checker import ResourceLayoutExhaustiveChecker
+from common.services.resource_layout_polynomial_checker import ResourceLayoutPolynomialChecker
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.baseClasses.base_tile import BaseTwinTile
@@ -28,7 +29,8 @@ class BreedAnimalsAction(BasePlayerChoiceAction, BaseReceiveEventService):
             raise ValueError("The maximum number of animals to breed cannot exceed the number of types of animals.")
         self._maximum_number_of_animals_to_reproduce = maximum
 
-        self._resource_layout_checker: ResourceLayoutCheckService = ResourceLayoutExhaustiveChecker()
+        self._resource_layout_checker: ResourceLayoutCheckService = ResourceLayoutPolynomialChecker()
+        # self._resource_layout_checker: ResourceLayoutCheckService = ResourceLayoutExhaustiveChecker()
         self._integer_partition_forge: IntegerPartitionForge = IntegerPartitionForge()
         self._integer_partition_permutation_forge: IntegerPartitionPermutationForge = IntegerPartitionPermutationForge()
 
