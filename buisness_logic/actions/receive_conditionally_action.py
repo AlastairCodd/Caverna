@@ -1,27 +1,23 @@
 from typing import Dict, Callable
 
-from buisness_logic.services.base_receive_event_service import BaseReceiveEventService
+from buisness_logic.actions.base_receive_action import BaseReceiveAction
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
-class ReceiveConditionallyAction(BaseReceiveEventService, BaseAction):
+class ReceiveConditionallyAction(BaseReceiveAction):
     def __init__(
             self,
             condition: Callable[[BasePlayerRepository], int],
-            receive_items: Dict[ResourceTypeEnum, int]) -> None:
+            items_to_receive: Dict[ResourceTypeEnum, int]) -> None:
         if condition is None:
             raise ValueError("Condition cannot be null")
-        if receive_items is None:
-            raise ValueError("Receive Items cannot be none")
 
         self._condition: Callable[[BasePlayerRepository], int] = condition
-        self._receive_items: Dict[ResourceTypeEnum, int] = receive_items
-        BaseReceiveEventService.__init__(self)
+        BaseReceiveAction.__init__(self, items_to_receive)
 
     def invoke(
             self,
@@ -41,7 +37,7 @@ class ReceiveConditionallyAction(BaseReceiveEventService, BaseAction):
 
         number_of_times_to_give: int = self._condition(player)
 
-        resources_to_give: Dict[ResourceTypeEnum, int] = {r: self._receive_items[r] * number_of_times_to_give for r in self._receive_items}
+        resources_to_give: Dict[ResourceTypeEnum, int] = {r: self._items_to_receive[r] * number_of_times_to_give for r in self._items_to_receive}
 
         result: ResultLookup[int] = self._give_player_resources(player, resources_to_give)
         return result
@@ -50,12 +46,12 @@ class ReceiveConditionallyAction(BaseReceiveEventService, BaseAction):
         pass
 
     def __str__(self) -> str:
-        result = "ReceiveAction("
+        result = "ReceiveConditionallyAction("
         count = 0
-        for resource in self._receive_items:
-            result += f"{resource.name}: {self._receive_items[resource]}"
+        for resource in self._items_to_receive:
+            result += f"{resource.name}: {self._items_to_receive[resource]}"
             count += 1
-            if count != len(self._receive_items):
+            if count != len(self._items_to_receive):
                 result += ", "
         result += ")"
 

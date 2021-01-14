@@ -1,5 +1,6 @@
 from typing import Dict
 
+from buisness_logic.actions.base_receive_action import BaseReceiveAction
 from buisness_logic.services.base_receive_event_service import BaseReceiveEventService
 from common.entities.dwarf import Dwarf
 from core.baseClasses.base_action import BaseAction
@@ -9,11 +10,9 @@ from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
-class ReceiveAction(BaseReceiveEventService, BaseAction):
-    def __init__(self, receive_items: Dict[ResourceTypeEnum, int]):
-        if receive_items is None:
-            raise ValueError("Receive items cannot be none")
-        self._receive_items: Dict[ResourceTypeEnum, int] = receive_items
+class ReceiveAction(BaseReceiveAction):
+    def __init__(self, items_to_receive: Dict[ResourceTypeEnum, int]) -> None:
+        BaseReceiveAction.__init__(self, items_to_receive)
 
     def invoke(
             self,
@@ -31,7 +30,7 @@ class ReceiveAction(BaseReceiveEventService, BaseAction):
         if player is None:
             raise ValueError("Player cannot be none")
 
-        result: ResultLookup[int] = self._give_player_resources(player, self._receive_items)
+        result: ResultLookup[int] = self._give_player_resources(player, self._items_to_receive)
         return result
 
     def new_turn_reset(self):
@@ -40,10 +39,10 @@ class ReceiveAction(BaseReceiveEventService, BaseAction):
     def __str__(self) -> str:
         result = "ReceiveAction("
         count = 0
-        for resource in self._receive_items:
-            result += f"{resource.name}: {self._receive_items[resource]}"
+        for resource in self._items_to_receive:
+            result += f"{resource.name}: {self._items_to_receive[resource]}"
             count += 1
-            if count != len(self._receive_items):
+            if count != len(self._items_to_receive):
                 result += ", "
         result += ")"
 

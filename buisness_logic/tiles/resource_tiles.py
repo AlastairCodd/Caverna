@@ -1,6 +1,7 @@
 from typing import List, Dict
 
-from buisness_logic.effects import resource_effects
+from buisness_logic.effects.receive_when_receiving_effect import ReceiveWhenReceivingEffect
+from buisness_logic.effects.resource_effects import ReceiveWhenBreedingEffect, ReceiveForTurnsEffect, ReceiveConditionallyAtStartOfTurnEffect
 from core.baseClasses.base_tile import BaseSpecificTile
 from core.constants import tile_ids
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
@@ -13,7 +14,7 @@ class MinerTile(BaseSpecificTile):
             self, "Miner", tile_ids.MinerTileId,
             base_points=3,
             cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.stone: 1},
-            effects=[resource_effects.ReceiveConditionallyAtStartOfTurnEffect(
+            effects=[ReceiveConditionallyAtStartOfTurnEffect(
                 {ResourceTypeEnum.donkey: 1},
                 self._condition)])
 
@@ -36,7 +37,7 @@ class WoodSupplierTile(BaseSpecificTile):
             self, "Wood Supplier", tile_ids.WoodSupplierTileId,
             base_points=2,
             cost={ResourceTypeEnum.stone: 1},
-            effects=[resource_effects.ReceiveForTurnsEffect({ResourceTypeEnum.wood: 1}, 7)])
+            effects=[ReceiveForTurnsEffect({ResourceTypeEnum.wood: 1}, 7)])
 
 
 class StoneSupplierTile(BaseSpecificTile):
@@ -45,7 +46,7 @@ class StoneSupplierTile(BaseSpecificTile):
             self, "Stone Supplier", tile_ids.StoneSupplierTileId,
             base_points=1,
             cost={ResourceTypeEnum.wood: 1},
-            effects=[resource_effects.ReceiveForTurnsEffect({ResourceTypeEnum.stone: 1}, 5)])
+            effects=[ReceiveForTurnsEffect({ResourceTypeEnum.stone: 1}, 5)])
 
 
 class RubySupplierTile(BaseSpecificTile):
@@ -54,14 +55,14 @@ class RubySupplierTile(BaseSpecificTile):
             self, "Ruby Supplier", tile_ids.RubySupplierTileId,
             base_points=2,
             cost={ResourceTypeEnum.stone: 2, ResourceTypeEnum.wood: 2},
-            effects=[resource_effects.ReceiveForTurnsEffect({ResourceTypeEnum.ruby: 1}, 4)])
+            effects=[ReceiveForTurnsEffect({ResourceTypeEnum.ruby: 1}, 4)])
 
 
 class DogSchoolTile(BaseSpecificTile):
     def __init__(self):
         BaseSpecificTile.__init__(
             self, "Dog School", tile_ids.DogSchoolTileId,
-            effects=[resource_effects.ReceiveWhenReceivingEffect(
+            effects=[ReceiveWhenReceivingEffect(
                 {ResourceTypeEnum.wood: 1},
                 {ResourceTypeEnum.dog: 1})])
 
@@ -72,7 +73,7 @@ class QuarryTile(BaseSpecificTile):
             self, "Quarry", tile_ids.QuarryTileId,
             base_points=2,
             cost={ResourceTypeEnum.wood: 1},
-            effects=[resource_effects.ReceiveWhenBreedingEffect(self._condition)])
+            effects=[ReceiveWhenBreedingEffect(self._condition)])
 
     def _condition(
             self,
@@ -89,7 +90,7 @@ class BreedingCaveTile(BaseSpecificTile):
             cost={
                 ResourceTypeEnum.grain: 1,
                 ResourceTypeEnum.stone: 1},
-            effects=[resource_effects.ReceiveWhenBreedingEffect(self._condition)])
+            effects=[ReceiveWhenBreedingEffect(self._condition)])
         self._conversion_effect: Dict[int, int] = {
             1: 1,
             2: 2,
@@ -112,6 +113,6 @@ class SeamTile(BaseSpecificTile):
             self, "Seam", tile_ids.SeamTileId,
             base_points=1,
             cost={ResourceTypeEnum.stone: 2},
-            effects=[resource_effects.ReceiveWhenReceivingEffect(
+            effects=[ReceiveWhenReceivingEffect(
                 {ResourceTypeEnum.ore: 1},
                 {ResourceTypeEnum.stone: 1})])
