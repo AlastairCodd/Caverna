@@ -19,7 +19,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 class Given_A_CompleteDwarfPlayerChoiceTransferService(TestCase, ABC):
     def setUp(self) -> None:
         self.SUT: CompleteDwarfPlayerChoiceTransferService = CompleteDwarfPlayerChoiceTransferService()
-        self._turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup([], [], 0, 0, HarvestTypeEnum.Harvest)
+        self._turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup([FakeCard()], [], 0, 0, HarvestTypeEnum.Harvest)
 
         self.because()
 

@@ -38,7 +38,7 @@ class test_when_chosen_actionchoice_has_compound_actions(Given_A_CompleteActionP
         )
 
         base_action_1.set_player_choice_returns(
-            lambda _1, _2, _3, _4, _5, _6: ResultLookup(True, self._additional_action_choice_lookup))
+            lambda unused_player, unused_dwarf, unused_turn_descriptor: ResultLookup(True, self._additional_action_choice_lookup))
 
         base_action_2: BaseAction = NullAction()
 

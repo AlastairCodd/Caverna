@@ -27,7 +27,7 @@ class test_when_player_has_dwarves_of_multiple_levels_but_does_not_use_them(Give
         self._player: BasePlayerService = mock_player
 
         mock_player.get_player_choice_use_dwarf_out_of_order_returns(
-            lambda info_dwarves, info_cards, info_turn_index, info_round_index, info_harvest_type: ResultLookup(True, False)
+            lambda info_dwarves, info_turn_descriptor: ResultLookup(True, False)
         )
 
         self._result: ResultLookup[Dwarf] = self.SUT.get_dwarf(self._player, self._turn_descriptor)

@@ -1,7 +1,7 @@
 from abc import ABCMeta
 from unittest import TestCase
 
-from buisness_logic.effects.resource_effects import AllowFarmingEffect
+from buisness_logic.effects.allow_farming_effect import AllowFarmingEffect
 
 
 # noinspection PyPep8Naming

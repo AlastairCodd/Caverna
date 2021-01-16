@@ -10,15 +10,14 @@ from buisness_logic.actions.take_accumulated_items_action import TakeAccumulated
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.multiconditional import Conditional
-from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
-from core.enums.harvest_type_enum import HarvestTypeEnum
-from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_constraint import BaseConstraint
+from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
+from core.enums.harvest_type_enum import HarvestTypeEnum
 
 
 class test_when_called_with_single_highest_score_and_no_constraints(Given_An_ExhaustiveActionOrderingService):
@@ -62,6 +61,8 @@ class test_when_called_with_single_highest_score_and_no_constraints(Given_An_Exh
             player: MockPlayer,
             dwarf: Dwarf,
             actions: List[BaseAction]):
+
+        player.get_player_choice_weapon_level_returns(lambda info_turn_descriptor: 3)
 
         player.get_player_choice_expedition_rewards_returns(
             lambda info_actions, info_expedition_level, info_turn_descriptor: ResultLookup(True, [info_actions[i] for i in range(info_expedition_level)])

@@ -86,7 +86,7 @@ class TurnExecutionService(object):
                 equivalent_cards: List[BaseCard] = self.get_equivalent_invalid_cards(player, chosen_dwarf, chosen_card)
                 card: BaseCard
                 for card in equivalent_cards:
-                    possible_choices: List[ActionChoiceLookup] = self._conditional_service.get_possible_choices(card.actions)
+                    possible_choices: List[ActionChoiceLookup] = self._conditional_service.get_possible_choices(card.actions, player)
                     action_choice: ActionChoiceLookup
                     for action_choice in possible_choices:
                         new_equivalent: DwarfCardActionCombinationLookup = DwarfCardActionCombinationLookup(
@@ -109,12 +109,10 @@ class TurnExecutionService(object):
                             action_choice)
                         equivalents.append(new_equivalent)
 
-        result: ResultLookup[ChosenDwarfCardActionCombinationAndEquivalentLookup]
-        data: ChosenDwarfCardActionCombinationAndEquivalentLookup
-        data = ChosenDwarfCardActionCombinationAndEquivalentLookup(
+        data: ChosenDwarfCardActionCombinationAndEquivalentLookup = ChosenDwarfCardActionCombinationAndEquivalentLookup(
             choice,
             equivalents)
-        result = ResultLookup(success, data, errors)
+        result: ResultLookup[ChosenDwarfCardActionCombinationAndEquivalentLookup] = ResultLookup(success, data, errors)
         return result
 
     def get_equivalent_invalid_dwarves(

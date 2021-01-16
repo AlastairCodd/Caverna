@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, cast
 
 from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests \
     .given_a_complete_dwarf_player_choice_transfer_service import Given_A_CompleteDwarfPlayerChoiceTransferService
@@ -27,11 +27,11 @@ class test_when_player_has_dwarves_of_multiple_levels_and_uses_one_out_of_turn(G
         self._player: BasePlayerService = mock_player
 
         mock_player.get_player_choice_use_dwarf_out_of_order_returns(
-            lambda info_dwarves, info_cards, info_turn_index, info_round_index, info_harvest_type: ResultLookup(True, True)
+            lambda info_dwarves, info_turn_descriptor: ResultLookup(True, True)
         )
 
         mock_player.get_player_choice_dwarf_to_use_out_of_order_returns(
-            lambda info_dwarves, info_cards, info_turn_index, info_round_index, info_harvest_type: ResultLookup(True, self._chosen_dwarf)
+            lambda info_dwarves, info_turn_descriptor: ResultLookup(True, self._chosen_dwarf)
         )
 
         self._result: ResultLookup[Dwarf] = self.SUT.get_dwarf(self._player, self._turn_descriptor)
@@ -52,17 +52,20 @@ class test_when_player_has_dwarves_of_multiple_levels_and_uses_one_out_of_turn(G
         dwarves: List[Dwarf] = [self._dwarf_1, self._dwarf_2, self._dwarf_3]
         return dwarves
 
-    def test_then_result_should_not_be_null(self) -> None:
+    def test_then_result_should_not_be_none(self) -> None:
         self.assertIsNotNone(self._result)
 
-    def test_then_result_flag_should_be_false(self) -> None:
-        self.assertFalse(self._result.flag)
+    def test_then_result_flag_should_be_true(self) -> None:
+        self.assertTrue(self._result.flag)
 
-    def test_then_result_value_should_be_chosen_dwarf(self) -> None:
-        self.assertIs(self._result.value, self._chosen_dwarf)
+    def test_then_result_value_should_not_be_none(self) -> None:
+        self.assertIsNotNone(self._result.value)
 
-    def test_then_result_errors_should_contain_expected_errors(self) -> None:
-        self.assertIn("player chose a dwarf that is already active", self._result.errors)
+    def test_then_result_value_should_be_expected(self) -> None:
+        self.assertEqual(self._result.value, self._chosen_dwarf)
 
-    def ignore_test_then_player_resources_should_be_reduced(self) -> None:
+    def test_then_result_errors_should_be_empty(self) -> None:
+        self.assertListEqual(cast(list, self._result.errors), [])
+
+    def test_then_player_resources_should_be_reduced(self) -> None:
         self.assertEqual(self._player.resources[ResourceTypeEnum.ruby], self._starting_rubies - 1)

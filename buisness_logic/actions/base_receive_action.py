@@ -19,14 +19,10 @@ from core.repositories.base_player_repository import BasePlayerRepository
 class BaseReceiveAction(BasePlayerChoiceAction, BaseReceiveEventService, metaclass=ABCMeta):
     def __init__(
             self,
-            items_to_receive: Union[Dict[ResourceTypeEnum, int], List[ResourceTypeEnum]]) -> None:
+            items_to_receive: Dict[ResourceTypeEnum, int]) -> None:
         if items_to_receive is None:
             raise ValueError("Items to Receive cannot be None")
-        self._items_to_receive: List[ResourceTypeEnum]
-        if isinstance(items_to_receive, list):
-            self._items_to_receive = items_to_receive.copy()
-        elif isinstance(items_to_receive, dict):
-            self._items_to_receive = list(items_to_receive.keys())
+        self._items_to_receive: Dict[ResourceTypeEnum] = items_to_receive
 
     def set_player_choice(
             self,

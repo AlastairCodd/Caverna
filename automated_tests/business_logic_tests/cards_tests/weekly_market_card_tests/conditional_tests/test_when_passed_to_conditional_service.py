@@ -1,3 +1,4 @@
+import unittest
 from typing import List
 from automated_tests.business_logic_tests.cards_tests.weekly_market_card_tests.test_weeklyMarketCard import \
     Given_A_WeeklyMarketCard
@@ -11,6 +12,7 @@ class Test_When_Passed_To_Conditional_Service(Given_A_WeeklyMarketCard):
         conditionalService: ConditionalService = ConditionalService()
         self.possible_choices: List[ActionChoiceLookup] = conditionalService.get_possible_choices(self.SUT._actions)
 
+    @unittest.skip
     def test_misc(self):
         # TODO: Make this test assert things
         print(len(self.possible_choices))

@@ -7,6 +7,7 @@ from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_card import BaseCard
+from core.constants import resource_types
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 from core.services.base_player_service import BasePlayerService
@@ -20,15 +21,8 @@ class BreedAnimalsAction(BaseReceiveAction):
             raise ValueError("The maximum number of animals to breed cannot exceed the number of types of animals.")
         self._maximum_number_of_animals_to_reproduce = maximum
 
-        self._animals_which_can_reproduce: List[ResourceTypeEnum] = [
-            ResourceTypeEnum.sheep,
-            ResourceTypeEnum.donkey,
-            ResourceTypeEnum.boar,
-            ResourceTypeEnum.cow,
-        ]
-
         self._animals_to_reproduce: Optional[List[ResourceTypeEnum]] = None
-        BaseReceiveAction.__init__(self, self._animals_which_can_reproduce)
+        BaseReceiveAction.__init__(self, {animal: 1 for animal in resource_types.farm_animals})
 
     def set_player_choice(
             self,
@@ -41,7 +35,7 @@ class BreedAnimalsAction(BaseReceiveAction):
             raise ValueError("Turn descriptor cannot be none")
 
         animals_to_reproduce_result: ResultLookup[List[ResourceTypeEnum]] = player.get_player_choice_animals_to_breed(
-            self._animals_which_can_reproduce,
+            resource_types.farm_animals,
             self._maximum_number_of_animals_to_reproduce,
             turn_descriptor)
 

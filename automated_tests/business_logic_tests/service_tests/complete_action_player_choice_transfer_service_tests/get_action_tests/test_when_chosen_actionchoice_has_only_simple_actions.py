@@ -36,7 +36,7 @@ class test_when_chosen_actionchoice_has_only_simple_actions(Given_A_CompleteActi
 
         card: BaseCard = FakeCard(actions=card_action_conditional)
         # parameter is unused by current actions
-        cards: List[BaseCard] = []
+        cards: List[BaseCard] = [card]
 
         self._expected_actions: List[BaseAction] = [
             base_action_1,

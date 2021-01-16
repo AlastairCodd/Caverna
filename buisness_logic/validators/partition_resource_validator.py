@@ -10,7 +10,7 @@ class PartitionResourceValidator:
             self,
             resource_layout: Dict[int, Dict[T, int]],
             current_resources: Dict[T, int],
-            partition: List[Optional[T]]) -> bool:
+            partition: Dict[int, Optional[T]]) -> bool:
         if resource_layout is None:
             raise ValueError("resource layout may not be null")
         if current_resources is None:
