@@ -92,17 +92,23 @@ class AllowSubstitutionForPurchaseEffect(BaseTilePurchaseEffect):
         if current_price is None:
             raise ValueError("Current price cannot be null")
 
-        new_price: Dict[ResourceTypeEnum, int] = {}
-        for resource in current_price:
-            if resource in self._substitute_for:
-                new_price[resource] = current_price[resource] - self._substitute_for[resource]
-            else:
-                new_price[resource] = current_price[resource]
+        new_price: Dict[ResourceTypeEnum, int] = dict(current_price)
 
-        for resource in self._substitute_with:
-            if resource not in new_price:
-                new_price[resource] = 0
-            new_price[resource] += self._substitute_with[resource]
+        is_contained: bool = True
+
+        for resource in self._substitute_for:
+            if resource in new_price and new_price[resource] >= self._substitute_for[resource]:
+                new_price[resource] -= self._substitute_for[resource]
+            else:
+                is_contained = False
+
+        if is_contained:
+            for resource in self._substitute_with:
+                if resource not in new_price:
+                    new_price[resource] = 0
+                new_price[resource] += self._substitute_with[resource]
+        else:
+            new_price = current_price
 
         return new_price
 
