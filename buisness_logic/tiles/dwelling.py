@@ -1,11 +1,14 @@
 from abc import ABCMeta
 from typing import Dict, List
 
+from buisness_logic.actions.pay_action import PayAction
+from buisness_logic.actions.place_a_single_tile_action import PlaceASingleTileAction
+from common.entities.multiconditional import Conditional
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseSpecificTile
 from core.constants import tile_ids
-from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum, TileTypeEnum
-from buisness_logic.effects import population_effects, animal_storage_effects
+from core.enums.caverna_enums import ResourceTypeEnum, TileColourEnum, TileTypeEnum, ActionCombinationEnum
+from buisness_logic.effects import population_effects, animal_storage_effects, conversion_effects
 
 
 class BaseDwelling(BaseSpecificTile, metaclass=ABCMeta):
@@ -82,4 +85,33 @@ class EntryLevelDwelling(BaseDwelling):
         BaseDwelling.__init__(
             self, "Entry Level Dwelling", tile_ids.EntryLevelDwellingTileId, 0, {},
             [population_effects.IncreasePopulationCapacityEffect(2),
-             animal_storage_effects.StoreAnyAnimalEffect(2)])
+             animal_storage_effects.StoreAnyAnimalEffect(2),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.ruby: 1}, {ResourceTypeEnum.dog: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.ruby: 1}, {ResourceTypeEnum.grain: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.ruby: 1}, {ResourceTypeEnum.veg: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.ruby: 1}, {ResourceTypeEnum.sheep: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.ruby: 1}, {ResourceTypeEnum.wood: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.ruby: 1}, {ResourceTypeEnum.donkey: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.ruby: 1}, {ResourceTypeEnum.stone: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.ruby: 1}, {ResourceTypeEnum.boar: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.ruby: 1}, {ResourceTypeEnum.ore: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.ruby: 1, ResourceTypeEnum.food: 1}, {ResourceTypeEnum.cow: 1}),
+
+             conversion_effects.ConvertEffect({ResourceTypeEnum.coin: 2}, {ResourceTypeEnum.food: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.coin: 3}, {ResourceTypeEnum.food: 2}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.coin: 4}, {ResourceTypeEnum.food: 3}),
+
+             conversion_effects.ConvertEffect({ResourceTypeEnum.donkey: 1}, {ResourceTypeEnum.food: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.sheep: 1}, {ResourceTypeEnum.food: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.grain: 1}, {ResourceTypeEnum.food: 1}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.boar: 1}, {ResourceTypeEnum.food: 2}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.veg: 1}, {ResourceTypeEnum.food: 2}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.ruby: 1}, {ResourceTypeEnum.food: 2}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.donkey: 2}, {ResourceTypeEnum.food: 3}),
+             conversion_effects.ConvertEffect({ResourceTypeEnum.cow: 1}, {ResourceTypeEnum.food: 3}),
+             # free action...
+             # free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.meadow, override_cost={ResourceTypeEnum.ruby: 1})),
+             # free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.field, override_cost={ResourceTypeEnum.ruby: 1})),
+             # free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.tunnel, override_cost={ResourceTypeEnum.ruby: 1})),
+             # free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.cavern, override_cost={ResourceTypeEnum.ruby: 2})),
+            ])

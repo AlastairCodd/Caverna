@@ -4,30 +4,7 @@ from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum
 
 
-class BaseConversionEffect(BaseEffect, metaclass=ABCMeta):
-    @abstractmethod
-    def invoke(
-            self,
-            # TODO Change signature
-            source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
-        raise NotImplementedError("base board effect class")
-
-
-class ChangeFoodConversionRate(BaseConversionEffect):
-    def __init__(
-            self,
-            new_conversion: Dict[Dict[ResourceTypeEnum, int], int]) -> None:
-        BaseEffect.__init__(self)
-        self._newConversion: Dict[Dict[ResourceTypeEnum, int], int] = new_conversion
-
-    def invoke(
-            self,
-            source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
-        # TODO: Implement this
-        raise NotImplementedError()
-
-
-class Convert(BaseConversionEffect):
+class ConvertEffect(BaseEffect):
     def __init__(
             self,
             input_items: Dict[ResourceTypeEnum, int],
@@ -41,33 +18,13 @@ class Convert(BaseConversionEffect):
         self._input: Dict[ResourceTypeEnum, int] = input_items
         self._output: Dict[ResourceTypeEnum, int] = output_items
 
-    def invoke(
-            self,
-            source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
-        # TODO: Implement this
-        pass
+    @property
+    def input(self) -> Dict[ResourceTypeEnum, int]:
+        return self._input
 
+    @property
+    def output(self) -> Dict[ResourceTypeEnum, int]:
+        return self._output
 
-class ConvertProportional(BaseConversionEffect):
-    def __init__(
-            self,
-            input_items: Dict[ResourceTypeEnum, int],
-            output_items: Dict[ResourceTypeEnum, int],
-            # TODO: Change this type
-            condition: Callable[[None], None]):
-        """Optional conversion. Pay an input and get a variable output
-    
-        :param input_items:
-        :param output_items:
-        :param condition:
-        """
-        BaseEffect.__init__(self)
-        self._input: Dict[ResourceTypeEnum, int] = input_items
-        self._output: Dict[ResourceTypeEnum, int] = output_items
-        self._condition: Callable[[None], None] = condition
-
-    def invoke(
-            self,
-            source: Dict[TileTypeEnum, List[TileTypeEnum]]) -> Dict[TileTypeEnum, List[TileTypeEnum]]:
-        # TODO: Implement this
-        pass
+    def __str__(self):
+        return f"ConvertEffect({self._input}, {self._output})"

@@ -1,4 +1,4 @@
-from typing import Union, List, Dict, Callable, Optional
+from typing import Union, List, Dict, Callable, Optional, Tuple
 
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.defaults.tile_container_default import TileContainerDefault
@@ -32,13 +32,17 @@ class MockPlayer(BasePlayerService):
         self._use_dwarf_out_of_order_func: Callable[
             [List[Dwarf],
              TurnDescriptorLookup],
-            ResultLookup[bool]] \
+            ResultLookup[Dwarf]] \
             = lambda info_dwarves, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._dwarf_to_use_out_of_order_func: Callable[
             [List[Dwarf],
              TurnDescriptorLookup],
             ResultLookup[Dwarf]] \
             = lambda info_dwarves, info_turn_descriptor: ResultLookup(errors="Not Implemented")
+        self._conversions_to_perform_func: Callable[
+            [TurnDescriptorLookup],
+            List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]] \
+            = lambda info_turn_descriptor: []
         self._action_choice_to_use_func: Callable[
             [List[ActionChoiceLookup],
              TurnDescriptorLookup],
@@ -102,6 +106,13 @@ class MockPlayer(BasePlayerService):
                  TurnDescriptorLookup],
                 ResultLookup[Dwarf]]) -> None:
         self._dwarf_to_use_out_of_order_func = func
+
+    def get_player_choice_conversions_to_perform_returns(
+            self,
+            func: Callable[
+                [TurnDescriptorLookup],
+                List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]]) -> None:
+        self._conversions_to_perform_func = func
 
     def get_player_choice_actions_to_use_returns(
             self,
@@ -184,10 +195,10 @@ class MockPlayer(BasePlayerService):
             possible_number_of_animals_to_reproduce,
             turn_descriptor)
 
-    def get_player_choice_market_action(
+    def get_player_choice_conversions_to_perform(
             self,
-            possible_items_and_costs: Dict[ResourceTypeEnum, int]) -> List[ResourceTypeEnum]:
-        pass
+            turn_descriptor: TurnDescriptorLookup) -> List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]:
+        return self._conversions_to_perform_func(turn_descriptor)
 
     def get_player_choice_card_to_use(
             self,

@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, Tuple
 
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -25,10 +25,10 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         BasePlayerRepository.__init__(self, player_id, turn_index, tile_container_default)
 
     @abstractmethod
-    def get_player_choice_market_action(
+    def get_player_choice_conversions_to_perform(
             self,
-            possible_items_and_costs: Dict[ResourceTypeEnum, int]) \
-            -> List[ResourceTypeEnum]:
+            turn_descriptor: TurnDescriptorLookup) \
+            -> List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]:
         raise NotImplementedError()
 
     @abstractmethod

@@ -47,15 +47,39 @@ class BaseOccursForSeveralTurnsEffect(
 class ReceiveOnPurchaseEffect(
         BaseResourceEffect,
         BaseOnPurchaseEffect):
-    def __init__(self, output):
-        self._output = output
+    def __init__(
+            self,
+            items_to_receive: Dict[ResourceTypeEnum, int]) -> None:
+        if items_to_receive is None:
+            raise ValueError("Items to Receive may not be null")
+        self._items_to_receive: Dict[ResourceTypeEnum, int] = items_to_receive
         BaseEffect.__init__(self)
 
     def invoke(self, player: BasePlayerRepository) -> bool:
         if player is None:
             raise ValueError("Player may not be null")
-        result: bool = player.give_resources(self._output)
+        result: bool = player.give_resources(self._items_to_receive)
         return result
+
+
+class ReceiveOnConvertFromEffect(BaseEffect):
+    def __init__(
+            self,
+            items_to_receive: Dict[ResourceTypeEnum, int],
+            when_converting_from: ResourceTypeEnum) -> None:
+        if items_to_receive is None:
+            raise ValueError("Items to Receive may not be null")
+        self._items_to_receive: Dict[ResourceTypeEnum, int] = items_to_receive
+        self._convert_from_item: ResourceTypeEnum = when_converting_from
+        BaseEffect.__init__(self)
+
+    @property
+    def items_to_receive(self) -> Dict[ResourceTypeEnum, int]:
+        return self._items_to_receive
+
+    @property
+    def convert_from_item(self) -> ResourceTypeEnum:
+        return self._convert_from_item
 
 
 class ReceiveProportionalOnPurchaseEffect(
