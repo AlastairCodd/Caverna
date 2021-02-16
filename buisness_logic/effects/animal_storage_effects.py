@@ -10,9 +10,6 @@ from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 
 
 class BaseAnimalStorageEffect(BaseEffect, metaclass=ABCMeta):
-    def __init(self):
-        BaseEffect.__init__(self)
-
     @abstractmethod
     def get_animal_storage_buckets(
             self,
@@ -26,7 +23,6 @@ class StoreAnyAnimalEffect(BaseAnimalStorageEffect):
             quantity: int):
         """Add storage capacity for some number of any type of animal"""
         self._quantity: int = quantity
-        BaseAnimalStorageEffect.__init__(self)
 
     def get_animal_storage_buckets(
             self,
@@ -46,7 +42,6 @@ class StoreSpecificAnimalEffect(BaseAnimalStorageEffect):
         if space_for_animals is None:
             raise ValueError("animals")
         self._animal_storage_buckets: Dict[ResourceTypeEnum, int] = space_for_animals
-        BaseAnimalStorageEffect.__init__(self)
 
     def get_animal_storage_buckets(
             self,
@@ -103,8 +98,6 @@ class ChangeAnimalStorageBaseEffect(BaseEffect):
         self._tiles: List[TileTypeEnum] = tiles
         self._animals_which_can_be_stored: Dict[ResourceTypeEnum, int] = animals_which_can_be_stored
         self._condition: Callable[[BasePlayerRepository, TileEntity], int] = condition
-
-        BaseEffect.__init__(self)
 
     def get_animal_storage_buckets_for_tile(
             self,

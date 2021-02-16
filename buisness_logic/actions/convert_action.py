@@ -45,9 +45,6 @@ class ConvertAction(BaseReceiveEventService, BasePlayerChoiceAction):
             player: BasePlayerRepository,
             active_card: BaseCard,
             current_dwarf: Dwarf) -> ResultLookup[int]:
-        if player is None:
-            raise ValueError("Player may not be None")
-
         result = ResultLookup(True, 0)
         return result
 

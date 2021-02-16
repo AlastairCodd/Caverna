@@ -26,7 +26,6 @@ class ChangeRequisiteEffect(BaseBoardEffect):
 
         self._tiles: List[TileTypeEnum] = tiles
         self._newRequisites: List[TileTypeEnum] = new_requisites
-        BaseBoardEffect.__init__(self)
 
     def invoke(
             self,
@@ -41,7 +40,8 @@ class ChangeRequisiteEffect(BaseBoardEffect):
 
 class FurnishTunnelsEffect(ChangeRequisiteEffect):
     def __init__(self):
-        super().__init__(
+        ChangeRequisiteEffect.__init__(
+            self,
             [TileTypeEnum.furnishedCavern, TileTypeEnum.furnishedDwelling],
             [TileTypeEnum.tunnel, TileTypeEnum.deepTunnel])
 
@@ -53,6 +53,7 @@ class TwinTilesOverhangEffect(ChangeRequisiteEffect):
             TileTypeEnum.cavernTunnelTwin,
             TileTypeEnum.meadowFieldTwin,
         ]
-        super().__init__(
+        ChangeRequisiteEffect.__init__(
+            self,
             twin_tiles,
             [TileTypeEnum.unavailable])

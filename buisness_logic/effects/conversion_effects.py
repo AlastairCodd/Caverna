@@ -14,7 +14,6 @@ class ConvertEffect(BaseEffect):
         :param input_items:
         :param output_items:
         """
-        BaseEffect.__init__(self)
         self._input: Dict[ResourceTypeEnum, int] = input_items
         self._output: Dict[ResourceTypeEnum, int] = output_items
 

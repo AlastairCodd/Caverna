@@ -9,7 +9,6 @@ class ChangeDecisionVerb(BaseEffect):
             change_to: ActionCombinationEnum):
         self._change_from: ActionCombinationEnum = change_from
         self._change_to: ActionCombinationEnum = change_to
-        BaseEffect.__init__(self)
 
     def invoke(
             self,

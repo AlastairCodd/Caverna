@@ -63,12 +63,6 @@ class ActionCombinationEnum(Enum):
     AndThen = auto()
 
 
-class TriggerStateEnum(Enum):
-    StartOfTurn = auto()
-    OnPurchase = auto()
-    UserChoice = auto()
-
-
 class TileColourEnum(Enum):
     Brown = auto()
     Green = auto()

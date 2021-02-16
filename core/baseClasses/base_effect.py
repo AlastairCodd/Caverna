@@ -1,8 +1,5 @@
-from abc import ABC
-
-from core.enums.caverna_enums import TriggerStateEnum
+from abc import ABCMeta
 
 
-class BaseEffect(ABC):
-    def __init__(self, trigger_state=TriggerStateEnum.UserChoice):
-        self._triggerState = trigger_state
+class BaseEffect(metaclass=ABCMeta):
+    pass

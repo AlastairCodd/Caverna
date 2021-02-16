@@ -7,7 +7,7 @@ from buisness_logic.services.base_receive_event_service import BaseReceiveEventS
 from common.entities.result_lookup import ResultLookup
 from common.services.resettable import Resettable
 from core.baseClasses.base_effect import BaseEffect
-from core.enums.caverna_enums import TriggerStateEnum, ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
@@ -33,8 +33,6 @@ class BaseOccursForSeveralTurnsEffect(
             raise IndexError("Number of turns must be positive")
         self._number_of_turns: int = number_of_turns
 
-        BaseEffect.__init__(self)
-
     def new_turn_reset(self) -> None:
         if self._number_of_turns > 0:
             self._number_of_turns -= 1
@@ -53,7 +51,6 @@ class ReceiveOnPurchaseEffect(
         if items_to_receive is None:
             raise ValueError("Items to Receive may not be null")
         self._items_to_receive: Dict[ResourceTypeEnum, int] = items_to_receive
-        BaseEffect.__init__(self)
 
     def invoke(self, player: BasePlayerRepository) -> bool:
         if player is None:
@@ -71,7 +68,6 @@ class ReceiveOnConvertFromEffect(BaseEffect):
             raise ValueError("Items to Receive may not be null")
         self._items_to_receive: Dict[ResourceTypeEnum, int] = items_to_receive
         self._convert_from_item: ResourceTypeEnum = when_converting_from
-        BaseEffect.__init__(self)
 
     @property
     def items_to_receive(self) -> Dict[ResourceTypeEnum, int]:
@@ -96,7 +92,6 @@ class ReceiveProportionalOnPurchaseEffect(
 
         self._receive: Dict[ResourceTypeEnum, int] = receive
         self._proportional_to: Dict[ResourceTypeEnum, int] = proportional_to
-        BaseResourceEffect.__init__(self)
 
     # TODO: this needs to be run through the ActionOrderingService, and so should be returned in the get_player_choice method
     # Or does it... this is invoked _immediately_ after the tile is purchased, and with the vanilla tile set there is only ever one receive per tile
@@ -120,14 +115,12 @@ class ReceiveConditionallyAtStartOfTurnEffect(
     def __init__(
             self,
             received: Dict[ResourceTypeEnum, int],
-            condition: Callable[[BasePlayerRepository], int],
-            trigger_state: TriggerStateEnum = TriggerStateEnum.StartOfTurn) -> None:
+            condition: Callable[[BasePlayerRepository], int]) -> None:
         """Receive some input when some condition is true.
 
         :param received: The resources which are received when the condition is met. This cannot be null.
         :param condition: A function which takes a player and returns the number of times they should be given
             "received". This cannot be null.
-        :param trigger_state: When does this action trigger? (Optional)
         """
         if received is None:
             raise ValueError("Received")
@@ -135,7 +128,6 @@ class ReceiveConditionallyAtStartOfTurnEffect(
             raise ValueError("Condition")
         self._received: Dict[ResourceTypeEnum, int] = received
         self._condition: Callable[[BasePlayerRepository], int] = condition
-        BaseEffect.__init__(self, trigger_state=trigger_state)
 
     def invoke(
             self,
@@ -182,7 +174,6 @@ class ReceiveWhenBreedingEffect(
         if conditional is None:
             raise ValueError("Conditional cannot be None")
         self._conditional: Callable[[List[ResourceTypeEnum]], Dict[ResourceTypeEnum, int]] = conditional
-        BaseEffect.__init__(self)
 
     def invoke(
             self,

@@ -2,14 +2,13 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict
 
 from core.baseClasses.base_effect import BaseEffect
-from core.enums.caverna_enums import ResourceTypeEnum, TriggerStateEnum
+from core.enums.caverna_enums import ResourceTypeEnum
 
 
 class BaseTilePurchaseEffect(BaseEffect, metaclass=ABCMeta):
     """Abstract class for effects that effect the tile purchase cost"""
     def __init__(self, can_be_used_only_once: bool = True) -> None:
         self._can_be_used_only_once = can_be_used_only_once
-        BaseEffect.__init__(self, TriggerStateEnum.UserChoice)
 
     @property
     def can_be_used_only_once(self) -> bool:
@@ -126,8 +125,6 @@ class DecreasePriceOfWeaponEffect(BaseWeaponPurchaseEffect):
         if decrease_by is None:
             raise ValueError("Cost to decrease by cannot be none")
         self._decrease_by: Dict[ResourceTypeEnum, int] = decrease_by
-
-        BaseEffect.__init__(self)
 
     def invoke(
             self,
