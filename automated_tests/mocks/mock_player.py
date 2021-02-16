@@ -1,5 +1,6 @@
 from typing import Union, List, Dict, Callable, Optional, Tuple
 
+from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.defaults.tile_container_default import TileContainerDefault
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -243,3 +244,9 @@ class MockPlayer(BasePlayerService):
             turn_descriptor: TurnDescriptorLookup,
             secondary_tile: Optional[BaseTile] = None) -> Dict[BaseTilePurchaseEffect, int]:
         return self._effects_to_use_for_cost_discount(specific_tile, turn_descriptor, secondary_tile)
+
+    def get_player_choice_effect_to_use_for_feeding_dwarves(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
+        pass
+

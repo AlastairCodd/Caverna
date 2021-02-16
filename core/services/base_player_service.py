@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABCMeta
 from typing import List, Dict, Union, Optional, Tuple
 
+from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -151,4 +152,10 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
             specific_tile: BaseTile,
             turn_descriptor: TurnDescriptorLookup,
             secondary_tile: Optional[BaseTile] = None) -> Dict[BaseTilePurchaseEffect, int]:
+        pass
+
+    @abstractmethod
+    def get_player_choice_effect_to_use_for_feeding_dwarves(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
         pass
