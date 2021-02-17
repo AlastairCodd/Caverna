@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Dict, Union, Optional, Tuple
+from typing import List, Dict, Optional, Tuple
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
@@ -8,7 +8,6 @@ from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from common.entities.weapon import Weapon
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
@@ -152,6 +151,12 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
             specific_tile: BaseTile,
             turn_descriptor: TurnDescriptorLookup,
             secondary_tile: Optional[BaseTile] = None) -> Dict[BaseTilePurchaseEffect, int]:
+        pass
+
+    @abstractmethod
+    def get_player_choice_use_harvest_action_instead_of_breeding(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> bool:
         pass
 
     @abstractmethod

@@ -1,20 +1,8 @@
-from typing import Dict, List, Union
+from typing import Dict
 
-from automated_tests.business_logic_tests.effects_tests.purchase_effects_tests.allow_substitution_for_purchase_tests\
+from automated_tests.business_logic_tests.effects_tests.purchase_effects_tests.allow_substitution_for_purchase_tests \
     .given_a_allowsubstitutionforpurchase import Given_An_AllowSubstitutionForPurchase
-from automated_tests.mocks.mock_player import MockPlayer
-from common.entities.weapon import Weapon
-from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
-
-
-class MockDiscountPlayer(MockPlayer):
-    def get_player_choice_discount(
-            self,
-            possible_prices: List[Dict[ResourceTypeEnum, int]],
-            target: Union[BaseTile, Weapon]) \
-            -> Dict[ResourceTypeEnum, int]:
-        return possible_prices[1]
 
 
 class Test_When_Substitute_For_Contained_Once(Given_An_AllowSubstitutionForPurchase):

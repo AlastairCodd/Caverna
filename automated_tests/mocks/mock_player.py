@@ -245,6 +245,11 @@ class MockPlayer(BasePlayerService):
             secondary_tile: Optional[BaseTile] = None) -> Dict[BaseTilePurchaseEffect, int]:
         return self._effects_to_use_for_cost_discount(specific_tile, turn_descriptor, secondary_tile)
 
+    def get_player_choice_use_harvest_action_instead_of_breeding(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> bool:
+        pass
+
     def get_player_choice_effect_to_use_for_feeding_dwarves(
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
