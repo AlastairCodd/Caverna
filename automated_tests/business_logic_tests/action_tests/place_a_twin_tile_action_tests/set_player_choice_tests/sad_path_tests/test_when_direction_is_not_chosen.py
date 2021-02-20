@@ -70,8 +70,6 @@ class test_direction_is_not_chosen(Given_A_PlaceATwinTileAction):
                 TileUnknownPlacementLookup(location_to_place_primary_tile, None)
             ))
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
-
         self._expected_tiles: Dict[int, Optional[BaseTile]] = {
             location_to_place_primary_tile: TunnelTile()
         }

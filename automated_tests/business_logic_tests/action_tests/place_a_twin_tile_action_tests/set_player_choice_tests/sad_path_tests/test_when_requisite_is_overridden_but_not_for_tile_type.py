@@ -84,7 +84,7 @@ class test_when_requisite_is_overridden_by_tile_effect_and_direction_is_invalid(
                 True,
                 TileUnknownPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.up)))
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: {})
 
         self._expected_tiles: Dict[int, BaseTile] = {
             1: office_room,

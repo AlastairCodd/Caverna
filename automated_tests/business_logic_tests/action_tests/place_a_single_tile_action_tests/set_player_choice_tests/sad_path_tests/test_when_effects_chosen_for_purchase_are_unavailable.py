@@ -90,7 +90,7 @@ class test_when_effects_chosen_for_purchase_are_unavailable(Given_A_PlaceASingle
                 True,
                 TileUnknownPlacementLookup(self._location_to_place_tile, None)
             ))
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: effects_to_use)
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: effects_to_use)
         return player
 
     def test_then_result_should_not_be_none(self) -> None:

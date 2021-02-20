@@ -79,8 +79,6 @@ class test_when_tile_cost_is_default(Given_A_PlaceATwinTileAction):
                 True,
                 TileUnknownPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.up)))
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
-
         self._expected_tiles: Dict[int, BaseTile] = {
             location_to_place_primary_tile: OreMineTile(),
             location_to_place_secondary_tile: DeepTunnelTile(),

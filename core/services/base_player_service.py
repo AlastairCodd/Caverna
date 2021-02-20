@@ -146,11 +146,16 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
+    def get_player_choice_location_to_build_stable(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
+        raise NotImplementedError()
+
+    @abstractmethod
     def get_player_choice_effects_to_use_for_cost_discount(
             self,
             specific_tile: BaseTile,
-            turn_descriptor: TurnDescriptorLookup,
-            secondary_tile: Optional[BaseTile] = None) -> Dict[BaseTilePurchaseEffect, int]:
+            turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
         pass
 
     @abstractmethod

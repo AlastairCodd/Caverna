@@ -80,10 +80,9 @@ class MockPlayer(BasePlayerService):
             = lambda info_tiles, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._effects_to_use_for_cost_discount: Callable[
             [BaseTile,
-             TurnDescriptorLookup,
-             Optional[BaseTile]],
+             TurnDescriptorLookup],
             Dict[BaseTilePurchaseEffect, int]] \
-            = lambda info_tile, info_turn_descriptor, info_secondary_tile: {}
+            = lambda info_tile, info_turn_descriptor: {}
 
     def get_player_choice_use_dwarf_out_of_order_returns(
             self,
@@ -161,18 +160,17 @@ class MockPlayer(BasePlayerService):
             self,
             func: Callable[
                 [BaseTile,
-                 TurnDescriptorLookup,
-                 Optional[BaseTile]],
+                 TurnDescriptorLookup],
                 Dict[BaseTilePurchaseEffect, int]]) -> None:
         self._effects_to_use_for_cost_discount = func
 
     def get_player_choice_animals_to_breed_returns(
-        self,
-        func: Callable[
-            [List[ResourceTypeEnum],
-             int,
-             TurnDescriptorLookup],
-            ResultLookup[List[ResourceTypeEnum]]]) -> None:
+            self,
+            func: Callable[
+                [List[ResourceTypeEnum],
+                 int,
+                 TurnDescriptorLookup],
+                ResultLookup[List[ResourceTypeEnum]]]) -> None:
         self._animals_to_breed_func = func
 
     def get_player_choice_weapon_level_returns(
@@ -241,9 +239,8 @@ class MockPlayer(BasePlayerService):
     def get_player_choice_effects_to_use_for_cost_discount(
             self,
             specific_tile: BaseTile,
-            turn_descriptor: TurnDescriptorLookup,
-            secondary_tile: Optional[BaseTile] = None) -> Dict[BaseTilePurchaseEffect, int]:
-        return self._effects_to_use_for_cost_discount(specific_tile, turn_descriptor, secondary_tile)
+            turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
+        return self._effects_to_use_for_cost_discount(specific_tile, turn_descriptor)
 
     def get_player_choice_use_harvest_action_instead_of_breeding(
             self,
@@ -254,4 +251,3 @@ class MockPlayer(BasePlayerService):
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
         pass
-

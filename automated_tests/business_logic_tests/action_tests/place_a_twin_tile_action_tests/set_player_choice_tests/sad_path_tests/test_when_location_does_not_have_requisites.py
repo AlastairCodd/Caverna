@@ -77,8 +77,6 @@ class test_when_location_does_not_have_requisites(Given_A_PlaceATwinTileAction):
                 True,
                 TileUnknownPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.up)))
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
-
         self._expected_tiles: Dict[int, Optional[BaseTile]] = {
             location_to_place_primary_tile: None,
             location_to_place_secondary_tile: TunnelTile()

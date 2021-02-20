@@ -14,9 +14,8 @@ class Given_A_PlaceATwinTileAction(TestCase, metaclass=ABCMeta):
 
     def initialise_sut_with_twin_tile(
             self,
-            tile_type: TileTypeEnum = TileTypeEnum.oreMineDeepTunnelTwin,
-            override_cost: Optional[Dict[ResourceTypeEnum, int]] = None) -> None:
-        self.SUT = PlaceATwinTileAction(tile_type, override_cost=override_cost)
+            tile_type: TileTypeEnum = TileTypeEnum.oreMineDeepTunnelTwin) -> None:
+        self.SUT = PlaceATwinTileAction(tile_type)
 
     def because(self) -> None:
         pass

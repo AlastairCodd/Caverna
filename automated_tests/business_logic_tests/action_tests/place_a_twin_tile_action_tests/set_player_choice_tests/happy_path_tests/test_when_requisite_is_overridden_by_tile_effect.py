@@ -8,7 +8,7 @@ from automated_tests.mocks.mock_card import MockCard
 from automated_tests.mocks.mock_player import MockPlayer
 from buisness_logic.tiles.dwelling import Dwelling
 from buisness_logic.tiles.game_change_tiles import OfficeRoomTile
-from buisness_logic.tiles.mine_tiles import OreMineTile, DeepTunnelTile, TunnelTile, CavernTile
+from buisness_logic.tiles.mine_tiles import CavernTile
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
@@ -82,8 +82,6 @@ class test_when_requisite_is_overridden_by_tile_effect(Given_A_PlaceATwinTileAct
             lambda _, __, ___: ResultLookup(
                 True,
                 TileUnknownPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.up)))
-
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
 
         self._expected_tiles: Dict[int, BaseTile] = {
             1: office_room,

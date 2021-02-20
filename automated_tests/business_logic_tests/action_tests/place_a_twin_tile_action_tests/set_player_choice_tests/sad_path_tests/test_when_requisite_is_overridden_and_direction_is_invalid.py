@@ -80,8 +80,6 @@ class test_when_requisite_is_overridden_and_direction_is_invalid(Given_A_PlaceAT
                 True,
                 TileUnknownPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.right)))
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
-
         self._expected_tiles: Dict[int, BaseTile] = {
             1: office_room,
             location_to_place_primary_tile: None,

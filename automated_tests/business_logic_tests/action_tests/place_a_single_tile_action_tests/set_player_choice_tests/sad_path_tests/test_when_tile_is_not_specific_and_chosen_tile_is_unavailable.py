@@ -84,7 +84,7 @@ class test_when_tile_is_not_specific_and_chosen_tile_is_unavailable(Given_A_Plac
             location_to_place_tile: cavern_for_building
         }
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: {})
 
         return player
 

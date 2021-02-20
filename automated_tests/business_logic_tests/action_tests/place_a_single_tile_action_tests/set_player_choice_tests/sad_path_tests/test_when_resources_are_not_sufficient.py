@@ -81,7 +81,7 @@ class test_when_location_chosen_is_invalid(Given_A_PlaceASingleTileAction):
             location_to_place: cavern_for_building
         }
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: effects_to_use)
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: effects_to_use)
         return player
 
     def test_then_result_should_not_be_none(self) -> None:

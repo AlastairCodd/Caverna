@@ -77,7 +77,7 @@ class test_when_location_chosen_is_invalid(Given_A_PlaceASingleTileAction):
                 TileUnknownPlacementLookup(location_to_place, None)
             ))
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: {})
 
         self._expected_tiles: Dict[int, Optional[BaseTile]] = {
             location_to_place: tile_at_location

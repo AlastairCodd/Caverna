@@ -7,7 +7,6 @@ from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_ch
 from automated_tests.mocks.mock_card import MockCard
 from automated_tests.mocks.mock_player import MockPlayer
 from buisness_logic.tiles.dwelling import Dwelling
-from buisness_logic.tiles.mine_tiles import TunnelTile
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
@@ -75,8 +74,6 @@ class test_when_location_does_not_have_requisites(Given_A_PlaceATwinTileAction):
             lambda _, __, ___: ResultLookup(
                 True,
                 TileUnknownPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.down)))
-
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
 
         self._expected_tiles: Dict[int, Optional[BaseTile]] = {
             location_to_place_primary_tile: None,

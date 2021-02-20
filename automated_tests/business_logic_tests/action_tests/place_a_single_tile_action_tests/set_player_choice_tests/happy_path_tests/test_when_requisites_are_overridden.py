@@ -88,8 +88,7 @@ class test_when_requisites_are_overridden(Given_A_PlaceASingleTileAction):
             lambda _, __: ResultLookup(True, self._tile_to_build)
         )
 
-        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __, ___: {})
-
+        player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: {})
 
         return player
 
