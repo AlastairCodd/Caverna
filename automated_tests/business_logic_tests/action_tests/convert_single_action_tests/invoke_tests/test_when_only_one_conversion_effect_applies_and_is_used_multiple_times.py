@@ -12,6 +12,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 
 
 class test_when_only_one_conversion_effect_applies_and_is_used_multiple_times(Given_A_ConvertSingleAction):
+    # noinspection PyTypeChecker
     def because(self) -> None:
         self.SUT = ConvertSingleAction(
             [ResourceTypeEnum.wood],

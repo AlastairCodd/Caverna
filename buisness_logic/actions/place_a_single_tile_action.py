@@ -11,7 +11,7 @@ from common.services.tile_service import TileService
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.baseClasses.base_tile import BaseTile
-from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileDirectionEnum
+from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 from core.services.base_player_service import BasePlayerService
 
@@ -72,9 +72,6 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
                 errors.extend(specific_tile_to_build_result.errors)
 
                 if specific_tile_to_build_result.flag:
-                    # That this returns the same instance as in turn_descriptor.tiles is not an issue,
-                    # since that item will be removed when it is placed
-                    # TODO: Do what this comment says
                     self._specific_tile_generation_method = lambda: specific_tile_to_build_result.value
                 else:
                     self._specific_tile_generation_method = lambda: None
@@ -100,8 +97,12 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
             should_get_effects_to_use_on_cost: bool = self._should_get_effects_to_use_on_cost(primary_tile)
 
             if should_get_effects_to_use_on_cost:
-                self._effects_to_use = player.get_player_choice_effects_to_use_for_cost_discount(
+                tile_cost_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service.get_cost_of_tile(
                     primary_tile,
+                    self._tile_cost_override)
+
+                self._effects_to_use = player.get_player_choice_effects_to_use_for_cost_discount(
+                    tile_cost_result.value,
                     turn_descriptor)
             else:
                 self._effects_to_use = {}

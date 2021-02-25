@@ -73,6 +73,10 @@ class MockPlayer(BasePlayerService):
              Optional[BaseTile]],
             ResultLookup[TileUnknownPlacementLookup]] \
             = lambda info_tile, info_turn_descriptor, info_secondary_tile: ResultLookup(errors="Not Implemented")
+        self._location_to_build_stable_func: Callable[
+            [TurnDescriptorLookup],
+            ResultLookup[int]] \
+            = lambda info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._tile_to_build_func: Callable[
             [List[BaseTile],
              TurnDescriptorLookup],
@@ -147,6 +151,13 @@ class MockPlayer(BasePlayerService):
                  Optional[BaseTile]],
                 ResultLookup[TileUnknownPlacementLookup]]) -> None:
         self._location_to_build_func = func
+
+    def get_player_choice_location_to_build_stable_returns(
+            self,
+            func: Callable[
+                [TurnDescriptorLookup],
+                ResultLookup[int]]) -> None:
+        self._location_to_build_stable_func = func
 
     def get_player_choice_tile_to_build_returns(
             self,
@@ -235,6 +246,11 @@ class MockPlayer(BasePlayerService):
             turn_descriptor: TurnDescriptorLookup,
             secondary_tile: Optional[BaseTile] = None) -> ResultLookup[TileUnknownPlacementLookup]:
         return self._location_to_build_func(tile, turn_descriptor, secondary_tile)
+
+    def get_player_choice_location_to_build_stable(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
+        return self._location_to_build_stable_func(turn_descriptor)
 
     def get_player_choice_effects_to_use_for_cost_discount(
             self,
