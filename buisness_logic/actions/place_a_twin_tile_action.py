@@ -22,7 +22,8 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         self._tile_service: TileService = TileService()
 
         self._tile_type: TileTypeEnum = tile_type
-        self._tile_is_twin: bool = self._tile_service.is_tile_a_twin_tile(self._tile_type)
+        if not self._tile_service.is_tile_a_twin_tile(self._tile_type):
+            raise ValueError("Tile type must be twin")
 
         self._primary_twin_tile_generation_method: Optional[Callable[[], BaseTile]] = None
         self._secondary_twin_tile_generation_method: Optional[Callable[[], BaseTile]] = None
@@ -146,3 +147,14 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         self._tile_location = -1
         self._tile_direction = None
         self._turn_descriptor = None
+
+    def __str__(self) -> str:
+        tile_type_displayable: Dict[TileTypeEnum,str] = {
+            TileTypeEnum.pastureTwin: "Twin Pasture",
+            TileTypeEnum.cavernTunnelTwin: "Cavern Tunnel Twin",
+            TileTypeEnum.cavernCavernTwin: "Twin Cavern",
+            TileTypeEnum.oreMineDeepTunnelTwin: "Ore Mine and Deep Tunnel",
+            TileTypeEnum.meadowFieldTwin: "Meadow and Field pair",
+        }
+
+        return f"Place a {tile_type_displayable[self._tile_type]}"

@@ -51,3 +51,6 @@ class GetABabyDwarfAction(BaseAction):
 
     def new_turn_reset(self):
         pass
+
+    def __str__(self) -> str:
+        return "Get a baby dwarf"

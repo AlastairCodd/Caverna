@@ -232,3 +232,50 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
 
         success: bool = len(errors) == 0
         return ResultLookup(success, success, errors)
+
+    def __str__(self) -> str:
+        tile_type_displayable: Dict[TileTypeEnum,str] = {
+            TileTypeEnum.forest: "Forest",
+            TileTypeEnum.underground: "Underground Tile",
+            TileTypeEnum.meadow: "Meadow",
+            TileTypeEnum.field: "Field",
+            TileTypeEnum.cavern: "Cavern",
+            TileTypeEnum.tunnel: "Tunnel",
+            TileTypeEnum.deepTunnel: "Deep Tunnel",
+            TileTypeEnum.pasture: "Pasture",
+            TileTypeEnum.furnishedCavern: "Furnished Cavern",
+            TileTypeEnum.furnishedDwelling: "Furnished Dwelling",
+            TileTypeEnum.oreMine: "Ore Mine",
+            TileTypeEnum.rubyMine: "Ruby Mine",
+        }
+
+        result_contents: List[str] = ["Place a"]
+        cost: Dict[ResourceTypeEnum, int] = {}
+
+        if self._specific_tile_generation_method is not None or self._tile_service.does_tile_type_have_unique_tile(self._tile_type):
+            specific_tile: BaseTile = self._specific_tile_generation_method() \
+                if self._specific_tile_generation_method is not None \
+                else self._tile_service.get_unique_tile_generation_method(self._tile_type)()
+            result_contents.append(specific_tile.name)
+
+            cost = self._tile_service.get_cost_of_tile(specific_tile, self._tile_cost_override).value
+        else:
+            result_contents.append(tile_type_displayable[self._tile_type])
+
+            if self._tile_cost_override is not None:
+                cost = self._tile_cost_override
+
+        if self._tile_requisites_override is not None:
+            result_contents.append("on ")
+
+            if len(self._tile_requisites_override) > 0:
+                " or ".join([tile_type_displayable[requisite] for requisite in self._tile_requisites_override])
+            else:
+                f" a {tile_type_displayable[self._tile_requisites_override[0]]}"
+
+        if any(cost):
+            displayable_resources: str = "and ".join([f"{amount} {resource.name}" for resource, amount in cost.items()])
+            result_contents.append("for")
+            result_contents.append(displayable_resources)
+
+        return " ".join(result_contents)

@@ -35,3 +35,6 @@ class TakeAccumulatedItemsAction(BaseReceiveEventService, BaseAction):
 
     def new_turn_reset(self):
         pass
+
+    def __str__(self) -> str:
+        return "Take accumulated items"

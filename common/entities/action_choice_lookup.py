@@ -28,8 +28,7 @@ class ActionChoiceLookup(object):
         return self._constraints
 
     def __str__(self) -> str:
-        constraints_string: str = "" if len(self._constraints) == 0 else f", {self._constraints}"
-        return f"ActionChoiceLookup({self._actions}{constraints_string})"
+        return ''.join(map(str, self._actions))
 
     def __repr__(self) -> str:
         list_of_strings: List[str] = ["ActionChoiceLookup("]

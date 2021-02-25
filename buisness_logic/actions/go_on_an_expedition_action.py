@@ -45,8 +45,8 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
             7: [PlaceASingleTileAction(TileTypeEnum.furnishedCavern)],
             8: [PlaceAStableAction(override_cost={})],
             9: [PlaceASingleTileAction(TileTypeEnum.tunnel),
-            10: [PlaceATwinTileAction(TileTypeEnum.pastureTwin),
                 PlaceASingleTileAction(TileTypeEnum.pasture, override_cost={ResourceTypeEnum.wood: 1})],
+            10: [PlaceATwinTileAction(TileTypeEnum.pastureTwin, override_cost={ResourceTypeEnum.wood: 2}),
                  ReceiveAction({ResourceTypeEnum.cow: 1})],
             11: [PlaceASingleTileAction(TileTypeEnum.meadow),
                  PlaceASingleTileAction(TileTypeEnum.furnishedDwelling,
@@ -140,3 +140,6 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
 
     def new_turn_reset(self) -> None:
         self._chosen_actions_and_levels.clear()
+
+    def __str__(self) -> str:
+        return f"Go on a level {self._level} expedition"

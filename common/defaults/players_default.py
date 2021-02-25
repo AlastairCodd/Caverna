@@ -1,5 +1,6 @@
 from typing import List
 
+from buisness_logic.services.keyboard_human_player_service import KeyboardHumanPlayerService
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.services.base_player_service import BasePlayerService
 
@@ -22,7 +23,7 @@ class PlayersDefault(object):
         players.clear()
 
         for x in range(self._numberOfPlayers):
-            new_player = BasePlayerService(x, x)
+            new_player: BasePlayerService = KeyboardHumanPlayerService()
             new_player.give_resource(ResourceTypeEnum.food, self._initialFood[x])
             players.append(new_player)
 

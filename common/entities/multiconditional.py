@@ -29,3 +29,14 @@ class Conditional(object):
 
     def get_combination_type(self) -> ActionCombinationEnum:
         return self._type
+
+    def __str__(self) -> str:
+        type_to_string: Dict[ActionCombinationEnum, Callable[[Any, Any], str]] = {
+            ActionCombinationEnum.EitherOr: lambda c1, c2: f"Either {self._condition1} or {self._condition2}",
+            ActionCombinationEnum.AndOr: lambda c1, c2: f"{self._condition1} and/or {self._condition2}",
+            ActionCombinationEnum.AndThenOr: lambda c1, c2: f"{self._condition1} and then/or {self._condition2}",
+            ActionCombinationEnum.Or: lambda c1, c2: f"{self._condition1} or {self._condition2}",
+            ActionCombinationEnum.AndThen: lambda c1, c2: f"{self._condition1} and then {self._condition2}",
+        }
+        result: str = type_to_string[self._type](self._condition1, self._condition2)
+        return result
