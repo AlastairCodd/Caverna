@@ -5,11 +5,10 @@ from core.enums.caverna_enums import ActionCombinationEnum, ResourceTypeEnum, Ti
 
 
 class SmallScaleDriftMiningCard(BaseCard):
-
     def __init__(self):
         BaseCard.__init__(
             self, "Small Scale Drift Mining", 13,
             actions=Conditional(
                 ActionCombinationEnum.AndOr,
                 receive_action.ReceiveAction({ResourceTypeEnum.stone: 1}),
-                place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.cavern)))
+                place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.cavernTunnelTwin)))

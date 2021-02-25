@@ -10,7 +10,7 @@ class GrowthCard(BaseCard):
         BaseCard.__init__(
             self, "Growth", 7,
             actions=Conditional(
-                ActionCombinationEnum.AndThen,
+                ActionCombinationEnum.EitherOr,
                 receive_action.ReceiveAction({
                     ResourceTypeEnum.wood: 1,
                     ResourceTypeEnum.stone: 1,

@@ -1,18 +1,16 @@
 from typing import Dict, cast
 
+from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
-from core.baseClasses.base_card import BaseCard
+from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
 from core.containers.tile_container import TileContainer
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
-from core.containers.resource_container import ResourceContainer
-from buisness_logic.actions import *
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
-class RubyMiningCard(BaseCard, ResourceContainer):
-
+class RubyMiningCard(BaseResourceContainingCard):
     def __init__(self):
-        BaseCard.__init__(
+        BaseResourceContainingCard.__init__(
             self, "Ruby Mining", 33, 4,
             Conditional(
                 ActionCombinationEnum.AndThenOr,
@@ -21,7 +19,6 @@ class RubyMiningCard(BaseCard, ResourceContainer):
                     self._condition,
                     {ResourceTypeEnum.ruby: 1})
             ))
-        ResourceContainer.__init__(self)
 
     def _condition(self, player: BasePlayerRepository) -> int:
         if player is None:

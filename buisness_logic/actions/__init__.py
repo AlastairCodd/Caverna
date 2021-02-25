@@ -14,5 +14,4 @@ __all__ = [
     "sowAction",
     "take_accumulated_items_action",
     "upgrade_all_weapons_action",
-    "upgrade_dwarf_weapon_action",
-    "useAnotherCardAction"]
+    "upgrade_dwarf_weapon_action"]

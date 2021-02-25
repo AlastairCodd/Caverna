@@ -8,13 +8,16 @@ from core.repositories.base_player_repository import BasePlayerRepository
 
 
 class AllowFarmingEffect(BaseEffect):
-    def __init__(self) -> None:
+    def __init__(
+            self,
+            planted_resource_type: Optional[ResourceTypeEnum] = None,
+            planted_resource_amount: int = 0) -> None:
         self._resource_type_rewards: Dict[ResourceTypeEnum, int] = {
             ResourceTypeEnum.grain: 3,
             ResourceTypeEnum.veg: 2}
 
-        self._planted_resource_type: Optional[ResourceTypeEnum] = None
-        self._planted_resource_amount: int = 0
+        self._planted_resource_type: Optional[ResourceTypeEnum] = planted_resource_type
+        self._planted_resource_amount: int = planted_resource_amount
 
     @property
     def planted_resource_type(self) -> Optional[ResourceTypeEnum]:
@@ -74,5 +77,3 @@ class AllowFarmingEffect(BaseEffect):
                 self._planted_resource_type = None
 
         return result
-
-

@@ -1,18 +1,15 @@
 from typing import Dict
 
 from buisness_logic.actions import take_accumulated_items_action
-from core.baseClasses.base_card import BaseCard
-from core.containers.resource_container import ResourceContainer
+from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
-class OreDeliveryCard(BaseCard, ResourceContainer):
-
+class OreDeliveryCard(BaseResourceContainingCard):
     def __init__(self):
-        BaseCard.__init__(
+        BaseResourceContainingCard.__init__(
             self, "Ore Delivery", 30, 3,
             take_accumulated_items_action.TakeAccumulatedItemsAction())
-        ResourceContainer.__init__(self)
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         self.give_resources(

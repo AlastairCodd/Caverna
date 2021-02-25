@@ -60,7 +60,7 @@ class StoreConditionalAnimalEffect(BaseAnimalStorageEffect):
         :param condition: A function which returns the number of animals which can be stored. This cannot be null."""
         if condition is None:
             raise ValueError("Condition cannot be None")
-        if animal_type not in self._animal_type:
+        if animal_type not in resource_types.farm_animals:
             raise ValueError(f"Cannot store {animal_type} in an animal storage effect")
         self._animal_type: ResourceTypeEnum = animal_type
         self._condition: Callable[[BasePlayerRepository], int] = condition

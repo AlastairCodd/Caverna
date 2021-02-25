@@ -1,14 +1,15 @@
+from typing import Dict
+
 from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
-from core.baseClasses.base_card import BaseCard
-from core.containers.resource_container import ResourceContainer
+from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
 from core.enums.caverna_enums import ActionCombinationEnum, ResourceTypeEnum, TileTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
-class RubyDeliveryCard(BaseCard, ResourceContainer):
+class RubyDeliveryCard(BaseResourceContainingCard):
     def __init__(self):
-        BaseCard.__init__(
+        BaseResourceContainingCard.__init__(
             self, "Ruby Delivery", 33, 4,
             Conditional(
                 ActionCombinationEnum.AndThen,
@@ -17,7 +18,6 @@ class RubyDeliveryCard(BaseCard, ResourceContainer):
                     self._condition,
                     {ResourceTypeEnum.ruby: 1})
             ))
-        ResourceContainer.__init__(self)
 
     def _condition(self, player: BasePlayerRepository) -> int:
         if player is None:
@@ -26,3 +26,8 @@ class RubyDeliveryCard(BaseCard, ResourceContainer):
         result: int = 1 if number_of_tiles > 1 else 0
         return result
 
+    def refill_action(self) -> Dict[ResourceTypeEnum, int]:
+        resources: Dict[ResourceTypeEnum, int] = {ResourceTypeEnum.ruby: 1} if self.has_resources else {ResourceTypeEnum.ruby: 2}
+        self.give_resources(resources)
+
+        return resources

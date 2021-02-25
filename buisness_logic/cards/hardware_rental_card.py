@@ -4,8 +4,17 @@ from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
 from buisness_logic.actions import *
 
 
-class HardwareRentalCard(BaseCard):
+class HardwareRentalSmallCard(BaseCard):
+    def __init__(self):
+        BaseCard.__init__(
+            self, "Hardware Rental", 9, -1,
+            Conditional(
+                ActionCombinationEnum.AndThenOr,
+                go_on_an_expedition_action.GoOnAnExpeditionAction(2),
+                sowAction.SowAction()))
 
+
+class HardwareRentalLargeCard(BaseCard):
     def __init__(self):
         BaseCard.__init__(
             self, "Hardware Rental", 9, -1,
