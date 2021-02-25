@@ -35,9 +35,13 @@ class CompleteActionPlayerChoiceTransferService(BaseActionPlayerChoiceTransferSe
 
         action_choices: List[ActionChoiceLookup] = self._conditional_service.get_possible_choices(card.actions, player)
 
-        player_action_choice_result: ResultLookup[ActionChoiceLookup] = player.get_player_choice_actions_to_use(
-            action_choices,
-            turn_descriptor)
+        player_action_choice_result: ResultLookup[ActionChoiceLookup]
+        if len(action_choices) == 1:
+            player_action_choice_result = ResultLookup(True, action_choices[0])
+        else:
+            player_action_choice_result = player.get_player_choice_actions_to_use(
+                action_choices,
+                turn_descriptor)
 
         success: bool = player_action_choice_result.flag
         errors: List[str] = []

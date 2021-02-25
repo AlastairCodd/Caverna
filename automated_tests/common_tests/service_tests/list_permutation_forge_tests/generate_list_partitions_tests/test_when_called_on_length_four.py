@@ -31,7 +31,7 @@ class Test_When_Called_On_Length_Four(Given_A_ListPermutationForge):
             [4, 3, 1, 2],
             [4, 3, 2, 1],
         ]
-        self._result: List[List[int]] = list(self.SUT.generate_list_partitions([1, 2, 3, 4]))
+        self._result: List[List[int]] = list(self.SUT.generate_list_permutations([1, 2, 3, 4]))
 
     def test_then_result_should_not_be_none(self) -> None:
         self.assertIsNotNone(self._result)

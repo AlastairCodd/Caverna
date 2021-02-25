@@ -1,137 +1,72 @@
-from typing import List, NamedTuple, Union
+from typing import List
 
-from buisness_logic.services.base_action_player_choice_transfer_service import BaseActionPlayerChoiceTransferService
-from buisness_logic.services.base_card_player_choice_transfer_service import BaseCardPlayerChoiceTransferService
-from buisness_logic.services.base_dwarf_player_choice_transfer_service import BaseDwarfPlayerChoiceTransferService
-from buisness_logic.services.complete_action_player_choice_transfer_service import CompleteActionPlayerChoiceTransferService
-from buisness_logic.services.complete_card_player_choice_transfer_service import CompleteCardPlayerChoiceTransferService
-from buisness_logic.services.complete_dwarf_player_choice_transfer_service import CompleteDwarfPlayerChoiceTransferService
+from buisness_logic.services.turn_transfer_service import TurnTransferService, ChosenDwarfCardActionCombinationAndEquivalentLookup
 from common.entities.action_choice_lookup import ActionChoiceLookup
-from common.entities.dwarf import Dwarf
 from common.entities.dwarf_card_action_combination_lookup import DwarfCardActionCombinationLookup
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from common.services.conditional_service import ConditionalService
-from core.baseClasses.base_card import BaseCard
+from common.services.action_invoke_service import ActionInvokeService
+from core.baseClasses.base_action import BaseAction
+from core.baseClasses.base_constraint import BaseConstraint
+from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.services.base_player_service import BasePlayerService
 
 
-class ChosenDwarfCardActionCombinationAndEquivalentLookup(NamedTuple):
-    choice: Union[DwarfCardActionCombinationLookup, None]
-    equivalents: List[DwarfCardActionCombinationLookup]
-
-
 class TurnExecutionService(object):
-    def __init__(self):
-        self._conditional_service: ConditionalService = ConditionalService()
-
-        self._dwarf_transfer_service: BaseDwarfPlayerChoiceTransferService = CompleteDwarfPlayerChoiceTransferService()
-        self._card_transfer_service: BaseCardPlayerChoiceTransferService = CompleteCardPlayerChoiceTransferService()
-        self._action_transfer_service: BaseActionPlayerChoiceTransferService = CompleteActionPlayerChoiceTransferService()
+    def __init__(self) -> None:
+        self._turn_transfer_service: TurnTransferService = TurnTransferService()
+        self._action_invoke_service: ActionInvokeService = ActionInvokeService()
 
     def take_turn(
             self,
             player: BasePlayerService,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ChosenDwarfCardActionCombinationAndEquivalentLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> None:
         if player is None:
-            raise ValueError("Player may not be null.")
+            raise ValueError("Player cannot be None")
         if turn_descriptor is None:
-            raise ValueError("Turn descriptor may not be null.")
-        if turn_descriptor.turn_index >= len(player.dwarves):
-            raise IndexError(f"Turn Index ({turn_descriptor.turn_index}) must be less than number of dwarves ({len(player.dwarves)})")
+            raise ValueError("Turn Descriptor cannot be None")
 
-        success: bool = False
-        choice: Union[DwarfCardActionCombinationLookup, None] = None
-        equivalents: List[DwarfCardActionCombinationLookup] = []
+        chosen_turn_descriptor_result: ResultLookup[ChosenDwarfCardActionCombinationAndEquivalentLookup] = self._turn_transfer_service.get_turn(
+            player,
+            turn_descriptor)
+
+        success: bool = True
         errors: List[str] = []
 
-        dwarf_result = self._dwarf_transfer_service \
-            .get_dwarf(
-                player,
-                turn_descriptor)
+        success &= chosen_turn_descriptor_result.flag
+        errors.extend(chosen_turn_descriptor_result.errors)
 
-        chosen_dwarf: Dwarf = dwarf_result.value
+        if chosen_turn_descriptor_result.flag:
+            choice: DwarfCardActionCombinationLookup = chosen_turn_descriptor_result.value.choice
 
-        errors.extend(dwarf_result.errors)
+            actions_to_take: List[BaseAction] = choice.actions.actions
+            constraints_on_actions: List[BaseConstraint] = choice.actions.constraints
 
-        if dwarf_result.flag:
-            card_result: ResultLookup[BaseCard] = self._card_transfer_service \
-                .get_card(
-                    player,
-                    chosen_dwarf,
-                    turn_descriptor)
-
-            chosen_card: BaseCard = card_result.value
-
-            errors.extend(card_result.errors)
-
-            if card_result.flag:
-                action_result: ResultLookup[ActionChoiceLookup] = self._action_transfer_service \
-                    .get_action(
+            for action in actions_to_take:
+                if isinstance(action, BasePlayerChoiceAction):
+                    player_choice_result: ResultLookup[ActionChoiceLookup] = action.set_player_choice(
                         player,
-                        chosen_dwarf,
-                        chosen_card,
+                        choice.dwarf,
                         turn_descriptor)
 
-                errors.extend(action_result.errors)
+                    success &= player_choice_result.flag
+                    errors.extend(player_choice_result.errors)
 
-                choice = DwarfCardActionCombinationLookup(
-                    chosen_dwarf,
-                    chosen_card,
-                    action_result.value)
+                    if player_choice_result.flag:
+                        actions_to_take.extend(player_choice_result.value.actions)
+                        constraints_on_actions.extend(player_choice_result.value.constraints)
 
-                if action_result.flag:
-                    success = True
-            else:
-                equivalent_cards: List[BaseCard] = self.get_equivalent_invalid_cards(player, chosen_dwarf, chosen_card)
-                card: BaseCard
-                for card in equivalent_cards:
-                    possible_choices: List[ActionChoiceLookup] = self._conditional_service.get_possible_choices(card.actions, player)
-                    action_choice: ActionChoiceLookup
-                    for action_choice in possible_choices:
-                        new_equivalent: DwarfCardActionCombinationLookup = DwarfCardActionCombinationLookup(
-                            chosen_dwarf,
-                            card,
-                            action_choice)
-                        equivalents.append(new_equivalent)
-        else:
-            equivalent_dwarves: List[Dwarf] = self.get_equivalent_invalid_dwarves(player, chosen_dwarf)
-            dwarf: Dwarf
-            for dwarf in equivalent_dwarves:
-                card: BaseCard
-                for card in turn_descriptor.cards:
-                    possible_choices: List[ActionChoiceLookup] = self._conditional_service.get_possible_choices(card.actions)
-                    action_choice: ActionChoiceLookup
-                    for action_choice in possible_choices:
-                        new_equivalent: DwarfCardActionCombinationLookup = DwarfCardActionCombinationLookup(
-                            dwarf,
-                            card,
-                            action_choice)
-                        equivalents.append(new_equivalent)
+            if success:
+                full_action_choice: ActionChoiceLookup = ActionChoiceLookup(actions_to_take, constraints_on_actions)
 
-        data: ChosenDwarfCardActionCombinationAndEquivalentLookup = ChosenDwarfCardActionCombinationAndEquivalentLookup(
-            choice,
-            equivalents)
-        result: ResultLookup[ChosenDwarfCardActionCombinationAndEquivalentLookup] = ResultLookup(success, data, errors)
-        return result
+                invoked_result: ResultLookup[int] = self._action_invoke_service.invoke(
+                    full_action_choice,
+                    player,
+                    choice.card,
+                    choice.dwarf)
 
-    def get_equivalent_invalid_dwarves(
-            self,
-            player: BasePlayerService,
-            chosen_dwarf: Dwarf) -> List[Dwarf]:
-        result: List[Dwarf]
+                success &= invoked_result.flag
+                errors.extend(invoked_result.errors)
 
-        if chosen_dwarf.is_active:
-            result = [dwarf for dwarf in player.dwarves if dwarf.is_active]
-        else:
-            result = [chosen_dwarf]
-
-        return result
-
-    def get_equivalent_invalid_cards(
-            self,
-            player: BasePlayerService,
-            dwarf: Dwarf,
-            card: BaseCard) -> List[BaseCard]:
-        # TODO: Implement this
-        return []
+                if invoked_result.flag:
+                    pass

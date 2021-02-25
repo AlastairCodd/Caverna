@@ -1,9 +1,12 @@
-from typing import List, Iterable, Tuple, Union
+from typing import List, Iterable, Tuple, Union, Optional
 
 from buisness_logic.services.most_points_permutation_ordering_service import MostPointsPermutationOrderingService
 from buisness_logic.services.most_resources_permutation_ordering_service import MostResourcesPermutationOrderingService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
+from common.prototypes.card_prototype import CardPrototype
+from common.prototypes.dwarf_prototype import DwarfPrototype
+from core.baseClasses.base_prototype import BaseImmutablePrototype
 from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from common.forges.list_permutation_forge import ListPermutationForge
@@ -15,13 +18,20 @@ from core.baseClasses.base_permutation_ordering_service import BasePermutationOr
 
 
 class ExhaustiveActionOrderingService(ActionOrderingService):
-    def __init__(self, permutation_ordering_services: Union[None, List[BasePermutationOrderingService], BasePermutationOrderingService] = None):
-        self._player_prototype: PlayerPrototype = PlayerPrototype()
+    def __init__(
+            self,
+            permutation_ordering_services: Union[List[BasePermutationOrderingService], BasePermutationOrderingService, None] = None):
+        self._player_prototype: BaseImmutablePrototype[BasePlayerRepository] = PlayerPrototype()
+        self._card_prototype: BaseImmutablePrototype[BaseCard] = CardPrototype()
+        self._dwarf_prototype: BaseImmutablePrototype[Dwarf] = DwarfPrototype()
+
         self._permutation_forge: ListPermutationForge = ListPermutationForge()
 
         self._permutation_ordering_services: List[BasePermutationOrderingService]
         if permutation_ordering_services is None:
-            self._permutation_ordering_services = [MostPointsPermutationOrderingService(), MostResourcesPermutationOrderingService()]
+            self._permutation_ordering_services = [
+                MostPointsPermutationOrderingService(),
+                MostResourcesPermutationOrderingService()]
         else:
             if isinstance(permutation_ordering_services, list):
                 self._permutation_ordering_services = list(permutation_ordering_services)
@@ -47,12 +57,14 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
         unsuccessful_permutations: List[ResultLookup[int]] = []
 
         permutation: List[BaseAction]
-        permutations: Iterable[List[BaseAction]] = self._permutation_forge.generate_list_partitions(actions.actions)
+        permutations: Iterable[List[BaseAction]] = self._permutation_forge.generate_list_permutations(actions.actions)
 
         for permutation in permutations:
             if all(constraint.passes_condition(permutation) for constraint in actions.constraints):
                 # The cloned player for testing shouldn't need to make any decisions
-                tile_and_resource_container: BasePlayerRepository = self._player_prototype.clone(player)
+                player_copy: BasePlayerRepository = self._player_prototype.clone(player)
+                card_copy: BaseCard = self._card_prototype.clone(current_card)
+                dwarf_copy: Dwarf = self._dwarf_prototype.clone(current_dwarf)
 
                 success: bool = True
                 successes: int = 0
@@ -60,26 +72,24 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
 
                 action: BaseAction
                 for action in permutation:
-                    action_result: ResultLookup[int] = action.invoke(tile_and_resource_container, current_card, current_dwarf)
+                    action_result: ResultLookup[int] = action.invoke(player_copy, card_copy, dwarf_copy)
+
+                    errors_for_permutation.extend(action_result.errors)
 
                     if action_result.flag:
                         successes += action_result.value
                     else:
                         success = False
-
-                        error: str
-                        for error in action_result.errors:
-                            errors_for_permutation.append(error)
                         break
 
                 permutation_result: ResultLookup[int] = ResultLookup(success, successes, errors_for_permutation)
                 if success:
-                    success_result: Tuple[List[BaseAction], int, BasePlayerRepository] = (permutation, successes, tile_and_resource_container)
+                    success_result: Tuple[List[BaseAction], int, BasePlayerRepository] = (permutation, successes, player_copy)
                     successful_permutations.append(success_result)
                 else:
                     unsuccessful_permutations.append(permutation_result)
 
-        result: Union[ResultLookup[List[BaseAction]], None] = None
+        result: Optional[ResultLookup[List[BaseAction]]] = None
         permutation_ordering_service_index: int = 0
         permutation_ordering_service: BasePermutationOrderingService
         ranked_results: List[Tuple[List[BaseAction], int, BasePlayerRepository]] = successful_permutations
@@ -88,7 +98,8 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
             while result is None:
                 if permutation_ordering_service_index >= len(self._permutation_ordering_services):
                     permutation_ordering_service = self._permutation_ordering_services[permutation_ordering_service_index]
-                    ordering_result = permutation_ordering_service.find_best_permutation(ranked_results)
+                    ordering_result: ResultLookup[List[Tuple[List[BaseAction], int, BasePlayerRepository]]] = permutation_ordering_service\
+                        .find_best_permutation(ranked_results)
 
                     if ordering_result.flag:
                         result = ResultLookup(True, ordering_result.value[0][0])

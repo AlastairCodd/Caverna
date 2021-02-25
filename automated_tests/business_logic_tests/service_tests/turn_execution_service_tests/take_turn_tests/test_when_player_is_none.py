@@ -15,4 +15,4 @@ class Test_When_player_Is_Null(Given_A_TurnExecutionService):
         )
 
     def test_Then_A_ValueError_Should_Be_Thrown(self):
-        self.assertRaises(ValueError, self.SUT.take_turn, None, self._turn_descriptor)
+        self.assertRaises(ValueError, self.SUT.get_turn, None, self._turn_descriptor)

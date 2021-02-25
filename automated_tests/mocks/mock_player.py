@@ -209,6 +209,14 @@ class MockPlayer(BasePlayerService):
             turn_descriptor: TurnDescriptorLookup) -> List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]:
         return self._conversions_to_perform_func(turn_descriptor)
 
+    def get_player_choice_use_card_already_in_use(
+            self,
+            unused_available_cards: List[BaseCard],
+            used_available_cards: List[BaseCard],
+            amount_of_food_required: int,
+            turn_descriptor: TurnDescriptorLookup) -> bool:
+        pass
+
     def get_player_choice_card_to_use(
             self,
             available_cards: List[BaseCard],

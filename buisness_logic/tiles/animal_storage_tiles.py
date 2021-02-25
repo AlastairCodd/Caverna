@@ -4,7 +4,7 @@ from buisness_logic.effects.allow_farming_effect import AllowFarmingEffect
 from common.entities.tile_entity import TileEntity
 from core.baseClasses.base_tile import BaseSpecificTile
 from core.constants import tile_ids, resource_types
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from buisness_logic.effects import *
 from core.repositories.base_player_repository import BasePlayerRepository
 
@@ -33,10 +33,11 @@ class StubbleRoomTile(BaseSpecificTile):
             base_points=1,
             cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.ore: 1},
             effects=[animal_storage_effects.ChangeAnimalStorageBaseEffect(
-                [ResourceTypeEnum.field],
+                [TileTypeEnum.field],
                 {animal_type: 1 for animal_type in resource_types.farm_animals},
                 self._condition)])
 
+    # noinspection PyUnusedLocal
     def _condition(
             self,
             unused_player: BasePlayerRepository,

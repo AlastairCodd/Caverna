@@ -82,6 +82,22 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
+    def get_player_choice_use_card_already_in_use(
+            self,
+            unused_available_cards: List[BaseCard],
+            used_available_cards: List[BaseCard],
+            amount_of_food_required: int,
+            turn_descriptor: TurnDescriptorLookup) -> bool:
+        """Gets user choice for which card to use.
+
+        :param unused_available_cards: The possible cards that may be chosen, which may be used for free. This cannot be null, but may be empty.
+        :param used_available_cards: The possible cards that may be chosen, which may be used at a cost. This cannot be null, or empty.
+        :param amount_of_food_required: The amount of food that must be payed to use a card already in use. This may be zero.
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
+        :returns: The card the player has chosen to activate."""
+        raise NotImplementedError()
+
+    @abstractmethod
     def get_player_choice_dwarf_to_use_out_of_order(
             self,
             dwarves: List[Dwarf],

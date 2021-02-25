@@ -1,4 +1,5 @@
 import math
+from functools import reduce
 from typing import List, Callable
 
 from buisness_logic.tiles.point_tiles import BaseConditionalPointTile
@@ -33,14 +34,14 @@ class PointCalculationService(object):
             lambda player: self._point_per_resource(ResourceTypeEnum.coin, player),
 
             # +1 per dwarf
-            lambda player: PointLookup(len(player.get_dwarves())),
+            lambda player: PointLookup(len(player.dwarves)),
 
             # -1 per unused space
             lambda player: PointLookup(0, player.get_number_of_tiles_of_type(TileTypeEnum.forest)),
             lambda player: PointLookup(0, player.get_number_of_tiles_of_type(TileTypeEnum.underground)),
 
             # base points
-            lambda player: PointLookup(sum([t.get_points() for t in player.tiles])),
+            lambda player: PointLookup(sum([t.points for t in player.tiles.values()])),
 
             # -3 per begging marker
             lambda player: PointLookup(0, 3 * player.get_resources_of_type(ResourceTypeEnum.begging_marker)),
@@ -51,9 +52,10 @@ class PointCalculationService(object):
             raise ValueError(str(player))
 
         points: List[PointLookup] = [point_action(player) for point_action in self._point_actions]
-        conditional_points = self._calculate_conditional_points(player)
-        total_points = sum(points, conditional_points)
-        total_score = abs(total_points)
+        conditional_points: List[PointLookup] = self._calculate_conditional_points(player)
+        points.extend(conditional_points)
+        total_points: PointLookup = reduce(lambda x, y: x + y, points)
+        total_score: int = abs(total_points)
         return total_score
 
     def _calculate_conditional_points(self, player: BasePlayerRepository) -> List[PointLookup]:

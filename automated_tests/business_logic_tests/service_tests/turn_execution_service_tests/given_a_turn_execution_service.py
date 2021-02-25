@@ -2,7 +2,7 @@ from abc import ABCMeta
 from typing import Union
 from unittest import TestCase
 
-from buisness_logic.services.turn_execution_service import TurnExecutionService
+from buisness_logic.services.turn_transfer_service import TurnTransferService
 from common.entities.dwarf import Dwarf
 from common.entities.multiconditional import Conditional
 from common.entities.weapon import Weapon
@@ -15,7 +15,7 @@ from core.baseClasses.base_card import BaseCard
 
 class Given_A_TurnExecutionService(TestCase, metaclass=ABCMeta):
     def setUp(self) -> None:
-        self.SUT: TurnExecutionService = TurnExecutionService()
+        self.SUT: TurnTransferService = TurnTransferService()
         self.because()
 
     def because(self) -> None:

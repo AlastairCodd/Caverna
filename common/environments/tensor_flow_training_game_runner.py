@@ -5,7 +5,7 @@ from gym import Env
 from numpy import random, array
 
 
-class GameRunner(object):
+class TensorFlowTrainingGameRunner(object):
     def __init__(
             self,
             model,

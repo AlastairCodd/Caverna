@@ -61,6 +61,10 @@ class TileEntity(object):
     def has_stable(self) -> bool:
         return self._has_stable
 
+    @property
+    def points(self) -> int:
+        return self._specific_tile.base_points if self._specific_tile is not None else 0
+
     def get_effects_of_type(
             self,
             effect_type: Generic[T]) -> List[T]:

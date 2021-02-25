@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from typing import Union
+from typing import Union, Optional
 
 from common.entities.multiconditional import Conditional
 from common.services.resettable import Resettable
@@ -13,20 +13,23 @@ class BaseCard(Resettable, metaclass=ABCMeta):
             name: str,
             card_id: int,
             level: int = -1,
-            actions: Union[BaseAction, Conditional] = None):
+            actions: Union[BaseAction, Conditional, None] = None,
+            is_visible: Optional[bool] = None) -> None:
         self._name: str = name
         self._id: int = card_id
         self._level: int = level
-        if actions is None:
-            raise ValueError("Card.__init__ actions cannot be null")
-        self._actions: Union[BaseAction, Conditional] = actions
+        self._actions: Union[BaseAction, Conditional, None] = actions
 
-        self._isVisible: bool = True if level < 0 else False
-        self._isActive: bool = False
+        self._is_visible: bool = True if level < 0 else False if is_visible is None else is_visible
+        self._is_active: bool = False
 
     @property
     def id(self) -> int:
         return self._id
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     @property
     def level(self) -> int:
@@ -34,20 +37,20 @@ class BaseCard(Resettable, metaclass=ABCMeta):
 
     @property
     def is_active(self) -> bool:
-        return self._isActive
+        return self._is_active
 
     @property
     def is_available(self) -> bool:
-        return not self._isActive and self._isVisible
+        return not self._is_active and self._is_visible
 
     @property
-    def actions(self) -> Union[BaseAction, Conditional]:
+    def actions(self) -> Union[BaseAction, Conditional, None]:
         return self._actions
 
     def reveal_card(self) -> None:
-        if self._isVisible:
+        if self._is_visible:
             raise InvalidOperationError("Cannot reveal a card that is already visible")
-        self._isVisible = True
+        self._is_visible = True
 
     def new_turn_reset(self) -> None:
-        self._isActive = False
+        self._is_active = False

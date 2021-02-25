@@ -64,7 +64,7 @@ class CompleteDwarfPlayerChoiceTransferService(BaseDwarfPlayerChoiceTransferServ
                 if player_choice_use_dwarf_out_of_order.flag:
                     if player_choice_use_dwarf_out_of_order.value in available_dwarves:
                         dwarf = player_choice_use_dwarf_out_of_order.value
-                        player.resources
+                        # player.resources
                     else:
                         success = False
                         errors.append("Attempted to use dwarf that is already in use.")

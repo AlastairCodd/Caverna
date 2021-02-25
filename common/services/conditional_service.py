@@ -13,7 +13,7 @@ class ConditionalService(object):
 
     def __init__(self):
         """Ctor. Sets up action dictionary for conditional"""
-        self._actionDictionary: Dict[
+        self._action_dictionary: Dict[
             ActionCombinationEnum,
             Callable[
                 [List[ActionChoiceLookup], List[ActionChoiceLookup]],
@@ -50,7 +50,7 @@ class ConditionalService(object):
             for change_decision_effect in change_decision_effects:
                 combination_type = change_decision_effect.invoke(combination_type)
 
-        choices: List[ActionChoiceLookup] = self._actionDictionary[combination_type](left, right)
+        choices: List[ActionChoiceLookup] = self._action_dictionary[combination_type](left, right)
         return choices
 
     def _combine_and_then(
