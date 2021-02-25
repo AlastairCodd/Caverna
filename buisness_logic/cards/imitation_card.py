@@ -1,6 +1,4 @@
 from core.baseClasses.base_card import BaseCard
-from core.enums.caverna_enums import ResourceTypeEnum
-from buisness_logic.actions import *
 
 
 class ImitationCard(BaseCard):

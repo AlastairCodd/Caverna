@@ -30,7 +30,9 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
         if tile_is_twin:
             raise ValueError(f"Tile type {self._tile_type} cannot be placed a single tile")
 
-        if specific_tile_generation_method is None and override_cost is not None:
+        if specific_tile_generation_method is None and \
+                not self._tile_service.does_tile_type_have_unique_tile(self._tile_type) and \
+                override_cost is not None:
             raise ValueError("Cannot override cost of unknown specific tile.")
         self._specific_tile_generation_method: Optional[Callable[[], BaseTile]] = specific_tile_generation_method
 

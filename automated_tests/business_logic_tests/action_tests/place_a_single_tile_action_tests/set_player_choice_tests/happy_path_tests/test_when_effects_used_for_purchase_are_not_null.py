@@ -111,7 +111,7 @@ class test_when_effects_used_for_purchase_are_not_null(Given_A_PlaceASingleTileA
                 TileUnknownPlacementLookup(location_to_place_tile, None)
             ))
         player.get_player_choice_effects_to_use_for_cost_discount_returns(
-            lambda _, __, ___: effects_to_use)
+            lambda _, __: effects_to_use)
 
         self._expected_tiles: Dict[int, Optional[BaseTile]] = {
             location_to_place_tile: self._specific_tile

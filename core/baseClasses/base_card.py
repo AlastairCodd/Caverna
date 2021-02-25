@@ -39,6 +39,11 @@ class BaseCard(Resettable, metaclass=ABCMeta):
     def is_active(self) -> bool:
         return self._is_active
 
+    def set_active(self) -> None:
+        if self._is_active:
+            raise InvalidOperationError("Cannot activate a card that is already active")
+        self._is_active = True
+
     @property
     def is_available(self) -> bool:
         return not self._is_active and self._is_visible
