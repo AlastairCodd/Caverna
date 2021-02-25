@@ -1,7 +1,8 @@
 from common.entities.dwarf import Dwarf
+from core.baseClasses.base_prototype import BasePrototype
 
 
-class DwarfPrototype(object):
+class DwarfPrototype(BasePrototype[Dwarf]):
     def clone(self, source: Dwarf) -> Dwarf:
         if source is None:
             raise ValueError

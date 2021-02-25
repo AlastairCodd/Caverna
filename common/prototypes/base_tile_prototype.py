@@ -1,9 +1,16 @@
+from typing import List
+
 from buisness_logic.tiles.generic_tile import GenericTile, GenericSpecificTile
+from common.prototypes.effect_prototype import EffectPrototype
+from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_prototype import BaseImmutablePrototype
 from core.baseClasses.base_tile import BaseTile, BaseSpecificTile
 
 
 class BaseTilePrototype(BaseImmutablePrototype[BaseTile]):
+    def __init__(self) -> None:
+        self._effect_prototype: BaseImmutablePrototype[BaseEffect] = EffectPrototype()
+
     def clone(
             self,
             source: BaseTile) -> BaseTile:
@@ -12,6 +19,8 @@ class BaseTilePrototype(BaseImmutablePrototype[BaseTile]):
 
         target: BaseTile
 
+        effects: List[BaseEffect] = self._effect_prototype.clone_range(source.effects)
+
         if isinstance(source, BaseSpecificTile):
             target = GenericSpecificTile(
                 source.name,
@@ -19,7 +28,7 @@ class BaseTilePrototype(BaseImmutablePrototype[BaseTile]):
                 source.tile_type,
                 source.base_points,
                 source.cost,
-                source.effects,
+                effects,
                 source.colour)
         else:
             target = GenericTile(
@@ -28,6 +37,6 @@ class BaseTilePrototype(BaseImmutablePrototype[BaseTile]):
                 source.tile_type,
                 source.base_points,
                 source.cost,
-                source.effects)
+                effects)
 
         return target

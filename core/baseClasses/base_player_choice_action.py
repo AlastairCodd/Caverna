@@ -9,7 +9,6 @@ from core.services.base_player_service import BasePlayerService
 
 
 class BasePlayerChoiceAction(BaseAction, metaclass=ABCMeta):
-    # TODO: What if this is immitated?
     @abstractmethod
     def set_player_choice(
             self,
