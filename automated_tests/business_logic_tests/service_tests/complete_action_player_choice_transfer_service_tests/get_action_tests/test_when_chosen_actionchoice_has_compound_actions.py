@@ -74,6 +74,7 @@ class test_when_chosen_actionchoice_has_compound_actions(Given_A_CompleteActionP
             card,
             self._turn_descriptor)
 
+    # noinspection PyUnusedLocal
     def action_choice_selection(
             self,
             possible_actions: List[ActionChoiceLookup],

@@ -5,7 +5,9 @@ T = TypeVar("T")
 
 
 class ListPermutationForge(object):
-    def generate_list_partitions(self, list_to_permute: List[T]) -> Generator[List[T], None, None]:
+    def generate_list_permutations(
+            self,
+            list_to_permute: List[T]) -> Generator[List[T], None, None]:
         if list_to_permute is None:
             raise ValueError
         number_of_permutations: int = math.factorial(len(list_to_permute))

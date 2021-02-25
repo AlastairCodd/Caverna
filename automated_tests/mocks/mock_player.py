@@ -9,7 +9,6 @@ from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLo
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
-from common.entities.weapon import Weapon
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile

@@ -1,7 +1,6 @@
-from typing import Tuple, List, Optional, Dict
+from typing import Tuple, List
 
 from buisness_logic.actions.convert_single_action import ConvertSingleAction
-from buisness_logic.effects.conversion_effects import ConvertEffect
 from buisness_logic.services.base_receive_event_service import BaseReceiveEventService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf

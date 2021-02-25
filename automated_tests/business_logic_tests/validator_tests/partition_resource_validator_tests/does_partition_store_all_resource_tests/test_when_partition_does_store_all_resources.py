@@ -1,4 +1,4 @@
-from typing import Dict, List, Union, Optional
+from typing import Dict, Optional
 
 from automated_tests.business_logic_tests.validator_tests.partition_resource_validator_tests.given_a_partition_resource_validator import \
     Given_A_PartitionResourceValidator

@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from typing import Dict, Union, List
+from typing import Dict
 
 from buisness_logic.actions.check_animal_storage_action import CheckAnimalStorageAction
 from buisness_logic.services.base_receive_event_service import BaseReceiveEventService

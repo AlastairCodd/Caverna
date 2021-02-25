@@ -6,6 +6,7 @@ from common.services.resettable import Resettable
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
+# noinspection PyUnresolvedReferences
 class BaseAction(Resettable, metaclass=ABCMeta):
     @abstractmethod
     def invoke(

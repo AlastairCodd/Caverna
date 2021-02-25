@@ -14,10 +14,10 @@ class TileForge(object):
             conversion_tiles.TraderTile(),
             conversion_tiles.SlaughteringCaveTile(),
             conversion_tiles.CookingCaveTile(),
-            conversion_tiles.PeacefulCaveTile(),
+            # conversion_tiles.PeacefulCaveTile(),
             conversion_tiles.HuntingParlorTile(),
             conversion_tiles.BeerParlorTile(),
-            conversion_tiles.BlacksmithingPalorTile(),
+            conversion_tiles.BlacksmithingParlorTile(),
             conversion_tiles.SparePartStorageTile(),
             dwelling.Dwelling(),
             dwelling.SimpleStoneDwelling(),
@@ -49,6 +49,5 @@ class TileForge(object):
             resource_tiles.MinerTile(),
             resource_tiles.WoodSupplierTile(),
             resource_tiles.StoneSupplierTile(),
-            resource_tiles.RubySupplierTile(),
-            ]
+            resource_tiles.RubySupplierTile(),]
         return tiles

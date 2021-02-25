@@ -1,5 +1,4 @@
 from abc import ABCMeta
-from typing import cast
 from unittest import TestCase
 
 # noinspection PyPep8Naming

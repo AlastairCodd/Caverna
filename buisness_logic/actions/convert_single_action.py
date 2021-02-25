@@ -1,6 +1,5 @@
 import math
 from collections import Counter
-from functools import reduce
 from typing import Dict, List
 
 from buisness_logic.effects.conversion_effects import ConvertEffect

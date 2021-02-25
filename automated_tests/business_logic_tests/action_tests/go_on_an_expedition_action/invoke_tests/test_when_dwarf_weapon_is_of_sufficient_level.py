@@ -56,6 +56,7 @@ class test_when_dwarf_weapon_level_is_not_sufficient(Given_A_GoOnAnExpeditionAct
 
         return weapon
 
+    # noinspection PyUnusedLocal
     def _expedition_reward_func(
             self,
             available_actions: List[BaseAction],

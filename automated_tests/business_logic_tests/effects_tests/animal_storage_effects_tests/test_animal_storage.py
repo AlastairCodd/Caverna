@@ -1,7 +1,7 @@
 from datetime import datetime
 from math import floor
 from os import path
-from typing import List, Generator, Union, Dict, Iterable, Tuple, TextIO
+from typing import List, Generator, Union, Dict, Iterable, Tuple, TextIO, Optional
 from buisness_logic.validators.partition_resource_validator import PartitionResourceValidator
 from common.forges.integer_partition_forge import IntegerPartitionForge
 from common.services.integer_partition_permutation_forge import IntegerPartitionPermutationForge
@@ -141,17 +141,15 @@ class Investigation(object):
                 logger.log(resource_line, True, True, True)
 
                 for resource_layout in self.generate_resource_layouts(resources_per_animal, max_per_tile, number_of_tiles):
-                    evaluated_partitions: Iterable[
-                        Tuple[
-                            bool,
-                            List[Union[ResourceTypeEnum, None]],
-                            Dict[ResourceTypeEnum, int],
-                            Dict[ResourceTypeEnum, int]
-                        ]
-                    ] = self._resourceLayoutExhaustiveChecker\
-                            .check_resource_layout(
-                                resource_layout,
-                                resources_per_animal)
+                    evaluated_partitions: Iterable[Tuple[
+                        bool,
+                        Dict[int, Optional[ResourceTypeEnum]],
+                        Dict[ResourceTypeEnum, int],
+                        Dict[ResourceTypeEnum, int]
+                    ]] = self._resourceLayoutExhaustiveChecker \
+                        .check_resource_layout(
+                        resource_layout,
+                        resources_per_animal)
 
                     has_header_been_added_to_successful_output: bool = False
                     has_header_been_added_to_failure_output: bool = False
@@ -209,7 +207,7 @@ class Investigation(object):
             max_resources_per_tile: int,
             number_of_tiles: int,
             excess: int = 0) \
-            -> Generator[List[Dict[ResourceTypeEnum, int]], None, None]:
+            -> Generator[Dict[int, Dict[ResourceTypeEnum, int]], None, None]:
         sheep_partitions: Iterable[List[int]] = self._integerPartitionForge \
             .generate_integer_partitions(resources_per_animal[ResourceTypeEnum.sheep] + excess)
         for sheep_partition in sheep_partitions:
@@ -298,7 +296,7 @@ class Investigation(object):
 
     def log_header(
             self,
-            resource_layout: List[Dict[ResourceTypeEnum, int]],
+            resource_layout: Dict[int, Dict[ResourceTypeEnum, int]],
             logger: SuccessFailLogger,
             log_to_success: bool = False,
             log_to_fail: bool = False,
@@ -308,7 +306,7 @@ class Investigation(object):
         for animal in self._animals:
             new_line: str = f"{animal.name}:".ljust(8)
             for tile in resource_layout:
-                new_line += str(tile[animal]).ljust(8)
+                new_line += f"{tile}: {str(resource_layout[tile][animal]).ljust(8)}"
             logger.log(new_line, log_to_success, log_to_fail, log_to_output)
 
 

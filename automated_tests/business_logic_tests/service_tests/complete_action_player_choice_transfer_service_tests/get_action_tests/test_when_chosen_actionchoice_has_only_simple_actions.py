@@ -64,6 +64,7 @@ class test_when_chosen_actionchoice_has_only_simple_actions(Given_A_CompleteActi
             card,
             turn_descriptor)
 
+    # noinspection PyUnusedLocal
     def action_choice_selection(
             self,
             possible_actions: List[ActionChoiceLookup],

@@ -16,7 +16,7 @@ from core.services.base_player_service import BasePlayerService
 
 class CompleteActionPlayerChoiceTransferService(BaseActionPlayerChoiceTransferService):
     def __init__(self):
-        self._conditionalService: ConditionalService = ConditionalService()
+        self._conditional_service: ConditionalService = ConditionalService()
 
     def get_action(
             self,
@@ -33,7 +33,7 @@ class CompleteActionPlayerChoiceTransferService(BaseActionPlayerChoiceTransferSe
         if turn_descriptor is None:
             raise ValueError("Turn descriptor may not be None")
 
-        action_choices: List[ActionChoiceLookup] = self._conditionalService.get_possible_choices(card.actions, player)
+        action_choices: List[ActionChoiceLookup] = self._conditional_service.get_possible_choices(card.actions, player)
 
         player_action_choice_result: ResultLookup[ActionChoiceLookup] = player.get_player_choice_actions_to_use(
             action_choices,

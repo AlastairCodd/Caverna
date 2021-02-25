@@ -2,15 +2,11 @@ from typing import Dict, cast
 
 from automated_tests.business_logic_tests.action_tests.check_animal_storage_action_tests.given_a_check_animal_storage_action import \
     Given_A_CheckAnimalStorageAction
-from automated_tests.business_logic_tests.service_tests.complete_dwarf_player_choice_transfer_service_tests \
-    .given_a_complete_dwarf_player_choice_transfer_service import FakeCard
 from automated_tests.mocks.mock_player import MockPlayer
 from buisness_logic.tiles.mine_tiles import OreMineTile, RubyMineTile
 from buisness_logic.tiles.outdoor_tiles import MeadowTile
 from common.entities.result_lookup import ResultLookup
-from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.enums.caverna_enums import ResourceTypeEnum
-from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 

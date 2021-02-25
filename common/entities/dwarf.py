@@ -4,6 +4,7 @@ from common.entities.result_lookup import ResultLookup
 from common.entities.weapon import Weapon
 
 
+# noinspection PyUnresolvedReferences
 class Dwarf(object):
     def __init__(self, is_adult: bool = False):
         self._is_adult: bool = is_adult

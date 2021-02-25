@@ -1,7 +1,7 @@
 from typing import Tuple, List
 
 
-class TakeAwayTrianglesService():
+class TakeAwayTrianglesService(object):
     tolerance: int = 0.001
 
     def calculate_next(self, n1: float, n2: float, n3: float) -> Tuple[float, float, float]:
@@ -25,7 +25,6 @@ class TakeAwayTrianglesService():
             iterations: int = 200,
             normalise: bool = False) -> List[Tuple[float, float, float]]:
         visited: List[Tuple[float, float, float]] = []
-        i: int = 0
         last_visited: Tuple[float, float, float] = (n1, n2, n3) if not normalise else self.normalise(n1, n2, n3)
         while len(visited) < iterations and not self.has_previously_visited(last_visited, visited):
             visited.append(last_visited)

@@ -6,6 +6,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 
 
 class SimplePlayerRepository(BasePlayerRepository):
+    """For use with the PlayerPrototype, when running ordering of actions."""
     def __init__(
             self,
             player_id: int,

@@ -1,9 +1,9 @@
 from abc import ABCMeta
-from typing import Optional, Dict, cast
+from typing import cast
 from unittest import TestCase
 
 from buisness_logic.actions.place_a_twin_tile_action import PlaceATwinTileAction
-from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum
+from core.enums.caverna_enums import TileTypeEnum
 
 
 class Given_A_PlaceATwinTileAction(TestCase, metaclass=ABCMeta):

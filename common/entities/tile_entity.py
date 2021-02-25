@@ -2,7 +2,7 @@ from typing import List, Optional, Generic, TypeVar
 
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseTile, BaseSpecificTile
-from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileColourEnum
+from core.enums.caverna_enums import TileTypeEnum, TileColourEnum
 
 T = TypeVar('T')
 

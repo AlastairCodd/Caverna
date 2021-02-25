@@ -1,6 +1,4 @@
-import collections
-import itertools
-from typing import Union, Dict, Iterable, Set
+from typing import Union, Dict, Set
 
 
 class MultiVariablePolynomial(object):
@@ -37,7 +35,7 @@ class MultiVariablePolynomial(object):
         return self._terms.get(variable, 0)
 
     def __add__(self, val: Union['MultiVariablePolynomial', int]) -> 'MultiVariablePolynomial':
-        "Return self+val"
+        """Return self+val"""
         res: Dict[Monomial, int]
         if isinstance(val, self.__class__):  # add MultiVariablePolynomial
             dict1: Dict[Monomial, int] = self._terms
@@ -57,14 +55,15 @@ class MultiVariablePolynomial(object):
         return self.__class__(res)
 
     def __eq__(self, val):
-        "Test self==val"
+        """Test self==val"""
         if isinstance(val, MultiVariablePolynomial):
-            return self.coefficients == val.coefficients
+            return self.terms == val.terms
         else:
-            return len(self.coefficients) == 1 and self.coefficients[0] == val
+            # noinspection PyTypeChecker
+            return len(self.terms) == 1 and self.terms[0] == val
 
     def __mul__(self, val):
-        "Return self*val"
+        """Return self*val"""
         res: Dict[Monomial, int]
         if isinstance(val, MultiVariablePolynomial):
             res = {}
@@ -80,27 +79,27 @@ class MultiVariablePolynomial(object):
         return self.__class__(res)
 
     def __neg__(self):
-        "Return -self"
+        """Return -self"""
         return self.__class__({mo: -co for mo, co in self._terms.items()})
 
     def __radd__(self, val):
-        "Return val+self"
+        """Return val+self"""
         return self + val
 
     def __rmul__(self, val):
-        "Return val*self"
+        """Return val*self"""
         return self * val
 
     def __rsub__(self, val):
-        "Return val-self"
+        """Return val-self"""
         return -self + val
 
     def __sub__(self, val):
-        "Return self-val"
+        """Return self-val"""
         return self.__add__(-val)
 
     def trim(self):
-        "Remove trailing 0-coefficients"
+        """Remove trailing 0-coefficients"""
         keys = list(self._terms.keys())
         index = len(keys) - 1
         if self._terms[keys[index]] == 0:

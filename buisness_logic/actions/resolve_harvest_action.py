@@ -47,6 +47,7 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
     def new_turn_reset(self) -> None:
         pass
 
+    # noinspection PyUnusedLocal
     def _handle_full_harvest(
             self,
             unused_player: BasePlayerService) -> ActionChoiceLookup:

@@ -9,7 +9,6 @@ from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.precedes_constraint import PrecedesConstraint
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from common.entities.unique_constraint import UniqueConstraint
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService

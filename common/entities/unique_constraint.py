@@ -1,4 +1,4 @@
-from typing import List, Type
+from typing import List
 
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_constraint import BaseConstraint

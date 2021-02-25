@@ -1,7 +1,6 @@
-from abc import ABCMeta, abstractmethod
-from typing import Dict, List, Callable
+from typing import Dict
 from core.baseClasses.base_effect import BaseEffect
-from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum
 
 
 class ConvertEffect(BaseEffect):

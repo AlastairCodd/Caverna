@@ -1,4 +1,4 @@
-from collection import Counter
+from collections import Counter
 from functools import reduce
 from typing import Dict, List
 
@@ -70,7 +70,8 @@ class FeedDwarvesAction(BasePlayerChoiceAction):
         for effect in per_dwarf_effects:
             effect.invoke(resources_per_dwarf)
 
-        resources_required: Dict[ResourceTypeEnum, int] = dict(reduce(lambda m,n: Counter(m) + Counter(n), resources_per_dwarf))
+        # noinspection PyTypeChecker
+        resources_required: Dict[ResourceTypeEnum, int] = dict(reduce(lambda m, n: Counter(m) + Counter(n), resources_per_dwarf))
 
         global_effects: List[FoodGlobalEffect] = []
         for effect in global_effects:

@@ -1,5 +1,3 @@
-from unittest import TestCase
-
 from automated_tests.common_tests.entity_tests.multi_variable_polynomial_tests.given_a_polynomial import Given_A_MultiVariablePolynomial
 from common.entities.multi_variable_polynomial import MultiVariablePolynomial, Monomial
 
