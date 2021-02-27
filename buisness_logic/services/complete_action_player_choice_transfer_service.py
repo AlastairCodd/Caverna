@@ -43,46 +43,4 @@ class CompleteActionPlayerChoiceTransferService(BaseActionPlayerChoiceTransferSe
                 action_choices,
                 turn_descriptor)
 
-        success: bool = player_action_choice_result.flag
-        errors: List[str] = []
-
-        errors.extend(player_action_choice_result.errors)
-
-        result: ResultLookup[ActionChoiceLookup]
-
-        if success:
-            untested_actions: List[BaseAction] = player_action_choice_result.value.actions
-
-            valid_actions: List[BaseAction] = []
-            constraints: List[BaseConstraint] = []
-
-            constraints.extend(player_action_choice_result.value.constraints)
-
-            action: BaseAction
-            for action in untested_actions:
-                if isinstance(action, BasePlayerChoiceAction):
-                    set_result: ResultLookup[ActionChoiceLookup] = action.set_player_choice(
-                        player,
-                        dwarf,
-                        turn_descriptor)
-
-                    success &= set_result.flag
-                    errors.extend(set_result.errors)
-
-                    if set_result.flag:
-                        constraints.extend(set_result.value.constraints)
-                        valid_actions.append(action)
-
-                        new_action: BaseAction
-                        for new_action in set_result.value.actions:
-                            untested_actions.append(new_action)
-                            new_constraint: BaseConstraint = PrecedesConstraint(action, new_action)
-                            constraints.append(new_constraint)
-                else:
-                    valid_actions.append(action)
-
-            data: ActionChoiceLookup = ActionChoiceLookup(valid_actions, constraints)
-            result = ResultLookup(success, data, errors)
-        else:
-            result = ResultLookup(False, errors=errors)
-        return result
+        return player_action_choice_result

@@ -1,4 +1,5 @@
-from typing import List, Iterable, Tuple, Union, Optional
+from functools import reduce
+from typing import List, Iterable, Tuple, Union, Optional, Set
 
 from buisness_logic.services.most_points_permutation_ordering_service import MostPointsPermutationOrderingService
 from buisness_logic.services.most_resources_permutation_ordering_service import MostResourcesPermutationOrderingService
@@ -82,11 +83,11 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
                         success = False
                         break
 
-                permutation_result: ResultLookup[int] = ResultLookup(success, successes, errors_for_permutation)
                 if success:
                     success_result: Tuple[List[BaseAction], int, BasePlayerRepository] = (permutation, successes, player_copy)
                     successful_permutations.append(success_result)
                 else:
+                    permutation_result: ResultLookup[int] = ResultLookup(success, successes, errors_for_permutation)
                     unsuccessful_permutations.append(permutation_result)
 
         result: Optional[ResultLookup[List[BaseAction]]] = None
@@ -112,5 +113,8 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
                     # if we've exhausted all ordering services, just pick a permutation at random
                     result = ResultLookup(True, ranked_results[0][0])
         else:
-            result = ResultLookup(errors="There is not a permutation which allows for all actions to be performed")
+            errors: List[str] = ["There is not a permutation which allows for all actions to be performed"]
+            for partition in unsuccessful_permutations:
+                errors.extend(partition.errors)
+            result = ResultLookup(errors=errors)
         return result

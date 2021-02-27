@@ -42,18 +42,21 @@ class ActionInvokeService(object):
 
         if actions_best_order.flag:
             for action in actions_best_order.value:
+                print(f"> Invoking {action}")
+
                 invoke_result: ResultLookup[int] = action.invoke(
                     player,
                     current_card,
                     current_dwarf)
 
-                if not invoke_result.flag:
+                if invoke_result.flag:
+                    print(f"> success, {invoke_result.value} actions")
+                else:
                     success = False
                     errors = ["Ordering Service returned invalid order"]
                     errors.extend(actions_best_order.errors)
                     break
                 successful_actions += invoke_result.value
-
         else:
             success = False
             errors = ["Ordering Service could not find valid ordering"]

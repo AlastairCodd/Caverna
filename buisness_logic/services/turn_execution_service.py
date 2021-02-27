@@ -3,6 +3,7 @@ from typing import List
 from buisness_logic.services.turn_transfer_service import TurnTransferService, ChosenDwarfCardActionCombinationAndEquivalentLookup
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf_card_action_combination_lookup import DwarfCardActionCombinationLookup
+from common.entities.precedes_constraint import PrecedesConstraint
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.action_invoke_service import ActionInvokeService
@@ -20,7 +21,7 @@ class TurnExecutionService(object):
     def take_turn(
             self,
             player: BasePlayerService,
-            turn_descriptor: TurnDescriptorLookup) -> None:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
         if player is None:
             raise ValueError("Player cannot be None")
         if turn_descriptor is None:
@@ -32,29 +33,46 @@ class TurnExecutionService(object):
 
         success: bool = True
         errors: List[str] = []
+        count: int = 0
 
         success &= chosen_turn_descriptor_result.flag
         errors.extend(chosen_turn_descriptor_result.errors)
 
         if chosen_turn_descriptor_result.flag:
+            print(chosen_turn_descriptor_result.value.choice)
+
             choice: DwarfCardActionCombinationLookup = chosen_turn_descriptor_result.value.choice
 
-            actions_to_take: List[BaseAction] = choice.actions.actions
-            constraints_on_actions: List[BaseConstraint] = choice.actions.constraints
+            untested_actions: List[BaseAction] = []
+            untested_actions.extend(choice.actions.actions)
 
-            for action in actions_to_take:
+            actions_to_take: List[BaseAction] = []
+            constraints_on_actions: List[BaseConstraint] = []
+
+            constraints_on_actions.extend(choice.actions.constraints)
+
+            action: BaseAction
+            for action in untested_actions:
                 if isinstance(action, BasePlayerChoiceAction):
-                    player_choice_result: ResultLookup[ActionChoiceLookup] = action.set_player_choice(
+                    set_result: ResultLookup[ActionChoiceLookup] = action.set_player_choice(
                         player,
                         choice.dwarf,
                         turn_descriptor)
 
-                    success &= player_choice_result.flag
-                    errors.extend(player_choice_result.errors)
+                    success &= set_result.flag
+                    errors.extend(set_result.errors)
 
-                    if player_choice_result.flag:
-                        actions_to_take.extend(player_choice_result.value.actions)
-                        constraints_on_actions.extend(player_choice_result.value.constraints)
+                    if set_result.flag:
+                        constraints_on_actions.extend(set_result.value.constraints)
+                        actions_to_take.append(action)
+
+                        new_action: BaseAction
+                        for new_action in set_result.value.actions:
+                            untested_actions.append(new_action)
+                            new_constraint: BaseConstraint = PrecedesConstraint(action, new_action)
+                            constraints_on_actions.append(new_constraint)
+                else:
+                    actions_to_take.append(action)
 
             if success:
                 full_action_choice: ActionChoiceLookup = ActionChoiceLookup(actions_to_take, constraints_on_actions)
@@ -69,4 +87,6 @@ class TurnExecutionService(object):
                 errors.extend(invoked_result.errors)
 
                 if invoked_result.flag:
-                    pass
+                    count = invoked_result.value
+
+        return ResultLookup(success, count, errors)

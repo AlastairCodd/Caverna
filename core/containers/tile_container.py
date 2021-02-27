@@ -24,7 +24,7 @@ class TileContainer(object):
         self._height: int = height
         self._width: int = width
 
-        self._tileCount: int = height * width
+        self._tile_count: int = height * width
 
         self._tiles: Dict[int, TileEntity] = {}
         tile_container_default.assign(self._tiles)
@@ -34,7 +34,7 @@ class TileContainer(object):
 
     @property
     def tile_count(self) -> int:
-        return self._tileCount
+        return self._tile_count
 
     @property
     def width(self) -> int:
@@ -50,8 +50,8 @@ class TileContainer(object):
         return self._tiles
 
     def get_tile_at_location(self, tile_index: int) -> TileEntity:
-        if tile_index < 0 or tile_index >= self._tileCount:
-            raise IndexError(f"Tile Index ({tile_index}) must be in range [0, Number of Tiles: {self._tileCount})")
+        if tile_index < 0 or tile_index >= self._tile_count:
+            raise IndexError(f"Tile Index ({tile_index}) must be in range [0, Number of Tiles: {self._tile_count})")
         return self._tiles[tile_index]
 
     def get_tiles_of_type(
@@ -68,7 +68,7 @@ class TileContainer(object):
 
         :param tile_index: The location to get the tile for. This must be in the range [0, self._tileCount).
         :return: The base tile at the given location, if it exists. If there is no tile, the result will be none."""
-        if tile_index < 0 or tile_index > self._tileCount:
+        if tile_index < 0 or tile_index > self._tile_count:
             raise ValueError()
         return self._tiles.get(tile_index, None).tile
 

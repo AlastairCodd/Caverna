@@ -1,7 +1,7 @@
 from typing import Optional
 
+from common.defaults.tile_container_default import TileContainerDefault
 from common.prototypes.base_tile_prototype import BaseTilePrototype
-from common.repositories.simple_player_repository import NullTileContainerDefault
 from core.baseClasses.base_prototype import BasePrototype, BaseImmutablePrototype
 from core.baseClasses.base_tile import BaseTile
 from core.containers.tile_container import TileContainer
@@ -14,7 +14,7 @@ class TileContainerPrototype(BasePrototype[TileContainer]):
     def clone(self, source: TileContainer) -> TileContainer:
         if source is None:
             raise ValueError
-        target = TileContainer(NullTileContainerDefault(), source.height, source.width)
+        target = TileContainer(TileContainerDefault(), source.height, source.width)
 
         self.assign(source, target)
         return target
