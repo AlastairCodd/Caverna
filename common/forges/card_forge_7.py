@@ -13,7 +13,7 @@ class SevenCardForge(BaseCardForge):
         cards: List[BaseCard] = [
             depot_card.LargeDepotCard(),
             imitation_card.ImitationCard(0),
-            extension_card.ExcensionCard()
+            extension_card.ExtensionCard()
         ]
 
         return cards
