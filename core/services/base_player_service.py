@@ -185,3 +185,17 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
         pass
+
+    @abstractmethod
+    def get_player_choice_locations_to_sow(
+            self,
+            number_of_resources_to_sow: int,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[int]]:
+        pass
+
+    @abstractmethod
+    def get_player_choice_resources_to_sow(
+            self,
+            number_of_resources_to_sow: int,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
+        pass

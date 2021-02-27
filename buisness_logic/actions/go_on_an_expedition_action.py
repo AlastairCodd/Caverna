@@ -5,7 +5,7 @@ from buisness_logic.actions.place_a_single_tile_action import PlaceASingleTileAc
 from buisness_logic.actions.place_a_stable_action import PlaceAStableAction
 from buisness_logic.actions.place_a_twin_tile_action import PlaceATwinTileAction
 from buisness_logic.actions.receive_action import ReceiveAction
-from buisness_logic.actions.sowAction import SowAction
+from buisness_logic.actions.sow_action import SowAction
 from buisness_logic.actions.upgrade_all_weapons_action import UpgradeAllWeaponsAction
 from buisness_logic.actions.upgrade_dwarf_weapon_action import UpgradeDwarfWeaponAction
 from buisness_logic.tiles.dwelling import Dwelling

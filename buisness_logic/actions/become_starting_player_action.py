@@ -39,3 +39,6 @@ class BecomeStartingPlayerAction(BaseAction):
 
     def new_turn_reset(self):
         self._starting_player_next_turn = None
+
+    def __str__(self) -> str:
+        return "Become Starting Player"

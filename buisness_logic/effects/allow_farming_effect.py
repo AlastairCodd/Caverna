@@ -20,6 +20,10 @@ class AllowFarmingEffect(BaseEffect):
         self._planted_resource_amount: int = planted_resource_amount
 
     @property
+    def can_plant(self) -> bool:
+        return self._planted_resource_type is None
+
+    @property
     def planted_resource_type(self) -> Optional[ResourceTypeEnum]:
         return self._planted_resource_type
 

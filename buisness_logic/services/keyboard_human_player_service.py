@@ -190,3 +190,15 @@ class KeyboardHumanPlayerService(BasePlayerService):
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
         pass
+
+    def get_player_choice_locations_to_sow(
+            self,
+            number_of_resources_to_sow: int,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[int]]:
+        pass
+
+    def get_player_choice_resources_to_sow(
+            self,
+            number_of_resources_to_sow: int,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
+        pass

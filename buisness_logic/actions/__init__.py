@@ -11,7 +11,7 @@ __all__ = [
     "place_a_twin_tile_action",
     "receive_action",
     "receive_conditionally_action",
-    "sowAction",
+    "sow_action",
     "take_accumulated_items_action",
     "upgrade_all_weapons_action",
     "upgrade_dwarf_weapon_action"]
