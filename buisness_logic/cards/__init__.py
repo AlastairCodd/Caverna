@@ -8,6 +8,7 @@ __all__ = [
     "drift_mining_card",
     "excavation_card",
     "exploration_card",
+    "extension_card",
     "family_life_card",
     "fence_building_card",
     "forest_exploration_card",
