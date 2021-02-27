@@ -39,3 +39,6 @@ class DwarfCardActionCombinationLookup(object):
                 result = dwarves_equal and cards_equal and actions_equal
 
         return result
+
+    def __str__(self) -> str:
+        return f"dwarf: {self._dwarf.weapon_level}  card: {self._card.name}  actions: {self._actions}"

@@ -28,7 +28,7 @@ class ActionChoiceLookup(object):
         return self._constraints
 
     def __str__(self) -> str:
-        return ''.join(map(str, self._actions))
+        return ' and '.join(map(str, self._actions))
 
     def __repr__(self) -> str:
         list_of_strings: List[str] = ["ActionChoiceLookup("]

@@ -1,6 +1,7 @@
 from typing import Dict
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
+from core.constants import card_ids
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
 from buisness_logic.actions import *
 
@@ -11,7 +12,7 @@ class ClearingCard(BaseResourceContainingCard):
             raise ValueError("Amount of wood must be positive")
         self._amount_of_wood: int = amount_of_wood
         BaseResourceContainingCard.__init__(
-            self, "Clearing", 0,
+            self, "Clearing", card_ids.ClearingCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),

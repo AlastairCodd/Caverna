@@ -3,13 +3,14 @@ from typing import Dict
 from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
+from core.constants import card_ids
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
 
 
 class StartingPlayerRubyCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Starting Player", 17,
+            self, "Starting Player", card_ids.StartingPlayerRubyCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
@@ -27,7 +28,7 @@ class StartingPlayerRubyCard(BaseResourceContainingCard):
 class StartingPlayerOreCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Starting Player", 41,
+            self, "Starting Player", card_ids.StartingPlayerOreCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),

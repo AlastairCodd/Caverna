@@ -2,13 +2,14 @@ from typing import Dict
 
 from buisness_logic.actions import *
 from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
+from core.constants import card_ids
 from core.enums.caverna_enums import ResourceTypeEnum
 
 
 class DepotCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Depot", 1,
+            self, "Depot", card_ids.DepotCardId,
             actions=take_accumulated_items_action.TakeAccumulatedItemsAction())
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
@@ -23,7 +24,7 @@ class DepotCard(BaseResourceContainingCard):
 class LargeDepotCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Large Depot", 1,
+            self, "Large Depot", card_ids.LargeDepotCardId,
             actions=take_accumulated_items_action.TakeAccumulatedItemsAction())
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

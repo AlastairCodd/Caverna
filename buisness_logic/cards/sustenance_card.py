@@ -3,13 +3,14 @@ from typing import Dict
 from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
+from core.constants import card_ids
 from core.enums.caverna_enums import ActionCombinationEnum, TileTypeEnum, ResourceTypeEnum
 
 
 class SustenanceVegAndGrainCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Sustenance", 19,
+            self, "Sustenance", card_ids.SustenanceVegAndGrainCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
@@ -27,7 +28,7 @@ class SustenanceVegAndGrainCard(BaseResourceContainingCard):
 class SustenanceGrainCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Sustenance", 19,
+            self, "Sustenance", card_ids.SustenanceGrainCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 Conditional(

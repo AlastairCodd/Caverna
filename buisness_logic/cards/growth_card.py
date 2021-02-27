@@ -1,14 +1,14 @@
 from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_card import BaseCard
+from core.constants import card_ids
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
 
 
 class GrowthCard(BaseCard):
-
     def __init__(self):
         BaseCard.__init__(
-            self, "Growth", 7,
+            self, "Growth", card_ids.GrowthCardId,
             actions=Conditional(
                 ActionCombinationEnum.EitherOr,
                 receive_action.ReceiveAction({

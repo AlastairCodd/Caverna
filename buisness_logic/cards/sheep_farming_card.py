@@ -3,13 +3,14 @@ from typing import Dict
 from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
+from core.constants import card_ids
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
 
 
 class SheepFarmingCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Sheep Farming", 24, 1,
+            self, "Sheep Farming", card_ids.SheepFarmingCardId, 1,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 Conditional(

@@ -3,14 +3,15 @@ from typing import Dict
 from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
+from core.constants import card_ids
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
 
 
 class ForestExplorationFoodCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Forest Exploration", 6, -1,
-            Conditional(
+            self, "Forest Exploration", card_ids.ForestExplorationFoodCardId,
+            actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 receive_action.ReceiveAction({ResourceTypeEnum.food: 2})))
@@ -25,8 +26,8 @@ class ForestExplorationFoodCard(BaseResourceContainingCard):
 class ForestExplorationVegCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Forest Exploration", 39, -1,
-            Conditional(
+            self, "Forest Exploration", card_ids.ForestExplorationVegCardId,
+            actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 receive_action.ReceiveAction({ResourceTypeEnum.veg: 1})))

@@ -3,6 +3,7 @@ from typing import Dict, cast
 from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
+from core.constants import card_ids
 from core.containers.tile_container import TileContainer
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
@@ -11,7 +12,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 class RubyMiningCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Ruby Mining", 33, 4,
+            self, "Ruby Mining", card_ids.RubyMiningCardId, 4,
             Conditional(
                 ActionCombinationEnum.AndThenOr,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),

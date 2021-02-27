@@ -3,13 +3,14 @@ from typing import Dict
 from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
+from core.constants import card_ids
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
 
 
 class LoggingOneCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Logging", 13,
+            self, "Logging", card_ids.LoggingOneCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
@@ -24,7 +25,7 @@ class LoggingOneCard(BaseResourceContainingCard):
 class LoggingThreeCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Logging", 42,
+            self, "Logging", card_ids.LoggingThreeCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),

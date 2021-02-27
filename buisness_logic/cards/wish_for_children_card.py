@@ -1,13 +1,14 @@
 from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_card import BaseCard
+from core.constants import card_ids
 from core.enums.caverna_enums import ActionCombinationEnum, TileTypeEnum, ResourceTypeEnum
 
 
 class WishForChildrenCard(BaseCard):
     def __init__(self):
         BaseCard.__init__(
-            self, "Wish For Children", 27, 2,
+            self, "Wish For Children", card_ids.WishForChildrenCardId, 2,
             Conditional(
                 ActionCombinationEnum.EitherOr,
                 get_a_baby_dwarf_action.GetABabyDwarfAction(),
@@ -19,7 +20,7 @@ class WishForChildrenCard(BaseCard):
 class UrgentWishForChildrenCard(BaseCard):
     def __init__(self):
         BaseCard.__init__(
-            self, "Urgent Wish For Children", 28, 2,
+            self, "Urgent Wish For Children", card_ids.UrgentWishForChildrenCardId, 2,
             Conditional(
                 ActionCombinationEnum.EitherOr,
                 Conditional(

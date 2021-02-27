@@ -3,13 +3,14 @@ from typing import Dict
 from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
+from core.constants import card_ids
 from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
 
 
 class ExcavationTwoCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Excavation", 4,
+            self, "Excavation", card_ids.ExcavationTwoStoneCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
@@ -28,7 +29,7 @@ class ExcavationTwoCard(BaseResourceContainingCard):
 class ExcavationOneCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Excavation", 40,
+            self, "Excavation", card_ids.ExcavationOneStoneCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),

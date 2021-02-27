@@ -3,6 +3,7 @@ from typing import Dict
 from buisness_logic.actions import *
 from common.entities.multiconditional import Conditional
 from core.baseClasses.base_resource_containing_card import BaseResourceContainingCard
+from core.constants import card_ids
 from core.enums.caverna_enums import ActionCombinationEnum, ResourceTypeEnum, TileTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
@@ -10,7 +11,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 class RubyDeliveryCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Ruby Delivery", 33, 4,
+            self, "Ruby Delivery", card_ids.RubyDeliveryCardId, 4,
             Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
