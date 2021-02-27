@@ -35,13 +35,7 @@ class ReceiveAction(BaseReceiveAction):
         pass
 
     def __str__(self) -> str:
-        result = "ReceiveAction("
-        count = 0
-        for resource in self._items_to_receive:
-            result += f"{resource.name}: {self._items_to_receive[resource]}"
-            count += 1
-            if count != len(self._items_to_receive):
-                result += ", "
-        result += ")"
+        result = "Receive " + " and ".join(f"{amount} {resource.name}" for resource, amount in self._items_to_receive.items())
 
         return result
+

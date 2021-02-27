@@ -1,4 +1,5 @@
-from typing import List, Tuple, Optional, Dict, Any
+import math
+from typing import List, Tuple, Optional, Dict, Any, Callable, Union
 
 from PyInquirer import prompt, Separator
 
@@ -8,13 +9,14 @@ from common.defaults.tile_container_default import TileContainerDefault
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
 from core.containers.resource_container import ResourceContainer
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum, TileTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
@@ -54,11 +56,11 @@ class KeyboardHumanPlayerService(BasePlayerService):
             {'type': 'confirm',
              "message": "Use Dwarf out of Order?",
              "name": name,
-             "default": False,}
+             "default": False, }
         ]
 
         answer = prompt(question)
-        result: ResultLookup[bool] = ResultLookup(answer[name],answer[name])
+        result: ResultLookup[bool] = ResultLookup(answer[name], answer[name])
         return result
 
     def get_player_choice_use_card_already_in_use(
@@ -72,7 +74,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             {'type': 'confirm',
              "message": "Use card already in use?",
              "name": name,
-             "default": False,}
+             "default": False, }
         ]
 
         answer = prompt(question)
@@ -83,32 +85,52 @@ class KeyboardHumanPlayerService(BasePlayerService):
             self,
             available_cards: List[BaseCard],
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[BaseCard]:
-        cards_by_name: Dict[str, BaseCard] = {card.name: card for card in available_cards}
+        choices: List[Dict[str, Any]] = [
+            {'name': card.name,
+             'value': card}
+            for card in available_cards
+        ]
 
-        choices: Dict[str, Dict[str, Any]] = {}
-        for card in available_cards:
-            card_description: Dict[str, Any] = {}
-            if card.actions is not None:
-                card_description["Actions:"] = str(card.actions)
-            if isinstance(card, ResourceContainer) and card.has_resources:
-                displayable_resources: str = ", ".join([f"{resource.name}: {amount}" for resource, amount in card.resources.items()])
-                card_description["Resources:"] = displayable_resources
-            choices[card.name] = card_description
-            print(card.name)
-            print(card_description)
-            print()
+        card_to_use_name: str = "card_to_use"
+        confirm_use_name: str = "confirm_card"
 
-        name = "card_to_use"
-        question = [
-            {
-                'type': 'list',
-                'name': name,
-                'message': 'Pick a card',
-                'choices': choices
-            },]
+        has_picked_card: bool = False
+        card_answer: Dict[str, Any] = {}
 
-        answer = prompt(question)
-        result: ResultLookup[BaseCard] = ResultLookup(True, cards_by_name[answer[name]])
+        while not has_picked_card:
+            card_question = [
+                {
+                    'type': 'list',
+                    'name': card_to_use_name,
+                    'message': 'Pick a card',
+                    'choices': choices
+                }, ]
+
+            card_answer = prompt(card_question)
+
+            card_to_use: BaseCard = card_answer[card_to_use_name]
+
+            card_description: List[str] = [f"Confirm using {card_to_use.name}?"]
+            if card_to_use.actions is not None:
+                card_description.append("  Actions: ")
+                card_description.append(f"    {str(card_to_use.actions)}")
+            if isinstance(card_to_use, ResourceContainer) and card_to_use.has_resources:
+                card_description.append("  Resources: ")
+                card_description.extend([f"    {resource.name}: {amount}" for resource, amount in card_to_use.resources.items()])
+            confirm_message: str = "\n".join(card_description)
+            print(confirm_message)
+
+            confirm_question = {
+                'type': 'confirm',
+                'name': confirm_use_name,
+                'message': ""
+            }
+
+            confirm_answer: Dict[str, Any] = prompt(confirm_question)
+
+            has_picked_card = confirm_answer[confirm_use_name]
+
+        result: ResultLookup[BaseCard] = ResultLookup(True, card_answer[card_to_use_name])
         return result
 
     def get_player_choice_dwarf_to_use_out_of_order(
@@ -124,7 +146,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
         ]
 
         answer = prompt(question)
-        result: ResultLookup[Dwarf] = answer[name]
+        result: ResultLookup[Dwarf] = ResultLookup(True, answer[name])
         return result
 
     def get_player_choice_actions_to_use(
@@ -136,18 +158,21 @@ class KeyboardHumanPlayerService(BasePlayerService):
         if not any(available_action_choices):
             raise ValueError("Must have at least one available choice")
 
-        choices_by_string: Dict[str, ActionChoiceLookup] = {str(choice): choice for choice in available_action_choices}
+        choices: List[Dict[str, Any]] = [
+            {"name": str(choice),
+             "value": choice, }
+            for choice in available_action_choices]
 
         name = "actions_to_use"
         question = [
             {"type": "list",
              "message": "Choose some actions to use",
              "name": name,
-             "choices": choices_by_string}
+             "choices": choices}
         ]
 
         answer = prompt(question)
-        result: ResultLookup[ActionChoiceLookup] = ResultLookup(True, choices_by_string[answer[name]])
+        result: ResultLookup[ActionChoiceLookup] = ResultLookup(True, answer[name])
         return result
 
     def get_player_choice_tile_to_build(
@@ -168,7 +193,114 @@ class KeyboardHumanPlayerService(BasePlayerService):
             tile: BaseTile,
             turn_descriptor: TurnDescriptorLookup,
             secondary_tile: Optional[BaseTile] = None) -> ResultLookup[TileUnknownPlacementLookup]:
-        pass
+        if tile is None:
+            raise ValueError("Tile cannot be None")
+
+        location_name: str = "location_to_use"
+        direction_name: str = "direction_to_point"
+
+        from common.services.tile_service import TileService
+        tile_service: TileService = TileService()
+
+        valid_locations: Union[List[int], Dict[int, List[TileTwinPlacementLookup]]]
+        is_outdoors_tile: bool = tile_service.is_tile_placed_outside(tile.tile_type)
+        requisites: List[TileTypeEnum] = tile_service.outdoor_tiles \
+            if is_outdoors_tile \
+            else [tile for tile in TileTypeEnum if tile not in tile_service.outdoor_tiles]
+
+        if secondary_tile is None:
+            valid_locations = tile_service.get_available_locations_for_single(self, tile.tile_type, requisites)
+        else:
+            locations_for_twin: List[TileTwinPlacementLookup] = tile_service.get_available_locations_for_twin(self, requisites_override=requisites)
+            valid_locations_for_twin: Dict[int, List[TileTwinPlacementLookup]] = {}
+            for tile_placement in locations_for_twin:
+                location: int = tile_placement.location
+                if location in valid_locations_for_twin:
+                    valid_locations_for_twin[location].append(tile_placement)
+                else:
+                    valid_locations_for_twin[location] = [tile_placement]
+            valid_locations = valid_locations_for_twin
+
+        # _ 1 2 _ | _ _ _ 7
+        # 8 x x x | x x x _
+        # _ x x x | x _ x _
+        # _ x x27 | C _ x _
+        # _ x x x | D x x _
+        # _ _ _ _ | _ _ _ _
+
+        index: int = 0
+        tiles_map: List[Tuple[List[str], List[str]]] = []
+
+        for y in range(self.height):
+            line_map_readable: List[str] = []
+            line_map_number: List[str] = []
+            for x in range(self.width):
+                tile_type_at_index: TileTypeEnum = self.tiles[index].tile_type
+                if (index % self.width) == math.floor(self.width / 2):
+                    line_map_readable.append("|")
+                    line_map_number.append("|")
+                is_tile_type_unavailable: bool = tile_type_at_index is TileTypeEnum.unavailable
+                is_location_valid: bool = index in valid_locations
+
+                tile_value_readable: str
+                tile_value_number: str
+
+                if is_location_valid:
+                    if not (tile_type_at_index is TileTypeEnum.furnishedDwelling
+                            or tile_type_at_index is TileTypeEnum.furnishedCavern):
+                        tile_value_readable = tile_type_at_index.name[0].rjust(2)
+                    else:
+                        tile_value_readable = self.tiles[index].tile.name[:2]
+                    tile_value_number = str(index).rjust(2)
+                elif not is_tile_type_unavailable:
+                    tile_value_readable = " _"
+                    tile_value_number = " _"
+                else:
+                    tile_value_readable = "  "
+                    tile_value_number = "  "
+
+                line_map_readable.append(tile_value_readable)
+                line_map_number.append(tile_value_number)
+
+                index += 1
+            tiles_map.append((line_map_readable, line_map_number))
+
+        for line_map_readable in tiles_map:
+            print(" ".join(line_map_readable[0]), end="    ")
+            print(" ".join(line_map_readable[1]))
+
+        def validate_location(chosen_location: str) -> bool:
+            location_is_valid: bool = not (chosen_location.isspace() or chosen_location == "")
+            if location_is_valid:
+                location_is_valid = int(chosen_location) in valid_locations
+            return location_is_valid
+
+        questions = [
+            {"type": "input",
+             "message": f"Choose a location",
+             "name": location_name,
+             "validate": validate_location}
+        ]
+
+        if secondary_tile is not None:
+            direction_question = {
+                "type": "list",
+                "message": "Pick a direction",
+                "name": direction_name,
+                "choices": lambda current_answers: [
+                    {"name": placement.direction.name,
+                     "value": placement, } for placement in valid_locations[int(current_answers[location_name])]]}
+            questions.append(direction_question)
+
+        answers = prompt(questions)
+
+        result: ResultLookup[TileUnknownPlacementLookup]
+        if secondary_tile is None:
+            result = ResultLookup(True, TileUnknownPlacementLookup(answers[location_name], None))
+        else:
+            result = ResultLookup(True, answers[direction_name])
+
+        return result
 
     def get_player_choice_location_to_build_stable(
             self,

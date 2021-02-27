@@ -53,7 +53,19 @@ class TileService(object):
             TileDirectionEnum.left: lambda _: -1,
             TileDirectionEnum.right: lambda _: 1}
 
-    # TODO Implement and test this service
+        self._outdoor_tiles: List[TileTypeEnum] = [
+            TileTypeEnum.forest,
+            TileTypeEnum.meadow,
+            TileTypeEnum.field,
+            TileTypeEnum.meadowFieldTwin,
+            TileTypeEnum.pasture,
+            TileTypeEnum.pastureTwin,
+        ]
+
+    @property
+    def outdoor_tiles(self) -> List[TileTypeEnum]:
+        return self._outdoor_tiles
+
     def is_tile_a_twin_tile(
             self,
             tile_type: TileTypeEnum) -> bool:
@@ -64,6 +76,12 @@ class TileService(object):
             self,
             tile_type: TileTypeEnum) -> bool:
         result: bool = tile_type in self._unique_tile_funcs
+        return result
+
+    def is_tile_placed_outside(
+            self,
+            tile_type: TileTypeEnum) -> bool:
+        result: bool = tile_type in self._outdoor_tiles
         return result
 
     def get_unique_tile_generation_method(
@@ -176,6 +194,7 @@ class TileService(object):
             .get_available_locations_for_twin(
             player,
             twin_tile_type)
+
         result: bool = TileTwinPlacementLookup(location, direction) in possible_locations
         return result
 
@@ -228,7 +247,7 @@ class TileService(object):
     def get_available_locations_for_single(
             self,
             player: TileContainer,
-            tile_type: TileTypeEnum,
+            tile_type: Optional[TileTypeEnum] = None,
             requisites_override: Optional[List[TileTypeEnum]] = None) -> List[int]:
         """Get all locations available for a tile with the given type
 
@@ -245,9 +264,11 @@ class TileService(object):
         tile_requisites: List[TileTypeEnum]
         if requisites_override is not None:
             tile_requisites = requisites_override
-        else:
+        elif tile_type is not None:
             all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
             tile_requisites = all_tile_requisites[tile_type]
+        else:
+            raise ValueError("Both tile_type and requisites_override cannot be None")
 
         valid_positions: List[int] = [location for location in player.tiles if player.tiles[location].tile_type in tile_requisites]
 
@@ -256,19 +277,26 @@ class TileService(object):
     def get_available_locations_for_twin(
             self,
             player: TileContainer,
-            twin_tile_type: TileTypeEnum) -> List[TileTwinPlacementLookup]:
+            twin_tile_type: Optional[TileTypeEnum] = None,
+            requisites_override: Optional[List[TileTypeEnum]] = None) -> List[TileTwinPlacementLookup]:
         """Get all locations available for a tile with the given type
 
         :param player: The player where the tile will be placed. This may not be null.
-        :param twin_tile_type: The type of the twin tile to be placed.
+        :param twin_tile_type: The type of the twin tile to be placed. This may only be none if requisites_override is not none.
+        :param requisites_override: The requisites that the tile must be placed on. If this is null, the default will be used.
         :returns: A list of locations and directions. This will never be null.
         """
         if player is None:
             raise ValueError("Player may not be null")
-        all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
 
-        # get the correct requisites -- if adjacent, allow unavailable
-        tile_requisites: List[TileTypeEnum] = all_tile_requisites[twin_tile_type]
+        tile_requisites: List[TileTypeEnum]
+        if requisites_override is not None:
+            tile_requisites = requisites_override
+        elif twin_tile_type is not None:
+            all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
+            tile_requisites = all_tile_requisites[twin_tile_type]
+        else:
+            raise ValueError("Both twin_tile_type and requisites_override cannot be None")
 
         valid_positions_with_adjacent: List[TileTwinPlacementLookup] = []
 
