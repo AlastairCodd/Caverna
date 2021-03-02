@@ -23,7 +23,7 @@ class PlayersDefault(object):
         players.clear()
 
         for x in range(self._numberOfPlayers):
-            new_player: BasePlayerService = KeyboardHumanPlayerService()
+            new_player: BasePlayerService = KeyboardHumanPlayerService(x,x)
             new_player.give_resource(ResourceTypeEnum.food, self._initialFood[x])
             players.append(new_player)
 
