@@ -2,6 +2,7 @@ from typing import List
 
 from common.forges.base_card_forge import BaseCardForge
 from common.forges.card_forge_1_3 import OneToThreeCardForge
+from common.forges.card_forge_1_7 import OneToSevenCardForge
 from common.forges.card_forge_3 import ThreeCardForge
 from common.forges.card_forge_4_7 import FourToSevenCardForge
 from common.forges.card_forge_5 import FiveCardForge
@@ -24,6 +25,7 @@ class CardDefault(object):
         cards_1_3: BaseCardForge = OneToThreeCardForge()
         cards_4_7: BaseCardForge = FourToSevenCardForge()
         cards_6_7: BaseCardForge = SixToSevenCardForge()
+        cards_1_7: BaseCardForge = OneToSevenCardForge()
 
         cards_3: BaseCardForge = ThreeCardForge()
         cards_5: BaseCardForge = FiveCardForge()
@@ -33,6 +35,7 @@ class CardDefault(object):
             cards_1_3,
             cards_4_7,
             cards_6_7,
+            cards_1_7,
 
             cards_3,
             cards_5,
