@@ -1,3 +1,4 @@
+from collections import Counter
 from typing import List, Iterable, Dict
 
 from buisness_logic.actions.breed_animals_action import BreedAnimalsAction
@@ -88,9 +89,14 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
         constraints: List[BaseConstraint] = [PrecedesConstraint(self, self._upgrade_dwarf_weapon_action)]
 
         if chosen_expedition_actions.flag:
-            if len(chosen_expedition_actions.value) != self._level:
+            if len(chosen_expedition_actions.value) > self._level:
                 errors.append(f"Player attempted to choose {len(chosen_expedition_actions.value)} actions, when only {self._level} are allowed")
             else:
+                any_duplicates: bool = any(map(lambda x: x > 1, Counter(chosen_expedition_actions.value).values()))
+
+                if any_duplicates:
+                    errors.append("Attempted to use the same action twice")
+
                 for action in chosen_expedition_actions.value:
                     if action in possible_expedition_rewards:
                         self._chosen_actions_and_levels[action] = possible_expedition_rewards_and_levels[action]
