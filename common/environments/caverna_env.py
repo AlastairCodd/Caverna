@@ -24,8 +24,10 @@ class CavernaEnv(object):
         """Ctor
         
         Params: numberOfPlayers: int. Must be between 1 and 7 (inclusive)."""
-        if number_of_players < 1: raise IndexError("numberOfPlayers")
-        if number_of_players > 7: raise IndexError("numberOfPlayers")
+        if number_of_players < 1:
+            raise IndexError("numberOfPlayers")
+        if number_of_players > 7:
+            raise IndexError("numberOfPlayers")
         self._number_of_players = number_of_players
 
         self._players_default: PlayersDefault = PlayersDefault(self._number_of_players)
@@ -132,6 +134,7 @@ class CavernaEnv(object):
         result: Optional[BasePlayerService] = None
         if any(self._player_turn_order):
             result = self._player_turn_order.pop(0)
+        print(f"Player {result.id} turn")
         return result
 
     def _create_player_turn_order(self) -> List[BasePlayerService]:

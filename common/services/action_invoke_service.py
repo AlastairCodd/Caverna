@@ -29,6 +29,8 @@ class ActionInvokeService(object):
         if current_dwarf is None:
             raise ValueError
 
+        print(repr(actions))
+
         actions_best_order: ResultLookup[List[BaseAction]] = self._action_ordering_service \
             .calculated_best_order(
             actions,
@@ -41,8 +43,9 @@ class ActionInvokeService(object):
         errors: List[str] = []
 
         if actions_best_order.flag:
+            print("> returned valid action ordering")
             for action in actions_best_order.value:
-                print(f"> Invoking {action}")
+                print(f"  > Invoking {action}")
 
                 invoke_result: ResultLookup[int] = action.invoke(
                     player,
@@ -50,11 +53,12 @@ class ActionInvokeService(object):
                     current_dwarf)
 
                 if invoke_result.flag:
-                    print(f"> success, {invoke_result.value} actions")
+                    print(f"    > Success, {invoke_result.value} actions")
                 else:
                     success = False
                     errors = ["Ordering Service returned invalid order"]
                     errors.extend(actions_best_order.errors)
+                    errors.extend(invoke_result.errors)
                     break
                 successful_actions += invoke_result.value
         else:

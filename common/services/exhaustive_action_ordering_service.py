@@ -1,6 +1,7 @@
 from functools import reduce
 from typing import List, Iterable, Tuple, Union, Optional, Set
 
+from buisness_logic.actions.activate_dwarf_action import ActivateDwarfAction
 from buisness_logic.services.most_points_permutation_ordering_service import MostPointsPermutationOrderingService
 from buisness_logic.services.most_resources_permutation_ordering_service import MostResourcesPermutationOrderingService
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -73,7 +74,11 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
 
                 action: BaseAction
                 for action in permutation:
-                    action_result: ResultLookup[int] = action.invoke(player_copy, card_copy, dwarf_copy)
+                    action_result: ResultLookup[int]
+                    if isinstance(action, ActivateDwarfAction):
+                        action_result = ResultLookup(True, 1)
+                    else:
+                        action_result = action.invoke(player_copy, card_copy, dwarf_copy)
 
                     errors_for_permutation.extend(action_result.errors)
 
@@ -116,5 +121,6 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
             errors: List[str] = ["There is not a permutation which allows for all actions to be performed"]
             for partition in unsuccessful_permutations:
                 errors.extend(partition.errors)
+            errors = list(set(errors))
             result = ResultLookup(errors=errors)
         return result

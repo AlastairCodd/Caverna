@@ -46,3 +46,10 @@ class ActivateDwarfAction(BaseAction):
     def new_turn_reset(self):
         # Probably not required, as action will go out of scope, but nice to have
         self._card_to_activate = None
+
+    def __str__(self) -> str:
+        return "Activate Dwarf Action"
+
+    @property
+    def card_to_activate(self) -> Optional[BaseCard]:
+        return self._card_to_activate
