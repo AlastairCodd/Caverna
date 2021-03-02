@@ -51,4 +51,7 @@ class UpgradeAllWeaponsAction(BaseAction):
         return 1
 
     def __str__(self) -> str:
+        return "Upgrade All Weapons"
+
+    def __repr__(self) -> str:
         return "UpgradeAllWeaponsAction()"

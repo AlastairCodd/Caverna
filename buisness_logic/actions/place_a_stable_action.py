@@ -156,3 +156,7 @@ class PlaceAStableAction(BasePlayerChoiceAction):
                 break
         result: bool = number_of_stables_remaining > 0
         return result
+
+    def __str__(self) -> str:
+        result: str = "Place a stable for " + " and ".join([f"{amount} {resource.name}" for resource, amount in self._stable_cost.items()])
+        return result

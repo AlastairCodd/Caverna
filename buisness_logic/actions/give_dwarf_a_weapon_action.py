@@ -90,3 +90,6 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
 
     def new_turn_reset(self):
         self._level_of_weapon = None
+
+    def __str__(self) -> str:
+        return "Give dwarf a weapon action"

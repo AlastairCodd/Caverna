@@ -105,3 +105,6 @@ class SowAction(BasePlayerChoiceAction):
     def new_turn_reset(self):
         self._resources_to_sow.clear()
         self._locations_to_sow.clear()
+
+    def __str__(self) -> str:
+        return f"Sow {self._quantity} resources"
