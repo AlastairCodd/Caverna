@@ -1,4 +1,4 @@
-from typing import List, NamedTuple, Union
+from typing import List, NamedTuple, Tuple, Optional
 
 from buisness_logic.services.base_action_player_choice_transfer_service import BaseActionPlayerChoiceTransferService
 from buisness_logic.services.base_card_player_choice_transfer_service import BaseCardPlayerChoiceTransferService
@@ -9,15 +9,18 @@ from buisness_logic.services.complete_dwarf_player_choice_transfer_service impor
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.dwarf_card_action_combination_lookup import DwarfCardActionCombinationLookup
+from common.entities.precedes_constraint import PrecedesConstraint
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.conditional_service import ConditionalService
+from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
+from core.baseClasses.base_constraint import BaseConstraint
 from core.services.base_player_service import BasePlayerService
 
 
 class ChosenDwarfCardActionCombinationAndEquivalentLookup(NamedTuple):
-    choice: Union[DwarfCardActionCombinationLookup, None]
+    choice: Optional[DwarfCardActionCombinationLookup]
     equivalents: List[DwarfCardActionCombinationLookup]
 
 
@@ -41,27 +44,31 @@ class TurnTransferService(object):
             raise IndexError(f"Turn Index ({turn_descriptor.turn_index}) must be less than number of dwarves ({len(player.dwarves)})")
 
         success: bool = False
-        choice: Union[DwarfCardActionCombinationLookup, None] = None
+        choice: Optional[DwarfCardActionCombinationLookup] = None
         equivalents: List[DwarfCardActionCombinationLookup] = []
         errors: List[str] = []
 
-        dwarf_result = self._dwarf_transfer_service \
+        dwarf_result: ResultLookup[Tuple[Dwarf, ActionChoiceLookup]] = self._dwarf_transfer_service \
             .get_dwarf(
                 player,
                 turn_descriptor)
 
-        chosen_dwarf: Dwarf = dwarf_result.value
+        chosen_dwarf: Dwarf
+        dwarf_action_choice: ActionChoiceLookup
+        chosen_dwarf, dwarf_action_choice = dwarf_result.value
 
         errors.extend(dwarf_result.errors)
 
         if dwarf_result.flag:
-            card_result: ResultLookup[BaseCard] = self._card_transfer_service \
+            card_result: ResultLookup[Tuple[BaseCard, ActionChoiceLookup]] = self._card_transfer_service \
                 .get_card(
                     player,
                     chosen_dwarf,
                     turn_descriptor)
 
-            chosen_card: BaseCard = card_result.value
+            chosen_card: BaseCard
+            card_action_choice: ActionChoiceLookup
+            chosen_card, card_action_choice = card_result.value
 
             errors.extend(card_result.errors)
 
@@ -75,12 +82,38 @@ class TurnTransferService(object):
 
                 errors.extend(action_result.errors)
 
-                choice = DwarfCardActionCombinationLookup(
-                    chosen_dwarf,
-                    chosen_card,
-                    action_result.value)
-
                 if action_result.flag:
+                    action_action_choice = action_result.value
+
+                    actions: List[BaseAction] = []
+                    actions.extend(dwarf_action_choice.actions)
+                    actions.extend(card_action_choice.actions)
+                    actions.extend(action_action_choice.actions)
+
+                    constraints: List[BaseConstraint] = []
+                    constraints.extend(dwarf_action_choice.constraints)
+                    constraints.extend(card_action_choice.constraints)
+                    constraints.extend(action_action_choice.constraints)
+
+                    for dwarf_action in dwarf_action_choice.actions:
+                        for card_action in card_action_choice.actions:
+                            constraint: BaseConstraint = PrecedesConstraint(dwarf_action, card_action)
+                            constraints.append(constraint)
+
+                        for action_action in action_action_choice.actions:
+                            constraint: BaseConstraint = PrecedesConstraint(dwarf_action, action_action)
+                            constraints.append(constraint)
+
+                    for card_action in card_action_choice.actions:
+                        for action_action in action_action_choice.actions:
+                            constraint: BaseConstraint = PrecedesConstraint(card_action, action_action)
+                            constraints.append(constraint)
+
+                    choice = DwarfCardActionCombinationLookup(
+                        chosen_dwarf,
+                        chosen_card,
+                        ActionChoiceLookup(actions, constraints))
+
                     success = True
             else:
                 equivalent_cards: List[BaseCard] = self.get_equivalent_invalid_cards(player, chosen_dwarf, chosen_card)

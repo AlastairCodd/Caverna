@@ -1,10 +1,15 @@
-from typing import List, Dict, Union
+from typing import List, Dict, Tuple, Optional
 
+from buisness_logic.actions.pay_action import PayAction
 from buisness_logic.services.available_dwarf_service import AvailableDwarfService
 from buisness_logic.services.base_dwarf_player_choice_transfer_service import BaseDwarfPlayerChoiceTransferService
+from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from core.baseClasses.base_action import BaseAction
+from core.enums.caverna_enums import ResourceTypeEnum
+from core.errors.invalid_operation_error import InvalidOperationError
 from core.services.base_player_service import BasePlayerService
 
 
@@ -15,7 +20,7 @@ class CompleteDwarfPlayerChoiceTransferService(BaseDwarfPlayerChoiceTransferServ
     def get_dwarf(
             self,
             player: BasePlayerService,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Dwarf]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Tuple[Dwarf, ActionChoiceLookup]]:
         if player is None:
             raise ValueError("Player may not be null.")
         if turn_descriptor is None:
@@ -48,7 +53,9 @@ class CompleteDwarfPlayerChoiceTransferService(BaseDwarfPlayerChoiceTransferServ
                 success = player_choice_use_dwarf_out_of_order.flag
                 is_using_dwarf_of_lowest_level = not player_choice_use_dwarf_out_of_order.value
 
-        dwarf: Union[Dwarf, None] = None
+        dwarf: Optional[Dwarf] = None
+        additional_actions: List[BaseAction] = []
+
         if success:
             if is_using_dwarf_of_lowest_level:
                 dwarf = available_dwarves_by_level[lowest_level_of_dwarves][0]
@@ -64,11 +71,20 @@ class CompleteDwarfPlayerChoiceTransferService(BaseDwarfPlayerChoiceTransferServ
                 if player_choice_use_dwarf_out_of_order.flag:
                     if player_choice_use_dwarf_out_of_order.value in available_dwarves:
                         dwarf = player_choice_use_dwarf_out_of_order.value
-                        # player.resources
+
+                        if dwarf.weapon_level != lowest_level_of_dwarves:
+                            pay_dwarf_cost_action: BaseAction = PayAction({ResourceTypeEnum.ruby: 1})
+                            additional_actions.append(pay_dwarf_cost_action)
                     else:
                         success = False
                         errors.append("Attempted to use dwarf that is already in use.")
 
-        result: ResultLookup[Dwarf] = ResultLookup(success, dwarf, errors)
+        result: ResultLookup[Tuple[Dwarf, ActionChoiceLookup]]
+        if success:
+            if dwarf is None:
+                raise InvalidOperationError("DEV ERROR: Success => dwarf is not none")
+            result = ResultLookup(success, (dwarf, ActionChoiceLookup(additional_actions)), errors)
+        else:
+            result = ResultLookup(errors=errors)
 
         return result

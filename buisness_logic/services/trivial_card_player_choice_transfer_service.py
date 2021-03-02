@@ -1,6 +1,7 @@
-from typing import Union
+from typing import Union, Tuple
 
 from buisness_logic.services.base_card_player_choice_transfer_service import BaseCardPlayerChoiceTransferService
+from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
@@ -13,7 +14,7 @@ class TrivialCardPlayerChoiceTransferService(BaseCardPlayerChoiceTransferService
             self,
             player: BasePlayerService,
             dwarf: Dwarf,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[BaseCard]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Tuple[BaseCard, ActionChoiceLookup]]:
         if turn_descriptor is None:
             raise ValueError("Turn descriptor may not be null.")
         chosen_card: Union[BaseCard, None] = None
@@ -27,5 +28,5 @@ class TrivialCardPlayerChoiceTransferService(BaseCardPlayerChoiceTransferService
         success: bool = chosen_card is not None
         error: Union[None, str] = None if success else "No cards remain"
 
-        result: ResultLookup[BaseCard] = ResultLookup(success, chosen_card, error)
+        result: ResultLookup[Tuple[BaseCard, ActionChoiceLookup]] = ResultLookup(success, (chosen_card, ActionChoiceLookup([])), error)
         return result

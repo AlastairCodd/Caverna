@@ -1,10 +1,11 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from buisness_logic.actions.activate_dwarf_action import ActivateDwarfAction
 from buisness_logic.actions.pay_action import PayAction
 from buisness_logic.cards.imitation_card import ImitationCard
 from buisness_logic.services.available_card_service import AvailableCardService
 from buisness_logic.services.base_card_player_choice_transfer_service import BaseCardPlayerChoiceTransferService
+from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
@@ -22,7 +23,7 @@ class CompleteCardPlayerChoiceTransferService(BaseCardPlayerChoiceTransferServic
             self,
             player: BasePlayerService,
             dwarf: Dwarf,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Optional[BaseCard]]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Tuple[BaseCard, ActionChoiceLookup]]:
         if player is None:
             raise ValueError("Player cannot be null")
         if dwarf is None:
@@ -73,11 +74,16 @@ class CompleteCardPlayerChoiceTransferService(BaseCardPlayerChoiceTransferServic
             card_choice_result = player.get_player_choice_card_to_use(
                 unused_available_cards,
                 turn_descriptor)
+            activate_dwarf_action: BaseAction = ActivateDwarfAction()
+            additional_actions.append(activate_dwarf_action)
 
         success &= card_choice_result.flag
         errors.extend(card_choice_result.errors)
 
-        chosen_card: Optional[BaseCard] = card_choice_result.value if card_choice_result.flag else None
-
-        result: ResultLookup[BaseCard] = ResultLookup(success, chosen_card, errors)
+        result: ResultLookup[Tuple[BaseCard, ActionChoiceLookup]]
+        if success:
+            action_choice: ActionChoiceLookup = ActionChoiceLookup(additional_actions, [])
+            result = ResultLookup(True, (card_choice_result.value, action_choice), errors)
+        else:
+            result = ResultLookup(errors=errors)
         return result
