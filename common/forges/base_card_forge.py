@@ -12,3 +12,12 @@ class BaseCardForge(metaclass=ABCMeta):
     @abstractmethod
     def get_cards(self) -> List[BaseCard]:
         pass
+
+
+class BaseLevelledCardForge(metaclass=ABCMeta):
+    @abstractmethod
+    def get_sequential_cards(self) -> List[BaseCard]:
+        pass
+
+    def get_additional_cards(self) -> List[BaseCard]:
+        return []

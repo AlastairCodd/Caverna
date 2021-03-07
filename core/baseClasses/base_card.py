@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from typing import Union, Optional
+from typing import Union, Optional, List
 
 from common.entities.multiconditional import Conditional
 from common.services.resettable import Resettable
@@ -52,7 +52,9 @@ class BaseCard(Resettable, metaclass=ABCMeta):
     def actions(self) -> Union[BaseAction, Conditional, None]:
         return self._actions
 
-    def reveal_card(self) -> None:
+    def reveal_card(
+            self,
+            cards: List['BaseCard']) -> None:
         if self._is_visible:
             raise InvalidOperationError("Cannot reveal a card that is already visible")
         self._is_visible = True
