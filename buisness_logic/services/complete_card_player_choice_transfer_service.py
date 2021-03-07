@@ -39,6 +39,9 @@ class CompleteCardPlayerChoiceTransferService(BaseCardPlayerChoiceTransferServic
             unused_available_cards,
             used_available_cards)
 
+        for error in can_use_card_already_in_use_result.errors:
+            print(error)
+
         use_card_already_in_use: bool = False
         imitation_card: Optional[ImitationCard] = None
         if can_use_card_already_in_use_result.flag:
@@ -72,7 +75,7 @@ class CompleteCardPlayerChoiceTransferService(BaseCardPlayerChoiceTransferServic
             additional_actions.append(activate_dwarf_action)
         else:
             card_choice_result = player.get_player_choice_card_to_use(
-                unused_available_cards,
+                [card for card in unused_available_cards if not isinstance(card, ImitationCard)],
                 turn_descriptor)
             activate_dwarf_action: BaseAction = ActivateDwarfAction()
             additional_actions.append(activate_dwarf_action)

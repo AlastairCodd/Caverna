@@ -35,14 +35,14 @@ class ActionChoiceLookup(object):
 
         if len(self._actions) > 0:
             for action in self._actions:
-                list_of_strings.append(str(action))
+                list_of_strings.append(repr(action))
         else:
             list_of_strings.append("[]")
 
         if len(self._constraints) > 0:
             list_of_strings.append(",")
             for constraint in self._constraints:
-                list_of_strings.append(str(constraint))
+                list_of_strings.append(repr(constraint))
         list_of_strings.append(")")
 
         return ''.join(list_of_strings)

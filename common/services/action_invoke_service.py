@@ -29,8 +29,6 @@ class ActionInvokeService(object):
         if current_dwarf is None:
             raise ValueError
 
-        print(repr(actions))
-
         actions_best_order: ResultLookup[List[BaseAction]] = self._action_ordering_service \
             .calculated_best_order(
             actions,
