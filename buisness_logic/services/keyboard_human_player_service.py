@@ -25,6 +25,7 @@ class QuestionTypeEnum(Enum):
     confirm = 0,
     list = 1,
     input = 2,
+    checkbox = 3,
 
 
 def create_question(
@@ -33,11 +34,13 @@ def create_question(
         message: str,
         choices: Optional[Union[List[Union[str, Dict[str, Any]]], Callable[[Dict[str, Any]], List[Dict[str, Any]]]]] = None,
         validator: Optional[Callable[[Any], bool]] = None,
-        default: Optional[Any] = None) -> Dict[str, Any]:
+        default: Optional[Any] = None,
+        when: Optional[Callable[[Dict[str, Any]], bool]] = None) -> Dict[str, Any]:
     type_name: str = {
         QuestionTypeEnum.confirm: "confirm",
         QuestionTypeEnum.list: "list",
         QuestionTypeEnum.input: "input",
+        QuestionTypeEnum.checkbox: "checkbox",
     }[question_type]
 
     result: Dict[str, Any] = {
@@ -52,6 +55,8 @@ def create_question(
         result["validate"] = validator
     if default is not None:
         result["default"] = default
+    if when is not None:
+        result["when"] = when
 
     return result
 
@@ -110,11 +115,19 @@ class KeyboardHumanPlayerService(BasePlayerService):
             used_available_cards: List[BaseCard],
             amount_of_food_required: int,
             turn_descriptor: TurnDescriptorLookup) -> bool:
+        print("Cards which are already in use:")
+        for card in used_available_cards:
+            print(card.name)
+            print(f" {str(card.actions)}")
+        print()
+        print(f"Can be used for {amount_of_food_required} food")
+        print(f"(Harvest Phase at end of turn: {turn_descriptor.harvest_type.name})")
+
         name = "use_card_already_in_use"
         question: Dict[str, Any] = create_question(
             QuestionTypeEnum.confirm,
-            "Use card already in use?",
             name,
+            "Use card already in use?",
             default=False
         )
 
@@ -166,7 +179,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 ""
             )
 
-            confirm_answer: Dict[str, Any] = prompt(confirm_question)
+            confirm_answer: Dict[str, Any] = prompt(confirm_question, bottom_toolbar=f"Harvest Type: {turn_descriptor.harvest_type.name}")
 
             has_picked_card = confirm_answer[confirm_use_name]
 
@@ -366,7 +379,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             print(" ".join(line_map_readable[1]))
 
         def validate_location(chosen_location: str) -> bool:
-            location_is_valid: bool = not (chosen_location.isspace() or chosen_location == "")
+            location_is_valid: bool = chosen_location.isdigit()
             if location_is_valid:
                 location_is_valid = int(chosen_location) in valid_locations
             return location_is_valid
@@ -398,7 +411,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
         result: ResultLookup[TileUnknownPlacementLookup]
         if secondary_tile is None:
-            result = ResultLookup(True, TileUnknownPlacementLookup(answers[location_name], None))
+            result = ResultLookup(True, TileUnknownPlacementLookup(int(answers[location_name]), None))
         else:
             result = ResultLookup(True, answers[direction_name])
 
@@ -477,7 +490,32 @@ class KeyboardHumanPlayerService(BasePlayerService):
             self,
             tile_cost: Dict[ResourceTypeEnum, int],
             turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
-        pass
+        use_any_effects_name: str = "use_any_effects_name"
+        effects_to_use_name: str = "effects_to_use_name"
+
+        possible_effects: List[Dict[str, BaseTilePurchaseEffect]] = []
+
+        questions: List[Dict[str, Any]] = [
+            create_question(
+                QuestionTypeEnum.confirm,
+                use_any_effects_name,
+                f"Use effects to reduce tile cost?\nCost: {tile_cost}"
+            ),
+            create_question(
+                QuestionTypeEnum.checkbox,
+                effects_to_use_name,
+                "Pick effects to use",
+                choices=possible_effects,
+                when=lambda current_answers: current_answers[use_any_effects_name]
+            ),
+            ]
+
+        answers: Dict[str, Any] = prompt(questions)
+
+        result: Dict[BaseTilePurchaseEffect, int] = {}
+        if answers[use_any_effects_name]:
+            raise NotImplementedError()
+        return result
 
     def get_player_choice_use_harvest_action_instead_of_breeding(
             self,
