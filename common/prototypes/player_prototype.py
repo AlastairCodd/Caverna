@@ -18,7 +18,7 @@ class PlayerPrototype(BasePrototype[BasePlayerRepository]):
         if source is None:
             raise ValueError
 
-        target = SimplePlayerRepository(source.id, source.turn_index)
+        target = SimplePlayerRepository(source.id, source.descriptor, source.turn_index)
         self.assign(source, target)
         return target
 

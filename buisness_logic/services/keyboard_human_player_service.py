@@ -60,10 +60,12 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def __init__(
             self,
             player_id: int,
+            player_descriptor: str,
             player_turn_index: int) -> None:
         BasePlayerService.__init__(
             self,
             player_id,
+            player_descriptor,
             player_turn_index,
             TileContainerDefault())
 

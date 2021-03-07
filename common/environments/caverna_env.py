@@ -185,6 +185,7 @@ class CavernaEnv(object):
         return player_observation
 
     def _observe_dwarf(self, dwarf: Dwarf) -> array:
-        if dwarf is None: return array([0, 0, 0, 0])
+        if dwarf is None:
+            return array([0, 0, 0, 0])
         dwarf_observation = array([dwarf.is_active, dwarf.is_adult, dwarf.weapon.level, dwarf.current_card_id])
         return dwarf_observation

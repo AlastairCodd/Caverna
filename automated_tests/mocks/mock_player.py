@@ -21,8 +21,14 @@ class MockPlayer(BasePlayerService):
             dwarves: Union[List[Dwarf], None] = None,
             resources: Union[Dict[ResourceTypeEnum, int], None] = None,
             player_id: int = 1,
+            player_descriptor: str = "Mock Player",
             turn_index: int = 2):
-        BasePlayerService.__init__(self, player_id, turn_index, TileContainerDefault())
+        BasePlayerService.__init__(
+            self,
+            player_id,
+            player_descriptor,
+            turn_index,
+            TileContainerDefault())
 
         if dwarves is not None:
             self._dwarves = dwarves

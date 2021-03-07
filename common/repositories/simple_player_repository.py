@@ -10,7 +10,13 @@ class SimplePlayerRepository(BasePlayerRepository):
     def __init__(
             self,
             player_id: int,
+            player_descriptor: str,
             turn_index: int,
             tile_container_default: Optional[BaseTileContainerDefault] = None) -> None:
         tile_container_default = TileContainerDefault() if tile_container_default is None else tile_container_default
-        BasePlayerRepository.__init__(self, player_id, turn_index, tile_container_default)
+        BasePlayerRepository.__init__(
+            self,
+            player_id,
+            player_descriptor,
+            turn_index,
+            tile_container_default)

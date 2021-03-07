@@ -20,9 +20,15 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
     def __init__(
             self,
             player_id: int,
+            player_descriptor: str,
             turn_index: int,
             tile_container_default: BaseTileContainerDefault) -> None:
-        BasePlayerRepository.__init__(self, player_id, turn_index, tile_container_default)
+        BasePlayerRepository.__init__(
+            self,
+            player_id,
+            player_descriptor,
+            turn_index,
+            tile_container_default)
 
     @abstractmethod
     def get_player_choice_conversions_to_perform(
