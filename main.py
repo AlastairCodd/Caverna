@@ -1,4 +1,7 @@
-from common.environments.interactive_game_runner import InteractiveGameRunner
+# from common.environments.interactive_game_runner import InteractiveGameRunner
+from view.shell_view import ShellView
 
-game_runner: InteractiveGameRunner = InteractiveGameRunner()
-game_runner.run()
+ShellView()
+
+# game_runner: InteractiveGameRunner = InteractiveGameRunner()
+# game_runner.run()
