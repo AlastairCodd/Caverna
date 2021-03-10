@@ -10,3 +10,4 @@ venv/
 venv9/
 htmlcov/
 .coverage
+venv6/
