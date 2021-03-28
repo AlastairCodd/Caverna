@@ -93,6 +93,9 @@ class MockPlayer(BasePlayerService):
             Dict[BaseTilePurchaseEffect, int]] \
             = lambda info_tile_cost, info_turn_descriptor: {}
 
+    def __repr__(self) -> str:
+        return f"{self.descriptor} {self.id}"
+
     def get_player_choice_use_dwarf_out_of_order_returns(
             self,
             func: Callable[
