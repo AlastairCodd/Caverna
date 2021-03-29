@@ -49,5 +49,5 @@ class ResourceLayoutExhaustiveChecker(ResourceLayoutCheckService):
                     Dict[int, Optional[ResourceTypeEnum]],
                     Dict[ResourceTypeEnum, int],
                     Dict[ResourceTypeEnum, int]
-                ] = success, partition, remaining, excess
+            ] = (success, partition, remaining, excess)
             yield result
