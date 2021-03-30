@@ -24,7 +24,7 @@ class CavernaEnv(object):
     """Environment for running caverna games"""
     def __init__(
             self,
-            number_of_players: int = 7,
+            number_of_players: int = 2,
             players_default: Optional[PlayersDefault] = None,
             card_default: Optional[CardDefault] = None,
             tile_forge: Optional[TileForge] = None):
@@ -97,6 +97,9 @@ class CavernaEnv(object):
             bool: whether or not the game has finished
             dict: additional debug information"""
         current_player: BasePlayerService = self._state.current_player
+        print("New Turn")
+        print(f"Player {current_player.descriptor} (#{current_player.id})")
+
         player_points_at_turn_start: int = self._point_calculation_service.calculate_points(current_player)
 
         turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
@@ -133,6 +136,7 @@ class CavernaEnv(object):
 
         player_points_after_action: int = self._point_calculation_service.calculate_points(current_player)
         reward: int = player_points_after_action - player_points_at_turn_start
+        print(f"reward: {reward}  current points: {player_points_after_action}")
         return array([]), reward, has_game_finished, {}
 
     def observe(self) -> array:

@@ -249,16 +249,44 @@ class KeyboardHumanPlayerService(BasePlayerService):
             for tile in possible_tiles]
 
         tile_to_build_name: str = "tile_to_build"
-        questions: List[Dict[str, Any]] = [
-            create_question(
+        confirm_use_name: str = "confirm_card"
+
+        has_picked_tile: bool = False
+        tile_answer: Dict[str, Any] = {}
+
+        while not has_picked_tile:
+            tile_question: Dict[str, Any] = create_question(
                 QuestionTypeEnum.list,
                 tile_to_build_name,
-                "Pick a tile to build",
+                "Pick a tile",
                 choices=choices
             )
-        ]
-        answers: Dict[str, Any] = prompt(questions)
-        result: ResultLookup[BaseTile] = ResultLookup(True, answers[tile_to_build_name])
+
+            tile_answer = prompt(tile_question)
+
+            tile_to_use: BaseTile = tile_answer[tile_to_build_name]
+
+            tile_description: List[str] = [f"Confirm building {tile_to_use.name}?"]
+            if tile_to_use.cost is not None and len(tile_to_use.cost) > 0:
+                tile_description.append("  Cost: ")
+                tile_description.extend([f"    {resource.name}: {amount}" for resource, amount in tile_to_use.cost.items()])
+            if tile_to_use.effects is not None and len(tile_to_use.effects) > 0:
+                tile_description.append("  Effects: ")
+                tile_description.extend([f"    {effect}" for effect in tile_to_use.effects])
+            confirm_message: str = "\n".join(tile_description)
+            print(confirm_message)
+
+            confirm_question: Dict[str, Any] = create_question(
+                QuestionTypeEnum.confirm,
+                confirm_use_name,
+                ""
+            )
+
+            confirm_answer: Dict[str, Any] = prompt(confirm_question)
+
+            has_picked_tile = confirm_answer[confirm_use_name]
+
+        result: ResultLookup[BaseTile] = ResultLookup(True, tile_answer[tile_to_build_name])
         return result
 
     def get_player_choice_expedition_reward(
