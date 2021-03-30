@@ -46,6 +46,7 @@ class CavernaEnv(object):
 
         self._cards_to_reveal: List[BaseCard] = []
         self._tiles: List[BaseTile] = []
+        self._state: CavernaStateService = CavernaStateService([], [])
 
         self._turn_execution_service: TurnExecutionService = TurnExecutionService()
         self._point_calculation_service: PointCalculationService = PointCalculationService()
@@ -55,15 +56,13 @@ class CavernaEnv(object):
 
         Returns: the observation of the game state"""
         players = self._players_default.assign([])
-        self._harvest_types_by_round = [HarvestTypeEnum.Harvest for _ in range(game_constants.number_of_rounds)]
 
         starting_cards: List[BaseCard] = self._card_default.get_cards()
         self._cards_to_reveal = self._levelled_card_service.get_cards()
 
-        self._state: CavernaStateService = CavernaStateService(players, starting_cards)
-
         self._tiles = self._tile_forge.create_all_tiles()
 
+        self._harvest_types_by_round = [HarvestTypeEnum.Harvest for _ in range(game_constants.number_of_rounds)]
         red_question_mark_harvest_round_indexes: List[int] = list(sorted(random.choice(list(range(5, 12)), 3, replace=False)))
         self._harvest_types_by_round[0] = HarvestTypeEnum.NoHarvest
         self._harvest_types_by_round[1] = HarvestTypeEnum.NoHarvest
@@ -71,6 +70,10 @@ class CavernaEnv(object):
         self._harvest_types_by_round[red_question_mark_harvest_round_indexes[0]] = HarvestTypeEnum.NoHarvest
         self._harvest_types_by_round[red_question_mark_harvest_round_indexes[1]] = HarvestTypeEnum.OneFoodPerDwarf
         self._harvest_types_by_round[red_question_mark_harvest_round_indexes[2]] = HarvestTypeEnum.EitherFieldPhaseOrBreedingPhase
+
+        self._state: CavernaStateService = CavernaStateService(players, starting_cards)
+        self._state.increment_round_index(self._cards_to_reveal[0], self._harvest_types_by_round[0])
+        self._state.get_next_player()
 
         return self.observe()
 
@@ -103,7 +106,10 @@ class CavernaEnv(object):
             self._state.round_index,
             self._state.round_harvest_type)
 
-        turn_result: ResultLookup[int] = self._turn_execution_service.take_turn(current_player, turn_descriptor)
+        turn_result: ResultLookup[int] = self._turn_execution_service.take_turn(
+            current_player,
+            self._state.is_current_players_final_turn,
+            turn_descriptor)
 
         for error in turn_result.errors:
             print(error)

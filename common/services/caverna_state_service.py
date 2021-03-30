@@ -15,7 +15,7 @@ class CavernaStateService(object):
             players: List[BasePlayerService],
             cards: List[BaseCard],
             starting_player_index: int = 0) -> None:
-        self._cards: List[BaseCard] = []
+        self._cards: List[BaseCard] = list(cards)
         self._players: List[BasePlayerService] = list(players)
 
         self._past_harvest_types: List[HarvestTypeEnum] = []
