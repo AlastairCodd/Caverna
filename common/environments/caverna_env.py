@@ -4,6 +4,7 @@ from numpy import array, concatenate, random
 
 from buisness_logic.services.turn_execution_service import TurnExecutionService
 from common.defaults.card_default import CardDefault
+from common.services.caverna_state_service import CavernaStateService
 from common.services.levelled_card_service import LevelledCardService
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
@@ -21,7 +22,12 @@ from core.baseClasses.base_card import BaseCard
 
 class CavernaEnv(object):
     """Environment for running caverna games"""
-    def __init__(self, number_of_players: int = 7):
+    def __init__(
+            self,
+            number_of_players: int = 7,
+            players_default: Optional[PlayersDefault] = None,
+            card_default: Optional[CardDefault] = None,
+            tile_forge: Optional[TileForge] = None):
         """Ctor
         
         Params: numberOfPlayers: int. Must be between 1 and 7 (inclusive)."""
@@ -31,46 +37,32 @@ class CavernaEnv(object):
             raise IndexError("numberOfPlayers")
         self._number_of_players = number_of_players
 
-        self._players_default: PlayersDefault = PlayersDefault(self._number_of_players)
-        self._card_default: CardDefault = CardDefault(self._number_of_players)
+        self._players_default: PlayersDefault = PlayersDefault(self._number_of_players) if players_default is None else players_default
+        self._card_default: CardDefault = CardDefault(self._number_of_players) if card_default is None else card_default
         self._levelled_card_service: LevelledCardService = LevelledCardService()
-        self._tile_forge: TileForge = TileForge()
+        self._tile_forge: TileForge = TileForge() if tile_forge is None else TileForge
 
-        self._players: List[BasePlayerService] = []
-        self._turn_index: int = 0
-        self._round_index: int = 0
-        self._harvest_type_for_round: HarvestTypeEnum = HarvestTypeEnum.NoHarvest
         self._harvest_types_by_round: List[HarvestTypeEnum] = []
 
-        # noinspection PyTypeChecker
-        self._current_player: BasePlayerService = None
-        self._is_current_players_final_turn: bool = False
-        # noinspection PyTypeChecker
-        self._starting_player: BasePlayerService = None
-        self._player_turn_order: List[BasePlayerService] = []
-
-        self._cards: List[BaseCard] = []
         self._cards_to_reveal: List[BaseCard] = []
         self._tiles: List[BaseTile] = []
+        self._state: CavernaStateService = CavernaStateService([], [])
 
         self._turn_execution_service: TurnExecutionService = TurnExecutionService()
         self._point_calculation_service: PointCalculationService = PointCalculationService()
     
     def reset(self) -> array:
         """Resets the environment
-        
-        Returns: the observation of the game state"""
-        self._players: List[BasePlayerService] = self._players_default.assign([])
-        self._harvest_types_by_round = [HarvestTypeEnum.Harvest for _ in range(game_constants.number_of_rounds)]
 
-        self._cards = self._card_default.get_cards()
+        Returns: the observation of the game state"""
+        players = self._players_default.assign([])
+
+        starting_cards: List[BaseCard] = self._card_default.get_cards()
         self._cards_to_reveal = self._levelled_card_service.get_cards()
-        self._cards.extend(self._cards_to_reveal)
 
         self._tiles = self._tile_forge.create_all_tiles()
 
-        self._starting_player = self._players[0]
-
+        self._harvest_types_by_round = [HarvestTypeEnum.Harvest for _ in range(game_constants.number_of_rounds)]
         red_question_mark_harvest_round_indexes: List[int] = list(sorted(random.choice(list(range(5, 12)), 3, replace=False)))
         self._harvest_types_by_round[0] = HarvestTypeEnum.NoHarvest
         self._harvest_types_by_round[1] = HarvestTypeEnum.NoHarvest
@@ -79,11 +71,9 @@ class CavernaEnv(object):
         self._harvest_types_by_round[red_question_mark_harvest_round_indexes[1]] = HarvestTypeEnum.OneFoodPerDwarf
         self._harvest_types_by_round[red_question_mark_harvest_round_indexes[2]] = HarvestTypeEnum.EitherFieldPhaseOrBreedingPhase
 
-        self._round_index = -1
-        self._increment_round_index()
-
-        self._player_turn_order = self._create_player_turn_order()
-        self._current_player, self._is_current_players_final_turn = self._get_next_player_in_turn()
+        self._state: CavernaStateService = CavernaStateService(players, starting_cards)
+        self._state.increment_round_index(self._cards_to_reveal[0], self._harvest_types_by_round[0])
+        self._state.get_next_player()
 
         return self.observe()
 
@@ -106,34 +96,42 @@ class CavernaEnv(object):
             float: the reward for the last action
             bool: whether or not the game has finished
             dict: additional debug information"""
-        player_points_at_turn_start: int = self._point_calculation_service.calculate_points(self._current_player)
+        current_player: BasePlayerService = self._state.current_player
+        player_points_at_turn_start: int = self._point_calculation_service.calculate_points(current_player)
 
         turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
-            self._cards,
+            self._state.cards,
             self._tiles,
-            self._turn_index,
-            self._round_index,
-            self._harvest_type_for_round)
+            self._state.turn_index,
+            self._state.round_index,
+            self._state.round_harvest_type)
 
-        turn_result: ResultLookup[int] = self._turn_execution_service.take_turn(self._current_player, turn_descriptor)
+        turn_result: ResultLookup[int] = self._turn_execution_service.take_turn(
+            current_player,
+            self._state.is_current_players_final_turn,
+            turn_descriptor)
 
         for error in turn_result.errors:
             print(error)
 
-        next_player: Optional[BasePlayerService]
-        is_final_turn: Optional[bool]
-        next_player, is_final_turn = self._get_next_player_in_turn()
+        next_player_result: ResultLookup[BasePlayerService] = self._state.get_next_player()
 
-        if next_player is None:
-            next_player = self._increment_turn_index()
-            is_final_turn = False
+        has_game_finished: bool = False
 
-        has_game_finished: bool = next_player is None
-        if not has_game_finished:
-            self._current_player = next_player
-            self._is_current_players_final_turn = is_final_turn
+        if not next_player_result.flag:
+            next_round_index = self._state.round_index + 1
 
-        player_points_after_action: int = self._point_calculation_service.calculate_points(self._current_player)
+            if next_round_index < game_constants.number_of_rounds:
+                card_to_reveal: BaseCard = self._cards_to_reveal[next_round_index]
+                harvest_type: HarvestTypeEnum = self._harvest_types_by_round[next_round_index]
+
+                self._state.increment_round_index(card_to_reveal, harvest_type)
+
+                next_player_result = self._state.get_next_player()
+            else:
+                has_game_finished = True
+
+        player_points_after_action: int = self._point_calculation_service.calculate_points(current_player)
         reward: int = player_points_after_action - player_points_at_turn_start
         return array([]), reward, has_game_finished, {}
 
@@ -141,68 +139,6 @@ class CavernaEnv(object):
         observation: array = array([])
         
         return observation
-
-    def _get_next_player_in_turn(self) -> Tuple[Optional[BasePlayerService], Optional[bool]]:
-        if any(self._player_turn_order):
-            player: BasePlayerService = self._player_turn_order.pop(0)
-            number_of_remaining_dwarves: int = len([d for d in player.dwarves if d.is_adult and not d.is_active])
-            is_final_turn: bool = number_of_remaining_dwarves == 1
-
-            print(f"{player.descriptor}{' final' if is_final_turn else ''} turn")
-            return player, is_final_turn
-        else:
-            return None, None
-
-    def _create_player_turn_order(self) -> List[BasePlayerService]:
-        player_turn_order: List[BasePlayerService] = []
-        for player in self._get_players_starting_at(self._starting_player.id):
-            if any(d for d in player.dwarves if d.is_adult and not d.is_active):
-                player_turn_order.append(player)
-
-        return player_turn_order
-    
-    def _get_players_starting_at(self, starting_index: int) -> List[BasePlayerService]:
-        result = self._players[starting_index:] + self._players[:starting_index-1]
-        return result
-
-    def _increment_turn_index(self) -> Optional[BasePlayerService]:
-        next_player: Optional[BasePlayerService] = None
-
-        self._turn_index += 1
-
-        player_turn_order: List[BasePlayerService] = self._create_player_turn_order()
-        if any(player_turn_order):
-            self._player_turn_order = player_turn_order
-            next_player, unused_is_final_turn = self._get_next_player_in_turn()
-
-            new_card: BaseCard = self._levelled_card_service.get_next_card_to_reveal(self._round_index, self._cards_to_reveal)
-            new_card.reveal_card(self._cards)
-
-            self._harvest_type_for_round = self._harvest_types_by_round[self._turn_index]
-        else:
-            are_any_more_rounds: bool = self._increment_round_index()
-            if are_any_more_rounds:
-                self._player_turn_order = self._create_player_turn_order()
-                next_player, unused_is_final_turn = self._get_next_player_in_turn()
-        return next_player
-
-    def _increment_round_index(self) -> bool:
-        if self._round_index == game_constants.number_of_rounds:
-            return False
-
-        self._round_index += 1
-        self._turn_index = 0
-        self._harvest_type_for_round = self._harvest_types_by_round[self._round_index]
-
-        print(f"Round {self._round_index}, Harvest Type: {self._harvest_type_for_round.name}")
-
-        for card in self._cards:
-            if isinstance(card, BaseResourceContainingCard):
-                card.refill_action()
-
-        for player in self._players:
-            for dwarf in player.dwarves:
-                dwarf.clear_active_card()
 
     def _observe_player(self, player: BasePlayerService) -> array:
         player_observation = array(player.resources)

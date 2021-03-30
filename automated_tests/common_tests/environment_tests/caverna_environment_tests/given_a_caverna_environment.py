@@ -8,7 +8,7 @@ from common.environments.caverna_env import CavernaEnv
 
 class Given_A_CavernaEnv(TestCase, metaclass=ABCMeta):
     def setUp(self) -> None:
-        self.SUT: CavernaEnv = CavernaEnv()
+        self.SUT: CavernaEnv = CavernaEnv(2)
         self.because()
 
     def because(self) -> None:

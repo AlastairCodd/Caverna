@@ -1,5 +1,6 @@
 from typing import List
 
+from buisness_logic.actions.resolve_harvest_action import ResolveHarvestAction
 from buisness_logic.services.turn_transfer_service import TurnTransferService, ChosenDwarfCardActionCombinationAndEquivalentLookup
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf_card_action_combination_lookup import DwarfCardActionCombinationLookup
@@ -21,6 +22,7 @@ class TurnExecutionService(object):
     def take_turn(
             self,
             player: BasePlayerService,
+            is_players_final_turn: bool,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
         if player is None:
             raise ValueError("Player cannot be None")
@@ -45,6 +47,10 @@ class TurnExecutionService(object):
 
             untested_actions: List[BaseAction] = []
             untested_actions.extend(choice.actions.actions)
+
+            if is_players_final_turn:
+                harvest_action: BaseAction = ResolveHarvestAction()
+                untested_actions.append(harvest_action)
 
             actions_to_take: List[BaseAction] = []
             constraints_on_actions: List[BaseConstraint] = []
