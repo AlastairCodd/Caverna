@@ -3,6 +3,7 @@ from typing import Dict, List
 
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import ResourceTypeEnum
+from localised_resources.localiser import format_resource_dict
 
 
 class ReceiveWhenReceivingEffect(BaseEffect):
@@ -30,3 +31,9 @@ class ReceiveWhenReceivingEffect(BaseEffect):
 
         resources_to_give: Dict[ResourceTypeEnum, int] = {r: amount_to_receive_multiplier * self._items_to_receive[r] for r in self._items_to_receive}
         return resources_to_give
+
+    def __str__(self) -> str:
+        receive_readable: str = format_resource_dict(self._items_to_receive, " and ")
+        when_receiving_readable: str = format_resource_dict(self._when_receiving_items, " and ")
+        result: str = f"Receive {receive_readable} when receiving {when_receiving_readable}"
+        return result

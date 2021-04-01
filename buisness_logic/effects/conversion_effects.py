@@ -1,6 +1,7 @@
 from typing import Dict
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import ResourceTypeEnum
+from localised_resources.localiser import format_list_with_separator, format_resource_dict
 
 
 class ConvertEffect(BaseEffect):
@@ -24,5 +25,11 @@ class ConvertEffect(BaseEffect):
     def output(self) -> Dict[ResourceTypeEnum, int]:
         return self._output
 
-    def __str__(self):
+    def __str__(self) -> str:
+        input_readable: str = format_resource_dict(self._input, " and ")
+        output_readable: str = format_resource_dict(self._output, " and ")
+        result: str = f"Allow conversion from {input_readable} to {output_readable}"
+        return result
+
+    def __repr__(self) -> str:
         return f"ConvertEffect({self._input}, {self._output})"

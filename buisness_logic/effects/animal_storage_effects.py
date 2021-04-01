@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABCMeta
-from typing import Dict, List, Callable
+from enum import Enum
+from typing import Dict, List, Callable, Union
 
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_entity import TileEntity
@@ -7,6 +8,8 @@ from core.constants import resource_types
 from core.repositories.base_player_repository import BasePlayerRepository
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
+from localised_resources import user_interface_res
+from localised_resources.localiser import format_list_with_separator
 
 
 class BaseAnimalStorageEffect(BaseEffect, metaclass=ABCMeta):
@@ -32,6 +35,10 @@ class StoreAnyAnimalEffect(BaseAnimalStorageEffect):
         result: Dict[ResourceTypeEnum, int] = {farm_animal: self._quantity for farm_animal in resource_types.farm_animals}
         return result
 
+    def __str__(self) -> str:
+        result: str = f"Store {self._quantity} of any farm animal"
+        return result
+
 
 class StoreSpecificAnimalEffect(BaseAnimalStorageEffect):
     def __init__(
@@ -47,6 +54,11 @@ class StoreSpecificAnimalEffect(BaseAnimalStorageEffect):
             self,
             player: BasePlayerRepository) -> Dict[ResourceTypeEnum, int]:
         return self._animal_storage_buckets.copy()
+
+    def __str__(self) -> str:
+        result: str = f"Store " + ", ".join([f"{amount} {user_interface_res.resource_plural_name[resource]}"
+                                             for resource, amount in self._animal_storage_buckets.items()])
+        return result
 
 
 class StoreConditionalAnimalEffect(BaseAnimalStorageEffect):
@@ -73,6 +85,10 @@ class StoreConditionalAnimalEffect(BaseAnimalStorageEffect):
             raise ValueError("Player cannot be None")
         storage_multiplier: int = self._condition(player)
         result: Dict[ResourceTypeEnum, int] = {self._animal_type: storage_multiplier}
+        return result
+
+    def __str__(self) -> str:
+        result: str = f"Store {user_interface_res.resource_plural_name[self._animal_type]} conditionally"
         return result
 
 
@@ -119,3 +135,10 @@ class ChangeAnimalStorageBaseEffect(BaseEffect):
             result = ResultLookup(False, {}, errors="Tile is not of type under influence of effect.")
         return result
 
+    def __str__(self) -> str:
+        tiles_readable: str = format_list_with_separator(self._tiles, " and ")
+        animals_plural: List[str] = [user_interface_res.resource_plural_name[resource] for resource in self._animals_which_can_be_stored.keys()]
+        animals_readable: str = format_list_with_separator(animals_plural, " or ")
+
+        result: str = f"Change which how many {animals_readable} may be stored on {tiles_readable}"
+        return result

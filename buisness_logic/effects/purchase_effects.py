@@ -3,6 +3,7 @@ from typing import Dict
 
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import ResourceTypeEnum
+from localised_resources.localiser import format_resource_dict
 
 
 class BaseTilePurchaseEffect(BaseEffect, metaclass=ABCMeta):
@@ -36,7 +37,7 @@ class DecreasePriceOfTileEffect(BaseTilePurchaseEffect):
         """
         if decrease_by is None:
             raise ValueError("Amount to decrease by cannot be null.")
-        self._decreaseBy: Dict[ResourceTypeEnum] = decrease_by
+        self._decrease_by: Dict[ResourceTypeEnum] = decrease_by
         BaseTilePurchaseEffect.__init__(self, True)
 
     def invoke(
@@ -52,13 +53,18 @@ class DecreasePriceOfTileEffect(BaseTilePurchaseEffect):
 
         new_price: Dict[ResourceTypeEnum, int] = dict(current_price)
 
-        for resource in self._decreaseBy:
+        for resource in self._decrease_by:
             current_price_for_resource = new_price.get(resource, 0)
-            current_price_for_resource -= self._decreaseBy[resource]
+            current_price_for_resource -= self._decrease_by[resource]
 
             new_price[resource] = current_price_for_resource
 
         return new_price
+
+    def __str__(self) -> str:
+        receive_readable: str = format_resource_dict(self._decrease_by, " and ")
+        result: str = f"Decrease the price of a tile by {receive_readable}"
+        return result
 
 
 class AllowSubstitutionForPurchaseEffect(BaseTilePurchaseEffect):
@@ -111,6 +117,12 @@ class AllowSubstitutionForPurchaseEffect(BaseTilePurchaseEffect):
 
         return new_price
 
+    def __str__(self) -> str:
+        substitute_for_readable: str = format_resource_dict(self._substitute_for, " and ")
+        substitute_with_readable: str = format_resource_dict(self._substitute_with, " and ")
+        result: str = f"You may replace {substitute_for_readable} with {substitute_with_readable} when purchasing a tile"
+        return result
+
 
 class BaseWeaponPurchaseEffect(BaseEffect, metaclass=ABCMeta):
     @abstractmethod
@@ -147,3 +159,8 @@ class DecreasePriceOfWeaponEffect(BaseWeaponPurchaseEffect):
             new_price[resource] = current_price_for_resource
 
         return new_price
+
+    def __str__(self) -> str:
+        receive_readable: str = format_resource_dict(self._decrease_by, " and ")
+        result: str = f"Decrease the price of a weapon by {receive_readable}"
+        return result

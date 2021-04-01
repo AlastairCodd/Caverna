@@ -15,8 +15,9 @@ class MinerTile(BaseSpecificTile):
             base_points=3,
             cost={ResourceTypeEnum.wood: 1, ResourceTypeEnum.stone: 1},
             effects=[ReceiveConditionallyAtStartOfTurnEffect(
-                {ResourceTypeEnum.donkey: 1},
-                self._condition)])
+                {ResourceTypeEnum.ore: 1},
+                self._condition,
+                "for each donkey in a mine.")])
 
     def _condition(
             self,
@@ -73,7 +74,9 @@ class QuarryTile(BaseSpecificTile):
             self, "Quarry", tile_ids.QuarryTileId,
             base_points=2,
             cost={ResourceTypeEnum.wood: 1},
-            effects=[ReceiveWhenBreedingEffect(self._condition)])
+            effects=[ReceiveWhenBreedingEffect(
+                self._condition,
+                "1 stone for each newborn donkey")])
 
     def _condition(
             self,
@@ -90,7 +93,9 @@ class BreedingCaveTile(BaseSpecificTile):
             cost={
                 ResourceTypeEnum.grain: 1,
                 ResourceTypeEnum.stone: 1},
-            effects=[ReceiveWhenBreedingEffect(self._condition)])
+            effects=[ReceiveWhenBreedingEffect(
+                self._condition,
+                "1/2/3/5 food when for each 1/2/3/4 newborn animals")])
         self._conversion_effect: Dict[int, int] = {
             1: 1,
             2: 2,

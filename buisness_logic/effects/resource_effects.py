@@ -9,6 +9,8 @@ from common.services.resettable import Resettable
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
+from localised_resources import user_interface_res
+from localised_resources.localiser import format_list_with_separator, format_resource_dict
 
 
 class BaseResourceEffect(
@@ -58,6 +60,11 @@ class ReceiveOnPurchaseEffect(
         result: bool = player.give_resources(self._items_to_receive)
         return result
 
+    def __str__(self) -> str:
+        receive_readable: str = format_resource_dict(self._items_to_receive, " and ")
+        result: str = f"Receive {receive_readable} immediately"
+        return result
+
 
 class ReceiveOnConvertFromEffect(BaseEffect):
     def __init__(
@@ -76,6 +83,11 @@ class ReceiveOnConvertFromEffect(BaseEffect):
     @property
     def convert_from_item(self) -> ResourceTypeEnum:
         return self._convert_from_item
+
+    def __str__(self) -> str:
+        receive_readable: str = format_resource_dict(self._items_to_receive, " and ")
+        result: str = f"Receive {receive_readable} when converting {user_interface_res.resource_plural_name[self._convert_from_item]}"
+        return result
 
 
 class ReceiveProportionalOnPurchaseEffect(
@@ -109,13 +121,19 @@ class ReceiveProportionalOnPurchaseEffect(
         else:
             return True
 
+    def __str__(self) -> str:
+        receive_readable: str = format_resource_dict(self._receive, " and ")
+        result: str = f"Receive {receive_readable} when tile is purchased"
+        return result
+
 
 class ReceiveConditionallyAtStartOfTurnEffect(
         BaseResourceEffect):
     def __init__(
             self,
             received: Dict[ResourceTypeEnum, int],
-            condition: Callable[[BasePlayerRepository], int]) -> None:
+            condition: Callable[[BasePlayerRepository], int],
+            condition_readable: str) -> None:
         """Receive some input when some condition is true.
 
         :param received: The resources which are received when the condition is met. This cannot be null.
@@ -128,6 +146,7 @@ class ReceiveConditionallyAtStartOfTurnEffect(
             raise ValueError("Condition")
         self._received: Dict[ResourceTypeEnum, int] = received
         self._condition: Callable[[BasePlayerRepository], int] = condition
+        self._condition_readable: str = condition_readable
 
     def invoke(
             self,
@@ -137,6 +156,11 @@ class ReceiveConditionallyAtStartOfTurnEffect(
             return False
         resources = {resource: self._received[resource] * number_of_times_condition_met for resource in self._received}
         return player.give_resources(resources)
+
+    def __str__(self) -> str:
+        receive_readable: str = format_resource_dict(self._received, " and ")
+        result: str = f"Receive {receive_readable} at start of term {self._condition_readable}"
+        return result
 
 
 class ReceiveForTurnsEffect(
@@ -164,16 +188,23 @@ class ReceiveForTurnsEffect(
             result = ResultLookup(True, 0, f"Action has been used for {self._number_of_turns} turns, and is exhausted.")
         return result
 
+    def __str__(self) -> str:
+        receive_readable: str = format_resource_dict(self._resources, " and ")
+        result: str = f"Receive {receive_readable} at start of term for {self._number_of_turns}"
+        return result
+
 
 class ReceiveWhenBreedingEffect(
         BaseEffect,
         BaseReceiveEventService):
     def __init__(
             self,
-            conditional: Callable[[List[ResourceTypeEnum]], Dict[ResourceTypeEnum, int]]) -> None:
+            conditional: Callable[[List[ResourceTypeEnum]], Dict[ResourceTypeEnum, int]],
+            condition_readable: str) -> None:
         if conditional is None:
             raise ValueError("Conditional cannot be None")
         self._conditional: Callable[[List[ResourceTypeEnum]], Dict[ResourceTypeEnum, int]] = conditional
+        self._condition_readable: str = condition_readable
 
     def invoke(
             self,
@@ -191,4 +222,8 @@ class ReceiveWhenBreedingEffect(
         else:
             result = ResultLookup(True, 0)
 
+        return result
+
+    def __str__(self) -> str:
+        result: str = f"Receive {self._condition_readable}"
         return result

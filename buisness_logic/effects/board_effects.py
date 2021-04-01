@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, List
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import TileTypeEnum
+from localised_resources.localiser import format_list_with_separator
 
 
 class BaseBoardEffect(BaseEffect, metaclass=ABCMeta):
@@ -25,7 +26,7 @@ class ChangeRequisiteEffect(BaseBoardEffect):
             raise ValueError("New placement requisites cannot be empty")
 
         self._tiles: List[TileTypeEnum] = tiles
-        self._newRequisites: List[TileTypeEnum] = new_requisites
+        self._new_requisites: List[TileTypeEnum] = new_requisites
 
     def invoke(
             self,
@@ -34,8 +35,14 @@ class ChangeRequisiteEffect(BaseBoardEffect):
             raise ValueError()
 
         for tile in self._tiles:
-            source[tile].extend(self._newRequisites)
+            source[tile].extend(self._new_requisites)
         return source
+
+    def __str__(self) -> str:
+        tiles_readable: str = format_list_with_separator(self._tiles, " and ")
+        requisites_readable: str = format_list_with_separator(self._new_requisites, " and ")
+        result: str = f"Allow {tiles_readable} to be built on {requisites_readable}"
+        return result
 
 
 class FurnishTunnelsEffect(ChangeRequisiteEffect):
@@ -57,3 +64,7 @@ class TwinTilesOverhangEffect(ChangeRequisiteEffect):
             self,
             twin_tiles,
             [TileTypeEnum.unavailable])
+
+    def __str__(self) -> str:
+        result: str = f"Allow twin tiles to overhang the edge of the board"
+        return result
