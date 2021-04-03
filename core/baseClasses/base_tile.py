@@ -26,7 +26,7 @@ class BaseTile(metaclass=ABCMeta):
         self._name: str = name
         self._id: int = tile_id
         self._tile_type: TileTypeEnum = tile_type
-        self._basePoints: int = base_points
+        self._base_points: int = base_points
 
         if cost is None:
             cost = {}
@@ -46,7 +46,7 @@ class BaseTile(metaclass=ABCMeta):
 
     @property
     def base_points(self) -> int:
-        return self._basePoints
+        return self._base_points
 
     @property
     def effects(self) -> List[BaseEffect]:

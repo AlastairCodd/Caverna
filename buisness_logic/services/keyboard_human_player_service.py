@@ -6,6 +6,7 @@ from PyInquirer import prompt
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
+from buisness_logic.tiles.point_tiles import BaseConditionalPointTile
 from common.defaults.tile_container_default import TileContainerDefault
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -15,7 +16,7 @@ from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLo
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
-from core.baseClasses.base_tile import BaseTile
+from core.baseClasses.base_tile import BaseTile, BaseSpecificTile
 from core.containers.resource_container import ResourceContainer
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.services.base_player_service import BasePlayerService
@@ -267,12 +268,18 @@ class KeyboardHumanPlayerService(BasePlayerService):
             tile_to_use: BaseTile = tile_answer[tile_to_build_name]
 
             tile_description: List[str] = [f"Confirm building {tile_to_use.name}?"]
+            if isinstance(tile_to_use, BaseSpecificTile):
+                tile_description.append(f"  Colour: {tile_to_use.colour}")
             if tile_to_use.cost is not None and len(tile_to_use.cost) > 0:
                 tile_description.append("  Cost: ")
                 tile_description.extend([f"    {resource.name}: {amount}" for resource, amount in tile_to_use.cost.items()])
             if tile_to_use.effects is not None and len(tile_to_use.effects) > 0:
                 tile_description.append("  Effects: ")
                 tile_description.extend([f"    {effect}" for effect in tile_to_use.effects])
+            tile_description.append(f"  Points: {tile_to_use.base_points}")
+            if isinstance(tile_to_use, BaseConditionalPointTile):
+                tile_description.append("  Conditional Points: ")
+                tile_description.extend([f"    {conditional}" for conditional in tile_to_use.get_conditional_point_description()])
             confirm_message: str = "\n".join(tile_description)
             print(confirm_message)
 
@@ -536,7 +543,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 choices=possible_effects,
                 when=lambda current_answers: current_answers[use_any_effects_name]
             ),
-            ]
+        ]
 
         answers: Dict[str, Any] = prompt(questions)
 
