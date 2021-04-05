@@ -1,7 +1,13 @@
+import argh
+
 from common.environments.interactive_game_runner import InteractiveGameRunner
-# from view.shell_view import ShellView
 
-# ShellView()
 
-game_runner: InteractiveGameRunner = InteractiveGameRunner()
-game_runner.run()
+@argh.arg('number_of_players', choices=list(range(2,8)))
+def main(number_of_players: int) -> None:
+    game_runner: InteractiveGameRunner = InteractiveGameRunner(number_of_players)
+    game_runner.run()
+
+
+if __name__ == '__main__':
+    argh.dispatch_command(main)
