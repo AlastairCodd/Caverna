@@ -64,6 +64,6 @@ class ActionCombinationEnum(Enum):
 
 
 class TileColourEnum(Enum):
-    Brown = auto()
     Green = auto()
+    Brown = auto()
     Yellow = auto()

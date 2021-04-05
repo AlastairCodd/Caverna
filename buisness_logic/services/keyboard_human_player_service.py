@@ -20,6 +20,7 @@ from core.baseClasses.base_tile import BaseTile, BaseSpecificTile
 from core.containers.resource_container import ResourceContainer
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.services.base_player_service import BasePlayerService
+from localised_resources.user_interface_res import resource_plural_name
 
 
 class QuestionTypeEnum(Enum):
@@ -116,19 +117,30 @@ class KeyboardHumanPlayerService(BasePlayerService):
             used_available_cards: List[BaseCard],
             amount_of_food_required: int,
             turn_descriptor: TurnDescriptorLookup) -> bool:
-        print("Cards which are already in use:")
-        for card in used_available_cards:
-            print(card.name)
-            print(f" {str(card.actions)}")
-        print()
-        print(f"Can be used for {amount_of_food_required} food")
-        print(f"(Harvest Phase at end of turn: {turn_descriptor.harvest_type.name})")
+        if unused_available_cards is None:
+            raise ValueError("unused_available_cards cannot be None")
+        if used_available_cards is None:
+            raise ValueError("used_available_cards cannot be None")
+        if amount_of_food_required < 0:
+            raise ValueError("amount_of_food_required must be positive")
+        if turn_descriptor is None:
+            raise ValueError("turn_descriptor may not be None")
 
-        name = "use_card_already_in_use"
+        cards_description: List[str] = ["Cards which are already in use:"]
+        for card in used_available_cards:
+            cards_description.append(f"  {card.name}")
+            cards_description.append(f"    {str(card.actions)}")
+        cards_description.append(f"Can be used for {amount_of_food_required} food")
+        cards_description.append(f"(Harvest Phase at end of turn: {turn_descriptor.harvest_type.name})")
+
+        cards_description.append("Use card already in use?")
+        confirm_message: str = "\n".join(cards_description)
+
+        name: str = "use_card_already_in_use"
         question: Dict[str, Any] = create_question(
             QuestionTypeEnum.confirm,
             name,
-            "Use card already in use?",
+            confirm_message,
             default=False
         )
 
@@ -247,7 +259,9 @@ class KeyboardHumanPlayerService(BasePlayerService):
         choices: List[Dict[str, Any]] = [
             {"name": tile.name,
              "value": tile}
-            for tile in possible_tiles]
+            for tile in sorted(
+                possible_tiles,
+                key=lambda x: x.colour.value if isinstance(x, BaseSpecificTile) else 0)]
 
         tile_to_build_name: str = "tile_to_build"
         confirm_use_name: str = "confirm_card"
@@ -269,7 +283,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
             tile_description: List[str] = [f"Confirm building {tile_to_use.name}?"]
             if isinstance(tile_to_use, BaseSpecificTile):
-                tile_description.append(f"  Colour: {tile_to_use.colour}")
+                tile_description.append(f"  Colour: {tile_to_use.colour.name}")
             if tile_to_use.cost is not None and len(tile_to_use.cost) > 0:
                 tile_description.append("  Cost: ")
                 tile_description.extend([f"    {resource.name}: {amount}" for resource, amount in tile_to_use.cost.items()])
@@ -279,14 +293,14 @@ class KeyboardHumanPlayerService(BasePlayerService):
             tile_description.append(f"  Points: {tile_to_use.base_points}")
             if isinstance(tile_to_use, BaseConditionalPointTile):
                 tile_description.append("  Conditional Points: ")
-                tile_description.extend([f"    {conditional}" for conditional in tile_to_use.get_conditional_point_description()])
+                tile_description.append(f"    {tile_to_use.get_conditional_point_description()}")
             confirm_message: str = "\n".join(tile_description)
-            print(confirm_message)
+            # print(confirm_message)
 
             confirm_question: Dict[str, Any] = create_question(
                 QuestionTypeEnum.confirm,
                 confirm_use_name,
-                ""
+                confirm_message
             )
 
             confirm_answer: Dict[str, Any] = prompt(confirm_question)
@@ -530,11 +544,13 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
         possible_effects: List[Dict[str, BaseTilePurchaseEffect]] = []
 
+        cost_readable: str = ", ".join([f"{amount} {resource_plural_name[resource]}" for resource, amount in tile_cost.items()])
+
         questions: List[Dict[str, Any]] = [
             create_question(
                 QuestionTypeEnum.confirm,
                 use_any_effects_name,
-                f"Use effects to reduce tile cost?\nCost: {tile_cost}"
+                f"Use effects to reduce tile cost?\nCost: {cost_readable}"
             ),
             create_question(
                 QuestionTypeEnum.checkbox,
