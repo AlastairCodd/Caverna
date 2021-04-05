@@ -65,7 +65,8 @@ class StoreConditionalAnimalEffect(BaseAnimalStorageEffect):
     def __init__(
             self,
             animal_type: ResourceTypeEnum,
-            condition: Callable[[BasePlayerRepository], int]):
+            condition: Callable[[BasePlayerRepository], int],
+            condition_readable: str):
         """Add a conditional amount of storage capacity for a specific type of animal
     
         :param animal_type: The animal which may be stored as many times as the condition is met.
@@ -76,6 +77,7 @@ class StoreConditionalAnimalEffect(BaseAnimalStorageEffect):
             raise ValueError(f"Cannot store {animal_type} in an animal storage effect")
         self._animal_type: ResourceTypeEnum = animal_type
         self._condition: Callable[[BasePlayerRepository], int] = condition
+        self._condition_readable: str = condition_readable
         BaseEffect.__init__(self)
 
     def get_animal_storage_buckets(
@@ -88,7 +90,7 @@ class StoreConditionalAnimalEffect(BaseAnimalStorageEffect):
         return result
 
     def __str__(self) -> str:
-        result: str = f"Store {user_interface_res.resource_plural_name[self._animal_type]} conditionally"
+        result: str = f"Store {user_interface_res.resource_plural_name[self._animal_type]} {self._condition_readable}"
         return result
 
 
