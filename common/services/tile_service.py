@@ -1,4 +1,4 @@
-from typing import List, Dict, Iterable, Tuple, Optional, Callable, cast
+from typing import List, Dict, Iterable, Tuple, Optional, Callable, cast, Set
 
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
@@ -62,6 +62,10 @@ class TileService(object):
             TileTypeEnum.pastureTwin,
         ]
 
+        self._subset_tiles: Dict[TileTypeEnum, TileTypeEnum] = {
+            TileTypeEnum.furnishedCavern: TileTypeEnum.furnishedDwelling
+        }
+
     @property
     def outdoor_tiles(self) -> List[TileTypeEnum]:
         return self._outdoor_tiles
@@ -116,8 +120,11 @@ class TileService(object):
             self,
             tiles: List[BaseTile],
             tile_type: TileTypeEnum) -> List[BaseTile]:
-        result: List[BaseTile] = [tile for tile in tiles if tile.tile_type == tile_type]
-        return result
+        result: Dict[int, BaseTile] = {tile.id: tile for tile in tiles if tile.tile_type == tile_type}
+        if tile_type in self._subset_tiles:
+            additional_tiles: Dict[int, BaseTile] = {tile.id: tile for tile in self.get_possible_tiles(tiles, self._subset_tiles[tile_type])}
+            result.update(additional_tiles)
+        return list(result.values())
 
     def is_tile_available(
             self,
