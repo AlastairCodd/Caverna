@@ -9,7 +9,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 from core.baseClasses.base_effect import BaseEffect
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from localised_resources import user_interface_res
-from localised_resources.localiser import format_list_with_separator
+from localised_resources.localiser import format_list_with_separator, format_resource_dict
 
 
 class BaseAnimalStorageEffect(BaseEffect, metaclass=ABCMeta):
@@ -56,8 +56,7 @@ class StoreSpecificAnimalEffect(BaseAnimalStorageEffect):
         return self._animal_storage_buckets.copy()
 
     def __str__(self) -> str:
-        result: str = f"Store " + ", ".join([f"{amount} {user_interface_res.resource_plural_name[resource]}"
-                                             for resource, amount in self._animal_storage_buckets.items()])
+        result: str = f"Store " + format_resource_dict(self._animal_storage_buckets, " or ")
         return result
 
 

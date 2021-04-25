@@ -15,7 +15,10 @@ class CuddleRoomTile(BaseSpecificTile):
             self, "Cuddle Room", tile_ids.CuddleRoomTileId,
             base_points=2,
             cost={ResourceTypeEnum.wood: 1},
-            effects=[animal_storage_effects.StoreConditionalAnimalEffect(ResourceTypeEnum.sheep, lambda p: len(p.dwarves))])
+            effects=[animal_storage_effects.StoreConditionalAnimalEffect(
+                ResourceTypeEnum.sheep,
+                lambda p: len(p.dwarves),
+                "one sheep per dwarf")])
 
 
 class BreakfastRoomTile(BaseSpecificTile):

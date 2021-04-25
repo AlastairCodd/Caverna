@@ -17,14 +17,15 @@ class RubyDeliveryCard(BaseResourceContainingCard):
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 receive_conditionally_action.ReceiveConditionallyAction(
                     self._condition,
-                    {ResourceTypeEnum.ruby: 1})
+                    {ResourceTypeEnum.ruby: 1},
+                    "if player has at least two ruby mines")
             ))
 
     def _condition(self, player: BasePlayerRepository) -> int:
         if player is None:
             raise ValueError(str(player))
         number_of_tiles: int = player.get_number_of_tiles_of_type(TileTypeEnum.rubyMine)
-        result: int = 1 if number_of_tiles > 1 else 0
+        result: int = 1 if number_of_tiles >= 2 else 0
         return result
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

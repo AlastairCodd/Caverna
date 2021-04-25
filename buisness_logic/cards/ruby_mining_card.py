@@ -18,7 +18,8 @@ class RubyMiningCard(BaseResourceContainingCard):
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 receive_conditionally_action.ReceiveConditionallyAction(
                     self._condition,
-                    {ResourceTypeEnum.ruby: 1})
+                    {ResourceTypeEnum.ruby: 1},
+                    "if player has at least one ruby mine")
             ))
 
     def _condition(self, player: BasePlayerRepository) -> int:
@@ -26,7 +27,7 @@ class RubyMiningCard(BaseResourceContainingCard):
             raise ValueError(str(player))
         tile_container: TileContainer = cast(TileContainer, player)
         number_of_tiles: int = tile_container.get_number_of_tiles_of_type(TileTypeEnum.rubyMine)
-        result: int = 1 if number_of_tiles > 1 else 0
+        result: int = 1 if number_of_tiles >= 1 else 0
         return result
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

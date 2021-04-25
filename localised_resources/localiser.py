@@ -26,6 +26,6 @@ def format_list_with_separator(
 def format_resource_dict(
         resources: Dict[ResourceTypeEnum, int],
         separator: str) -> str:
-    resources_readable: List[str] = [f"{amount} {resource.name if amount == 1 else user_interface_res.resource_plural_name[resource]}" \
+    resources_readable: List[str] = [f"{amount} {resource.name if amount == 1 else user_interface_res.resource_plural_name[resource]}"\
                                      for resource, amount in resources.items()]
     return format_list_with_separator(resources_readable, separator)

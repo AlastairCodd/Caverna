@@ -6,17 +6,20 @@ from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
+from localised_resources.localiser import format_resource_dict
 
 
 class ReceiveConditionallyAction(BaseReceiveAction):
     def __init__(
             self,
             condition: Callable[[BasePlayerRepository], int],
-            items_to_receive: Dict[ResourceTypeEnum, int]) -> None:
+            items_to_receive: Dict[ResourceTypeEnum, int],
+            condition_readable: str) -> None:
         if condition is None:
             raise ValueError("Condition cannot be null")
 
         self._condition: Callable[[BasePlayerRepository], int] = condition
+        self._condition_readable: str = condition_readable
         BaseReceiveAction.__init__(self, items_to_receive)
 
     def invoke(
@@ -46,14 +49,6 @@ class ReceiveConditionallyAction(BaseReceiveAction):
         pass
 
     def __str__(self) -> str:
-        result = "ReceiveConditionallyAction("
-        count = 0
-        for resource in self._items_to_receive:
-            result += f"{resource.name}: {self._items_to_receive[resource]}"
-            count += 1
-            if count != len(self._items_to_receive):
-                result += ", "
-        result += ")"
-
+        receive_readable: str = format_resource_dict(self._items_to_receive, " and ")
+        result: str = f"Receive {receive_readable} {self._condition_readable}"
         return result
-
