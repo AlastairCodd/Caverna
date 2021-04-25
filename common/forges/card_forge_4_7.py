@@ -17,7 +17,7 @@ class FourToSevenCardForge(BaseCardForge):
             imitation_card.ImitationCard(2),
             logging_card.LoggingThreeCard(),
             growth_card.GrowthCard(),
-            ore_mining_card.OreMiningTwoCard(),
+            ore_mining_card.OreMiningThreeCard(),
             forest_exploration_card.ForestExplorationFoodCard(),
             clearing_card.ClearingCard(2),
             sustenance_card.SustenanceVegAndGrainCard()
