@@ -1,3 +1,4 @@
+from abc import ABCMeta
 from typing import Dict, cast
 
 from buisness_logic.actions import *
@@ -9,23 +10,32 @@ from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, Ti
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
-class OreMiningThreeCard(BaseResourceContainingCard):
-    def __init__(self):
+class BaseOreMiningCard(BaseResourceContainingCard, metaclass=ABCMeta):
+    def __init__(
+            self,
+            tile_id: int) -> None:
         BaseResourceContainingCard.__init__(
-            self, "Ore Mining", card_ids.OreMiningThreeCardId,
+            self, "Ore Mining", tile_id,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 receive_conditionally_action.ReceiveConditionallyAction(
                     self._condition,
-                    {ResourceTypeEnum.ore: 1})))
+                    {ResourceTypeEnum.ore: 1},
+                    "for each ore mine"
+                )))
 
     def _condition(self, player: BasePlayerRepository) -> int:
         if player is None:
             raise ValueError(str(player))
-        tileContainer = cast(TileContainer, player)
-        numberOfTiles = tileContainer.get_number_of_tiles_of_type(TileTypeEnum.oreMineDeepTunnelTwin)
-        return numberOfTiles * 2
+        tile_container = cast(TileContainer, player)
+        number_of_tiles: int = tile_container.get_number_of_tiles_of_type(TileTypeEnum.oreMineDeepTunnelTwin)
+        return number_of_tiles * 2
+
+
+class OreMiningTwoCard(BaseOreMiningCard):
+    def __init__(self):
+        BaseOreMiningCard.__init__(self, card_ids.OreMiningTwoCardId)
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         amount_of_ore: int = 1 if self.has_resources else 2
@@ -34,23 +44,9 @@ class OreMiningThreeCard(BaseResourceContainingCard):
         return self.resources
 
 
-class OreMiningTwoCard(BaseResourceContainingCard):
-    def __init__(self):
-        BaseResourceContainingCard.__init__(
-            self, "Ore Mining", card_ids.OreMiningThreeCardId,
-            actions=Conditional(
-                ActionCombinationEnum.AndThenOr,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
-                receive_conditionally_action.ReceiveConditionallyAction(
-                    self._condition,
-                    {ResourceTypeEnum.ore: 1})))
-
-    def _condition(self, player: BasePlayerRepository) -> int:
-        if player is None:
-            raise ValueError(str(player))
-        tileContainer = cast(TileContainer, player)
-        numberOfTiles = tileContainer.get_number_of_tiles_of_type(TileTypeEnum.oreMineDeepTunnelTwin)
-        return numberOfTiles * 2
+class OreMiningThreeCard(BaseOreMiningCard):
+    def __init__(self) -> None:
+        BaseOreMiningCard.__init__(self, card_ids.OreMiningThreeCardId)
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         amount_of_ore: int = 2 if self.has_resources else 3

@@ -38,6 +38,6 @@ class SustenanceGrainCard(BaseResourceContainingCard):
                 place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.meadowFieldTwin)))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
-        self.give_resource(ResourceTypeEnum.grain, 1)
+        self.give_resource(ResourceTypeEnum.food, 1)
 
         return self.resources
