@@ -11,3 +11,4 @@ venv9/
 htmlcov/
 .coverage
 venv6/
+venv6 prompt-toolkit/
