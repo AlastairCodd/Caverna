@@ -277,7 +277,16 @@ class TileService(object):
         else:
             raise ValueError("Both tile_type and requisites_override cannot be None")
 
-        valid_positions: List[int] = [location for location in player.tiles if player.tiles[location].tile_type in tile_requisites]
+        valid_positions: List[int] = []
+        for location in player.tiles:
+            location_tile_type: TileTypeEnum = player.tiles[location].tile_type
+
+            if location_tile_type in tile_requisites:
+                adjacent_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(player, location)
+                is_tile_connected: bool = self._is_location_connected(player, location, adjacent_tile_locations)
+
+                if is_tile_connected:
+                    valid_positions.append(location)
 
         return valid_positions
 
@@ -308,18 +317,31 @@ class TileService(object):
         valid_positions_with_adjacent: List[TileTwinPlacementLookup] = []
 
         for location in player.tiles:
-            primary_location_tile_type = player.tiles[location].tile_type
+            primary_location_tile_type: TileTypeEnum = player.tiles[location].tile_type
+
             if primary_location_tile_type in tile_requisites:
                 adjacent_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(player, location)
-                for adjacent_tile_location in adjacent_tile_locations:
-                    secondary_location_tile_type: TileTypeEnum = player.tiles[adjacent_tile_location.location].tile_type
+                does_primary_tile_have_connected_adjacent_tiles: bool = self._is_location_connected(player, location, adjacent_tile_locations)
+
+                for secondary_tile_location in adjacent_tile_locations:
+                    secondary_location_tile_type: TileTypeEnum = player.tiles[secondary_tile_location.location].tile_type
                     if secondary_location_tile_type in tile_requisites and \
                             not (primary_location_tile_type == TileTypeEnum.unavailable
                                  and secondary_location_tile_type == TileTypeEnum.unavailable):
-                        valid_positions_with_adjacent.append(
-                            TileTwinPlacementLookup(
-                                location,
-                                adjacent_tile_location.direction))
+
+                        is_location_connected: bool = does_primary_tile_have_connected_adjacent_tiles
+                        if not is_location_connected:
+                            adjacent_to_secondary_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(
+                                player,
+                                secondary_tile_location.location)
+
+                            is_location_connected = self._is_location_connected(player, secondary_tile_location.location, adjacent_to_secondary_tile_locations)
+
+                        if is_location_connected:
+                            valid_positions_with_adjacent.append(
+                                TileTwinPlacementLookup(
+                                    location,
+                                    secondary_tile_location.direction))
 
         return valid_positions_with_adjacent
 
@@ -438,3 +460,33 @@ class TileService(object):
             effect.invoke(all_tile_requisites)
 
         return all_tile_requisites
+
+    def _is_location_connected(
+            self,
+            player: TileContainer,
+            location: int,
+            adjacent_tiles: List[TileTwinPlacementLookup]) -> bool:
+
+        is_tile_connected: bool = False
+        is_location_outside: bool = player.tiles[location].tile_type in self.outdoor_tiles
+
+        for adjacent_tile_location in adjacent_tiles:
+            adjacent_location_tile_type: TileTypeEnum = player.tiles[adjacent_tile_location.location].tile_type
+            is_adjacent_location_outside: bool = adjacent_location_tile_type in self.outdoor_tiles
+
+            can_connection_be_made_through_adjacent_tile: bool
+            if is_location_outside and is_adjacent_location_outside:
+                can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.forest and \
+                                                               adjacent_location_tile_type != TileTypeEnum.unavailable
+            elif not is_location_outside and not is_adjacent_location_outside:
+                can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.underground and \
+                                                               adjacent_location_tile_type != TileTypeEnum.unavailable
+            else:
+                can_connection_be_made_through_adjacent_tile = location == 35 and adjacent_tile_location.location == 36 or \
+                                                               location == 36 and adjacent_tile_location.location == 35
+
+            if can_connection_be_made_through_adjacent_tile:
+                is_tile_connected = True
+                break
+
+        return is_tile_connected

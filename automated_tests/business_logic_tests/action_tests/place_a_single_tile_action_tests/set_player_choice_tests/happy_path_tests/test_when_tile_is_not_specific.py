@@ -74,10 +74,10 @@ class test_when_requisites_are_overridden(Given_A_PlaceASingleTileAction):
         # _ 1 2 _ | _ _ _ 7
         # 8 x x x | x x x _
         # _ x x x | x _ x _
-        # _ x x27 | C _ x _
-        # _ x x x | D x x _
+        # _ x x x | C _ x _
+        # _ x x35 | D x x _
         # _ _ _ _ | _ _ _ _
-        location_to_place_tile: int = 27
+        location_to_place_tile: int = 35
         player.get_player_choice_location_to_build_returns(
             lambda _, __, ___: ResultLookup(
                 True,
