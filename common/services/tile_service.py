@@ -280,29 +280,12 @@ class TileService(object):
         valid_positions: List[int] = []
         for location in player.tiles:
             location_tile_type: TileTypeEnum = player.tiles[location].tile_type
-            is_location_outside: bool = location_tile_type in self.outdoor_tiles
 
             if location_tile_type in tile_requisites:
                 adjacent_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(player, location)
-                does_primary_tile_have_connected_adjacent_tiles: bool = False
+                is_tile_connected: bool = self._is_location_connected(player, location, adjacent_tile_locations)
 
-                for adjacent_tile_location in adjacent_tile_locations:
-                    adjacent_location_tile_type: TileTypeEnum = player.tiles[adjacent_tile_location.location].tile_type
-                    is_adjacent_location_outside: bool = adjacent_location_tile_type in self.outdoor_tiles
-
-                    can_connection_be_made_through_adjacent_tile: bool = False
-                    if is_location_outside and is_adjacent_location_outside:
-                        can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.forest and \
-                                                                       adjacent_location_tile_type != TileTypeEnum.unavailable
-                    elif not is_location_outside and not is_adjacent_location_outside:
-                        can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.underground and \
-                                                                       adjacent_location_tile_type != TileTypeEnum.unavailable
-
-                    if can_connection_be_made_through_adjacent_tile:
-                        does_primary_tile_have_connected_adjacent_tiles = True
-                        break
-
-                if does_primary_tile_have_connected_adjacent_tiles:
+                if is_tile_connected:
                     valid_positions.append(location)
 
         return valid_positions
@@ -491,13 +474,16 @@ class TileService(object):
             adjacent_location_tile_type: TileTypeEnum = player.tiles[adjacent_tile_location.location].tile_type
             is_adjacent_location_outside: bool = adjacent_location_tile_type in self.outdoor_tiles
 
-            can_connection_be_made_through_adjacent_tile: bool = False
+            can_connection_be_made_through_adjacent_tile: bool
             if is_location_outside and is_adjacent_location_outside:
                 can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.forest and \
                                                                adjacent_location_tile_type != TileTypeEnum.unavailable
             elif not is_location_outside and not is_adjacent_location_outside:
                 can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.underground and \
                                                                adjacent_location_tile_type != TileTypeEnum.unavailable
+            else:
+                can_connection_be_made_through_adjacent_tile = location == 35 and adjacent_tile_location.location == 36 or \
+                                                               location == 36 and adjacent_tile_location.location == 35
 
             if can_connection_be_made_through_adjacent_tile:
                 is_tile_connected = True
