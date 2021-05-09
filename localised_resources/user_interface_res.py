@@ -1,6 +1,6 @@
 from typing import Dict
 
-from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum
+from core.enums.caverna_enums import ResourceTypeEnum, ActionCombinationEnum, TileTypeEnum
 
 resource_plural_name: Dict[ResourceTypeEnum, str] = {
     ResourceTypeEnum.stone: "stone",
@@ -27,4 +27,18 @@ action_combination_readable: Dict[ActionCombinationEnum, str] = {
     ActionCombinationEnum.AndThen: "and then",
     ActionCombinationEnum.EitherOr: "either/or",
     ActionCombinationEnum.AndThenOr: "and then/or"
+}
+
+tile_name_short: Dict[TileTypeEnum, str] = {
+    TileTypeEnum.unavailable: "na",
+    TileTypeEnum.forest: "fo",
+    TileTypeEnum.underground: "ug",
+    TileTypeEnum.meadow: "m",
+    TileTypeEnum.field: "fi",
+    TileTypeEnum.cavern: "c",
+    TileTypeEnum.tunnel: "t",
+    TileTypeEnum.deepTunnel: "dt",
+    TileTypeEnum.pasture: "p",
+    TileTypeEnum.oreMine: "or",
+    TileTypeEnum.rubyMine: "ru",
 }
