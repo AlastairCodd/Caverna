@@ -335,27 +335,10 @@ class TileService(object):
 
         for location in player.tiles:
             primary_location_tile_type: TileTypeEnum = player.tiles[location].tile_type
-            is_primary_location_outside: bool = primary_location_tile_type in self.outdoor_tiles
 
             if primary_location_tile_type in tile_requisites:
                 adjacent_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(player, location)
-                does_primary_tile_have_connected_adjacent_tiles: bool = False
-
-                for adjacent_tile_location in adjacent_tile_locations:
-                    adjacent_location_tile_type: TileTypeEnum = player.tiles[adjacent_tile_location.location].tile_type
-                    is_adjacent_location_outside: bool = adjacent_location_tile_type in self.outdoor_tiles
-
-                    can_connection_be_made_through_adjacent_tile: bool = False
-                    if is_primary_location_outside and is_adjacent_location_outside:
-                        can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.forest and \
-                                                                       adjacent_location_tile_type != TileTypeEnum.unavailable
-                    elif not is_primary_location_outside and not is_adjacent_location_outside:
-                        can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.underground and \
-                                                                       adjacent_location_tile_type != TileTypeEnum.unavailable
-
-                    if can_connection_be_made_through_adjacent_tile:
-                        does_primary_tile_have_connected_adjacent_tiles = True
-                        break
+                does_primary_tile_have_connected_adjacent_tiles: bool = self._is_location_connected(player, location, adjacent_tile_locations)
 
                 for secondary_tile_location in adjacent_tile_locations:
                     secondary_location_tile_type: TileTypeEnum = player.tiles[secondary_tile_location.location].tile_type
@@ -363,29 +346,13 @@ class TileService(object):
                             not (primary_location_tile_type == TileTypeEnum.unavailable
                                  and secondary_location_tile_type == TileTypeEnum.unavailable):
 
-                        is_secondary_location_outside: bool = secondary_location_tile_type in self.outdoor_tiles
-
                         is_location_connected: bool = does_primary_tile_have_connected_adjacent_tiles
                         if not is_location_connected:
                             adjacent_to_secondary_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(
                                 player,
                                 secondary_tile_location.location)
 
-                            for adjacent_to_secondary_tile_location in adjacent_to_secondary_tile_locations:
-                                adjacent_location_tile_type: TileTypeEnum = player.tiles[adjacent_to_secondary_tile_location.location].tile_type
-                                is_adjacent_location_outside: bool = adjacent_location_tile_type in self.outdoor_tiles
-
-                                can_connection_be_made_through_adjacent_tile: bool = False
-                                if is_secondary_location_outside and is_adjacent_location_outside:
-                                    can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.forest and \
-                                                                                   adjacent_location_tile_type != TileTypeEnum.unavailable
-                                elif not is_secondary_location_outside and not is_adjacent_location_outside:
-                                    can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.underground and \
-                                                                                   adjacent_location_tile_type != TileTypeEnum.unavailable
-
-                                if can_connection_be_made_through_adjacent_tile:
-                                    is_location_connected = True
-                                    break
+                            is_location_connected = self._is_location_connected(player, secondary_tile_location.location, adjacent_to_secondary_tile_locations)
 
                         if is_location_connected:
                             valid_positions_with_adjacent.append(
@@ -515,5 +482,25 @@ class TileService(object):
             self,
             player: TileContainer,
             location: int,
-            adjacent_tiles: List[int]) -> bool:
-        return False
+            adjacent_tiles: List[TileTwinPlacementLookup]) -> bool:
+
+        is_tile_connected: bool = False
+        is_location_outside: bool = player.tiles[location].tile_type in self.outdoor_tiles
+
+        for adjacent_tile_location in adjacent_tiles:
+            adjacent_location_tile_type: TileTypeEnum = player.tiles[adjacent_tile_location.location].tile_type
+            is_adjacent_location_outside: bool = adjacent_location_tile_type in self.outdoor_tiles
+
+            can_connection_be_made_through_adjacent_tile: bool = False
+            if is_location_outside and is_adjacent_location_outside:
+                can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.forest and \
+                                                               adjacent_location_tile_type != TileTypeEnum.unavailable
+            elif not is_location_outside and not is_adjacent_location_outside:
+                can_connection_be_made_through_adjacent_tile = adjacent_location_tile_type != TileTypeEnum.underground and \
+                                                               adjacent_location_tile_type != TileTypeEnum.unavailable
+
+            if can_connection_be_made_through_adjacent_tile:
+                is_tile_connected = True
+                break
+
+        return is_tile_connected
