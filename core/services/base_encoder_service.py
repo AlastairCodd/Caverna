@@ -4,7 +4,7 @@ from typing import Tuple, TypeVar
 T = TypeVar("T")
 
 
-class BaseObservationService(metaclass=ABCMeta):
+class BaseEncoderService(metaclass=ABCMeta):
     @abstractmethod
     def observe(self, object_to_observe: T) -> Tuple[int, ...]:
         pass
