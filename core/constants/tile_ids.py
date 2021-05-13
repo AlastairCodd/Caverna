@@ -53,3 +53,5 @@ FoodChamberTileId: int = 44
 PrayerChamberTileId: int = 45
 WritingChamberTileId: int = 46
 FodderChamberTileId: int = 47
+
+total_number_of_tiles: int = 48
