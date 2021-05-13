@@ -17,15 +17,18 @@ class TileContainerEncoderService(BaseEncoderService):
             specific_tile_section: List[int] = [0 for _ in range(tile_ids.total_number_of_tiles)]
             resources_section: List[int] = [0, 0]
 
-            if tile_entity.tile is not None:
-                if tile_entity.tile.id < tile_ids.total_number_of_tiles:
-                    specific_tile_section[tile_entity.tile.id] = True
-                storage_effects: List[AllowFarmingEffect] = tile_entity.get_effects_of_type(AllowFarmingEffect)
-                for effect in storage_effects:
-                    if effect.planted_resource_type == ResourceTypeEnum.grain:
-                        resources_section[0] += effect.planted_resource_amount
-                    elif effect.planted_resource_type == ResourceTypeEnum.veg:
-                        resources_section[1] += effect.planted_resource_amount
+            if tile_entity.tile is None:
+                continue
+
+            if tile_entity.tile.id < tile_ids.total_number_of_tiles:
+                specific_tile_section[tile_entity.tile.id] = True
+
+            storage_effects: List[AllowFarmingEffect] = tile_entity.get_effects_of_type(AllowFarmingEffect)
+            for effect in storage_effects:
+                if effect.planted_resource_type == ResourceTypeEnum.grain:
+                    resources_section[0] += effect.planted_resource_amount
+                elif effect.planted_resource_type == ResourceTypeEnum.veg:
+                    resources_section[1] += effect.planted_resource_amount
 
             tile_section: List[int] = type_section
             tile_section.extend(specific_tile_section)
