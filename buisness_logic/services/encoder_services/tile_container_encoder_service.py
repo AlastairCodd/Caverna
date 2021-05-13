@@ -4,10 +4,10 @@ from buisness_logic.effects.allow_farming_effect import AllowFarmingEffect
 from core.constants import tile_ids
 from core.containers.tile_container import TileContainer
 from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum
-from core.services.base_observation_service import BaseObservationService
+from core.services.base_encoder_service import BaseEncoderService
 
 
-class TileContainerEncoderService(BaseObservationService):
+class TileContainerEncoderService(BaseEncoderService):
     def observe(self, object_to_observe: TileContainer) -> Tuple[int, ...]:
         result: List[int] = []
         for location, tile_entity in object_to_observe.tiles.items():
