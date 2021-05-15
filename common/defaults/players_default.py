@@ -1,6 +1,6 @@
 from typing import List
 
-from buisness_logic.services.keyboard_human_player_service import KeyboardHumanPlayerService
+from buisness_logic.services.player_services.keyboard_human_player_service import KeyboardHumanPlayerService
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.services.base_player_service import BasePlayerService
 
