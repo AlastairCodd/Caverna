@@ -54,4 +54,15 @@ PrayerChamberTileId: int = 45
 WritingChamberTileId: int = 46
 FodderChamberTileId: int = 47
 
+CavernTileId: int = 50
+TunnelTileId: int = 51
+DeepTunnelTileId: int = 52
+OreMineTileId: int = 53
+RubyMineTileId: int = 54
+
+MeadowTileId: int = 55
+FieldTileId: int = 56
+PastureTileId: int = 57
+LargePastureTileId: int = 58
+
 total_number_of_tiles: int = 48
