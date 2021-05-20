@@ -3,11 +3,17 @@ from typing import Dict, List
 from buisness_logic.tiles.dwelling import EntryLevelDwelling
 from buisness_logic.tiles.mine_tiles import CavernTile
 from core.baseClasses.base_tile_container_default import BaseTileContainerDefault
+from core.constants import game_constants
 from core.enums.caverna_enums import TileTypeEnum
 from common.entities.tile_entity import TileEntity
 
 
 class TileContainerDefault(BaseTileContainerDefault):
+    def __init__(self) -> None:
+        self._last_row_index: int = game_constants.default_board_tile_count - game_constants.default_board_width
+        self._first_column_index: int = 0
+        self._last_column_index: int = game_constants.default_board_width - 1
+
     def assign(
             self,
             tile_collection: Dict[int, TileEntity]) -> Dict[int, TileEntity]:
@@ -19,11 +25,15 @@ class TileContainerDefault(BaseTileContainerDefault):
 
         tiles_types: List[TileTypeEnum] = []
 
-        for tile_id in range(48):
+        for tile_id in range(game_constants.default_board_tile_count):
             tile_type: TileTypeEnum
-            if tile_id < 8 or tile_id > 40 or tile_id % 8 == 0 or tile_id % 8 == 7:
+            column_id: int = tile_id % game_constants.default_board_width
+            if tile_id < game_constants.default_board_width \
+                    or tile_id > self._last_row_index \
+                    or column_id == self._first_column_index \
+                    or column_id == self._last_column_index:
                 tile_type = TileTypeEnum.unavailable
-            elif tile_id % 8 < 4:
+            elif column_id < 4:
                 tile_type = TileTypeEnum.forest
             else:
                 tile_type = TileTypeEnum.underground
