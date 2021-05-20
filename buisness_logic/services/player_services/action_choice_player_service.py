@@ -1,0 +1,191 @@
+from typing import List, Tuple, Optional, Dict
+
+from buisness_logic.effects.food_effects import BaseFoodEffect
+from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
+from buisness_logic.services.processor_services.specific_tile_placement_action_choice_processor_service import SpecificTilePlacementActionChoiceProcessorService
+from buisness_logic.services.processor_services.tile_and_placement_action_choice_processor_service import TileAndPlacementActionChoiceProcessorService
+from common.defaults.tile_container_default import TileContainerDefault
+from common.entities.action_choice_lookup import ActionChoiceLookup
+from common.entities.dwarf import Dwarf
+from common.entities.result_lookup import ResultLookup
+from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from common.services.tile_service import TileService
+from core.baseClasses.base_action import BaseAction
+from core.baseClasses.base_card import BaseCard
+from core.baseClasses.base_tile import BaseTile
+from core.enums.caverna_enums import ResourceTypeEnum
+from core.services.base_action_choice_processor_service import BaseActionChoiceProcessorService
+from core.services.base_player_service import BasePlayerService
+
+
+class ActionChoicePlayerService(BasePlayerService):
+    def __init__(
+            self,
+            player_id: int,
+            player_descriptor: str,
+            player_turn_index: int) -> None:
+        BasePlayerService.__init__(
+            self,
+            player_id,
+            player_descriptor,
+            player_turn_index,
+            TileContainerDefault())
+        self._tile_and_placement_action_choice_processor_service: TileAndPlacementActionChoiceProcessorService = TileAndPlacementActionChoiceProcessorService()
+        self._specific_tile_placement_action_choice_processor_service: SpecificTilePlacementActionChoiceProcessorService = \
+            SpecificTilePlacementActionChoiceProcessorService()
+
+        self._tile_service: TileService = TileService()
+
+        self._processor_services: List[BaseActionChoiceProcessorService] = [
+            self._tile_and_placement_action_choice_processor_service,
+            self._specific_tile_placement_action_choice_processor_service]
+
+        current_total: int = 0
+        for service in self._processor_services:
+            service.offset = current_total
+            current_total += service.length
+
+        self._action_choice_length: int = current_total
+
+    def set_action_choice_for_turn(
+            self,
+            action_choice: List[int]) -> None:
+        if action_choice is None:
+            raise ValueError("Action choice may not be None")
+        if len(action_choice) != self._action_choice_length:
+            raise ValueError(f"Action choice is not of correct length (actual={len(action_choice)}, expected={self._action_choice_length})")
+        for service in self._processor_services:
+            service.set_action_choice(action_choice)
+
+    def get_player_choice_conversions_to_perform(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]:
+        pass
+
+    def get_player_choice_weapon_level(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> int:
+        pass
+
+    def get_player_choice_animals_to_breed(
+            self,
+            animals_which_can_reproduce: List[ResourceTypeEnum],
+            possible_number_of_animals_to_reproduce: int,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
+        pass
+
+    def get_player_choice_use_dwarf_out_of_order(
+            self,
+            dwarves: List[Dwarf],
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[bool]:
+        pass
+
+    def get_player_choice_use_card_already_in_use(
+            self,
+            unused_available_cards: List[BaseCard],
+            used_available_cards: List[BaseCard],
+            amount_of_food_required: int,
+            turn_descriptor: TurnDescriptorLookup) -> bool:
+        pass
+
+    def get_player_choice_card_to_use(
+            self,
+            available_cards: List[BaseCard],
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[BaseCard]:
+        pass
+
+    def get_player_choice_dwarf_to_use_out_of_order(
+            self,
+            dwarves: List[Dwarf],
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Dwarf]:
+        pass
+
+    def get_player_choice_actions_to_use(
+            self,
+            available_action_choices: List[ActionChoiceLookup],
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
+        pass
+
+    def get_player_choice_tile_to_build(
+            self,
+            possible_tiles: List[BaseTile],
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[BaseTile]:
+        if possible_tiles is None:
+            raise ValueError("Possible tiles may not be none")
+        if len(possible_tiles) == 0:
+            raise ValueError("Must have at least one possible tile")
+        if turn_descriptor is None:
+            raise ValueError("Turn Descriptor may not be none")
+        possible_tiles_by_id: Dict[int, BaseTile] = {tile.id: tile for tile in possible_tiles}
+        tile_id: int
+        _, __, tile_id = self._tile_and_placement_action_choice_processor_service.process_action_choice_tile_and_placement()
+
+        result: ResultLookup[BaseTile]
+        if tile_id in possible_tiles_by_id:
+            result = ResultLookup(True, possible_tiles_by_id[tile_id])
+        else:
+            result = ResultLookup(errors=f"Attempted to choose tile with id {tile_id} but it was not available")
+        return result
+
+    def get_player_choice_expedition_reward(
+            self,
+            possible_expedition_rewards: List[BaseAction],
+            expedition_level: int,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
+        pass
+
+    def get_player_choice_location_to_build(
+            self,
+            tile: BaseTile,
+            turn_descriptor: TurnDescriptorLookup,
+            secondary_tile: Optional[BaseTile] = None) -> ResultLookup[TileUnknownPlacementLookup]:
+        if tile is None:
+            raise ValueError("Tile may not be none")
+        if turn_descriptor is None:
+            raise ValueError("Turn Descriptor may not be none")
+
+        result: ResultLookup[TileUnknownPlacementLookup]
+        if secondary_tile is None:
+            location: int
+            if self._tile_service.does_tile_type_have_unique_tile(tile.tile_type):
+                _, location = self._specific_tile_placement_action_choice_processor_service.process_action_choice_placement_for_tile(tile)
+            else:
+                _, location, __ = self._tile_and_placement_action_choice_processor_service.process_action_choice_tile_and_placement()
+            result = ResultLookup(True, TileUnknownPlacementLookup(location, None))
+        else:
+            raise NotImplementedError
+        return result
+
+    def get_player_choice_location_to_build_stable(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
+        pass
+
+    def get_player_choice_effects_to_use_for_cost_discount(
+            self,
+            tile_cost: Dict[ResourceTypeEnum, int],
+            turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
+        pass
+
+    def get_player_choice_use_harvest_action_instead_of_breeding(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> bool:
+        pass
+
+    def get_player_choice_effect_to_use_for_feeding_dwarves(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
+        pass
+
+    def get_player_choice_locations_to_sow(
+            self,
+            number_of_resources_to_sow: int,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[int]]:
+        pass
+
+    def get_player_choice_resources_to_sow(
+            self,
+            number_of_resources_to_sow: int,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
+        pass
