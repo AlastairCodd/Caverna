@@ -4,6 +4,7 @@ from common.entities.tile_entity import TileEntity
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseTile
 from core.baseClasses.base_tile_container_default import BaseTileContainerDefault
+from core.constants import game_constants
 from core.enums.caverna_enums import TileTypeEnum
 
 T = TypeVar('T')
@@ -13,8 +14,8 @@ class TileContainer(object):
     def __init__(
             self,
             tile_container_default: BaseTileContainerDefault,
-            height: int = 6,
-            width: int = 8):
+            height: int = game_constants.default_board_height,
+            width: int = game_constants.default_board_width):
         if tile_container_default is None:
             raise ValueError("Tile Container Default cannot be null")
         if height < 0:
