@@ -42,3 +42,17 @@ tile_name_short: Dict[TileTypeEnum, str] = {
     TileTypeEnum.oreMine: "or",
     TileTypeEnum.rubyMine: "ru",
 }
+
+tile_name_long: Dict[TileTypeEnum, str] = {
+    TileTypeEnum.unavailable: "N/A",
+    TileTypeEnum.forest: "Forest",
+    TileTypeEnum.underground: "Underground",
+    TileTypeEnum.meadow: "Meadow",
+    TileTypeEnum.field: "Field",
+    TileTypeEnum.cavern: "Cavern",
+    TileTypeEnum.tunnel: "Tunnel",
+    TileTypeEnum.deepTunnel: "Deep Tunnel",
+    TileTypeEnum.pasture: "Pasture",
+    TileTypeEnum.oreMine: "Ore Mine",
+    TileTypeEnum.rubyMine: "Ruby Mine",
+}

@@ -1,5 +1,5 @@
 from random import randrange, choice
-from typing import List, Dict, Tuple
+from typing import Dict, Tuple, List
 
 from prompt_toolkit import Application, HTML
 from prompt_toolkit.buffer import Buffer
@@ -8,7 +8,9 @@ from prompt_toolkit.layout import VSplit, HSplit, Window, BufferControl, Formatt
 from prompt_toolkit.layout.containers import Container
 from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import Frame
+from prompt_toolkit.widgets.base import Border
 
+from buisness_logic.effects.allow_farming_effect import AllowFarmingEffect
 from buisness_logic.tiles.animal_storage_tiles import BreakfastRoomTile
 from buisness_logic.tiles.dwelling import Dwelling, MixedDwelling
 from buisness_logic.tiles.game_change_tiles import GuestRoomTile
@@ -22,42 +24,46 @@ from core.baseClasses.base_tile import BaseTile
 from core.constants import html_tags
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
+from view.ui_controls.pick_tile_control import PickTileControl
 
 
 class ShellView(object):
-    def __init__(self):
+    def __init__(
+            self,
+            use_compatible_characters: bool = False,
+            show_tile_index: bool = True):
+        if use_compatible_characters:
+            Border.TOP_LEFT = "|"
+            Border.TOP_RIGHT = "|"
+            Border.BOTTOM_LEFT = "|"
+            Border.BOTTOM_RIGHT = "|"
+
+            Border.VERTICAL = "|"
+            Border.HORIZONTAL = "-"
+
         bindings = KeyBindings()
 
         bindings.add("c-q")(self.close_app)
         bindings.add("c-c")(self.close_app)
 
         buffer1: Buffer = Buffer()  # Editable buffer.
-        buffer2: Buffer = Buffer()  # Editable buffer.
 
         buffer1.insert_text("Master")
-        buffer2.insert_text("Detail")
 
         # noinspection PyTypeChecker
+        pick_tile_container: PickTileControl = PickTileControl(buffer1, use_compatible_characters, show_tile_index)
         top_host: Container = VSplit([
-            # One window that holds the BufferControl with the default buffer on
-            # the left.
+            Frame(
+                Window(pick_tile_container),
+                title="Detail"),
             Frame(
                 Window(content=BufferControl(buffer=buffer1)),
                 title="Master"),
-
-            # A vertical line in the middle. We explicitly specify the width, to
-            # make sure that the layout engine will not try to divide the whole
-            # width by three for all these windows. The window will simply fill its
-            # content by repeating this character.
-            # Window(width=1, char='|'),
-
-            # Display the text 'Hello world' on the right.
-            Frame(
-                Window(content=BufferControl(buffer=buffer2)),
-                title="Detail"),
         ])
 
         player, resources_delta = self._temp_initialise_random_player()
+
+        pick_tile_container.set_tile_container(player)
 
         resource_container_formatter: ResourceContainerFormatter = ResourceContainerFormatter()
         resource_text: str = resource_container_formatter.format(player, resources_delta)
@@ -159,7 +165,18 @@ class ShellView(object):
             38: GuestRoomTile(),
         }
 
+        resources_at_location: Dict[int, ResourceTypeEnum] = {
+            11: ResourceTypeEnum.grain,
+            19: ResourceTypeEnum.veg,
+        }
+
         for location, tile in tile_and_location.items():
             player.tiles[location].set_tile(tile)
+
+            if location in resources_at_location:
+                resource: ResourceTypeEnum = resources_at_location[location]
+                allow_farming_effects: List[AllowFarmingEffect] = player.tiles[location].get_effects_of_type(AllowFarmingEffect)
+                player.give_resource(resource, 1)
+                allow_farming_effects[0].plant_resource(player, resource)
 
         return player, resources_delta
