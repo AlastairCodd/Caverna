@@ -5,7 +5,7 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
+from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.tile_service import TileService
 from core.baseClasses.base_card import BaseCard
@@ -51,15 +51,11 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         self._primary_twin_tile_generation_method, self._secondary_twin_tile_generation_method = self._tile_service\
             .get_twin_tile_generation_methods(self._tile_type)
 
-        primary_tile: BaseTile = self._primary_twin_tile_generation_method()
-        secondary_tile: BaseTile = self._secondary_twin_tile_generation_method()
-
         if success:
-            location_to_build_result: ResultLookup[TileUnknownPlacementLookup] = player \
-                .get_player_choice_location_to_build(
-                primary_tile,
-                turn_descriptor,
-                secondary_tile)
+            location_to_build_result: ResultLookup[TileTwinPlacementLookup] = player \
+                .get_player_choice_location_to_build_twin(
+                self._tile_type,
+                turn_descriptor)
 
             success = location_to_build_result.flag
             errors.extend(location_to_build_result.errors)
@@ -67,12 +63,11 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
             if location_to_build_result.flag:
                 self._tile_location = location_to_build_result.value[0]
 
-                if True:
-                    if location_to_build_result.value[1] is None:
-                        success = False
-                        errors.append("Must have direction when placing twin tile")
-                    else:
-                        self._tile_direction = location_to_build_result.value[1]
+                if location_to_build_result.value[1] is None:
+                    success = False
+                    errors.append("Must have direction when placing twin tile")
+                else:
+                    self._tile_direction = location_to_build_result.value[1]
 
         if success:
             if self._tile_cost_override is not None and any(self._tile_cost_override):
