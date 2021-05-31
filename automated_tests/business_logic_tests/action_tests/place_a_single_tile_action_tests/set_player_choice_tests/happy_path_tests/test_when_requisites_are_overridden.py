@@ -11,7 +11,6 @@ from buisness_logic.tiles.point_tiles import BroomChamberTile, TreasureChamberTi
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
@@ -79,9 +78,9 @@ class test_when_requisites_are_overridden(Given_A_PlaceASingleTileAction):
         # _ _ _ _ | _ _ _ _
         self._location_to_place_tile: int = 35
         player.get_player_choice_location_to_build_returns(
-            lambda _, __, ___: ResultLookup(
+            lambda _, __: ResultLookup(
                 True,
-                TileUnknownPlacementLookup(self._location_to_place_tile, None)))
+                self._location_to_place_tile))
 
         self._tile_to_build: BaseTile = tiles[0]
         player.get_player_choice_tile_to_build_returns(

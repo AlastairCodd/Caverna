@@ -10,7 +10,6 @@ from buisness_logic.tiles.mine_tiles import TunnelTile
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
@@ -72,9 +71,9 @@ class test_when_location_chosen_is_invalid(Given_A_PlaceASingleTileAction):
         tile_at_location: BaseTile = TunnelTile()
         player.tiles[location_to_place].set_tile(tile_at_location)
         player.get_player_choice_location_to_build_returns(
-            lambda _, __, ___: ResultLookup(
+            lambda _, __: ResultLookup(
                 True,
-                TileUnknownPlacementLookup(location_to_place, None)
+                location_to_place
             ))
 
         player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: {})

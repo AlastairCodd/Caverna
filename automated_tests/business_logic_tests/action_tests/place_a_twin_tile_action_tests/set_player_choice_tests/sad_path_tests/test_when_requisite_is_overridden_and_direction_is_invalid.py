@@ -11,7 +11,7 @@ from buisness_logic.tiles.game_change_tiles import OfficeRoomTile
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
+from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum, TileDirectionEnum, TileTypeEnum
@@ -75,10 +75,10 @@ class test_when_requisite_is_overridden_and_direction_is_invalid(Given_A_PlaceAT
         location_to_place_primary_tile: int = 45
         location_to_place_secondary_tile: int = location_to_place_primary_tile + 1
 
-        player.get_player_choice_location_to_build_returns(
-            lambda _, __, ___: ResultLookup(
+        player.get_player_choice_location_to_build_twin_returns(
+            lambda _, __: ResultLookup(
                 True,
-                TileUnknownPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.right)))
+                TileTwinPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.right)))
 
         player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: {})
 

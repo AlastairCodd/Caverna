@@ -11,7 +11,6 @@ from buisness_logic.tiles.point_tiles import BroomChamberTile, TreasureChamberTi
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum
@@ -70,9 +69,9 @@ class test_when_tile_is_not_specific_and_chosen_tile_is_unavailable(Given_A_Plac
         # _ _ _ _ | _ _ _ _
         location_to_place_tile: int = 28
         player.get_player_choice_location_to_build_returns(
-            lambda _, __, ___: ResultLookup(
+            lambda _, __: ResultLookup(
                 True,
-                TileUnknownPlacementLookup(location_to_place_tile, None)))
+                location_to_place_tile))
 
         cavern_for_building: BaseTile = player.tiles[location_to_place_tile].tile
         self._tile_to_build: BaseTile = FoodChamberTile()

@@ -12,7 +12,7 @@ from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.precedes_constraint import PrecedesConstraint
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
+from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_constraint import BaseConstraint
@@ -78,8 +78,8 @@ class test_when_called(Given_An_ActionInvokeService):
         location_to_place_primary_tile: int = 37
         location_to_place_secondary_tile: int = 29
 
-        player.get_player_choice_location_to_build_returns(
-            lambda _, __, ___: ResultLookup(True, TileUnknownPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.up))
+        player.get_player_choice_location_to_build_twin_returns(
+            lambda _, __: ResultLookup(True, TileTwinPlacementLookup(location_to_place_primary_tile, TileDirectionEnum.up))
         )
 
         self._expected_tiles: Dict[int, BaseTile] = {

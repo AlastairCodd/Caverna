@@ -1,18 +1,18 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Tuple
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
+from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
 from core.baseClasses.base_tile_container_default import BaseTileContainerDefault
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
@@ -157,14 +157,24 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
     def get_player_choice_location_to_build(
             self,
             tile: BaseTile,
-            turn_descriptor: TurnDescriptorLookup,
-            secondary_tile: Optional[BaseTile] = None) -> ResultLookup[TileUnknownPlacementLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
         """Gets user choice for location to place the given tile.
 
         :param tile: The tile to be placed. This cannot be null.
         :param turn_descriptor: The description of game state. This cannot be null, or empty.
-        :param secondary_tile: The secondary tile to be placed, if the specified tile type is twin. This cannot be null, or empty.
-        :returns: The location (and direction, if the tile is a twin-tile) that the place has decided to place this tile. This will never be null."""
+        :returns: The location that the player has decided to place this tile. This will never be null."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_location_to_build_twin(
+            self,
+            tile_type: TileTypeEnum,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[TileTwinPlacementLookup]:
+        """Gets user choice for location to place the given twin tile.
+
+        :param tile_type: The type of the twin tile to be placed. This cannot be null.
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
+        :returns: The location and direction that the player has decided to place this tile. This will never be null."""
         raise NotImplementedError()
 
     @abstractmethod

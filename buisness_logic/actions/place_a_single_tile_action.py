@@ -5,7 +5,6 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.tile_service import TileService
 from core.baseClasses.base_card import BaseCard
@@ -80,7 +79,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
         primary_tile = self._specific_tile_generation_method()
 
         if success:
-            location_to_build_result: ResultLookup[TileUnknownPlacementLookup] = player \
+            location_to_build_result: ResultLookup[int] = player \
                 .get_player_choice_location_to_build(
                 primary_tile,
                 turn_descriptor)
@@ -89,11 +88,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
             errors.extend(location_to_build_result.errors)
 
             if location_to_build_result.flag:
-                self._tile_location = location_to_build_result.value[0]
-
-                if location_to_build_result.value[1] is not None:
-                    error: str = f"Warning: direction to place tile is meaningless when placing single tile {self._tile_type}"
-                    errors.append(error)
+                self._tile_location = location_to_build_result.value
 
         if success:
             should_get_effects_to_use_on_cost: bool = self._should_get_effects_to_use_on_cost(primary_tile)
