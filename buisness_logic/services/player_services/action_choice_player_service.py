@@ -1,20 +1,21 @@
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Dict
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from buisness_logic.services.processor_services.specific_tile_placement_action_choice_processor_service import SpecificTilePlacementActionChoiceProcessorService
 from buisness_logic.services.processor_services.tile_and_placement_action_choice_processor_service import TileAndPlacementActionChoiceProcessorService
+from buisness_logic.services.processor_services.twin_tile_placement_action_choice_processor_service import TwinTilePlacementActionChoiceProcessorService
 from common.defaults.tile_container_default import TileContainerDefault
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
+from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.tile_service import TileService
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.services.base_action_choice_processor_service import BaseActionChoiceProcessorService
 from core.services.base_player_service import BasePlayerService
 
@@ -34,12 +35,16 @@ class ActionChoicePlayerService(BasePlayerService):
         self._tile_and_placement_action_choice_processor_service: TileAndPlacementActionChoiceProcessorService = TileAndPlacementActionChoiceProcessorService()
         self._specific_tile_placement_action_choice_processor_service: SpecificTilePlacementActionChoiceProcessorService = \
             SpecificTilePlacementActionChoiceProcessorService()
+        self._twin_tile_placement_action_choice_processor_service: TwinTilePlacementActionChoiceProcessorService = \
+            TwinTilePlacementActionChoiceProcessorService()
 
         self._tile_service: TileService = TileService()
 
         self._processor_services: List[BaseActionChoiceProcessorService] = [
             self._tile_and_placement_action_choice_processor_service,
-            self._specific_tile_placement_action_choice_processor_service]
+            self._specific_tile_placement_action_choice_processor_service,
+            self._twin_tile_placement_action_choice_processor_service
+        ]
 
         current_total: int = 0
         for service in self._processor_services:
@@ -138,23 +143,31 @@ class ActionChoicePlayerService(BasePlayerService):
     def get_player_choice_location_to_build(
             self,
             tile: BaseTile,
-            turn_descriptor: TurnDescriptorLookup,
-            secondary_tile: Optional[BaseTile] = None) -> ResultLookup[TileUnknownPlacementLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
         if tile is None:
             raise ValueError("Tile may not be none")
         if turn_descriptor is None:
             raise ValueError("Turn Descriptor may not be none")
 
-        result: ResultLookup[TileUnknownPlacementLookup]
-        if secondary_tile is None:
-            location: int
-            if self._tile_service.does_tile_type_have_unique_tile(tile.tile_type):
-                _, location = self._specific_tile_placement_action_choice_processor_service.process_action_choice_placement_for_tile(tile)
-            else:
-                _, location, __ = self._tile_and_placement_action_choice_processor_service.process_action_choice_tile_and_placement()
-            result = ResultLookup(True, TileUnknownPlacementLookup(location, None))
+        location: int
+        if self._tile_service.does_tile_type_have_unique_tile(tile.tile_type):
+            _, location = self._specific_tile_placement_action_choice_processor_service.process_action_choice_placement_for_tile(tile)
         else:
-            raise NotImplementedError
+            _, location, __ = self._tile_and_placement_action_choice_processor_service.process_action_choice_tile_and_placement()
+        result: ResultLookup[int] = ResultLookup(True, location)
+        return result
+
+    def get_player_choice_location_to_build_twin(
+            self,
+            tile_type: TileTypeEnum,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[TileTwinPlacementLookup]:
+        if turn_descriptor is None:
+            raise ValueError("Turn Descriptor may not be none")
+
+        placement: TileTwinPlacementLookup
+        _, placement = self._twin_tile_placement_action_choice_processor_service.process_action_choice_placement_for_tile(tile_type)
+
+        result: ResultLookup[TileTwinPlacementLookup] = ResultLookup(True, placement)
         return result
 
     def get_player_choice_location_to_build_stable(
