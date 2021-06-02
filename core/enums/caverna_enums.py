@@ -49,10 +49,10 @@ class TileDimensionEnum(Enum):
 
 
 class TileDirectionEnum(Enum):
-    up = auto()
-    right = auto()
-    down = auto()
-    left = auto()
+    up = 0
+    right = 1
+    down = 2
+    left = 3
 
 
 class ActionCombinationEnum(Enum):
