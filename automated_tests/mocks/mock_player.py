@@ -229,6 +229,11 @@ class MockPlayer(BasePlayerService):
             turn_descriptor: TurnDescriptorLookup) -> List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]:
         return self._conversions_to_perform_func(turn_descriptor)
 
+    def get_player_choice_market_items_to_purchase(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
+        raise NotImplementedError()
+
     def get_player_choice_use_card_already_in_use(
             self,
             unused_available_cards: List[BaseCard],

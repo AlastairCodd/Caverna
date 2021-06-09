@@ -38,6 +38,13 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
+    def get_player_choice_market_items_to_purchase(
+            self,
+            turn_descriptor: TurnDescriptorLookup) \
+            -> ResultLookup[List[ResourceTypeEnum]]:
+        raise NotImplementedError()
+
+    @abstractmethod
     def get_player_choice_weapon_level(
             self,
             turn_descriptor: TurnDescriptorLookup) -> int:
