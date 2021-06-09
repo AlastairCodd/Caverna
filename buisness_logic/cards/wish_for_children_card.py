@@ -31,8 +31,8 @@ class UrgentWishForChildrenCard(BaseCard):
                 ActionCombinationEnum.EitherOr,
                 Conditional(
                     ActionCombinationEnum.AndThen,
-                    get_a_baby_dwarf_action.GetABabyDwarfAction(),
-                    place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.furnishedDwelling)),
+                    place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.furnishedDwelling),
+                    get_a_baby_dwarf_action.GetABabyDwarfAction()),
                 receive_action.ReceiveAction({ResourceTypeEnum.coin: 3})
             )
         )
