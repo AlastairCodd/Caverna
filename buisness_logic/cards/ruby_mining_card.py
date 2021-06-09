@@ -14,7 +14,7 @@ class RubyMiningCard(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Ruby Mining", card_ids.RubyMiningCardId, 4,
             Conditional(
-                ActionCombinationEnum.AndThenOr,
+                ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 receive_conditionally_action.ReceiveConditionallyAction(
                     self._condition,

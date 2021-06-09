@@ -20,7 +20,7 @@ class HardwareRentalLargeCard(BaseCard):
         BaseCard.__init__(
             self, "Hardware Rental", card_ids.HardwareRentalLargeCardId,
             actions=Conditional(
-                ActionCombinationEnum.AndThenOr,
+                ActionCombinationEnum.AndThen,
                 receive_action.ReceiveAction({ResourceTypeEnum.wood: 2}),
                 Conditional(
                     ActionCombinationEnum.AndThenOr,

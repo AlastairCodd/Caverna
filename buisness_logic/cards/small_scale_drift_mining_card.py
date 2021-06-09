@@ -10,6 +10,6 @@ class SmallScaleDriftMiningCard(BaseCard):
         BaseCard.__init__(
             self, "Small Scale Drift Mining", card_ids.SmallScaleDriftMiningCardId,
             actions=Conditional(
-                ActionCombinationEnum.AndOr,
-                receive_action.ReceiveAction({ResourceTypeEnum.stone: 1}),
-                place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.cavernTunnelTwin)))
+                ActionCombinationEnum.AndThenOr,
+                place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.cavernTunnelTwin),
+                receive_action.ReceiveAction({ResourceTypeEnum.stone: 1})))

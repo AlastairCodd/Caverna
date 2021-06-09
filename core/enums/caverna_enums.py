@@ -58,7 +58,9 @@ class TileDirectionEnum(Enum):
 class ActionCombinationEnum(Enum):
     EitherOr = auto()
     AndOr = auto()
+    And = auto()
     AndThenOr = auto()
+    OrAndThen = auto
     Or = auto()
     AndThen = auto()
 
