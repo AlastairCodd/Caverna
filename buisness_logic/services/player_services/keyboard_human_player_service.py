@@ -78,6 +78,11 @@ class KeyboardHumanPlayerService(BasePlayerService):
             turn_descriptor: TurnDescriptorLookup) -> List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]:
         pass
 
+    def get_player_choice_market_items_to_purchase(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
+        raise NotImplementedError()
+
     def get_player_choice_weapon_level(
             self,
             turn_descriptor: TurnDescriptorLookup) -> int:
