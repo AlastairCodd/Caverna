@@ -1,3 +1,18 @@
 __all__ = [
+    "base_card_forge",
     "card_forge_1_3",
-    "tile_forge"]
+    "card_forge_1_7",
+    "card_forge_3",
+    "card_forge_4_7",
+    "card_forge_5",
+    "card_forge_6_7",
+    "card_forge_7",
+    "card_forge_level_1",
+    "card_forge_level_2",
+    "card_forge_level_3",
+    "card_forge_level_4",
+    "integer_partition_forge",
+    "list_permutation_forge",
+    "set_partition_forge",
+    "tile_forge",
+]
