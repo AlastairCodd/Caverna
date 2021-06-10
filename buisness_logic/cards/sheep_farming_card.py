@@ -12,7 +12,7 @@ class SheepFarmingCard(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Sheep Farming", card_ids.SheepFarmingCardId, 1,
             actions=Conditional(
-                ActionCombinationEnum.AndThen,
+                ActionCombinationEnum.AndThenOr,
                 Conditional(
                     ActionCombinationEnum.AndOr,
                     Conditional(

@@ -59,6 +59,7 @@ class ActionCombinationEnum(Enum):
     EitherOr = auto()
     AndOr = auto()
     And = auto()
+    AndOptionally = auto()
     AndThenOr = auto()
     OrAndThen = auto
     Or = auto()

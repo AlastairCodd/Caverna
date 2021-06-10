@@ -1,5 +1,6 @@
 from typing import List
 
+from buisness_logic.effects.action_effects import ChangeDecisionVerb
 from buisness_logic.services.base_action_player_choice_transfer_service import BaseActionPlayerChoiceTransferService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -33,7 +34,8 @@ class CompleteActionPlayerChoiceTransferService(BaseActionPlayerChoiceTransferSe
         if turn_descriptor is None:
             raise ValueError("Turn descriptor may not be None")
 
-        action_choices: List[ActionChoiceLookup] = self._conditional_service.get_possible_choices(card.actions, player)
+        change_decision_effects: List[ChangeDecisionVerb] = player.get_effects_of_type(ChangeDecisionVerb)
+        action_choices: List[ActionChoiceLookup] = self._conditional_service.get_possible_choices(card.actions, change_decision_effects)
 
         player_action_choice_result: ResultLookup[ActionChoiceLookup]
         if len(action_choices) == 1:
