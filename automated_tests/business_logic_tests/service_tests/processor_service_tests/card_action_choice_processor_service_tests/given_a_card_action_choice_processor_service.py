@@ -1,7 +1,7 @@
 from abc import ABCMeta
 from unittest import TestCase
 
-from buisness_logic.services.processor_services.weapon_level_action_choice_processor_service import CardActionChoiceProcessorService
+from buisness_logic.services.processor_services.card_action_choice_processor_service import CardActionChoiceProcessorService
 
 
 # noinspection PyPep8Naming
