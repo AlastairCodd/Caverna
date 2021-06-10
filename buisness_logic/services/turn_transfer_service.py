@@ -1,5 +1,6 @@
 from typing import List, NamedTuple, Tuple, Optional
 
+from buisness_logic.effects.action_effects import ChangeDecisionVerb
 from buisness_logic.services.base_action_player_choice_transfer_service import BaseActionPlayerChoiceTransferService
 from buisness_logic.services.base_card_player_choice_transfer_service import BaseCardPlayerChoiceTransferService
 from buisness_logic.services.base_dwarf_player_choice_transfer_service import BaseDwarfPlayerChoiceTransferService
@@ -119,7 +120,8 @@ class TurnTransferService(object):
                 equivalent_cards: List[BaseCard] = self.get_equivalent_invalid_cards(player, chosen_dwarf, chosen_card)
                 card: BaseCard
                 for card in equivalent_cards:
-                    possible_choices: List[ActionChoiceLookup] = self._conditional_service.get_possible_choices(card.actions, player)
+                    change_decision_effects: List[ChangeDecisionVerb] = player.get_effects_of_type(ChangeDecisionVerb)
+                    possible_choices: List[ActionChoiceLookup] = self._conditional_service.get_possible_choices(card.actions, change_decision_effects)
                     action_choice: ActionChoiceLookup
                     for action_choice in possible_choices:
                         new_equivalent: DwarfCardActionCombinationLookup = DwarfCardActionCombinationLookup(

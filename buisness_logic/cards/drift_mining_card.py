@@ -25,7 +25,7 @@ class DriftMiningTwoStoneCard(BaseResourceContainingCard):
 class DriftMiningOneStoneCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Drift Mining", card_ids.DriftMiningTwoStoneCardId,
+            self, "Drift Mining", card_ids.DriftMiningOneStoneCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),

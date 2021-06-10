@@ -12,7 +12,7 @@ class SustenanceVegAndGrainCard(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Sustenance", card_ids.SustenanceVegAndGrainCardId,
             actions=Conditional(
-                ActionCombinationEnum.AndThen,
+                ActionCombinationEnum.AndThenOr,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.meadowFieldTwin)))
 

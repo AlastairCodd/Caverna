@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, cast
 
 from buisness_logic.actions.base_receive_action import BaseReceiveAction
 from common.entities.dwarf import Dwarf
@@ -36,6 +36,16 @@ class ReceiveAction(BaseReceiveAction):
 
     def __str__(self) -> str:
         result = "Receive " + " and ".join(f"{amount} {resource.name}" for resource, amount in self._items_to_receive.items())
+
+        return result
+
+    def __eq__(self, other) -> bool:
+        result: bool = isinstance(other, ReceiveAction)
+
+        if result:
+            cast_other: ReceiveAction = cast(ReceiveAction, other)
+            if self is not other:
+                result = self._items_to_receive == cast_other._items_to_receive
 
         return result
 

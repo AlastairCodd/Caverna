@@ -37,6 +37,7 @@ class Conditional(object):
             ActionCombinationEnum.EitherOr: lambda c1, c2: f"Either {self._condition1} or {self._condition2}",
             ActionCombinationEnum.AndOr: lambda c1, c2: f"{self._condition1} and/or {self._condition2}",
             ActionCombinationEnum.And: lambda c1, c2: f"{self._condition1} and {self._condition2}",
+            ActionCombinationEnum.AndOptionally: lambda c1, c2: f"{self._condition1} and/or {self._condition2}",
             ActionCombinationEnum.AndThenOr: lambda c1, c2: f"{self._condition1} and then/or {self._condition2}",
             ActionCombinationEnum.OrAndThen: lambda c1, c2: f"{self._condition1} and then {self._condition2}, or {self._condition1}",
             ActionCombinationEnum.Or: lambda c1, c2: f"{self._condition1} or {self._condition2}",
