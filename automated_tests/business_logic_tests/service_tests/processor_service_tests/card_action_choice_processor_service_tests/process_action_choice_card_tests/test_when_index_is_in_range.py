@@ -202,4 +202,4 @@ class test_when_index_is_in_range(Given_A_CardActionChoiceProcessorService):
         for index, card_id in self._card_choices.items():
             with self.subTest(index=index):
                 calculated_card: CardActionChoice = self.SUT.convert_index_to_card_choice(index)
-                self.assertEqual(card_id, calculated_card.card.id)
+                self.assertEqual(card_id, calculated_card.card_id)

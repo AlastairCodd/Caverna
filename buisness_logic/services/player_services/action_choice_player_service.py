@@ -1,7 +1,8 @@
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Optional
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
+from buisness_logic.services.processor_services.card_action_choice_processor_service import CardActionChoiceProcessorService
 from buisness_logic.services.processor_services.specific_tile_placement_action_choice_processor_service import SpecificTilePlacementActionChoiceProcessorService
 from buisness_logic.services.processor_services.tile_and_placement_action_choice_processor_service import TileAndPlacementActionChoiceProcessorService
 from buisness_logic.services.processor_services.twin_tile_placement_action_choice_processor_service import TwinTilePlacementActionChoiceProcessorService
@@ -32,6 +33,7 @@ class ActionChoicePlayerService(BasePlayerService):
             player_descriptor,
             player_turn_index,
             TileContainerDefault())
+        self._card_action_choice_processor_service: CardActionChoiceProcessorService = CardActionChoiceProcessorService()
         self._tile_and_placement_action_choice_processor_service: TileAndPlacementActionChoiceProcessorService = TileAndPlacementActionChoiceProcessorService()
         self._specific_tile_placement_action_choice_processor_service: SpecificTilePlacementActionChoiceProcessorService = \
             SpecificTilePlacementActionChoiceProcessorService()
@@ -41,6 +43,7 @@ class ActionChoicePlayerService(BasePlayerService):
         self._tile_service: TileService = TileService()
 
         self._processor_services: List[BaseActionChoiceProcessorService] = [
+            self._card_action_choice_processor_service,
             self._tile_and_placement_action_choice_processor_service,
             self._specific_tile_placement_action_choice_processor_service,
             self._twin_tile_placement_action_choice_processor_service
@@ -89,7 +92,10 @@ class ActionChoicePlayerService(BasePlayerService):
             self,
             dwarves: List[Dwarf],
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[bool]:
-        pass
+        use_dwarf_out_of_order: bool
+        _, use_dwarf_out_of_order = self._card_action_choice_processor_service.process_action_choice_use_dwarf_out_of_order()
+        result: ResultLookup[bool] = ResultLookup(True, use_dwarf_out_of_order)
+        return result
 
     def get_player_choice_use_card_already_in_use(
             self,
@@ -103,19 +109,63 @@ class ActionChoicePlayerService(BasePlayerService):
             self,
             available_cards: List[BaseCard],
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[BaseCard]:
-        pass
+        if len(available_cards) == 0:
+            raise ValueError("Must have at least one available card")
+        card_id: int
+        _, card_id = self._card_action_choice_processor_service.process_action_choice_card()
+
+        is_card_available: bool = False
+        # noinspection PyTypeChecker
+        card: BaseCard = None
+        for card in available_cards:
+            if card.id == card_id:
+                is_card_available = True
+                break
+
+        result: ResultLookup[BaseCard]
+        if is_card_available:
+            result = ResultLookup(True, card)
+        else:
+            result = ResultLookup(errors=f"Chosen card {card_id} was not available")
+        return result
 
     def get_player_choice_dwarf_to_use_out_of_order(
             self,
             dwarves: List[Dwarf],
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[Dwarf]:
-        pass
+        dwarf_to_use_out_of_order: int
+        _, dwarf_to_use_out_of_order = self._card_action_choice_processor_service.process_action_choice_use_dwarf_out_of_order()
+
+        result: ResultLookup[Dwarf]
+        if dwarf_to_use_out_of_order < len(dwarves):
+            dwarves = sorted(dwarves, key=lambda d: d.weapon_level)
+            dwarf_to_use: Dwarf = dwarves[dwarf_to_use_out_of_order]
+            result = ResultLookup(True, dwarf_to_use)
+        else:
+            result = ResultLookup(errors=f"Chosen dwarf {dwarf_to_use_out_of_order} was not available: only {len(dwarves)} to choose from.")
+        return result
 
     def get_player_choice_actions_to_use(
             self,
             available_action_choices: List[ActionChoiceLookup],
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
-        pass
+        actions_to_use: ActionChoiceLookup
+        _, actions_to_use = self._card_action_choice_processor_service.process_action_choice_action()
+
+        is_action_choice_valid: bool = False
+        # noinspection PyTypeChecker
+        action_choice: ActionChoiceLookup = None
+        for action_choice in available_action_choices:
+            if action_choice == actions_to_use:
+                is_action_choice_valid = True
+
+        result: ResultLookup[ActionChoiceLookup]
+        if is_action_choice_valid:
+            result = ResultLookup(True, action_choice)
+        else:
+            result = ResultLookup(errors="Action choice is invalid")
+
+        return result
 
     def get_player_choice_tile_to_build(
             self,

@@ -1,4 +1,4 @@
-from typing import NamedTuple, List, Tuple, Dict, Optional
+from typing import NamedTuple, List, Tuple, Dict, Optional, TypeVar, Callable
 
 from buisness_logic.cards.imitation_card import ImitationCard
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -10,7 +10,7 @@ from core.services.base_action_choice_processor_service import BaseActionChoiceP
 
 class CardActionChoice(NamedTuple):
     index: int
-    card: BaseCard
+    card_id: int
 
 
 class ActionsAndConstraintsActionChoice(NamedTuple):
@@ -28,6 +28,9 @@ class DwarfToUseOutOfOrder(NamedTuple):
     dwarf_id: int
 
 
+T = TypeVar('T')
+
+
 class CardActionChoiceProcessorService(BaseActionChoiceProcessorService):
     def __init__(self) -> None:
         self._card_choices: Dict[int, CardActionChoice]
@@ -38,13 +41,44 @@ class CardActionChoiceProcessorService(BaseActionChoiceProcessorService):
         self._card_choices, self._action_choices,\
             self._use_dwarf_out_of_order_choices, self._dwarf_to_use_out_of_order_choices = self._populate_choices()
 
-        BaseActionChoiceProcessorService.__init__(self, len(self._action_choices))
+        BaseActionChoiceProcessorService.__init__(self, len(self._card_choices))
 
     def process_action_choice_card(self) -> CardActionChoice:
-        raise IndexError("No valid choices")
+        return self._process_action(self.convert_index_to_card_choice)
+
+    def process_action_choice_action(self) -> ActionsAndConstraintsActionChoice:
+        return self._process_action(self.convert_index_to_action_choice)
+
+    def process_action_choice_use_dwarf_out_of_order(self) -> UseDwarfOutOfOrderActionChoice:
+        return self._process_action(self.convert_index_to_use_dwarf_out_of_order_choice)
+
+    def process_action_choice_dwarf_to_use(self) -> DwarfToUseOutOfOrder:
+        return self._process_action(self.convert_index_to_dwarf_choice)
 
     def convert_index_to_card_choice(self, index: int) -> CardActionChoice:
         return self._card_choices[index]
+
+    def convert_index_to_action_choice(self, index: int) -> ActionsAndConstraintsActionChoice:
+        return self._action_choices[index]
+
+    def convert_index_to_use_dwarf_out_of_order_choice(self, index: int) -> UseDwarfOutOfOrderActionChoice:
+        return self._use_dwarf_out_of_order_choices[index]
+
+    def convert_index_to_dwarf_choice(self, index: int) -> DwarfToUseOutOfOrder:
+        return self._dwarf_to_use_out_of_order_choices[index]
+
+    def _process_action(
+            self,
+            index_conversion_func: Callable[[int], T]) -> T:
+        card_action_choices: List[float] = self._action_choice[self.offset: self.offset + self.length]
+        action_choices: List[Tuple[int, float]] = [(index, action_choice_value) for index, action_choice_value in enumerate(card_action_choices)]
+        action_choices = sorted(action_choices, key=lambda x: x[1])
+
+        for index, probability in action_choices:
+            if index in self._invalid_actions:
+                continue
+            return index_conversion_func(index)
+        raise IndexError("No valid choices")
 
     def _populate_choices(self) -> Tuple[
             Dict[int, CardActionChoice],
@@ -79,7 +113,7 @@ class CardActionChoiceProcessorService(BaseActionChoiceProcessorService):
             possible_action_choices: List[ActionChoiceLookup] = conditional_service.get_possible_choices(card_action_conditional, change_decision_effects)
 
             for action_choice in possible_action_choices:
-                card_choices[index] = CardActionChoice(index, card)
+                card_choices[index] = CardActionChoice(index, card.id)
                 action_choices[index] = ActionsAndConstraintsActionChoice(index, action_choice)
                 use_dwarf_out_of_order_choices[index] = UseDwarfOutOfOrderActionChoice(index, False)
                 dwarf_to_use_out_of_order_choices[index] = None
@@ -90,7 +124,7 @@ class CardActionChoiceProcessorService(BaseActionChoiceProcessorService):
                     any_give_dwarf_a_weapon_actions: bool = any(action for action in action_choice.actions if isinstance(action, GiveDwarfAWeaponAction))
                     if not any_give_dwarf_a_weapon_actions:
                         for i in range(game_constants.maximum_number_of_dwarves):
-                            card_choices[index] = CardActionChoice(index, card)
+                            card_choices[index] = CardActionChoice(index, card.id)
                             action_choices[index] = ActionsAndConstraintsActionChoice(index, action_choice)
                             use_dwarf_out_of_order_choices[index] = UseDwarfOutOfOrderActionChoice(index, True)
                             dwarf_to_use_out_of_order_choices[index] = DwarfToUseOutOfOrder(index, i)
