@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Optional
+from typing import List, Tuple, Dict
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
@@ -192,6 +192,7 @@ class ActionChoicePlayerService(BasePlayerService):
             self,
             possible_expedition_rewards: List[BaseAction],
             expedition_level: int,
+            is_first_expedition_action: bool,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
         pass
 
