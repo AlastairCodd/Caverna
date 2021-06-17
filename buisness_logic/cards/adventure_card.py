@@ -16,4 +16,4 @@ class AdventureCard(BaseCard):
                 Conditional(
                     ActionCombinationEnum.AndThen,
                     go_on_an_expedition_action.GoOnAnExpeditionAction(1),
-                    go_on_an_expedition_action.GoOnAnExpeditionAction(1))))
+                    go_on_an_expedition_action.GoOnAnExpeditionAction(1, False))))

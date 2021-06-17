@@ -69,9 +69,10 @@ class MockPlayer(BasePlayerService):
         self._expedition_rewards_func: Callable[
             [List[BaseAction],
              int,
+             bool,
              TurnDescriptorLookup],
             ResultLookup[List[BaseAction]]] \
-            = lambda info_available_actions, info_expedition_level, info_turn_descriptor: ResultLookup(errors="Not Implemented")
+            = lambda info_available_actions, info_expedition_level, info_is_first_expedition_action, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._location_to_build_func: Callable[
             [BaseTile,
              TurnDescriptorLookup],
@@ -263,8 +264,13 @@ class MockPlayer(BasePlayerService):
             self,
             possible_expedition_rewards: List[BaseAction],
             expedition_level: int,
+            is_first_expedition_action: bool,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
-        return self._expedition_rewards_func(possible_expedition_rewards, expedition_level, turn_descriptor)
+        return self._expedition_rewards_func(
+            possible_expedition_rewards,
+            expedition_level,
+            is_first_expedition_action,
+            turn_descriptor)
 
     def get_player_choice_tile_to_build(
             self,

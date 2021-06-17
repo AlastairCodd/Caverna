@@ -151,11 +151,13 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
             self,
             possible_expedition_rewards: List[BaseAction],
             expedition_level: int,
+            is_first_expedition_action: bool,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
         """Gets user choice for which expedition rewards to use.
 
         :param possible_expedition_rewards: The possible expedition rewards that may be chosen, given the level of the dwarf. This cannot be null, or empty.
         :param expedition_level: The number of rewards the player must take. This must be positive.
+        :param is_first_expedition_action: Is this the first expedition action on the card. Only really useful for the machine learned action.
         :param turn_descriptor: The description of game state. This cannot be null, or empty.
         :returns: The expedition rewards the player has chosen to claim. This will never be null."""
         raise NotImplementedError()

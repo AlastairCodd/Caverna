@@ -27,10 +27,13 @@ from core.services.base_player_service import BasePlayerService
 class GoOnAnExpeditionAction(BasePlayerChoiceAction):
     def __init__(
             self,
-            level: int) -> None:
+            level: int,
+            is_first_expedition_action: bool = True) -> None:
         if level < 1:
             raise ValueError(f"Level must be positive: (level={level})")
-        self._level = level
+        self._level: int = level
+        self._is_first_expedition_action: bool = is_first_expedition_action
+
         self._expedition_actions: Dict[int, Iterable[BaseAction]] = {
             1: [UpgradeAllWeaponsAction(),
                 ReceiveAction({ResourceTypeEnum.wood: 1}),
@@ -80,6 +83,7 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
         chosen_expedition_actions: ResultLookup[List[BaseAction]] = player.get_player_choice_expedition_reward(
             possible_expedition_rewards,
             self._level,
+            self._is_first_expedition_action,
             turn_descriptor)
 
         errors: List[str] = []

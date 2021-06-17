@@ -269,6 +269,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             self,
             possible_expedition_rewards: List[BaseAction],
             expedition_level: int,
+            is_first_expedition_action: bool,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
         choices: List[Dict[str, Any]] = [
             {"name": str(action),
