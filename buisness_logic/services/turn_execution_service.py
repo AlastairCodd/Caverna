@@ -77,6 +77,9 @@ class TurnExecutionService(object):
                             untested_actions.append(new_action)
                             new_constraint: BaseConstraint = PrecedesConstraint(action, new_action)
                             constraints_on_actions.append(new_constraint)
+                    else:
+                        pass
+                        # invalidate current action choice, if player is NN.
                 else:
                     actions_to_take.append(action)
 
