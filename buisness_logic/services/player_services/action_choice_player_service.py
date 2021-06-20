@@ -3,6 +3,8 @@ from typing import List, Tuple, Dict
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from buisness_logic.services.processor_services.card_action_choice_processor_service import CardActionChoiceProcessorService
+from buisness_logic.services.processor_services.expedition_reward_action_choice_processor_service import \
+    ExpeditionRewardActionChoiceProcessorService
 from buisness_logic.services.processor_services.specific_tile_placement_action_choice_processor_service import SpecificTilePlacementActionChoiceProcessorService
 from buisness_logic.services.processor_services.tile_and_placement_action_choice_processor_service import TileAndPlacementActionChoiceProcessorService
 from buisness_logic.services.processor_services.twin_tile_placement_action_choice_processor_service import TwinTilePlacementActionChoiceProcessorService
@@ -39,6 +41,7 @@ class ActionChoicePlayerService(BasePlayerService):
             SpecificTilePlacementActionChoiceProcessorService()
         self._twin_tile_placement_action_choice_processor_service: TwinTilePlacementActionChoiceProcessorService = \
             TwinTilePlacementActionChoiceProcessorService()
+        self._expedition_reward_action_choice_processor_service: ExpeditionRewardActionChoiceProcessorService = ExpeditionRewardActionChoiceProcessorService()
 
         self._tile_service: TileService = TileService()
 
@@ -46,7 +49,8 @@ class ActionChoicePlayerService(BasePlayerService):
             self._card_action_choice_processor_service,
             self._tile_and_placement_action_choice_processor_service,
             self._specific_tile_placement_action_choice_processor_service,
-            self._twin_tile_placement_action_choice_processor_service
+            self._twin_tile_placement_action_choice_processor_service,
+            self._expedition_reward_action_choice_processor_service,
         ]
 
         current_total: int = 0
@@ -194,7 +198,27 @@ class ActionChoicePlayerService(BasePlayerService):
             expedition_level: int,
             is_first_expedition_action: bool,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
-        pass
+        if possible_expedition_rewards is None:
+            raise ValueError("Possible rewards may not be none")
+        if len(possible_expedition_rewards) == 0:
+            raise ValueError("Must have at least one possible expedition reward")
+        if expedition_level < 1:
+            raise ValueError("Expedition level must be positive")
+        if turn_descriptor is None:
+            raise ValueError("Turn Descriptor may not be none")
+        rewards: List[BaseAction]
+        _, rewards = self._expedition_reward_action_choice_processor_service.process_action_choice_placement_for_rewards(
+            expedition_level,
+            is_first_expedition_action,
+            possible_expedition_rewards)
+
+        result: ResultLookup[List[BaseAction]]
+        if len(rewards) > expedition_level:
+            result = ResultLookup(errors=f"Can only pick {expedition_level} rewards -- chose {len(rewards)}")
+        else:
+            result = ResultLookup(True, rewards)
+
+        return result
 
     def get_player_choice_location_to_build(
             self,
