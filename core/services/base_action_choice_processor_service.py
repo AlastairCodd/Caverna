@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from typing import List
+from typing import List, Tuple
 
 
 class BaseActionChoiceProcessorService(metaclass=ABCMeta):
@@ -23,6 +23,18 @@ class BaseActionChoiceProcessorService(metaclass=ABCMeta):
             action_choice: List[float]) -> None:
         self._action_choice = action_choice
         self._invalid_actions.clear()
+
+    def _get_action_choice_subset(
+            self,
+            count: int,
+            additional_offset: int = 0) -> List[Tuple[int, float]]:
+        action_reward_choices: List[float] = self._action_choice[
+                                             self.offset + additional_offset:
+                                             self.offset + additional_offset + count]
+        probabilities: List[Tuple[int, float]] = [(index, probability) for
+                                                  index, probability in enumerate(action_reward_choices)]
+        probabilities = sorted(probabilities, key=lambda x: x[1], reverse=True)
+        return probabilities
 
     def mark_invalid_action(
             self,

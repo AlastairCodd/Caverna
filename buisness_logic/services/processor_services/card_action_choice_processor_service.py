@@ -70,11 +70,9 @@ class CardActionChoiceProcessorService(BaseActionChoiceProcessorService):
     def _process_action(
             self,
             index_conversion_func: Callable[[int], T]) -> T:
-        card_action_choices: List[float] = self._action_choice[self.offset: self.offset + self.length]
-        action_choices: List[Tuple[int, float]] = [(index, action_choice_value) for index, action_choice_value in enumerate(card_action_choices)]
-        action_choices = sorted(action_choices, key=lambda x: x[1])
+        probabilities: List[Tuple[int, float]] = self._get_action_choice_subset(self._length)
 
-        for index, probability in action_choices:
+        for index, probability in probabilities:
             if index in self._invalid_actions:
                 continue
             return index_conversion_func(index)
