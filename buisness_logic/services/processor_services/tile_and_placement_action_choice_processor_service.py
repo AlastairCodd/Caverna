@@ -15,12 +15,10 @@ class TileAndPlacementActionChoiceProcessorService(BaseActionChoiceProcessorServ
         BaseActionChoiceProcessorService.__init__(self, game_constants.default_board_tile_count * tile_ids.total_number_of_tiles)
 
     def process_action_choice_tile_and_placement(self) -> TileAndPlacementActionChoice:
-        if len(self._action_choice) != self._length:
-            raise ValueError("Must set action choice before processing")
-        tile_placement_choices: List[float] = self._action_choice[self.offset: self.offset + self._length]
-        choices_and_locations: List[Tuple[int, float]] = [(index, tile_placement_choices[index]) for index in range(self._length)]
-        choices_and_locations = sorted(choices_and_locations, key=lambda x: x[1])
-        for index, probability in choices_and_locations:
+        probabilities: List[Tuple[int, float]] = self._get_action_choice_subset(
+            self._length)
+
+        for index, probability in probabilities:
             if index in self._invalid_actions:
                 continue
             return self.convert_index_to_tile_and_placement(index)

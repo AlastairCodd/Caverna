@@ -29,17 +29,14 @@ class SpecificTilePlacementActionChoiceProcessorService(BaseActionChoiceProcesso
     def process_action_choice_placement_for_tile(
             self,
             tile: BaseTile) -> PlacementActionChoice:
-        if len(self._action_choice) != self._length:
-            raise ValueError("Must set action choice before processing")
         if tile.id not in self._tile_id_to_offset:
             raise IndexError("Tile position cannot be set using this processor service")
         tile_action_choice_offset: int = self._tile_id_to_offset[tile.id] * game_constants.default_board_tile_count
-        tile_placement_choices: List[float] = self._action_choice[
-                                              tile_action_choice_offset + self.offset:
-                                              tile_action_choice_offset + self.offset + game_constants.default_board_tile_count]
-        locations: List[Tuple[int, float]] = [(index + tile_action_choice_offset, tile_placement_choices[index]) for index in range(len(tile_placement_choices))]
-        locations = sorted(locations, key=lambda x: x[1])
-        for index, probability in locations:
+        probabilities: List[Tuple[int, float]] = self._get_action_choice_subset(
+            game_constants.default_board_tile_count,
+            tile_action_choice_offset)
+
+        for index, probability in probabilities:
             if index in self._invalid_actions:
                 continue
             return self.convert_index_to_placement(index)
