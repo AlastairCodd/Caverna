@@ -37,7 +37,39 @@ class ExpeditionRewardActionChoiceProcessorService(BaseActionChoiceProcessorServ
             14,  # Breed up to 2 animals
         ]
 
-        BaseActionChoiceProcessorService.__init__(self, len(self._expedition_reward_levels))
+        self._number_of_expedition_rewards: int = len(self._expedition_reward_levels)
+        BaseActionChoiceProcessorService.__init__(self, self._number_of_expedition_rewards)
+
+    def mark_invalid_action(
+            self,
+            index: int) -> None:
+        if index < 0 or index >= self._length:
+            raise ValueError(f"Index must be between zero and {self._length}")
+        if index in self._invalid_actions:
+            raise ValueError("Index is already marked as invalid")
+        if index > self._number_of_expedition_rewards:
+            sub_index: int = index - self._number_of_expedition_rewards
+            lowest_index_of_same_level_as_sub_index: int = self._get_lowest_index_for_reward_of_same_level(sub_index)
+
+            lower_bound_on_invalid_actions: int = lowest_index_of_same_level_as_sub_index + self._number_of_expedition_rewards
+
+            self._invalid_actions.extend(range(lower_bound_on_invalid_actions, self._number_of_expedition_rewards * 2))
+        else:
+            lowest_index_of_same_level_as_sub_index: int = self._get_lowest_index_for_reward_of_same_level(index)
+
+            self._invalid_actions.extend(range(lowest_index_of_same_level_as_sub_index, self._number_of_expedition_rewards))
+
+    def _get_lowest_index_for_reward_of_same_level(self, index: int) -> int:
+        level: int = self._expedition_reward_levels[index]
+        for i in range(index, index - 3, -1):  # three is known to be the maximum number of items of the same level
+            if i >= 0:
+                if self._expedition_reward_levels[i] == level:
+                    index = i
+                else:
+                    break
+            else:
+                break
+        return index
 
     def process_action_choice_placement_for_rewards(
             self,
@@ -45,16 +77,12 @@ class ExpeditionRewardActionChoiceProcessorService(BaseActionChoiceProcessorServ
             is_first_expedition: bool,
             possible_expedition_rewards: List[BaseAction]) -> ExpeditionRewardActionChoice:
         additional_offset: int = len(self._expedition_reward_levels) if not is_first_expedition else 0
-        action_reward_choices: List[float] = self._action_choice[self.offset + additional_offset:
-                                                                 self.offset + additional_offset + self._length]
-        locations: List[Tuple[int, float]] = [(index, probability) for
-                                              index, probability in enumerate(action_reward_choices)]
-        locations = sorted(locations, key=lambda x: x[1], reverse=True)
+        probabilities: List[Tuple[int, float]] = self._get_action_choice_subset(self._length, additional_offset)
 
         reward_indexes: List[int] = []
         rewards: List[BaseAction] = []
 
-        for reward_index, probability in locations:
+        for reward_index, probability in probabilities:
             actual_index: int = reward_index + additional_offset
             if actual_index in self._invalid_actions:
                 continue
