@@ -6,6 +6,7 @@ from buisness_logic.services.processor_services.card_action_choice_processor_ser
 from buisness_logic.services.processor_services.expedition_reward_action_choice_processor_service import \
     ExpeditionRewardActionChoiceProcessorService
 from buisness_logic.services.processor_services.specific_tile_placement_action_choice_processor_service import SpecificTilePlacementActionChoiceProcessorService
+from buisness_logic.services.processor_services.stable_placement_action_choice_processor_service import StablePlacementActionChoiceProcessorService
 from buisness_logic.services.processor_services.tile_and_placement_action_choice_processor_service import TileAndPlacementActionChoiceProcessorService
 from buisness_logic.services.processor_services.tile_purchase_effect_action_choice_processor_service import \
     TilePurchaseEffectActionChoiceProcessorService
@@ -43,6 +44,7 @@ class ActionChoicePlayerService(BasePlayerService):
             SpecificTilePlacementActionChoiceProcessorService()
         self._twin_tile_placement_action_choice_processor_service: TwinTilePlacementActionChoiceProcessorService = \
             TwinTilePlacementActionChoiceProcessorService()
+        self._stable_placement_action_choice_processor_service: StablePlacementActionChoiceProcessorService = StablePlacementActionChoiceProcessorService()
         self._expedition_reward_action_choice_processor_service: ExpeditionRewardActionChoiceProcessorService = ExpeditionRewardActionChoiceProcessorService()
         self._tile_purchase_effect_action_choice_processor_service: TilePurchaseEffectActionChoiceProcessorService = \
             TilePurchaseEffectActionChoiceProcessorService()
@@ -54,6 +56,7 @@ class ActionChoicePlayerService(BasePlayerService):
             self._tile_and_placement_action_choice_processor_service,
             self._specific_tile_placement_action_choice_processor_service,
             self._twin_tile_placement_action_choice_processor_service,
+            self._stable_placement_action_choice_processor_service,
             self._expedition_reward_action_choice_processor_service,
             self._tile_purchase_effect_action_choice_processor_service,
         ]
@@ -258,7 +261,14 @@ class ActionChoicePlayerService(BasePlayerService):
     def get_player_choice_location_to_build_stable(
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
-        pass
+        if turn_descriptor is None:
+            raise ValueError("Turn Descriptor may not be none")
+
+        location: int
+        _, location = self._stable_placement_action_choice_processor_service.process_action_choice_placement_for_stable()
+
+        result: ResultLookup[int] = ResultLookup(True, location)
+        return result
 
     def get_player_choice_effects_to_use_for_cost_discount(
             self,
