@@ -1,13 +1,9 @@
 from typing import NamedTuple, List, Tuple, Dict
 
+from common.entities.placement_action_choice import PlacementActionChoice
 from core.baseClasses.base_tile import BaseTile
 from core.constants import game_constants, tile_ids
 from core.services.base_action_choice_processor_service import BaseActionChoiceProcessorService
-
-
-class PlacementActionChoice(NamedTuple):
-    index: int
-    location: int
 
 
 class SpecificTilePlacementActionChoiceProcessorService(BaseActionChoiceProcessorService):

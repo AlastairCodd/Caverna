@@ -2,7 +2,7 @@ from typing import Dict
 
 from automated_tests.business_logic_tests.service_tests.processor_service_tests.twin_tile_placement_action_choice_processor_service_tests.given_a_twin_tile_placement_action_choice_processor_service import \
     Given_A_TwinTilePlacementActionChoiceProcessorService
-from buisness_logic.services.processor_services.twin_tile_placement_action_choice_processor_service import PlacementActionChoice
+from buisness_logic.services.processor_services.twin_tile_placement_action_choice_processor_service import TwinPlacementActionChoice
 from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from core.enums.caverna_enums import TileDirectionEnum
 
@@ -196,5 +196,5 @@ class test_when_index_is_within_range(Given_A_TwinTilePlacementActionChoiceProce
     def test_then_result_should_be_expected(self) -> None:
         for index, placement in self._placements.items():
             with self.subTest(position=index):
-                calculated_placement: PlacementActionChoice = self.SUT.convert_index_to_placement(index)
+                calculated_placement: TwinPlacementActionChoice = self.SUT.convert_index_to_placement(index)
                 self.assertEqual(placement, calculated_placement.placement)

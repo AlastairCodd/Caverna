@@ -6,7 +6,7 @@ from core.enums.caverna_enums import TileTypeEnum, TileDirectionEnum
 from core.services.base_action_choice_processor_service import BaseActionChoiceProcessorService
 
 
-class PlacementActionChoice(NamedTuple):
+class TwinPlacementActionChoice(NamedTuple):
     index: int
     placement: TileTwinPlacementLookup
 
@@ -79,7 +79,7 @@ class TwinTilePlacementActionChoiceProcessorService(BaseActionChoiceProcessorSer
 
     def process_action_choice_placement_for_tile(
             self,
-            tile_type: TileTypeEnum) -> PlacementActionChoice:
+            tile_type: TileTypeEnum) -> TwinPlacementActionChoice:
         if tile_type not in self._tile_type_to_offset:
             raise IndexError("Tile position cannot be set using this processor service")
         tile_action_choice_offset: int = self._tile_type_to_offset[tile_type] * self._number_of_possible_twin_placements
@@ -93,7 +93,7 @@ class TwinTilePlacementActionChoiceProcessorService(BaseActionChoiceProcessorSer
             return self.convert_index_to_placement(index)
         raise IndexError("No valid choices")
 
-    def convert_index_to_placement(self, index: int) -> PlacementActionChoice:
+    def convert_index_to_placement(self, index: int) -> TwinPlacementActionChoice:
         local_index: int = index % self._number_of_possible_twin_placements
         placement: TileTwinPlacementLookup
 
@@ -156,4 +156,4 @@ class TwinTilePlacementActionChoiceProcessorService(BaseActionChoiceProcessorSer
 
                 placement = TileTwinPlacementLookup(location, direction)
 
-        return PlacementActionChoice(index=index, placement=placement)
+        return TwinPlacementActionChoice(index=index, placement=placement)
