@@ -12,7 +12,7 @@ class FenceBuildingSmallCard(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Fence Building", card_ids.FenceBuildingSmallCardId,
             actions=Conditional(
-                ActionCombinationEnum.AndThen,
+                ActionCombinationEnum.OrAndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 Conditional(
                     ActionCombinationEnum.AndOr,
@@ -30,7 +30,7 @@ class FenceBuildingLargeCard(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Fence Building", card_ids.FenceBuildingLargeCardId,
             actions=Conditional(
-                ActionCombinationEnum.AndThen,
+                ActionCombinationEnum.OrAndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 Conditional(
                     ActionCombinationEnum.AndOr,

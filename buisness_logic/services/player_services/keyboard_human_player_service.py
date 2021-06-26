@@ -12,7 +12,6 @@ from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
@@ -80,6 +79,11 @@ class KeyboardHumanPlayerService(BasePlayerService):
             self,
             turn_descriptor: TurnDescriptorLookup) -> List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]:
         pass
+
+    def get_player_choice_market_items_to_purchase(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
+        raise NotImplementedError()
 
     def get_player_choice_weapon_level(
             self,
@@ -314,6 +318,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             self,
             possible_expedition_rewards: List[BaseAction],
             expedition_level: int,
+            is_first_expedition_action: bool,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
         choices: List[Dict[str, Any]] = [
             {"name": str(action),
@@ -349,35 +354,21 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def get_player_choice_location_to_build(
             self,
             tile: BaseTile,
-            turn_descriptor: TurnDescriptorLookup,
-            secondary_tile: Optional[BaseTile] = None) -> ResultLookup[TileUnknownPlacementLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
         if tile is None:
             raise ValueError("Tile cannot be None")
 
         location_name: str = "location_to_use"
-        direction_name: str = "direction_to_point"
 
         from common.services.tile_service import TileService
         tile_service: TileService = TileService()
 
-        valid_locations: Union[List[int], Dict[int, List[TileTwinPlacementLookup]]]
         is_outdoors_tile: bool = tile_service.is_tile_placed_outside(tile.tile_type)
         requisites: List[TileTypeEnum] = tile_service.outdoor_tiles \
             if is_outdoors_tile \
             else [tile for tile in TileTypeEnum if tile not in tile_service.outdoor_tiles]
 
-        if secondary_tile is None:
-            valid_locations = tile_service.get_available_locations_for_single(self, tile.tile_type, requisites)
-        else:
-            locations_for_twin: List[TileTwinPlacementLookup] = tile_service.get_available_locations_for_twin(self, requisites_override=requisites)
-            valid_locations_for_twin: Dict[int, List[TileTwinPlacementLookup]] = {}
-            for tile_placement in locations_for_twin:
-                location: int = tile_placement.location
-                if location in valid_locations_for_twin:
-                    valid_locations_for_twin[location].append(tile_placement)
-                else:
-                    valid_locations_for_twin[location] = [tile_placement]
-            valid_locations = valid_locations_for_twin
+        valid_locations: List[int] = tile_service.get_available_locations_for_single(self, tile.tile_type, requisites)
 
         # _ 1 2 _ | _ _ _ 7
         # 8 x x x | x x x _
@@ -440,29 +431,115 @@ class KeyboardHumanPlayerService(BasePlayerService):
             validator=validate_location
         )]
 
-        if secondary_tile is not None:
-            def direction_choices(current_answers: Dict[str, Any]) -> List[Dict[str, Any]]:
-                return [
-                    {"name": placement.direction.name,
-                     "value": placement}
-                    for placement in
-                    valid_locations[int(current_answers[location_name])]]
+        answers = prompt(questions)
 
-            direction_question: Dict[str, Any] = create_question(
-                QuestionTypeEnum.list,
-                direction_name,
-                "Pick a direction",
-                choices=direction_choices
-            )
-            questions.append(direction_question)
+        result: ResultLookup[int] = ResultLookup(True, int(answers[location_name]))
+
+        return result
+
+    def get_player_choice_location_to_build_twin(
+            self,
+            tile_type: TileTypeEnum,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[TileTwinPlacementLookup]:
+        location_name: str = "location_to_use"
+        direction_name: str = "direction_to_point"
+
+        from common.services.tile_service import TileService
+        tile_service: TileService = TileService()
+
+        is_outdoors_tile: bool = tile_service.is_tile_placed_outside(tile_type)
+        requisites: List[TileTypeEnum] = tile_service.outdoor_tiles \
+            if is_outdoors_tile \
+            else [tile for tile in TileTypeEnum if tile not in tile_service.outdoor_tiles]
+
+        locations_for_twin: List[TileTwinPlacementLookup] = tile_service.get_available_locations_for_twin(self, requisites_override=requisites)
+        valid_locations: Dict[int, List[TileTwinPlacementLookup]] = {}
+        for tile_placement in locations_for_twin:
+            location: int = tile_placement.location
+            if location in valid_locations:
+                valid_locations[location].append(tile_placement)
+            else:
+                valid_locations[location] = [tile_placement]
+
+        # _ 1 2 _ | _ _ _ 7
+        # 8 x x x | x x x _
+        # _ x x x | x _ x _
+        # _ x x27 | C _ x _
+        # _ x x x | D x x _
+        # _ _ _ _ | _ _ _ _
+
+        index: int = 0
+        tiles_map: List[Tuple[List[str], List[str]]] = []
+
+        for y in range(self.height):
+            line_map_readable: List[str] = []
+            line_map_number: List[str] = []
+            for x in range(self.width):
+                tile_type_at_index: TileTypeEnum = self.tiles[index].tile_type
+                if (index % self.width) == math.floor(self.width / 2):
+                    line_map_readable.append("|")
+                    line_map_number.append("|")
+                is_tile_type_unavailable: bool = tile_type_at_index is TileTypeEnum.unavailable
+                is_location_valid: bool = index in valid_locations
+
+                tile_value_readable: str
+                tile_value_number: str
+
+                if is_location_valid:
+                    if not (tile_type_at_index is TileTypeEnum.furnishedDwelling
+                            or tile_type_at_index is TileTypeEnum.furnishedCavern):
+                        tile_value_readable = tile_type_at_index.name[0].rjust(2)
+                    else:
+                        tile_value_readable = self.tiles[index].tile.name[:2]
+                    tile_value_number = str(index).rjust(2)
+                elif not is_tile_type_unavailable:
+                    tile_value_readable = " _"
+                    tile_value_number = " _"
+                else:
+                    tile_value_readable = "  "
+                    tile_value_number = "  "
+
+                line_map_readable.append(tile_value_readable)
+                line_map_number.append(tile_value_number)
+
+                index += 1
+            tiles_map.append((line_map_readable, line_map_number))
+
+        for line_map_readable in tiles_map:
+            print(" ".join(line_map_readable[0]), end="    ")
+            print(" ".join(line_map_readable[1]))
+
+        def validate_location(chosen_location: str) -> bool:
+            location_is_valid: bool = chosen_location.isdigit()
+            if location_is_valid:
+                location_is_valid = int(chosen_location) in valid_locations
+            return location_is_valid
+
+        questions: List[Dict[str, Any]] = [create_question(
+            QuestionTypeEnum.input,
+            location_name,
+            "Choose a location",
+            validator=validate_location
+        )]
+
+        def direction_choices(current_answers: Dict[str, Any]) -> List[Dict[str, Any]]:
+            return [
+                {"name": placement.direction.name,
+                 "value": placement}
+                for placement in
+                valid_locations[int(current_answers[location_name])]]
+
+        direction_question: Dict[str, Any] = create_question(
+            QuestionTypeEnum.list,
+            direction_name,
+            "Pick a direction",
+            choices=direction_choices
+        )
+        questions.append(direction_question)
 
         answers = prompt(questions)
 
-        result: ResultLookup[TileUnknownPlacementLookup]
-        if secondary_tile is None:
-            result = ResultLookup(True, TileUnknownPlacementLookup(int(answers[location_name]), None))
-        else:
-            result = ResultLookup(True, answers[direction_name])
+        result: ResultLookup[TileTwinPlacementLookup] = ResultLookup(True, answers[direction_name])
 
         return result
 
@@ -577,75 +654,6 @@ class KeyboardHumanPlayerService(BasePlayerService):
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
         pass
-
-    def get_player_choice_locations_to_sow(
-            self,
-            number_of_resources_to_sow: int,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[int]]:
-        index: int = 0
-        tiles_map: List[Tuple[List[str], List[str]]] = []
-
-        for y in range(self.height):
-            line_map_readable: List[str] = []
-            line_map_number: List[str] = []
-            for x in range(self.width):
-                tile_type_at_index: TileTypeEnum = self.tiles[index].tile_type
-                if (index % self.width) == math.floor(self.width / 2):
-                    line_map_readable.append("|")
-                    line_map_number.append("|")
-                is_tile_type_unavailable: bool = tile_type_at_index is TileTypeEnum.unavailable
-
-                tile_value_readable: str
-                tile_value_number: str
-
-                if not is_tile_type_unavailable:
-                    if not (tile_type_at_index is TileTypeEnum.furnishedDwelling
-                            or tile_type_at_index is TileTypeEnum.furnishedCavern):
-                        tile_value_readable = tile_type_at_index.name[0].rjust(2)
-                    else:
-                        tile_value_readable = self.tiles[index].tile.name[:2]
-                    tile_value_number = str(index).rjust(2)
-                else:
-                    tile_value_readable = "  "
-                    tile_value_number = "  "
-
-                line_map_readable.append(tile_value_readable)
-                line_map_number.append(tile_value_number)
-
-                index += 1
-            tiles_map.append((line_map_readable, line_map_number))
-
-        for line_map_readable in tiles_map:
-            print(" ".join(line_map_readable[0]), end="    ")
-            print(" ".join(line_map_readable[1]))
-
-        location_name: str = "location_to_use"
-
-        def validate_location(chosen_location: str) -> bool:
-            location_is_valid: bool = chosen_location.isspace() or chosen_location == "" or chosen_location.isdigit()
-            if chosen_location.isdigit():
-                location_is_valid = 0 <= int(chosen_location) < self.tile_count
-            return location_is_valid
-
-        questions = [
-            create_question(
-                QuestionTypeEnum.input,
-                location_name,
-                "Choose a location",
-                validator=validate_location
-            )
-        ]
-
-        locations_to_build: List[int] = []
-
-        for _ in range(number_of_resources_to_sow):
-            answers: Dict[str, Any] = prompt(questions)
-            location_to_build = answers[location_name]
-            if location_to_build.isdigit():
-                locations_to_build.append(int(location_to_build))
-
-        result: ResultLookup[List[int]] = ResultLookup(True, locations_to_build)
-        return result
 
     def get_player_choice_resources_to_sow(
             self,

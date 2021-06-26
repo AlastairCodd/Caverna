@@ -12,7 +12,7 @@ class SustenanceVegAndGrainCard(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Sustenance", card_ids.SustenanceVegAndGrainCardId,
             actions=Conditional(
-                ActionCombinationEnum.AndThen,
+                ActionCombinationEnum.AndThenOr,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.meadowFieldTwin)))
 
@@ -30,12 +30,12 @@ class SustenanceGrainCard(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Sustenance", card_ids.SustenanceGrainCardId,
             actions=Conditional(
-                ActionCombinationEnum.AndThen,
+                ActionCombinationEnum.AndThenOr,
+                place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.meadowFieldTwin),
                 Conditional(
                     ActionCombinationEnum.AndThen,
                     take_accumulated_items_action.TakeAccumulatedItemsAction(),
-                    receive_action.ReceiveAction({ResourceTypeEnum.grain: 1})),
-                place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.meadowFieldTwin)))
+                    receive_action.ReceiveAction({ResourceTypeEnum.grain: 1}))))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         self.give_resource(ResourceTypeEnum.food, 1)

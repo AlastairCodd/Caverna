@@ -11,13 +11,13 @@ class OreTradingCard(BaseCard):
         BaseCard.__init__(
             self, "Ore Trading", card_ids.OreTradingCardId, 4,
             actions=Conditional(
-                ActionCombinationEnum.AndOr,
+                ActionCombinationEnum.AndThenOr,
                 Conditional(
                     ActionCombinationEnum.AndThen,
                     pay_action.PayAction({ResourceTypeEnum.ore: 2}),
                     receive_action.ReceiveAction({ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 1})),
                 Conditional(
-                    ActionCombinationEnum.AndOr,
+                    ActionCombinationEnum.AndThenOr,
                     Conditional(
                         ActionCombinationEnum.AndThen,
                         pay_action.PayAction({ResourceTypeEnum.ore: 2}),

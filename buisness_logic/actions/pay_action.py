@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, cast
 
 from common.entities.dwarf import Dwarf
 from core.repositories.base_player_repository import BasePlayerRepository
@@ -55,4 +55,14 @@ class PayAction(BaseAction):
             if count != len(self._items_to_pay):
                 result += ", "
         result += ")"
+        return result
+
+    def __eq__(self, other) -> bool:
+        result: bool = isinstance(other, PayAction)
+
+        if result:
+            cast_other: PayAction = cast(PayAction, other)
+            if self is not other:
+                result = self._items_to_pay == cast_other._items_to_pay
+
         return result

@@ -17,7 +17,7 @@ class BaseOreMiningCard(BaseResourceContainingCard, metaclass=ABCMeta):
         BaseResourceContainingCard.__init__(
             self, "Ore Mining", tile_id,
             actions=Conditional(
-                ActionCombinationEnum.AndThenOr,
+                ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 receive_conditionally_action.ReceiveConditionallyAction(
                     self._condition,

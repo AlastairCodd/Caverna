@@ -11,7 +11,6 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect, Allo
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
@@ -86,9 +85,9 @@ class test_when_effects_chosen_for_purchase_are_unavailable(Given_A_PlaceASingle
         player: MockPlayer = MockPlayer(dwarves, starting_resources)
         self._location_to_place_tile: int = 28
         player.get_player_choice_location_to_build_returns(
-            lambda _, __, ___: ResultLookup(
+            lambda _, __: ResultLookup(
                 True,
-                TileUnknownPlacementLookup(self._location_to_place_tile, None)
+                self._location_to_place_tile
             ))
         player.get_player_choice_effects_to_use_for_cost_discount_returns(lambda _, __: effects_to_use)
         return player

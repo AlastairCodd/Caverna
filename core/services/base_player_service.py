@@ -1,18 +1,18 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Tuple
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
+from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
 from core.baseClasses.base_tile_container_default import BaseTileContainerDefault
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
@@ -35,6 +35,13 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
             self,
             turn_descriptor: TurnDescriptorLookup) \
             -> List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_market_items_to_purchase(
+            self,
+            turn_descriptor: TurnDescriptorLookup) \
+            -> ResultLookup[List[ResourceTypeEnum]]:
         raise NotImplementedError()
 
     @abstractmethod
@@ -144,11 +151,13 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
             self,
             possible_expedition_rewards: List[BaseAction],
             expedition_level: int,
+            is_first_expedition_action: bool,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
         """Gets user choice for which expedition rewards to use.
 
         :param possible_expedition_rewards: The possible expedition rewards that may be chosen, given the level of the dwarf. This cannot be null, or empty.
         :param expedition_level: The number of rewards the player must take. This must be positive.
+        :param is_first_expedition_action: Is this the first expedition action on the card. Only really useful for the machine learned action.
         :param turn_descriptor: The description of game state. This cannot be null, or empty.
         :returns: The expedition rewards the player has chosen to claim. This will never be null."""
         raise NotImplementedError()
@@ -157,14 +166,24 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
     def get_player_choice_location_to_build(
             self,
             tile: BaseTile,
-            turn_descriptor: TurnDescriptorLookup,
-            secondary_tile: Optional[BaseTile] = None) -> ResultLookup[TileUnknownPlacementLookup]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
         """Gets user choice for location to place the given tile.
 
         :param tile: The tile to be placed. This cannot be null.
         :param turn_descriptor: The description of game state. This cannot be null, or empty.
-        :param secondary_tile: The secondary tile to be placed, if the specified tile type is twin. This cannot be null, or empty.
-        :returns: The location (and direction, if the tile is a twin-tile) that the place has decided to place this tile. This will never be null."""
+        :returns: The location that the player has decided to place this tile. This will never be null."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_location_to_build_twin(
+            self,
+            tile_type: TileTypeEnum,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[TileTwinPlacementLookup]:
+        """Gets user choice for location to place the given twin tile.
+
+        :param tile_type: The type of the twin tile to be placed. This cannot be null.
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
+        :returns: The location and direction that the player has decided to place this tile. This will never be null."""
         raise NotImplementedError()
 
     @abstractmethod
@@ -190,13 +209,6 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
     def get_player_choice_effect_to_use_for_feeding_dwarves(
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
-        pass
-
-    @abstractmethod
-    def get_player_choice_locations_to_sow(
-            self,
-            number_of_resources_to_sow: int,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[int]]:
         pass
 
     @abstractmethod

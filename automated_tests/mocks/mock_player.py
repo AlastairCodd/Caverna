@@ -5,14 +5,14 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.defaults.tile_container_default import TileContainerDefault
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.entities.tile_unknown_placement_lookup import TileUnknownPlacementLookup
+from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.services.base_player_service import BasePlayerService
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
-from core.enums.caverna_enums import ResourceTypeEnum
+from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 
 
 class MockPlayer(BasePlayerService):
@@ -69,15 +69,20 @@ class MockPlayer(BasePlayerService):
         self._expedition_rewards_func: Callable[
             [List[BaseAction],
              int,
+             bool,
              TurnDescriptorLookup],
             ResultLookup[List[BaseAction]]] \
-            = lambda info_available_actions, info_expedition_level, info_turn_descriptor: ResultLookup(errors="Not Implemented")
+            = lambda info_available_actions, info_expedition_level, info_is_first_expedition_action, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._location_to_build_func: Callable[
             [BaseTile,
-             TurnDescriptorLookup,
-             Optional[BaseTile]],
-            ResultLookup[TileUnknownPlacementLookup]] \
-            = lambda info_tile, info_turn_descriptor, info_secondary_tile: ResultLookup(errors="Not Implemented")
+             TurnDescriptorLookup],
+            ResultLookup[int]] \
+            = lambda info_tile, info_turn_descriptor: ResultLookup(errors="Not Implemented")
+        self._location_to_build_twin_func: Callable[
+            [TileTypeEnum,
+             TurnDescriptorLookup],
+            ResultLookup[TileTwinPlacementLookup]] \
+            = lambda info_tile_type, info_turn_descriptor: ResultLookup(errors="Not Implemented")
         self._location_to_build_stable_func: Callable[
             [TurnDescriptorLookup],
             ResultLookup[int]] \
@@ -92,6 +97,11 @@ class MockPlayer(BasePlayerService):
              TurnDescriptorLookup],
             Dict[BaseTilePurchaseEffect, int]] \
             = lambda info_tile_cost, info_turn_descriptor: {}
+        self._resources_to_sow_action: Callable[
+            [int,
+             TurnDescriptorLookup],
+            ResultLookup[List[ResourceTypeEnum]]] \
+            = lambda info_number_of_resources_to_sow, info_turn_descriptor_lookup: ResultLookup(errors="Not Implemented")
 
     def __repr__(self) -> str:
         return f"{self.descriptor} {self.id}"
@@ -155,10 +165,17 @@ class MockPlayer(BasePlayerService):
             self,
             func: Callable[
                 [BaseTile,
-                 TurnDescriptorLookup,
-                 Optional[BaseTile]],
-                ResultLookup[TileUnknownPlacementLookup]]) -> None:
+                 TurnDescriptorLookup],
+                ResultLookup[int]]) -> None:
         self._location_to_build_func = func
+
+    def get_player_choice_location_to_build_twin_returns(
+            self,
+            func: Callable[
+                [TileTypeEnum,
+                 TurnDescriptorLookup],
+                ResultLookup[TileTwinPlacementLookup]]) -> None:
+        self._location_to_build_twin_func = func
 
     def get_player_choice_location_to_build_stable_returns(
             self,
@@ -197,6 +214,11 @@ class MockPlayer(BasePlayerService):
             func: Callable[[TurnDescriptorLookup], int]) -> None:
         self._weapon_level_func = func
 
+    def get_player_choice_resources_to_sow_returns(
+            self,
+            func: Callable[[int, TurnDescriptorLookup], ResultLookup[List[ResourceTypeEnum]]]) -> None:
+        self._resources_to_sow_action = func
+
     def get_player_choice_dwarf_to_use_out_of_order(
             self,
             dwarves: List[Dwarf],
@@ -217,6 +239,11 @@ class MockPlayer(BasePlayerService):
             self,
             turn_descriptor: TurnDescriptorLookup) -> List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]:
         return self._conversions_to_perform_func(turn_descriptor)
+
+    def get_player_choice_market_items_to_purchase(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
+        raise NotImplementedError()
 
     def get_player_choice_use_card_already_in_use(
             self,
@@ -247,8 +274,13 @@ class MockPlayer(BasePlayerService):
             self,
             possible_expedition_rewards: List[BaseAction],
             expedition_level: int,
+            is_first_expedition_action: bool,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
-        return self._expedition_rewards_func(possible_expedition_rewards, expedition_level, turn_descriptor)
+        return self._expedition_rewards_func(
+            possible_expedition_rewards,
+            expedition_level,
+            is_first_expedition_action,
+            turn_descriptor)
 
     def get_player_choice_tile_to_build(
             self,
@@ -259,9 +291,14 @@ class MockPlayer(BasePlayerService):
     def get_player_choice_location_to_build(
             self,
             tile: BaseTile,
-            turn_descriptor: TurnDescriptorLookup,
-            secondary_tile: Optional[BaseTile] = None) -> ResultLookup[TileUnknownPlacementLookup]:
-        return self._location_to_build_func(tile, turn_descriptor, secondary_tile)
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
+        return self._location_to_build_func(tile, turn_descriptor)
+
+    def get_player_choice_location_to_build_twin(
+            self,
+            tile_type: TileTypeEnum,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[TileTwinPlacementLookup]:
+        return self._location_to_build_twin_func(tile_type, turn_descriptor)
 
     def get_player_choice_location_to_build_stable(
             self,
@@ -284,14 +321,8 @@ class MockPlayer(BasePlayerService):
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
         pass
 
-    def get_player_choice_locations_to_sow(
-            self,
-            number_of_resources_to_sow: int,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[int]]:
-        pass
-
     def get_player_choice_resources_to_sow(
             self,
             number_of_resources_to_sow: int,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
-        pass
+        return self._resources_to_sow_action(number_of_resources_to_sow, turn_descriptor)
