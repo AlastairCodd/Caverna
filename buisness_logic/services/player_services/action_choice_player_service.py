@@ -5,6 +5,7 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from buisness_logic.services.processor_services.card_action_choice_processor_service import CardActionChoiceProcessorService
 from buisness_logic.services.processor_services.expedition_reward_action_choice_processor_service import \
     ExpeditionRewardActionChoiceProcessorService
+from buisness_logic.services.processor_services.resource_to_sow_action_choice_processor_service import ResourceToSowActionChoiceProcessorService
 from buisness_logic.services.processor_services.specific_tile_placement_action_choice_processor_service import SpecificTilePlacementActionChoiceProcessorService
 from buisness_logic.services.processor_services.stable_placement_action_choice_processor_service import StablePlacementActionChoiceProcessorService
 from buisness_logic.services.processor_services.tile_and_placement_action_choice_processor_service import TileAndPlacementActionChoiceProcessorService
@@ -48,6 +49,7 @@ class ActionChoicePlayerService(BasePlayerService):
         self._expedition_reward_action_choice_processor_service: ExpeditionRewardActionChoiceProcessorService = ExpeditionRewardActionChoiceProcessorService()
         self._tile_purchase_effect_action_choice_processor_service: TilePurchaseEffectActionChoiceProcessorService = \
             TilePurchaseEffectActionChoiceProcessorService()
+        self._resource_to_sow_action_choice_processor_service: ResourceToSowActionChoiceProcessorService = ResourceToSowActionChoiceProcessorService()
 
         self._tile_service: TileService = TileService()
 
@@ -59,6 +61,7 @@ class ActionChoicePlayerService(BasePlayerService):
             self._stable_placement_action_choice_processor_service,
             self._expedition_reward_action_choice_processor_service,
             self._tile_purchase_effect_action_choice_processor_service,
+            self._resource_to_sow_action_choice_processor_service,
         ]
 
         current_total: int = 0
@@ -261,9 +264,6 @@ class ActionChoicePlayerService(BasePlayerService):
     def get_player_choice_location_to_build_stable(
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
-        if turn_descriptor is None:
-            raise ValueError("Turn Descriptor may not be none")
-
         location: int
         _, location = self._stable_placement_action_choice_processor_service.process_action_choice_placement_for_stable()
 
@@ -291,4 +291,8 @@ class ActionChoicePlayerService(BasePlayerService):
             self,
             number_of_resources_to_sow: int,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
-        pass
+        resources_to_sow: List[ResourceTypeEnum]
+        _, resources_to_sow = self._resource_to_sow_action_choice_processor_service.process_action_choice_for_resources_to_sow()
+
+        result: ResultLookup[List[ResourceTypeEnum]] = ResultLookup(True, resources_to_sow)
+        return result
