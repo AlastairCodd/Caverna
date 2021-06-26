@@ -24,8 +24,9 @@ class SowAction(BasePlayerChoiceAction):
             raise ValueError("Quantity must be greater than 0")
         self._quantity: int = quantity
 
+        self._sowable_resources: List[ResourceTypeEnum] = [ResourceTypeEnum.veg, ResourceTypeEnum.grain]
+
         self._resources_to_sow: List[ResourceTypeEnum] = []
-        self._locations_to_sow: List[int] = []
 
     def set_player_choice(
             self,
@@ -35,25 +36,29 @@ class SowAction(BasePlayerChoiceAction):
         if player is None:
             raise ValueError("Player may not be None")
 
-        locations_to_sow_result: ResultLookup[List[int]] = player.get_player_choice_locations_to_sow(
+        resources_to_sow_result: ResultLookup[List[ResourceTypeEnum]] = player.get_player_choice_resources_to_sow(
             self._quantity,
             turn_descriptor)
 
-        success: bool = locations_to_sow_result.flag
+        success: bool = resources_to_sow_result.flag
         errors: List[str] = []
 
-        errors.extend(locations_to_sow_result.errors)
+        errors.extend(resources_to_sow_result.errors)
 
-        if success:
-            resources_to_sow_result: ResultLookup[List[ResourceTypeEnum]] = player.get_player_choice_resources_to_sow(
-                len(locations_to_sow_result.value),
-                turn_descriptor)
+        if resources_to_sow_result.flag:
+            is_attempted_number_of_resources_in_range: bool = len(resources_to_sow_result.value) <= self._quantity
+            invalid_resources: List[ResourceTypeEnum] = [resource for resource in resources_to_sow_result.value if resource not in self._sowable_resources]
 
-            success &= resources_to_sow_result.flag
-            errors.extend(resources_to_sow_result.errors)
+            if not is_attempted_number_of_resources_in_range:
+                success = False
+                errors.append(f"Attempted to sow more resources than was permitted: attempted {len(resources_to_sow_result.value)}, permitted {self._quantity}")
 
-            if resources_to_sow_result.flag:
-                self._locations_to_sow = locations_to_sow_result.value
+            if any(invalid_resources):
+                success = False
+                for invalid_resource in invalid_resources:
+                    errors.append(f"Attempted to sow resource which cannot be sown: resource {invalid_resource.name}")
+
+            if success:
                 self._resources_to_sow = resources_to_sow_result.value
 
         result: ResultLookup[ActionChoiceLookup] = ResultLookup(success, ActionChoiceLookup([]), errors)
@@ -79,32 +84,30 @@ class SowAction(BasePlayerChoiceAction):
         successes: int = 0
         errors: List[str] = []
 
-        for resource_index in range(len(self._resources_to_sow)):
-            resource_to_sow: ResourceTypeEnum = self._resources_to_sow[resource_index]
-            location_to_sow: int = self._locations_to_sow[resource_index]
+        farming_effects: List[AllowFarmingEffect] = [effect
+                                                     for effect
+                                                     in player.get_effects_of_type(AllowFarmingEffect)
+                                                     if effect.can_plant]
 
-            farming_effects: List[AllowFarmingEffect] = [effect
-                                                         for effect
-                                                         in player.tiles[location_to_sow]
-                                                             .get_effects_of_type(AllowFarmingEffect)
-                                                         if effect.can_plant]
-            if len(farming_effects) == 0:
-                success = False
-                errors.append(f"Cannot plant any resources on {location_to_sow}")
-            else:
-                plant_resource_result: ResultLookup[bool] = farming_effects[1].plant_resource(player, resource_to_sow)
+        number_of_farming_effects: int = len(farming_effects)
+        if number_of_farming_effects >= len(self._resources_to_sow):
+            for effect, resource in zip(farming_effects, self._resources_to_sow):
+                plant_resource_result: ResultLookup[bool] = effect.plant_resource(player, resource)
                 success &= plant_resource_result.flag
                 errors.extend(plant_resource_result.errors)
 
                 if plant_resource_result.flag:
                     successes += 1
+        else:
+            success = False
+            errors.append(
+                f"Insufficient locations available for planting resources: attempted {len(self._resources_to_sow)}, permitted {number_of_farming_effects}")
 
         result: ResultLookup[int] = ResultLookup(success, successes, errors)
         return result
 
     def new_turn_reset(self):
         self._resources_to_sow.clear()
-        self._locations_to_sow.clear()
 
     def __str__(self) -> str:
         return f"Sow {self._quantity} resources"
