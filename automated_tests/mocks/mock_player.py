@@ -97,6 +97,11 @@ class MockPlayer(BasePlayerService):
              TurnDescriptorLookup],
             Dict[BaseTilePurchaseEffect, int]] \
             = lambda info_tile_cost, info_turn_descriptor: {}
+        self._resources_to_sow_action: Callable[
+            [int,
+             TurnDescriptorLookup],
+            ResultLookup[List[ResourceTypeEnum]]] \
+            = lambda info_number_of_resources_to_sow, info_turn_descriptor_lookup: ResultLookup(errors="Not Implemented")
 
     def __repr__(self) -> str:
         return f"{self.descriptor} {self.id}"
@@ -209,6 +214,11 @@ class MockPlayer(BasePlayerService):
             func: Callable[[TurnDescriptorLookup], int]) -> None:
         self._weapon_level_func = func
 
+    def get_player_choice_resources_to_sow_returns(
+            self,
+            func: Callable[[int, TurnDescriptorLookup], ResultLookup[List[ResourceTypeEnum]]]) -> None:
+        self._resources_to_sow_action = func
+
     def get_player_choice_dwarf_to_use_out_of_order(
             self,
             dwarves: List[Dwarf],
@@ -311,14 +321,8 @@ class MockPlayer(BasePlayerService):
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
         pass
 
-    def get_player_choice_locations_to_sow(
-            self,
-            number_of_resources_to_sow: int,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[int]]:
-        pass
-
     def get_player_choice_resources_to_sow(
             self,
             number_of_resources_to_sow: int,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
-        pass
+        return self._resources_to_sow_action(number_of_resources_to_sow, turn_descriptor)

@@ -1,4 +1,5 @@
 from typing import Dict, cast, Tuple
+from unittest import skip
 
 from automated_tests.business_logic_tests.service_tests.encoder_service_tests.tile_container_encoder_service_tests \
     .given_a_tile_container_encoder_service import Given_A_TileContainerEncoderService
@@ -39,6 +40,7 @@ class test_when_called(Given_A_TileContainerEncoderService):
         tile_38: Tuple[int] = self._result[self._number_of_columns * 38: self._number_of_columns * 39]
         self.assertTupleEqual(tile_28, tile_38)
 
+    @skip
     def test_print_result(self) -> None:
         index: int = 0
 
