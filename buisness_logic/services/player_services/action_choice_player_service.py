@@ -5,6 +5,8 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from buisness_logic.services.processor_services.card_action_choice_processor_service import CardActionChoiceProcessorService
 from buisness_logic.services.processor_services.expedition_reward_action_choice_processor_service import \
     ExpeditionRewardActionChoiceProcessorService
+from buisness_logic.services.processor_services.market_items_to_purchase_action_choice_processor_service import \
+    MarketItemsToPurchaseActionChoiceProcessorService
 from buisness_logic.services.processor_services.resource_to_sow_action_choice_processor_service import ResourceToSowActionChoiceProcessorService
 from buisness_logic.services.processor_services.specific_tile_placement_action_choice_processor_service import SpecificTilePlacementActionChoiceProcessorService
 from buisness_logic.services.processor_services.stable_placement_action_choice_processor_service import StablePlacementActionChoiceProcessorService
@@ -46,6 +48,8 @@ class ActionChoicePlayerService(BasePlayerService):
         self._stable_placement_action_choice_processor_service: StablePlacementActionChoiceProcessorService = StablePlacementActionChoiceProcessorService()
         self._expedition_reward_action_choice_processor_service: ExpeditionRewardActionChoiceProcessorService = ExpeditionRewardActionChoiceProcessorService()
         self._resource_to_sow_action_choice_processor_service: ResourceToSowActionChoiceProcessorService = ResourceToSowActionChoiceProcessorService()
+        self._market_items_to_purchase_action_choice_processor_service: MarketItemsToPurchaseActionChoiceProcessorService = \
+            MarketItemsToPurchaseActionChoiceProcessorService()
 
         self._tile_service: TileService = TileService()
 
@@ -57,6 +61,7 @@ class ActionChoicePlayerService(BasePlayerService):
             self._stable_placement_action_choice_processor_service,
             self._expedition_reward_action_choice_processor_service,
             self._resource_to_sow_action_choice_processor_service,
+            self._market_items_to_purchase_action_choice_processor_service,
         ]
 
         current_total: int = 0
@@ -84,7 +89,10 @@ class ActionChoicePlayerService(BasePlayerService):
     def get_player_choice_market_items_to_purchase(
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
-        raise NotImplementedError()
+        items_to_purchase: List[ResourceTypeEnum]
+        _, items_to_purchase = self._market_items_to_purchase_action_choice_processor_service.process_action_choice_for_market_items()
+        result: ResultLookup[List[ResourceTypeEnum]] = ResultLookup(True, items_to_purchase)
+        return result
 
     def get_player_choice_weapon_level(
             self,
