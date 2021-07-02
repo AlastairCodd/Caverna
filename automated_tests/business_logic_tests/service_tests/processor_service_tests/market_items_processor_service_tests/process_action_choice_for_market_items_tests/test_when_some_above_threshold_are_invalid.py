@@ -35,7 +35,7 @@ class test_when_no_probability_is_above_threshold(Given_A_MarketItemsToPurchaseA
         self.assertIsNotNone(self._result)
 
     def test_then_result_hashcode_should_be_expected(self) -> None:
-        self.assertEqual(self._result.hashcode, 69)
+        self.assertEqual(self._result.hashcode, 0x7a)
 
     def test_then_result_items_to_purchase_should_contain_expected_number_of_items(self) -> None:
         self.assertEqual(len(self._result.items_to_purchase), 2)
