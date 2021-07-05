@@ -18,7 +18,7 @@ class AnimalsToBreedActionChoiceProcessorService(BaseActionChoiceProcessorServic
 
     def process_action_choice_for_animals_to_breed(
             self,
-            maximum_number_of_animals) -> AnimalsToBreedActionChoice:
+            maximum_number_of_animals: int) -> AnimalsToBreedActionChoice:
         action_reward_choices: List[float] = self._action_choice[
                                              self.offset:
                                              self.offset + self._length]
@@ -32,11 +32,11 @@ class AnimalsToBreedActionChoiceProcessorService(BaseActionChoiceProcessorServic
         for index, probability in probabilities:
             if index in self._invalid_actions:
                 continue
-            should_purchase: bool = probability > self._threshold
+            should_purchase: bool = probability > self._threshold and len(animals_to_breed) < maximum_number_of_animals
             if should_purchase:
                 item_to_purchase: ResourceTypeEnum = resource_types.farm_animals[index]
                 animals_to_breed.append(item_to_purchase)
-                hashcode <<= 2 + index
+                hashcode = (5 * hashcode) + (index + 1)
             else:
                 # order is sorted by probability, so if we're below the threshold, nothing else will be valid
                 break
@@ -47,5 +47,5 @@ class AnimalsToBreedActionChoiceProcessorService(BaseActionChoiceProcessorServic
     def mark_invalid_action(
             self,
             hashcode: int) -> None:
-        index: int = hashcode | 0b11
+        index: int = (hashcode % 5) - 1
         self._invalid_actions.append(index)
