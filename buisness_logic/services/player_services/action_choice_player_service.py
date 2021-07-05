@@ -2,6 +2,7 @@ from typing import List, Tuple, Dict
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
+from buisness_logic.services.processor_services.animals_to_breed_action_choice_processor_service import AnimalsToBreedActionChoiceProcessorService
 from buisness_logic.services.processor_services.card_action_choice_processor_service import CardActionChoiceProcessorService
 from buisness_logic.services.processor_services.expedition_reward_action_choice_processor_service import \
     ExpeditionRewardActionChoiceProcessorService
@@ -50,6 +51,7 @@ class ActionChoicePlayerService(BasePlayerService):
         self._resource_to_sow_action_choice_processor_service: ResourceToSowActionChoiceProcessorService = ResourceToSowActionChoiceProcessorService()
         self._market_items_to_purchase_action_choice_processor_service: MarketItemsToPurchaseActionChoiceProcessorService = \
             MarketItemsToPurchaseActionChoiceProcessorService()
+        self.__animals_to_breed_action_choice_processor_service: AnimalsToBreedActionChoiceProcessorService = AnimalsToBreedActionChoiceProcessorService()
 
         self._tile_service: TileService = TileService()
 
@@ -62,6 +64,7 @@ class ActionChoicePlayerService(BasePlayerService):
             self._expedition_reward_action_choice_processor_service,
             self._resource_to_sow_action_choice_processor_service,
             self._market_items_to_purchase_action_choice_processor_service,
+            self.__animals_to_breed_action_choice_processor_service,
         ]
 
         current_total: int = 0
@@ -104,7 +107,11 @@ class ActionChoicePlayerService(BasePlayerService):
             animals_which_can_reproduce: List[ResourceTypeEnum],
             possible_number_of_animals_to_reproduce: int,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
-        pass
+        animals_to_breed: List[ResourceTypeEnum]
+        _, animals_to_breed = self.__animals_to_breed_action_choice_processor_service.process_action_choice_for_animals_to_breed(
+            possible_number_of_animals_to_reproduce)
+        result: ResultLookup[List[ResourceTypeEnum]] = ResultLookup(True, animals_to_breed)
+        return result
 
     def get_player_choice_use_dwarf_out_of_order(
             self,
