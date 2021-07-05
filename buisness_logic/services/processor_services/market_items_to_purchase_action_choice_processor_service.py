@@ -46,7 +46,7 @@ class MarketItemsToPurchaseActionChoiceProcessorService(BaseActionChoiceProcesso
             if should_purchase:
                 item_to_purchase: ResourceTypeEnum = self._purchasable_items[index]
                 items_to_purchase.append(item_to_purchase)
-                hashcode = hashcode * 10 + index
+                hashcode = (11 * hashcode) + index + 1
             else:
                 # order is sorted by probability, so if we're below the threshold, nothing else will be valid
                 break
@@ -57,5 +57,5 @@ class MarketItemsToPurchaseActionChoiceProcessorService(BaseActionChoiceProcesso
     def mark_invalid_action(
             self,
             hashcode: int) -> None:
-        index: int = hashcode % 10
+        index: int = hashcode % 11 - 1
         self._invalid_actions.append(index)
