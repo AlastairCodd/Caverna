@@ -7,6 +7,8 @@ from buisness_logic.services.processor_services.expedition_reward_action_choice_
     ExpeditionRewardActionChoiceProcessorService
 from buisness_logic.services.processor_services.specific_tile_placement_action_choice_processor_service import SpecificTilePlacementActionChoiceProcessorService
 from buisness_logic.services.processor_services.tile_and_placement_action_choice_processor_service import TileAndPlacementActionChoiceProcessorService
+from buisness_logic.services.processor_services.tile_purchase_effect_action_choice_processor_service import \
+    TilePurchaseEffectActionChoiceProcessorService
 from buisness_logic.services.processor_services.twin_tile_placement_action_choice_processor_service import TwinTilePlacementActionChoiceProcessorService
 from common.defaults.tile_container_default import TileContainerDefault
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -42,6 +44,8 @@ class ActionChoicePlayerService(BasePlayerService):
         self._twin_tile_placement_action_choice_processor_service: TwinTilePlacementActionChoiceProcessorService = \
             TwinTilePlacementActionChoiceProcessorService()
         self._expedition_reward_action_choice_processor_service: ExpeditionRewardActionChoiceProcessorService = ExpeditionRewardActionChoiceProcessorService()
+        self._tile_purchase_effect_action_choice_processor_service: TilePurchaseEffectActionChoiceProcessorService = \
+            TilePurchaseEffectActionChoiceProcessorService()
 
         self._tile_service: TileService = TileService()
 
@@ -51,6 +55,7 @@ class ActionChoicePlayerService(BasePlayerService):
             self._specific_tile_placement_action_choice_processor_service,
             self._twin_tile_placement_action_choice_processor_service,
             self._expedition_reward_action_choice_processor_service,
+            self._tile_purchase_effect_action_choice_processor_service,
         ]
 
         current_total: int = 0
@@ -258,8 +263,9 @@ class ActionChoicePlayerService(BasePlayerService):
     def get_player_choice_effects_to_use_for_cost_discount(
             self,
             tile_cost: Dict[ResourceTypeEnum, int],
+            possible_effects: List[BaseTilePurchaseEffect],
             turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
-        pass
+        self._tile_purchase_effect_action_choice_processor_service.process_action_choice_purchase_effects()
 
     def get_player_choice_use_harvest_action_instead_of_breeding(
             self,
