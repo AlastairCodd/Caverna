@@ -558,6 +558,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def get_player_choice_effects_to_use_for_cost_discount(
             self,
             tile_cost: Dict[ResourceTypeEnum, int],
+            possible_effects: List[BaseTilePurchaseEffect],
             turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
         use_any_effects_name: str = "use_any_effects_name"
         effects_to_use_name: str = "effects_to_use_name"

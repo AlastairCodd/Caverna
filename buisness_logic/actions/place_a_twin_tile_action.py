@@ -71,6 +71,7 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         if any(default_cost):
             self._effects_to_use = player.get_player_choice_effects_to_use_for_cost_discount(
                 default_cost,
+                possible_purchase_effects,
                 turn_descriptor)
         else:
             self._effects_to_use = {}

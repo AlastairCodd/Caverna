@@ -196,6 +196,7 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
     def get_player_choice_effects_to_use_for_cost_discount(
             self,
             tile_cost: Dict[ResourceTypeEnum, int],
+            possible_effects: List[BaseTilePurchaseEffect],
             turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
         pass
 

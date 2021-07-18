@@ -99,8 +99,11 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
                     primary_tile,
                     self._tile_cost_override)
 
+                possible_purchase_effects: List[BaseTilePurchaseEffect] = self._tile_service.get_purchase_effects(player, turn_descriptor.tiles)
+
                 self._effects_to_use = player.get_player_choice_effects_to_use_for_cost_discount(
                     tile_cost_result.value,
+                    possible_purchase_effects,
                     turn_descriptor)
             else:
                 self._effects_to_use = {}
@@ -231,7 +234,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
         return ResultLookup(success, success, errors)
 
     def __str__(self) -> str:
-        tile_type_displayable: Dict[TileTypeEnum,str] = {
+        tile_type_displayable: Dict[TileTypeEnum, str] = {
             TileTypeEnum.forest: "Forest",
             TileTypeEnum.underground: "Underground Tile",
             TileTypeEnum.meadow: "Meadow",
