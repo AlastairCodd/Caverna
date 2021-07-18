@@ -1,4 +1,4 @@
-from typing import List, Dict, Iterable, Tuple, Optional, Callable, cast, Set
+from typing import List, Dict, Iterable, Tuple, Optional, Callable, cast
 
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
@@ -16,7 +16,11 @@ from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileDirecti
 
 
 class TileService(object):
-    def __init__(self):
+    def __init__(
+            self,
+            consider_unowned_tiles: bool = False) -> None:
+        self._consider_unpurchased_tiles: bool = consider_unowned_tiles
+
         requisite_default: TileRequisiteDefault = TileRequisiteDefault()
         self._tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = {}
         requisite_default.assign(self._tile_requisites)
@@ -126,6 +130,22 @@ class TileService(object):
             result.update(additional_tiles)
         return list(result.values())
 
+    def get_purchase_effects(
+            self,
+            player: TileContainer,
+            unowned_tiles: List[BaseTile]) -> List[BaseTilePurchaseEffect]:
+        possible_effects: List[BaseTilePurchaseEffect] = player.get_effects_of_type(BaseTilePurchaseEffect)
+        if self._consider_unpurchased_tiles:
+            possible_effects.extend(
+                effect for tile
+                in self.get_possible_tiles(
+                    unowned_tiles,
+                    TileTypeEnum.furnishedCavern)
+                for effect in tile.effects
+                if isinstance(effect, BaseTilePurchaseEffect))
+
+        return possible_effects
+
     def is_tile_available(
             self,
             turn_descriptor: TurnDescriptorLookup,
@@ -197,7 +217,7 @@ class TileService(object):
         if location < 0 or location >= player.tile_count:
             raise IndexError(f"Location index ({location}) must be in range [0, Number of Tiles owned by Player: {player.tile_count})")
 
-        possible_locations: List[TileTwinPlacementLookup] = self\
+        possible_locations: List[TileTwinPlacementLookup] = self \
             .get_available_locations_for_twin(
             player,
             twin_tile_type)
@@ -209,7 +229,8 @@ class TileService(object):
             self,
             tile: Optional[BaseTile] = None,
             cost_override: Optional[Dict[ResourceTypeEnum, int]] = None,
-            effects_to_use: Optional[Dict[BaseTilePurchaseEffect, int]] = None) -> ResultLookup[Dict[ResourceTypeEnum, int]]:
+            effects_to_use: Optional[Dict[BaseTilePurchaseEffect, int]] = None) \
+            -> ResultLookup[Dict[ResourceTypeEnum, int]]:
         """Gets the cost to the given player to build the given tile.
 
         :param tile: The tile to be built. This may be null, if cost override is not null.

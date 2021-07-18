@@ -71,8 +71,13 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
 
         if success:
             if self._tile_cost_override is not None and any(self._tile_cost_override):
+                possible_purchase_effects: List[BaseTilePurchaseEffect] = self._tile_service.get_purchase_effects(
+                    player,
+                    turn_descriptor.tiles)
+
                 self._effects_to_use = player.get_player_choice_effects_to_use_for_cost_discount(
                     self._tile_cost_override,
+                    possible_purchase_effects,
                     turn_descriptor)
             else:
                 self._effects_to_use = {}

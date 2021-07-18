@@ -191,6 +191,7 @@ class MockPlayer(BasePlayerService):
             self,
             func: Callable[
                 [Dict[ResourceTypeEnum, int],
+                 List[BaseTilePurchaseEffect],
                  TurnDescriptorLookup],
                 Dict[BaseTilePurchaseEffect, int]]) -> None:
         self._effects_to_use_for_cost_discount = func
@@ -298,6 +299,7 @@ class MockPlayer(BasePlayerService):
     def get_player_choice_effects_to_use_for_cost_discount(
             self,
             tile_cost: Dict[ResourceTypeEnum, int],
+            possible_effects: List[BaseTilePurchaseEffect],
             turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
         return self._effects_to_use_for_cost_discount(tile_cost, turn_descriptor)
 

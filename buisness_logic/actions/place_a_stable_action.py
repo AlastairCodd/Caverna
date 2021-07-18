@@ -47,8 +47,11 @@ class PlaceAStableAction(BasePlayerChoiceAction):
                 self._tile_location = location_to_build_result.value
 
         if success:
+            possible_purchase_effects: List[BaseTilePurchaseEffect] = self._tile_service.get_purchase_effects(player, turn_descriptor.tiles)
+
             self._effects_to_use = player.get_player_choice_effects_to_use_for_cost_discount(
                 self._stable_cost,
+                possible_purchase_effects,
                 turn_descriptor)
 
         if success:
