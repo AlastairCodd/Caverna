@@ -4,6 +4,7 @@ from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from buisness_logic.services.processor_services.animals_to_breed_action_choice_processor_service import AnimalsToBreedActionChoiceProcessorService
 from buisness_logic.services.processor_services.card_action_choice_processor_service import CardActionChoiceProcessorService
+from buisness_logic.services.processor_services.conversions_to_perform_action_choice_processor_service import ConversionsToPerformActionChoiceProcessorService
 from buisness_logic.services.processor_services.expedition_reward_action_choice_processor_service import \
     ExpeditionRewardActionChoiceProcessorService
 from buisness_logic.services.processor_services.market_items_to_purchase_action_choice_processor_service import \
@@ -55,7 +56,9 @@ class ActionChoicePlayerService(BasePlayerService):
         self._resource_to_sow_action_choice_processor_service: ResourceToSowActionChoiceProcessorService = ResourceToSowActionChoiceProcessorService()
         self._market_items_to_purchase_action_choice_processor_service: MarketItemsToPurchaseActionChoiceProcessorService = \
             MarketItemsToPurchaseActionChoiceProcessorService()
-        self.__animals_to_breed_action_choice_processor_service: AnimalsToBreedActionChoiceProcessorService = AnimalsToBreedActionChoiceProcessorService()
+        self._animals_to_breed_action_choice_processor_service: AnimalsToBreedActionChoiceProcessorService = AnimalsToBreedActionChoiceProcessorService()
+        self._conversions_to_perform_action_choice_processor_service: ConversionsToPerformActionChoiceProcessorService = \
+            ConversionsToPerformActionChoiceProcessorService()
 
         self._tile_service: TileService = TileService()
 
@@ -69,7 +72,8 @@ class ActionChoicePlayerService(BasePlayerService):
             self._tile_purchase_effect_action_choice_processor_service,
             self._resource_to_sow_action_choice_processor_service,
             self._market_items_to_purchase_action_choice_processor_service,
-            self.__animals_to_breed_action_choice_processor_service,
+            self._animals_to_breed_action_choice_processor_service,
+            self._conversions_to_perform_action_choice_processor_service,
         ]
 
         current_total: int = 0
@@ -92,7 +96,12 @@ class ActionChoicePlayerService(BasePlayerService):
     def get_player_choice_conversions_to_perform(
             self,
             turn_descriptor: TurnDescriptorLookup) -> List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]:
-        pass
+        if turn_descriptor is None:
+            raise ValueError("Turn Descriptor cannot be none")
+        conversions_to_perform: List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]
+        _, conversions_to_perform = self._conversions_to_perform_action_choice_processor_service.process_action_choice_conversions_to_perform()
+
+        return conversions_to_perform
 
     def get_player_choice_market_items_to_purchase(
             self,
@@ -113,7 +122,7 @@ class ActionChoicePlayerService(BasePlayerService):
             possible_number_of_animals_to_reproduce: int,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
         animals_to_breed: List[ResourceTypeEnum]
-        _, animals_to_breed = self.__animals_to_breed_action_choice_processor_service.process_action_choice_for_animals_to_breed(
+        _, animals_to_breed = self._animals_to_breed_action_choice_processor_service.process_action_choice_for_animals_to_breed(
             possible_number_of_animals_to_reproduce)
         result: ResultLookup[List[ResourceTypeEnum]] = ResultLookup(True, animals_to_breed)
         return result
