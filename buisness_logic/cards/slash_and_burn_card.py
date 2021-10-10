@@ -12,5 +12,5 @@ class SlashAndBurnCard(BaseCard):
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
                 place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.meadowFieldTwin),
-                sow_action.SowAction()
+                sow_action.SowAction(2)
             ))
