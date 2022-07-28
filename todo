@@ -1,0 +1,8 @@
+global:
+* dwelling is subset of furnishing
+add to tile service; show only possible locations for tile based on current and future locations
+
+terminal:
+split list of tiles into sections
+show only possible effects -- those that the player already has, and those which could be gained using tile effects
+
