@@ -86,3 +86,9 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
 
     def new_turn_reset(self) -> None:
         pass
+
+    def __str__(self) -> str:
+        result = "buy from\r\n        "
+        result += ",\r\n        ".join(f"{resource.name} ({cost} coin{('s' if cost > 1 else '')})" for (resource, cost) in self._purchasable_items)
+        result += "\r\n    (maximum of one purchase per resource)"
+        return result
