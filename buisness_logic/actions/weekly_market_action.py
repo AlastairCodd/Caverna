@@ -45,35 +45,35 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
 
         result: ResultLookup[ActionChoiceLookup]
 
-        if market_items_result.flag:
-            success: bool = True
-            errors: List[str] = []
+        if not market_items_result.flag:
+            return ResultLookup(False, errors=market_items_result.errors)
 
-            success &= market_items_result.flag
-            errors.extend(market_items_result.errors)
+        success: bool = True
+        errors: List[str] = []
 
-            actions: List[BaseAction] = []
-            constraints: List[BaseConstraint] = []
+        success &= market_items_result.flag
+        errors.extend(market_items_result.errors)
 
-            for resource in market_items_result.value:
-                if resource in self._purchasable_items:
-                    pay_action: PayAction = PayAction({ResourceTypeEnum.coin: self._purchasable_items[resource][1]})
-                    receive_action: ReceiveAction = ReceiveAction({resource: 1})
+        actions: List[BaseAction] = []
+        constraints: List[BaseConstraint] = []
 
-                    precedes_constraints: PrecedesConstraint = PrecedesConstraint(pay_action, receive_action)
+        for resource in market_items_result.value:
+            if resource in self._purchasable_items:
+                pay_action: PayAction = PayAction({ResourceTypeEnum.coin: self._purchasable_items[resource][1]})
+                receive_action: ReceiveAction = ReceiveAction({resource: 1})
 
-                    actions.append(pay_action)
-                    actions.append(receive_action)
+                precedes_constraints: PrecedesConstraint = PrecedesConstraint(pay_action, receive_action)
 
-                    constraints.append(precedes_constraints)
-                else:
-                    success = False
-                    errors.append(f"{resource.name} cannot be purchased at market")
+                actions.append(pay_action)
+                actions.append(receive_action)
 
-            action_choice: ActionChoiceLookup = ActionChoiceLookup(actions, constraints)
-            result = ResultLookup(success, action_choice, errors)
-        else:
-            result = ResultLookup(False, errors=market_items_result.errors)
+                constraints.append(precedes_constraints)
+            else:
+                success = False
+                errors.append(f"{resource.name} cannot be purchased at market")
+
+        action_choice: ActionChoiceLookup = ActionChoiceLookup(actions, constraints)
+        result = ResultLookup(success, action_choice, errors)
 
         return result
 
