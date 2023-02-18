@@ -2,7 +2,7 @@ import math
 from enum import Enum
 from typing import List, Tuple, Optional, Dict, Any, Union, Callable
 
-from PyInquirer import prompt
+from InquirerPy import inquirer, prompt
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
@@ -177,15 +177,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             confirm_message: str = "\n".join(card_description)
             print(confirm_message)
 
-            confirm_question: Dict[str, Any] = create_question(
-                QuestionTypeEnum.confirm,
-                confirm_use_name,
-                ""
-            )
-
-            confirm_answer: Dict[str, Any] = prompt(confirm_question, bottom_toolbar=f"Harvest Type: {turn_descriptor.harvest_type.name}")
-
-            has_picked_card = confirm_answer[confirm_use_name]
+            has_picked_card = inquirer.confirm(message="", default=True).execute()
 
         result: ResultLookup[BaseCard] = ResultLookup(True, card_answer[card_to_use_name])
         return result

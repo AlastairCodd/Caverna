@@ -1,6 +1,6 @@
 from typing import Dict, Any
 
-from PyInquirer import prompt
+from InquirerPy import prompt
 
 from buisness_logic.services.player_services.keyboard_human_player_service import create_question, QuestionTypeEnum
 from common.environments.interactive_game_runner import InteractiveGameRunner
