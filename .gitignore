@@ -8,6 +8,7 @@ venv/
 *.blend1
 *.blend2
 venv9/
+venv10/
 htmlcov/
 .coverage
 venv6/
