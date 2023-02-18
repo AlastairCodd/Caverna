@@ -27,8 +27,11 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         if not self._tile_service.is_tile_a_twin_tile(self._tile_type):
             raise ValueError("Tile type must be twin")
 
-        self._primary_twin_tile_generation_method: Optional[Callable[[], BaseTile]] = None
-        self._secondary_twin_tile_generation_method: Optional[Callable[[], BaseTile]] = None
+        self._primary_twin_tile_generation_method: Optional[Callable[[], BaseTile]]
+        self._secondary_twin_tile_generation_method: Optional[Callable[[], BaseTile]]
+
+        self._primary_twin_tile_generation_method, self._secondary_twin_tile_generation_method = self._tile_service\
+            .get_twin_tile_generation_methods(self._tile_type)
 
         self._tile_cost_override: Optional[Dict[ResourceTypeEnum, int]] = override_cost
 
@@ -45,45 +48,37 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         if player is None:
             raise ValueError("player cannot be none")
 
-        success: bool = True
-        errors: List[str] = []
+        location_to_build_result: ResultLookup[TileTwinPlacementLookup] = player \
+            .get_player_choice_location_to_build_twin(
+            self._tile_type,
+            turn_descriptor)
 
-        self._primary_twin_tile_generation_method, self._secondary_twin_tile_generation_method = self._tile_service\
-            .get_twin_tile_generation_methods(self._tile_type)
+        if not location_to_build_result.flag:
+            return ResultLookup(
+                False,
+                ActionChoiceLookup([]),
+                location_to_build_result.errors)
 
-        if success:
-            location_to_build_result: ResultLookup[TileTwinPlacementLookup] = player \
-                .get_player_choice_location_to_build_twin(
-                self._tile_type,
+        self._tile_location = location_to_build_result.value[0]
+
+        if location_to_build_result.value[1] is None:
+            return ResultLookup(errors="Must have direction when placing twin tile")
+
+        self._tile_direction = location_to_build_result.value[1]
+
+        default_cost = self._get_cost()
+        if any(default_cost):
+            self._effects_to_use = player.get_player_choice_effects_to_use_for_cost_discount(
+                default_cost,
                 turn_descriptor)
+        else:
+            self._effects_to_use = {}
 
-            success = location_to_build_result.flag
-            errors.extend(location_to_build_result.errors)
-
-            if location_to_build_result.flag:
-                self._tile_location = location_to_build_result.value[0]
-
-                if location_to_build_result.value[1] is None:
-                    success = False
-                    errors.append("Must have direction when placing twin tile")
-                else:
-                    self._tile_direction = location_to_build_result.value[1]
-
-        if success:
-            if self._tile_cost_override is not None and any(self._tile_cost_override):
-                self._effects_to_use = player.get_player_choice_effects_to_use_for_cost_discount(
-                    self._tile_cost_override,
-                    turn_descriptor)
-            else:
-                self._effects_to_use = {}
-
-        if success:
-            self._turn_descriptor = turn_descriptor
+        self._turn_descriptor = turn_descriptor
 
         result: ResultLookup[ActionChoiceLookup] = ResultLookup(
-            success,
-            ActionChoiceLookup([]),
-            errors)
+            True,
+            ActionChoiceLookup([]))
         return result
 
     def invoke(
@@ -136,8 +131,7 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         if self._tile_cost_override is None:
             actual_cost_of_primary_tile_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service.get_cost_of_tile(
                 primary_tile,
-                self._tile_cost_override,
-                self._effects_to_use)
+                effects_to_use=self._effects_to_use)
             errors.extend(actual_cost_of_primary_tile_result.errors)
 
             actual_cost_of_secondary_tile_result: ResultLookup[Dict[ResourceTypeEnum, int]]
@@ -218,7 +212,13 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
             TileTypeEnum.meadowFieldTwin: "Meadow and Field pair",
         }
 
-        return f"Place a {tile_type_displayable[self._tile_type]}"
+        result = f"Place a {tile_type_displayable[self._tile_type]}"
+        cost = self._get_cost()
+        if any(cost):
+            result += " (for "
+            result += ", ".join(f"{amount} {resource.name}" for (resource, amount) in cost.items())
+            result += ")"
+        return result
 
     def _does_player_have_effects(
             self,
@@ -247,3 +247,26 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
 
         success: bool = len(errors) == 0
         return ResultLookup(success, success, errors)
+
+    def _get_cost(self) -> Dict[ResourceTypeEnum, int]:
+        if self._tile_cost_override is not None:
+            return self._tile_cost_override
+
+        primary_tile = self._primary_twin_tile_generation_method()
+        primary_cost = primary_tile.cost
+        secondary_tile = self._secondary_twin_tile_generation_method()
+        secondary_cost = secondary_tile.cost
+
+        if not any(secondary_cost) or primary_tile is secondary_tile:
+            return primary_cost
+
+        if not any(primary_cost):
+            return secondary_cost
+
+        total = {}
+        for resource, amount in primary_cost.items():
+            total[resource] = total.get(resource, 0) + amount
+        for resource, amount in secondary_cost.items():
+            total[resource] = total.get(resource, 0) + amount
+
+        return total
