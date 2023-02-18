@@ -1,9 +1,11 @@
+from typing import Optional
+
 from common.environments.caverna_env import CavernaEnv
 
 
 class InteractiveGameRunner(object):
-    def __init__(self) -> None:
-        self._caverna_env: CavernaEnv = CavernaEnv()
+    def __init__(self, number_of_players: Optional[int]) -> None:
+        self._caverna_env: CavernaEnv = CavernaEnv() if number_of_players is None else CavernaEnv(number_of_players=number_of_players)
 
     def run(self) -> None:
         self._caverna_env.reset()
