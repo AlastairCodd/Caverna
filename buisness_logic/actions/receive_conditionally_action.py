@@ -46,6 +46,13 @@ class ReceiveConditionallyAction(BaseReceiveAction):
         pass
 
     def __str__(self) -> str:
+        result = "Receive "
+        for resource in self._items_to_receive:
+            result += f"{self._items_to_receive[resource]} {resource.name} "
+        result += "for each time the condition is met"
+        return result
+
+    def __repr__(self) -> str:
         result = "ReceiveConditionallyAction("
         count = 0
         for resource in self._items_to_receive:
