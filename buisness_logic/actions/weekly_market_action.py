@@ -88,7 +88,22 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
         pass
 
     def __str__(self) -> str:
-        result = "buy from\r\n        "
-        result += ",\r\n        ".join(f"{resource.name} ({cost} coin{('s' if cost > 1 else '')})" for (resource, cost) in self._purchasable_items)
-        result += "\r\n    (maximum of one purchase per resource)"
+        return self.__format__(0)
+
+    def __format__(self, format_spec) -> str:
+        newline_separator = ""
+        long_separator = separator = " "
+
+        try:
+            num_spaces = int(format_spec)
+            if num_spaces != 0:
+                newline_separator = "\r\n"
+                separator = " " * num_spaces
+                long_separator = " " * num_spaces * 2
+        except ValueError:
+            pass
+
+        result = f"buy from{newline_separator}{long_separator}"
+        result += f",{newline_separator}{long_separator}".join(f"{resource.name} ({cost} coin{('s' if cost > 1 else '')})" for (resource, cost) in self._purchasable_items)
+        result += f"{newline_separator}{separator}(maximum of one purchase per resource)"
         return result
