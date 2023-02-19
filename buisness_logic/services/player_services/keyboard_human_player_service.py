@@ -124,7 +124,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             print(card.name)
             print(f" {str(card.actions)}")
         print()
-        print(f"Can be used for {amount_of_food_required} food")
+        print(f"(immitating a card costs {amount_of_food_required} food)")
         print(f"(Harvest Phase at end of turn: {turn_descriptor.harvest_type.name})")
 
         name = "use_card_already_in_use"
@@ -167,7 +167,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
             card_to_use: BaseCard = card_answer[card_to_use_name]
 
-            card_description: List[str] = [f"Confirm using {card_to_use.name}?"]
+            card_description: List[str] = [f"Confirm that you'd like to use {card_to_use.name}?"]
             if card_to_use.actions is not None:
                 card_description.append("  Actions: ")
                 card_description.append(f"    {str(card_to_use.actions)}")
