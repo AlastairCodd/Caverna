@@ -1,14 +1,16 @@
 from typing import Dict, Any
 
+from InquirerPy.utils import color_print
 from InquirerPy import prompt
 
 from buisness_logic.services.player_services.keyboard_human_player_service import create_question, QuestionTypeEnum
 from common.environments.interactive_game_runner import InteractiveGameRunner
 
 if __name__ == "__main__":
-    print("Welcome to...")
-    print("Cavernabot!")
-    print()
+    color_print(
+        formatted_text=[("", "Welcome to...\r\n"), ("class:emphasis", "Cavernabot!"), ("","\r\n")],
+        style={"emphasis": "fg:yellow bold"},
+    )
 
     def validate_number_of_players(chosen_number_of_players) -> bool:
         if not chosen_number_of_players.isdigit():
