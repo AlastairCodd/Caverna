@@ -10,7 +10,7 @@ class PlayersDefault(object):
             self,
             number_of_players: int = 7):
         self._initial_food: List[int] = [1, 1, 2, 3, 3, 3, 3]
-        self._names: List[str] = ["Kaite", "Inth", "Callie", "Merra", "Tali", "Menxing", "Belville"]
+        self._names: List[str] = ["Inth", "Callie", "Merra", "Tali", "Menxing", "Kaite", "Belville"]
 
         if number_of_players < 1:
             raise IndexError(f"Must have at least one player (number_of_players={number_of_players})")
