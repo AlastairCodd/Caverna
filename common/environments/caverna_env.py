@@ -2,6 +2,8 @@ from typing import Tuple, Dict, List, Optional
 # from gym import Env
 from numpy import array, concatenate, random
 
+from InquirerPy.utils import color_print
+
 from buisness_logic.services.turn_execution_service import TurnExecutionService
 from common.defaults.card_default import CardDefault
 from common.services.caverna_state_service import CavernaStateService
@@ -29,7 +31,7 @@ class CavernaEnv(object):
             card_default: Optional[CardDefault] = None,
             tile_forge: Optional[TileForge] = None):
         """Ctor
-        
+
         Params: numberOfPlayers: int. Must be between 1 and 7 (inclusive)."""
         if number_of_players < 1:
             raise IndexError("numberOfPlayers")
@@ -50,7 +52,7 @@ class CavernaEnv(object):
 
         self._turn_execution_service: TurnExecutionService = TurnExecutionService()
         self._point_calculation_service: PointCalculationService = PointCalculationService()
-    
+
     def reset(self) -> array:
         """Resets the environment
 
@@ -90,7 +92,7 @@ class CavernaEnv(object):
     def step(self) -> Tuple[array, float, bool, Dict]:
         """Takes an action service (either the output of a network or a delayed decision maker)
         and applies the actions to get the next state
-        
+
         Returns:
             array: the observation of the game state
             float: the reward for the last action
@@ -105,6 +107,11 @@ class CavernaEnv(object):
             self._state.turn_index,
             self._state.round_index,
             self._state.round_harvest_type)
+
+        color_print(
+            formatted_text=[("", current_player.descriptor), ("", "'s turn:")],
+            style={"": "underline"},
+        )
 
         turn_result: ResultLookup[int] = self._turn_execution_service.take_turn(
             current_player,
@@ -137,7 +144,7 @@ class CavernaEnv(object):
 
     def observe(self) -> array:
         observation: array = array([])
-        
+
         return observation
 
     def _observe_player(self, player: BasePlayerService) -> array:
