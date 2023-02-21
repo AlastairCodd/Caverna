@@ -63,7 +63,7 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
 
         self._upgrade_dwarf_weapon_action: BaseAction = UpgradeDwarfWeaponAction()
 
-        self._chosen_actions_and_levels: Dict[BaseAction, int] = {}
+        self._chosen_actions_and_levels: List[Tuple[BaseAction, int]] = []
 
     def set_player_choice(
             self,
@@ -74,11 +74,9 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
             raise ValueError(str(player))
 
         possible_expedition_rewards = []
-        possible_expedition_rewards_and_levels: Dict[BaseAction, int] = {}
         for level in self._expedition_actions:
             for action in self._expedition_actions[level]:
                 possible_expedition_rewards.append(action)
-                possible_expedition_rewards_and_levels[action] = level
 
         chosen_expedition_actions: ResultLookup[List[BaseAction]] = player.get_player_choice_expedition_reward(
             possible_expedition_rewards,
@@ -86,33 +84,38 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
             self._is_first_expedition_action,
             turn_descriptor)
 
-        errors: List[str] = []
-        errors.extend(chosen_expedition_actions.errors)
-
         actions: List[BaseAction] = [self._upgrade_dwarf_weapon_action]
         constraints: List[BaseConstraint] = [PrecedesConstraint(self, self._upgrade_dwarf_weapon_action)]
 
-        if chosen_expedition_actions.flag:
-            if len(chosen_expedition_actions.value) > self._level:
-                errors.append(f"Player attempted to choose {len(chosen_expedition_actions.value)} actions, when only {self._level} are allowed")
-            else:
-                any_duplicates: bool = any(map(lambda x: x > 1, Counter(chosen_expedition_actions.value).values()))
+        if not chosen_expedition_actions.flag:
+            return ResultLookup(errors=chosen_expedition_actions.errors)
 
-                if any_duplicates:
-                    errors.append("Attempted to use the same action twice")
+        errors: List[str] = []
+        errors.extend(chosen_expedition_actions.errors)
 
-                for action in chosen_expedition_actions.value:
-                    if action in possible_expedition_rewards:
-                        self._chosen_actions_and_levels[action] = possible_expedition_rewards_and_levels[action]
+        if len(chosen_expedition_actions.value) > self._level:
+            errors.append(f"Player attempted to choose {len(chosen_expedition_actions.value)} actions, when only {self._level} are allowed")
+            return ResultLookup(errors=errors)
 
-                        after_expedition_constraint: BaseConstraint = PrecedesConstraint(self, action)
-                        constraints.append(after_expedition_constraint)
-                        actions.append(action)
+        any_duplicates: bool = any(map(lambda x: x > 1, Counter(chosen_expedition_actions.value).values()))
 
-                        before_dwarf_level_constraint: BaseConstraint = PrecedesConstraint(action, self._upgrade_dwarf_weapon_action)
-                        constraints.append(before_dwarf_level_constraint)
-                    else:
-                        errors.append(f"player attempted to perform expedition action {action} that does not exist")
+        if any_duplicates:
+            errors.append("Attempted to use the same action twice")
+            return ResultLookup(errors=errors)
+
+        for action in chosen_expedition_actions.value:
+            if action not in possible_expedition_rewards:
+                errors.append(f"player attempted to perform expedition action {action} that does not exist")
+                continue
+            # set action and level
+            self._chosen_actions_and_levels.append((action, self._get_weapon_level_required_to_perform_action(action)))
+
+            after_expedition_constraint: BaseConstraint = PrecedesConstraint(self, action)
+            constraints.append(after_expedition_constraint)
+            actions.append(action)
+
+            before_dwarf_level_constraint: BaseConstraint = PrecedesConstraint(action, self._upgrade_dwarf_weapon_action)
+            constraints.append(before_dwarf_level_constraint)
 
         result: ResultLookup[ActionChoiceLookup]
         if len(errors) == 0:
@@ -137,8 +140,7 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
         errors: List[str] = []
 
         if current_dwarf.has_weapon:
-            for action in self._chosen_actions_and_levels:
-                dwarf_level_required_for_action: int = self._chosen_actions_and_levels[action]
+            for (action, dwarf_level_required_for_action) in self._chosen_actions_and_levels:
                 if dwarf_level_required_for_action > current_dwarf.weapon_level:
                     errors.append(f"Tried to perform expedition {action} of level {dwarf_level_required_for_action}, but dwarf weapon was of level "
                                   f"{current_dwarf.weapon_level}")
@@ -153,3 +155,9 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
 
     def __str__(self) -> str:
         return f"Go on a level {self._level} expedition"
+
+    def _get_weapon_level_required_to_perform_action(self, action: BaseAction) -> int:
+        for (level, actions) in self._expedition_actions.items():
+            if action in actions:
+                return level
+        raise Exception(f"Could not find action {action:r} in actions {self._expedition_actions}")
