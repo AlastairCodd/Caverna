@@ -149,7 +149,7 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
     @abstractmethod
     def get_player_choice_expedition_reward(
             self,
-            possible_expedition_rewards: List[BaseAction],
+            possible_expedition_rewards: List[Tuple[BaseAction, int]],
             expedition_level: int,
             is_first_expedition_action: bool,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:

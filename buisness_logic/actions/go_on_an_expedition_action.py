@@ -73,10 +73,10 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
         if player is None:
             raise ValueError(str(player))
 
-        possible_expedition_rewards = []
+        possible_expedition_rewards: List[Tuple[BaseAction, int]] = []
         for level in self._expedition_actions:
             for action in self._expedition_actions[level]:
-                possible_expedition_rewards.append(action)
+                possible_expedition_rewards.append((action, level))
 
         chosen_expedition_actions: ResultLookup[List[BaseAction]] = player.get_player_choice_expedition_reward(
             possible_expedition_rewards,

@@ -259,14 +259,14 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
     def get_player_choice_expedition_reward(
             self,
-            possible_expedition_rewards: List[BaseAction],
+            possible_expedition_rewards: List[Tuple[BaseAction, int]],
             expedition_level: int,
             is_first_expedition_action: bool,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
         choices: List[Dict[str, Any]] = [
-            {"name": str(action),
+            {"name": f"{action} (level {level})",
              "value": action}
-            for action in possible_expedition_rewards
+            for (action, level) in possible_expedition_rewards
         ]
 
         expedition_reward_name: str = "expedition_reward_name"
