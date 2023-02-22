@@ -104,7 +104,7 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
             return ResultLookup(errors=errors)
 
         for action in chosen_expedition_actions.value:
-            if action not in possible_expedition_rewards:
+            if action not in map(lambda x: x[0], possible_expedition_rewards):
                 errors.append(f"player attempted to perform expedition action {action} that does not exist")
                 continue
             # set action and level
