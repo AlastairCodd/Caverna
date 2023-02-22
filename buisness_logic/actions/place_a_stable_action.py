@@ -158,5 +158,7 @@ class PlaceAStableAction(BasePlayerChoiceAction):
         return result
 
     def __str__(self) -> str:
+        if self._stable_cost is None or not any(self._stable_cost):
+            return "Place a stable (for free)"
         result: str = "Place a stable for " + " and ".join([f"{amount} {resource.name}" for resource, amount in self._stable_cost.items()])
         return result
