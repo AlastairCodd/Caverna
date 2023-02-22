@@ -246,33 +246,29 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
             TileTypeEnum.rubyMine: "Ruby Mine",
         }
 
-        result_contents: List[str] = ["Place a"]
+        result: str = "Place a "
         cost: Dict[ResourceTypeEnum, int] = {}
 
         if self._specific_tile_generation_method is not None or self._tile_service.does_tile_type_have_unique_tile(self._tile_type):
             specific_tile: BaseTile = self._specific_tile_generation_method() \
                 if self._specific_tile_generation_method is not None \
                 else self._tile_service.get_unique_tile_generation_method(self._tile_type)()
-            result_contents.append(specific_tile.name)
+            result += specific_tile.name
 
             cost = self._tile_service.get_cost_of_tile(specific_tile, self._tile_cost_override).value
         else:
-            result_contents.append(tile_type_displayable[self._tile_type])
+            result += tile_type_displayable[self._tile_type]
 
             if self._tile_cost_override is not None:
                 cost = self._tile_cost_override
 
         if self._tile_requisites_override is not None:
-            result_contents.append("on ")
-
-            if len(self._tile_requisites_override) > 0:
-                " or ".join([tile_type_displayable[requisite] for requisite in self._tile_requisites_override])
-            else:
+            result += " on " + \
+                " or ".join([tile_type_displayable[requisite] for requisite in self._tile_requisites_override]) \
+                if len(self._tile_requisites_override) > 0 else \
                 f" a {tile_type_displayable[self._tile_requisites_override[0]]}"
 
         if any(cost):
-            displayable_resources: str = "and ".join([f"{amount} {resource.name}" for resource, amount in cost.items()])
-            result_contents.append("for")
-            result_contents.append(displayable_resources)
+            result += " (for " + " and ".join([f"{amount} {resource.name}" for resource, amount in cost.items()]) + ")"
 
-        return " ".join(result_contents)
+        return result
