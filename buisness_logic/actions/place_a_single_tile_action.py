@@ -272,3 +272,6 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
             result += " (for " + " and ".join([f"{amount} {resource.name}" for resource, amount in cost.items()]) + ")"
 
         return result
+
+    def __hash__(self):
+        return hash(("place single", self._tile_type, self._specific_tile_generation_method, self._tile_requisites_override, self._tile_cost_override))

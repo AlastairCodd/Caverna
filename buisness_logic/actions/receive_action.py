@@ -49,3 +49,5 @@ class ReceiveAction(BaseReceiveAction):
 
         return result
 
+    def __hash__(self):
+        return hash(("receive action", tuple(self._items_to_receive)))
