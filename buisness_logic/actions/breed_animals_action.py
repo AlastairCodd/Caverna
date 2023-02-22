@@ -39,16 +39,15 @@ class BreedAnimalsAction(BaseReceiveAction):
             self._maximum_number_of_animals_to_reproduce,
             turn_descriptor)
 
-        result: ResultLookup[ActionChoiceLookup]
-        if animals_to_reproduce_result.flag:
-            if len(animals_to_reproduce_result.value) > self._maximum_number_of_animals_to_reproduce:
-                result = ResultLookup(
-                    errors=f"Attempted to breed more than {self._maximum_number_of_animals_to_reproduce} animals")
-            else:
-                self._animals_to_reproduce = animals_to_reproduce_result.value
-                result = BaseReceiveAction.set_player_choice(self, player, dwarf, turn_descriptor)
-        else:
-            result = ResultLookup(errors=animals_to_reproduce_result.errors)
+        if not animals_to_reproduce_result.flag:
+            return ResultLookup(errors=animals_to_reproduce.errors)
+
+        if len(animals_to_reproduce_result.value) > self._maximum_number_of_animals_to_reproduce:
+            return ResultLookup(errors=f"Attempted to breed more than {self._maximum_number_of_animals_to_reproduce} animals")
+
+        self._animals_to_reproduce = animals_to_reproduce_result.value
+        result = BaseReceiveAction.set_player_choice(self, player, dwarf, turn_descriptor)
+
         return result
 
     def invoke(
@@ -86,6 +85,9 @@ class BreedAnimalsAction(BaseReceiveAction):
         success: bool = len(errors) == 0
         result: ResultLookup[int] = ResultLookup(True, value) if success else ResultLookup(errors=errors)
         return result
+
+    def __str__(self) -> str:
+       return f"Breed at most {self._maximum_number_of_animals_to_reproduce} pairs of animals"
 
     def _does_player_have_enough_animals(
             self,
