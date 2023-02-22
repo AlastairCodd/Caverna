@@ -14,8 +14,7 @@ if __name__ == "__main__":
     number_of_players = int(inquirer.number(
         message="How many players are playing?",
         min_allowed=2,
-        max_allowed=7,
-        default=None,
+        max_allowed=7
     ).execute())
 
     print()
