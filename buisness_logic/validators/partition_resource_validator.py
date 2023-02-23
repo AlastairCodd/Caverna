@@ -1,5 +1,6 @@
 from typing import Dict, Optional, TypeVar, Tuple
-from core.exceptions.ArgumentOutOfRangeError import ArgumentOutOfRangeError
+
+from core.exceptions.argument_out_of_range_error import ArgumentOutOfRangeError
 
 T = TypeVar('T')
 

@@ -9,7 +9,7 @@ from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_action import BaseAction
 from core.enums.caverna_enums import ResourceTypeEnum
-from core.errors.invalid_operation_error import InvalidOperationError
+from core.exceptions.invalid_operation_error import InvalidOperationError
 from core.services.base_player_service import BasePlayerService
 
 

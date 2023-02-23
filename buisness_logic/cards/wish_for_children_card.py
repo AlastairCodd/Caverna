@@ -3,7 +3,7 @@ from common.entities.multiconditional import Conditional
 from core.baseClasses.base_card import BaseCard
 from core.constants import card_ids
 from core.enums.caverna_enums import ActionCombinationEnum, TileTypeEnum, ResourceTypeEnum
-from core.errors.invalid_operation_error import InvalidOperationError
+from core.exceptions.invalid_operation_error import InvalidOperationError
 
 
 class WishForChildrenCard(BaseCard):

@@ -4,7 +4,7 @@ from typing import Union, Optional, List
 from common.entities.multiconditional import Conditional
 from common.services.resettable import Resettable
 from core.baseClasses.base_action import BaseAction
-from core.errors.invalid_operation_error import InvalidOperationError
+from core.exceptions.invalid_operation_error import InvalidOperationError
 
 
 class BaseCard(Resettable, metaclass=ABCMeta):
