@@ -274,27 +274,15 @@ class KeyboardHumanPlayerService(BasePlayerService):
             for (action, level) in possible_expedition_rewards
         ]
 
-        expedition_reward_name: str = "expedition_reward_name"
-        chosen_rewards: List[BaseAction] = []
+        def expedition_reward_validator(rewards: List[BaseAction]) -> bool:
+            return len(rewards) <= expedition_level
 
-        def expedition_reward_validator(reward: BaseAction) -> bool:
-            is_valid: bool = reward not in chosen_rewards
-            return is_valid
-
-        questions: List[Dict[str, Any]] = [
-            create_question(
-                QuestionTypeEnum.list,
-                expedition_reward_name,
-                "Pick an expedition reward",
-                choices=choices,
-                validator=expedition_reward_validator
-            )
-        ]
-
-        for _ in range(expedition_level):
-            answers: Dict[str, Any] = prompt(questions)
-            chosen_reward: BaseAction = answers[expedition_reward_name]
-            chosen_rewards.append(chosen_reward)
+        chosen_rewards: List[BaseAction] = inquirer.select(
+             message="Pick an expedition reward",
+             choices=choices,
+             multiselect=True,
+             validate=expedition_reward_validator
+        ).execute()
 
         result: ResultLookup[List[BaseAction]] = ResultLookup(True, chosen_rewards)
         return result
