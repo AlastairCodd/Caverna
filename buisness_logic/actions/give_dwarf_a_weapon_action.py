@@ -1,5 +1,6 @@
 from typing import List, Optional, Dict
 
+from buisness_logic.actions.cannot_afford_action_error import CannotAffordActionError
 from buisness_logic.effects.purchase_effects import DecreasePriceOfWeaponEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -69,21 +70,21 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
 
         can_player_afford_weapon: bool = player.has_more_resources_than(cost_of_weapon)
         if not can_player_afford_weapon:
-            errors.append(f"Player cannot afford weapon (\r\ncost: {cost_of_weapon},\r\n" +
-                          f"player resources: {player.resources})")
+            # duck typing is almost always bad. except when it's not.
+            errors.append(CannotAffordActionError("Player", "weapon", cost_of_weapon, player.resources))
 
         if current_dwarf.has_weapon:
             errors.append("Dwarf already has a weapon")
 
-        success: bool = len(errors) == 0
+        if len(errors) != 0:
+            return ResultLookup(errors=errors)
 
-        if success:
-            weapon_for_dwarf: Weapon = Weapon(self._level_of_weapon)
-            current_dwarf.give_weapon(weapon_for_dwarf)
+        weapon_for_dwarf: Weapon = Weapon(self._level_of_weapon)
+        current_dwarf.give_weapon(weapon_for_dwarf)
 
-            success &= player.take_resources(cost_of_weapon)
-            if not success:
-                errors.append("Failed to take resources from player")
+        success = player.take_resources(cost_of_weapon)
+        if not success:
+            errors.append("Failed to take resources from player")
 
         result: ResultLookup[int] = ResultLookup(True, 1) if success else ResultLookup(errors=errors)
         return result

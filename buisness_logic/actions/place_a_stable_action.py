@@ -1,5 +1,6 @@
 from typing import Optional, List, Dict
 
+from buisness_logic.actions.cannot_afford_action_error import CannotAffordActionError
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -87,17 +88,16 @@ class PlaceAStableAction(BasePlayerChoiceAction):
         if not can_place_stable_at_chosen_location:
             errors.append(f"Chosen location {self._tile_location} already has a stable")
 
-        actual_cost_of_tile_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service.get_cost_of_tile(
+        actual_cost_of_stable_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service.get_cost_of_tile(
             None,
             self._stable_cost,
             self._effects_to_use)
-        errors.extend(actual_cost_of_tile_result.errors)
+        errors.extend(actual_cost_of_stable_result.errors)
 
-        if actual_cost_of_tile_result.flag:
-            can_player_afford_tile: bool = player.has_more_resources_than(actual_cost_of_tile_result.value)
-            if not can_player_afford_tile:
-                errors.append(f"Player cannot afford tile (cost: {actual_cost_of_tile_result.value}," +
-                              f" player resources: {player.resources})")
+        if actual_cost_of_stable_result.flag:
+            can_player_afford_stable: bool = player.has_more_resources_than(actual_cost_of_stable_result.value)
+            if not can_player_afford_stable:
+                errors.append(CannotAffordActionError("Player", "stable", actual_cost_of_stable_result.value, player.resources))
 
         success: bool = len(errors) == 0
 

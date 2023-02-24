@@ -1,5 +1,6 @@
 from typing import List, Dict, Optional, Callable
 
+from buisness_logic.actions.cannot_afford_action_error import CannotAffordActionError
 from buisness_logic.effects.base_effects import BaseOnPurchaseEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -157,8 +158,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
         if actual_cost_of_tile_result.flag:
             can_player_afford_tile: bool = player.has_more_resources_than(actual_cost_of_tile_result.value)
             if not can_player_afford_tile:
-                errors.append(f"Player cannot afford tile (cost: {actual_cost_of_tile_result.value}," +
-                              f" player resources: {player.resources})")
+                errors.append(CannotAffordActionError("Player", "tile", actual_cost_of_tile_result.value, player.resources))
 
         success: bool = len(errors) == 0
 
