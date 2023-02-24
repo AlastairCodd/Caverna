@@ -36,33 +36,31 @@ class ActionInvokeService(object):
             current_card,
             current_dwarf)
 
-        success: bool = True
-        successful_actions: int = 0
-        errors: List[str] = []
-
-        if actions_best_order.flag:
-            print("> returned valid action ordering")
-            for action in actions_best_order.value:
-                print(f"  > Invoking {action}")
-
-                invoke_result: ResultLookup[int] = action.invoke(
-                    player,
-                    current_card,
-                    current_dwarf)
-
-                if invoke_result.flag:
-                    print(f"    > Success, {invoke_result.value} actions")
-                else:
-                    success = False
-                    errors = ["Ordering Service returned invalid order"]
-                    errors.extend(actions_best_order.errors)
-                    errors.extend(invoke_result.errors)
-                    break
-                successful_actions += invoke_result.value
-        else:
-            success = False
+        if not actions_best_order.flag:
             errors = ["Ordering Service could not find valid ordering"]
             errors.extend(actions_best_order.errors)
+            return ResultLookup(errors=errors)
 
-        result: ResultLookup[int] = ResultLookup(success, successful_actions, errors)
+        print("> returned valid action ordering")
+
+        successful_actions: int = 0
+
+        for action in actions_best_order.value:
+            print(f"  > Invoking {action}")
+
+            invoke_result: ResultLookup[int] = action.invoke(
+                player,
+                current_card,
+                current_dwarf)
+
+            if not invoke_result.flag:
+                errors = ["Ordering Service returned invalid order"]
+                errors.extend(actions_best_order.errors)
+                errors.extend(invoke_result.errors)
+                return ResultLookup(errors=errors)
+
+            print(f"    > Success, {invoke_result.value} actions")
+            successful_actions += invoke_result.value
+
+        result: ResultLookup[int] = ResultLookup(True, successful_actions)
         return result

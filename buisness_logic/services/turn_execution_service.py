@@ -33,6 +33,9 @@ class TurnExecutionService(object):
             player,
             turn_descriptor)
 
+        if not chosen_turn_descriptor_result.flag:
+            return ResultLookup(errors=chosen_turn_descriptor_result.errors)
+
         success: bool = True
         errors: List[str] = []
         count: int = 0
@@ -40,59 +43,61 @@ class TurnExecutionService(object):
         success &= chosen_turn_descriptor_result.flag
         errors.extend(chosen_turn_descriptor_result.errors)
 
-        if chosen_turn_descriptor_result.flag:
-            print(chosen_turn_descriptor_result.value.choice)
+        print(chosen_turn_descriptor_result.value.choice)
 
-            choice: DwarfCardActionCombinationLookup = chosen_turn_descriptor_result.value.choice
+        choice: DwarfCardActionCombinationLookup = chosen_turn_descriptor_result.value.choice
 
-            untested_actions: List[BaseAction] = []
-            untested_actions.extend(choice.actions.actions)
+        untested_actions: List[BaseAction] = []
+        untested_actions.extend(choice.actions.actions)
 
-            if is_players_final_turn:
-                harvest_action: BaseAction = ResolveHarvestAction()
-                untested_actions.append(harvest_action)
+        if is_players_final_turn:
+            harvest_action: BaseAction = ResolveHarvestAction()
+            untested_actions.append(harvest_action)
 
-            actions_to_take: List[BaseAction] = []
-            constraints_on_actions: List[BaseConstraint] = []
+        actions_to_take: List[BaseAction] = []
+        constraints_on_actions: List[BaseConstraint] = []
 
-            constraints_on_actions.extend(choice.actions.constraints)
+        constraints_on_actions.extend(choice.actions.constraints)
 
-            action: BaseAction
-            for action in untested_actions:
-                if isinstance(action, BasePlayerChoiceAction):
-                    set_result: ResultLookup[ActionChoiceLookup] = action.set_player_choice(
-                        player,
-                        choice.dwarf,
-                        turn_descriptor)
+        action: BaseAction
+        for action in untested_actions:
+            if not isinstance(action, BasePlayerChoiceAction):
+                actions_to_take.append(action)
+                continue
+            set_result: ResultLookup[ActionChoiceLookup] = action.set_player_choice(
+                player,
+                choice.dwarf,
+                turn_descriptor)
 
-                    success &= set_result.flag
-                    errors.extend(set_result.errors)
+            success &= set_result.flag
+            errors.extend(set_result.errors)
 
-                    if set_result.flag:
-                        constraints_on_actions.extend(set_result.value.constraints)
-                        actions_to_take.append(action)
+            if not set_result.flag:
+                continue
+            constraints_on_actions.extend(set_result.value.constraints)
+            actions_to_take.append(action)
 
-                        new_action: BaseAction
-                        for new_action in set_result.value.actions:
-                            untested_actions.append(new_action)
-                            new_constraint: BaseConstraint = PrecedesConstraint(action, new_action)
-                            constraints_on_actions.append(new_constraint)
-                else:
-                    actions_to_take.append(action)
+            new_action: BaseAction
+            for new_action in set_result.value.actions:
+                untested_actions.append(new_action)
+                new_constraint: BaseConstraint = PrecedesConstraint(action, new_action)
+                constraints_on_actions.append(new_constraint)
 
-            if success:
-                full_action_choice: ActionChoiceLookup = ActionChoiceLookup(actions_to_take, constraints_on_actions)
+        if not success:
+            return ResultLookup(errors=errors)
 
-                invoked_result: ResultLookup[int] = self._action_invoke_service.invoke(
-                    full_action_choice,
-                    player,
-                    choice.card,
-                    choice.dwarf)
+        full_action_choice: ActionChoiceLookup = ActionChoiceLookup(actions_to_take, constraints_on_actions)
 
-                success &= invoked_result.flag
-                errors.extend(invoked_result.errors)
+        invoked_result: ResultLookup[int] = self._action_invoke_service.invoke(
+            full_action_choice,
+            player,
+            choice.card,
+            choice.dwarf)
 
-                if invoked_result.flag:
-                    count = invoked_result.value
+        success &= invoked_result.flag
+        errors.extend(invoked_result.errors)
+
+        if invoked_result.flag:
+            count = invoked_result.value
 
         return ResultLookup(success, count, errors)
