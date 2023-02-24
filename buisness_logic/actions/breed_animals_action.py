@@ -87,7 +87,7 @@ class BreedAnimalsAction(BaseReceiveAction):
         return result
 
     def __str__(self) -> str:
-       return f"Breed at most {self._maximum_number_of_animals_to_reproduce} pairs of animals"
+        return f"Breed at most {self._maximum_number_of_animals_to_reproduce} pairs of animals"
 
     def _does_player_have_enough_animals(
             self,
