@@ -175,7 +175,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             card_description: List[str] = [f"Confirm that you'd like to use {card_to_use.name}?"]
             if card_to_use.actions is not None:
                 card_description.append("  Actions: ")
-                card_description.append(f"    {str(card_to_use.actions)}")
+                card_description.append(f"    {card_to_use.actions:4}")
             if isinstance(card_to_use, ResourceContainer) and card_to_use.has_resources:
                 card_description.append("  Resources: ")
                 card_description.extend([f"    {resource.name}: {amount}" for resource, amount in card_to_use.resources.items()])

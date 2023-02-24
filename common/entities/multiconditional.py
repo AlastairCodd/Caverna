@@ -33,15 +33,18 @@ class Conditional(object):
         return self._type
 
     def __str__(self) -> str:
+        return self.__format__("")
+
+    def __format__(self, format_spec) -> str:
         type_to_string: Dict[ActionCombinationEnum, Callable[[Any, Any], str]] = {
-            ActionCombinationEnum.EitherOr: lambda c1, c2: f"Either {self._condition1} or {self._condition2}",
-            ActionCombinationEnum.AndOr: lambda c1, c2: f"{self._condition1} and/or {self._condition2}",
-            ActionCombinationEnum.And: lambda c1, c2: f"{self._condition1} and {self._condition2}",
-            ActionCombinationEnum.AndOptionally: lambda c1, c2: f"{self._condition1} and/or {self._condition2}",
-            ActionCombinationEnum.AndThenOr: lambda c1, c2: f"{self._condition1} and then/or {self._condition2}",
-            ActionCombinationEnum.OrAndThen: lambda c1, c2: f"{self._condition1} and then {self._condition2}, or {self._condition1}",
-            ActionCombinationEnum.Or: lambda c1, c2: f"{self._condition1} or {self._condition2}",
-            ActionCombinationEnum.AndThen: lambda c1, c2: f"{self._condition1} and then {self._condition2}",
+            ActionCombinationEnum.EitherOr: lambda c1, c2: f"Either {self._condition1:{format_spec}} or {self._condition2:{format_spec}}",
+            ActionCombinationEnum.AndOr: lambda c1, c2: f"{self._condition1:{format_spec}} and/or {self._condition2:{format_spec}}",
+            ActionCombinationEnum.And: lambda c1, c2: f"{self._condition1:{format_spec}} and {self._condition2:{format_spec}}",
+            ActionCombinationEnum.AndOptionally: lambda c1, c2: f"{self._condition1:{format_spec}} and/or {self._condition2:{format_spec}}",
+            ActionCombinationEnum.AndThenOr: lambda c1, c2: f"{self._condition1:{format_spec}} and then/or {self._condition2:{format_spec}}",
+            ActionCombinationEnum.OrAndThen: lambda c1, c2: f"{self._condition1:{format_spec}} and then {self._condition2:{format_spec}}, or {self._condition1:{format_spec}}",
+            ActionCombinationEnum.Or: lambda c1, c2: f"{self._condition1:{format_spec}} or {self._condition2:{format_spec}}",
+            ActionCombinationEnum.AndThen: lambda c1, c2: f"{self._condition1:{format_spec}} and then {self._condition2:{format_spec}}",
         }
         result: str = type_to_string[self._type](self._condition1, self._condition2)
         return result

@@ -15,3 +15,6 @@ class BaseAction(Resettable, metaclass=ABCMeta):
             active_card: 'BaseCard',
             current_dwarf: Dwarf) -> ResultLookup[int]:
         raise NotImplementedError("abstract base action class")
+
+    def __format__(self, format_spec) -> str:
+        return str(self)
