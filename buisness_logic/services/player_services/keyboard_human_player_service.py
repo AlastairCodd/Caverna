@@ -124,24 +124,31 @@ class KeyboardHumanPlayerService(BasePlayerService):
             used_available_cards: List[BaseCard],
             amount_of_food_required: int,
             turn_descriptor: TurnDescriptorLookup) -> bool:
-        print("Cards which are already in use:")
-        for card in used_available_cards:
-            print(card.name)
-            print(f" {str(card.actions)}")
-        print()
-        print(f"(immitating a card costs {amount_of_food_required} food)")
-        print(f"(Harvest Phase at end of turn: {turn_descriptor.harvest_type.name})")
 
-        name = "use_card_already_in_use"
-        question: Dict[str, Any] = create_question(
-            QuestionTypeEnum.confirm,
-            name,
-            "Use card already in use?",
-            default=False
-        )
+        result = None
+        first_loop = True
+        while result is None:
+            prompt = inquirer.confirm(
+                message="Use card already in use?",
+                instruction="(y/N/q)" if first_loop else "(y/N)",
+                default=False,
+                mandatory=not first_loop)
 
-        answer = prompt(question)
-        result: bool = answer[name]
+            if first_loop:
+                @prompt.register_kb("q")
+                def _handle_question(event):
+                    print("\r\nCards which are already in use:")
+                    for card in used_available_cards:
+                        print(card.name)
+                        print(f"    {card.actions:4}")
+                    print()
+                    print(f"(immitating a card costs {amount_of_food_required} food)")
+                    print(f"(Harvest Phase at end of turn: {turn_descriptor.harvest_type.name})")
+                    prompt._handle_skip(event)
+
+            result = prompt.execute()
+            first_loop = False
+
         return result
 
     def get_player_choice_card_to_use(
