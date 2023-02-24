@@ -119,7 +119,7 @@ class CavernaEnv(object):
             turn_descriptor)
 
         for error in turn_result.errors:
-            print(error)
+            print(format(error, "4"))
 
         next_player_result: ResultLookup[BasePlayerService] = self._state.get_next_player()
 
