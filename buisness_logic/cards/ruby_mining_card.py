@@ -12,8 +12,8 @@ from core.repositories.base_player_repository import BasePlayerRepository
 class RubyMiningCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
-            self, "Ruby Mining", card_ids.RubyMiningCardId, 4,
-            Conditional(
+            self, "Ruby Mining", card_ids.RubyMiningCardId,
+            actions=Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 receive_conditionally_action.ReceiveConditionallyAction(
