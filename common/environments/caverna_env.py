@@ -109,7 +109,7 @@ class CavernaEnv(object):
             self._state.round_harvest_type)
 
         color_print(
-            formatted_text=[("", f"{current_player.descriptor}'s turn ({current_player.turn_index+1}/{self._number_of_players}):")],
+            formatted_text=[("", f"{current_player.descriptor}'s turn (player {current_player.turn_index+1}/{self._number_of_players}, dwarf {self._state.turn_index + 1}):")],
             style={"": "underline"},
         )
 
