@@ -41,7 +41,7 @@ class CavernaStateService(object):
             return False
         number_of_available_dwarves: int = 0
         for (i, dwarf) in enumerate(self._current_player.dwarves):
-            print(f" > dwarf {i}: is_adult={dwarf.is_adult}, is_active={dwarf.is_active}")
+            print(f"[DBG] - dwarf {i}: is_adult={dwarf.is_adult}, is_active={dwarf.is_active}")
             if not dwarf.is_adult:
                 continue
             if dwarf.is_active:
@@ -58,6 +58,7 @@ class CavernaStateService(object):
 
     @property
     def is_game_finished(self) -> bool:
+        print("[DBG] checking if game is finished")
         result: bool = self.is_current_players_final_turn and self._round_index == game_constants.number_of_rounds - 1
         return result
 
@@ -103,51 +104,90 @@ class CavernaStateService(object):
         self._past_harvest_types.append(harvest_type)
 
         if logging:
-            print(f"[DBG] Round {self._round_index}, Harvest Type: {self._harvest_type.name}")
+            print(f"[DBG] Incrementing round index: roud_index={self._round_index}, harvest_type={self._harvest_type.name}")
 
         if not card.is_available:
             card.reveal_card(self._cards)
 
         self._cards.append(card)
 
+        print(f"[DBG] Resetting Cards")
+
         for card in self._cards:
             if not card.has_been_revealled:
+                if logging:
+                    print(f"[VRB]   Card \"{card.name}\" hasn't been revealled, not resetting")
                 continue
+            if logging:
+                print(f"[VRB]   Resetting card \"{card.name}\"")
             card.new_turn_reset()
             if isinstance(card, BaseResourceContainingCard):
+                if logging:
+                    print(f"[VRB]   > holds resources! refilling resources. currently:")
+                    for (resource, amount) in card.resources.items():
+                        print(f"[VRB]    > {resource.name}: {amount}")
                 card.refill_action()
+                if logging:
+                    print(f"[VRB]   ! refilled. now:")
+                    for (resource, amount) in card.resources.items():
+                        print(f"[VRB]    > {resource.name}: {amount}")
+
+        print(f"[DBG] Resetting players")
 
         for player in self._players:
-            for dwarf in player.dwarves:
+            if logging:
+                print(f"[VRB]   Resetting player \"{player.descriptor}\"")
+            for (i, dwarf) in enumerate(player.dwarves):
+                if logging:
+                    print(f"[VRB]   > Resetting dwarf {i}")
                 dwarf.clear_active_card()
-                if not dwarf.is_adult:
-                    dwarf.make_adult()
+                if dwarf.is_adult:
+                    continue
+                if logging:
+                    print(f"[VRB]     > is a child! happy birthday {i}")
+                dwarf.make_adult()
 
         self._players_in_order = self._players[self.starting_player_index_next_round:] \
             + self._players[:self.starting_player_index_next_round]
 
-    def get_next_player(self) -> ResultLookup[BasePlayerService]:
-        """Gets the next player, if applicable.
-
+    def get_next_player(
+            self,
+            logging: bool = True) -> ResultLookup[BasePlayerService]:
+        """Gets the next player to go this round, if applicable.
+        :param logging: (Optional) Whether to perform any console logging. Defaults to true.
         :returns: A result lookup, containing the next player if any players still remain without dwarves.
             Flag will be false if this is not the case, true otherwise.
             This will never be null.
         """
+        if logging:
+            print(f"[DBG] getting next player. using dwarf number {self._turn_index + 1}")
         if self._next_player_index == len(self._players):
             self._turn_index += 1
             self._next_player_index = 0
 
         for i in range(len(self._players)):
             self._current_player = self._players_in_order[self._next_player_index]
+            if logging:
+                print(f"[DBG] > is it player {self._next_player_index + 1} ({self._current_player.descriptor}'s) turn?")
             self._next_player_index += 1
 
             does_current_player_have_any_available_dwarves: bool = any(dwarf for dwarf in self._current_player.dwarves if dwarf.is_adult and not dwarf.is_active)
 
             if does_current_player_have_any_available_dwarves:
+                if logging:
+                    print("[DBG]   < yes!")
                 return ResultLookup(True, self._current_player)
 
+            if logging:
+                print(f"[DBG]   < no: has_dwarves={does_current_player_have_any_available_dwarves}")
+
+            # how does this work with non-zero starting player? weird
             if self._next_player_index == len(self._players):
+                if logging:
+                    print("[VRB] exhausted all players, going to next turn")
                 self._turn_index += 1
                 self._next_player_index = 0
 
+        if logging:
+            print("[DBG] no remaining players in turn")
         return ResultLookup(errors="No remaining players in turn")
