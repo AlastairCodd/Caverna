@@ -37,10 +37,17 @@ class CavernaStateService(object):
 
     @property
     def is_current_players_final_turn(self) -> bool:
-        result: bool = False
-        if self._current_player is not None:
-            available_dwarves: List[Dwarf] = [dwarf for dwarf in self._current_player.dwarves if dwarf.is_adult and not dwarf.is_adult]
-            result = len(available_dwarves) == 1
+        if self._current_player is None:
+            return False
+        number_of_available_dwarves: int = 0
+        for (i, dwarf) in enumerate(self._current_player.dwarves):
+            print(f" > dwarf {i}: is_adult={dwarf.is_adult}, is_active={dwarf.is_active}")
+            if not dwarf.is_adult:
+                continue
+            if dwarf.is_active:
+                continue
+            number_of_available_dwarves += 1
+        result = number_of_available_dwarves == 1
         return result
 
     @property
@@ -96,7 +103,7 @@ class CavernaStateService(object):
         self._past_harvest_types.append(harvest_type)
 
         if logging:
-            print(f"Round {self._round_index}, Harvest Type: {self._harvest_type.name}")
+            print(f"[DBG] Round {self._round_index}, Harvest Type: {self._harvest_type.name}")
 
         if not card.is_available:
             card.reveal_card(self._cards)
