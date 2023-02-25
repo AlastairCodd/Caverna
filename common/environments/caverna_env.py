@@ -74,8 +74,8 @@ class CavernaEnv(object):
         self._harvest_types_by_round[red_question_mark_harvest_round_indexes[2]] = HarvestTypeEnum.EitherFieldPhaseOrBreedingPhase
 
         self._state: CavernaStateService = CavernaStateService(players, starting_cards)
-        self._state.increment_round_index(self._cards_to_reveal[0], self._harvest_types_by_round[0])
-        self._state.get_next_player()
+        self._state.increment_round_index(self._cards_to_reveal[0], self._harvest_types_by_round[0], logging=False)
+        self._state.get_next_player(logging=False)
 
         return self.observe()
 
@@ -121,7 +121,7 @@ class CavernaEnv(object):
         for error in turn_result.errors:
             print(format(error, "4"))
 
-        next_player_result: ResultLookup[BasePlayerService] = self._state.get_next_player()
+        next_player_result: ResultLookup[BasePlayerService] = self._state.get_next_player(logging=False)
 
         has_game_finished: bool = False
 
@@ -132,9 +132,9 @@ class CavernaEnv(object):
                 card_to_reveal: BaseCard = self._cards_to_reveal[next_round_index]
                 harvest_type: HarvestTypeEnum = self._harvest_types_by_round[next_round_index]
 
-                self._state.increment_round_index(card_to_reveal, harvest_type)
+                self._state.increment_round_index(card_to_reveal, harvest_type, logging=False)
 
-                next_player_result = self._state.get_next_player()
+                next_player_result = self._state.get_next_player(logging=False)
             else:
                 has_game_finished = True
 
