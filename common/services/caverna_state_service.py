@@ -137,23 +137,17 @@ class CavernaStateService(object):
             self._turn_index += 1
             self._next_player_index = 0
 
-        was_player_found: bool = False
         for i in range(len(self._players)):
             self._current_player = self._players_in_order[self._next_player_index]
             self._next_player_index += 1
 
-            is_current_players_final_turn: bool = self.is_current_players_final_turn
             does_current_player_have_any_available_dwarves: bool = any(dwarf for dwarf in self._current_player.dwarves if dwarf.is_adult and not dwarf.is_active)
 
-            if not is_current_players_final_turn and does_current_player_have_any_available_dwarves:
-                was_player_found = True
-                break
-            elif self._next_player_index == len(self._players):
+            if does_current_player_have_any_available_dwarves:
+                return ResultLookup(True, self._current_player)
+
+            if self._next_player_index == len(self._players):
                 self._turn_index += 1
                 self._next_player_index = 0
 
-        result: ResultLookup[BasePlayerService] = ResultLookup(True, self._current_player) \
-            if was_player_found \
-            else ResultLookup(errors="No remaining players in turn")
-
-        return result
+        return ResultLookup(errors="No remaining players in turn")
