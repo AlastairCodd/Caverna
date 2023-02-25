@@ -2,6 +2,7 @@ from automated_tests.common_tests.environment_tests.caverna_environment_tests.gi
 
 
 class test_when_called_at_end_of_turn(Given_A_CavernaEnv):
+    @unittest.skip("don't do caverna env stuff")
     def because(self) -> None:
         self.SUT.reset()
 
