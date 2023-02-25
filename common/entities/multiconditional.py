@@ -2,9 +2,10 @@ from typing import Dict, Callable, Any, Union
 
 from core.baseClasses.base_action import BaseAction
 from core.enums.caverna_enums import ActionCombinationEnum
+from common.services.resettable import Resettable
 
 
-class Conditional(object):
+class Conditional(Resettable):
     def __init__(
             self,
             combination_type: ActionCombinationEnum,
@@ -31,6 +32,10 @@ class Conditional(object):
 
     def get_combination_type(self) -> ActionCombinationEnum:
         return self._type
+
+    def new_turn_reset(self) -> None:
+        self._condition1.new_turn_reset()
+        self._condition2.new_turn_reset()
 
     def __str__(self) -> str:
         return self.__format__("")
