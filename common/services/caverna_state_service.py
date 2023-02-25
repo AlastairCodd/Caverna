@@ -111,6 +111,8 @@ class CavernaStateService(object):
         self._cards.append(card)
 
         for card in self._cards:
+            if not card.has_been_revealled:
+                continue
             card.new_turn_reset()
             if isinstance(card, BaseResourceContainingCard):
                 card.refill_action()

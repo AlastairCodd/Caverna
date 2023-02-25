@@ -36,6 +36,10 @@ class BaseCard(Resettable, metaclass=ABCMeta):
         return self._level
 
     @property
+    def has_been_revealled(self) -> bool:
+        return self._is_visible
+
+    @property
     def is_active(self) -> bool:
         return self._is_active
 
