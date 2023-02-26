@@ -342,29 +342,33 @@ class TileService(object):
         for location in player.tiles:
             primary_location_tile_type: TileTypeEnum = player.tiles[location].tile_type
 
-            if primary_location_tile_type in tile_requisites:
-                adjacent_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(player, location)
-                does_primary_tile_have_connected_adjacent_tiles: bool = self._is_location_connected(player, location, adjacent_tile_locations)
+            if primary_location_tile_type not in tile_requisites:
+                continue
+            adjacent_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(player, location)
+            does_primary_tile_have_connected_adjacent_tiles: bool = self._is_location_connected(player, location, adjacent_tile_locations)
 
-                for secondary_tile_location in adjacent_tile_locations:
-                    secondary_location_tile_type: TileTypeEnum = player.tiles[secondary_tile_location.location].tile_type
-                    if secondary_location_tile_type in tile_requisites and \
-                            not (primary_location_tile_type == TileTypeEnum.unavailable
-                                 and secondary_location_tile_type == TileTypeEnum.unavailable):
+            for secondary_tile_location in adjacent_tile_locations:
+                secondary_location_tile_type: TileTypeEnum = player.tiles[secondary_tile_location.location].tile_type
+                if secondary_location_tile_type not in tile_requisites or \
+                    (primary_location_tile_type == TileTypeEnum.unavailable and \
+                        secondary_location_tile_type == TileTypeEnum.unavailable):
+                    continue
 
-                        is_location_connected: bool = does_primary_tile_have_connected_adjacent_tiles
-                        if not is_location_connected:
-                            adjacent_to_secondary_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(
-                                player,
-                                secondary_tile_location.location)
+                is_location_connected: bool = does_primary_tile_have_connected_adjacent_tiles
+                if not is_location_connected:
+                    adjacent_to_secondary_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(
+                        player,
+                        secondary_tile_location.location)
 
-                            is_location_connected = self._is_location_connected(player, secondary_tile_location.location, adjacent_to_secondary_tile_locations)
+                    is_location_connected = self._is_location_connected(player, secondary_tile_location.location, adjacent_to_secondary_tile_locations)
 
-                        if is_location_connected:
-                            valid_positions_with_adjacent.append(
-                                TileTwinPlacementLookup(
-                                    location,
-                                    secondary_tile_location.direction))
+                if not is_location_connected:
+                    continue
+
+                valid_positions_with_adjacent.append(
+                    TileTwinPlacementLookup(
+                        location,
+                        secondary_tile_location.direction))
 
         return valid_positions_with_adjacent
 
