@@ -65,4 +65,6 @@ class BaseCard(Resettable, metaclass=ABCMeta):
 
     def new_turn_reset(self) -> None:
         self._is_active = False
+        if self._actions is None:
+            return
         self._actions.new_turn_reset()
