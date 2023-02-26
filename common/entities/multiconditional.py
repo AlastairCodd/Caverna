@@ -45,7 +45,6 @@ class Conditional(Resettable):
             ActionCombinationEnum.EitherOr: lambda c1, c2: f"Either {self._condition1:{format_spec}} or {self._condition2:{format_spec}}",
             ActionCombinationEnum.AndOr: lambda c1, c2: f"{self._condition1:{format_spec}} and/or {self._condition2:{format_spec}}",
             ActionCombinationEnum.And: lambda c1, c2: f"{self._condition1:{format_spec}} and {self._condition2:{format_spec}}",
-            ActionCombinationEnum.AndOptionally: lambda c1, c2: f"{self._condition1:{format_spec}} and/or {self._condition2:{format_spec}}",
             ActionCombinationEnum.AndThenOr: lambda c1, c2: f"{self._condition1:{format_spec}} and then/or {self._condition2:{format_spec}}",
             ActionCombinationEnum.OrAndThen: lambda c1, c2: f"{self._condition1:{format_spec}} and then {self._condition2:{format_spec}}, or {self._condition1:{format_spec}}",
             ActionCombinationEnum.Or: lambda c1, c2: f"{self._condition1:{format_spec}} or {self._condition2:{format_spec}}",

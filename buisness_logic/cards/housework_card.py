@@ -11,6 +11,6 @@ class HouseworkCard(BaseCard):
         BaseCard.__init__(
             self, "Housework", card_ids.HouseworkCardId,
             actions=Conditional(
-                ActionCombinationEnum.AndOptionally,
+                ActionCombinationEnum.OrAndThen,
                 receive_action.ReceiveAction({ResourceTypeEnum.dog: 1}),
                 place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.furnishedCavern)))
