@@ -20,6 +20,9 @@ from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
+Printable = str | Tuple[List[Tuple[str, str]], Optional[Dict[str, str]]]
+
+
 class QuestionTypeEnum(Enum):
     confirm = 0,
     list = 1,
@@ -308,46 +311,11 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
         valid_locations: List[int] = tile_service.get_available_locations_for_single(self, tile.tile_type)
 
-        index: int = 0
-        tiles_map: List[Tuple[List[str], List[str]]] = []
-
-        for y in range(self.height):
-            line_map_readable: List[str] = []
-            line_map_number: List[str] = []
-            for x in range(self.width):
-                tile_type_at_index: TileTypeEnum = self.tiles[index].tile_type
-                if (index % self.width) == math.floor(self.width / 2):
-                    line_map_readable.append("|")
-                    line_map_number.append("|")
-                is_tile_type_unavailable: bool = tile_type_at_index is TileTypeEnum.unavailable
-                is_location_valid: bool = index in valid_locations
-
-                tile_value_readable: str
-                tile_value_number: str
-
-                if is_location_valid:
-                    if not (tile_type_at_index is TileTypeEnum.furnishedDwelling
-                            or tile_type_at_index is TileTypeEnum.furnishedCavern):
-                        tile_value_readable = tile_type_at_index.name[0].rjust(2)
-                    else:
-                        tile_value_readable = self.tiles[index].tile.name[:2]
-                    tile_value_number = str(index).rjust(2)
-                elif not is_tile_type_unavailable:
-                    tile_value_readable = " _"
-                    tile_value_number = " _"
-                else:
-                    tile_value_readable = "  "
-                    tile_value_number = "  "
-
-                line_map_readable.append(tile_value_readable)
-                line_map_number.append(tile_value_number)
-
-                index += 1
-            tiles_map.append((line_map_readable, line_map_number))
-
-        for line_map_readable in tiles_map:
-            print(" ".join(line_map_readable[0]), end="    ")
-            print(" ".join(line_map_readable[1]))
+        additional_information = self._create_map_for_tile_placement(valid_locations)
+        if isinstance(additional_information, str):
+            print(additional_information)
+        else:
+            color_print(additional_information[0], additional_information[1])
 
         def validate_location(chosen_location: str) -> bool:
             location_is_valid: bool = chosen_location.isdigit()
@@ -387,53 +355,11 @@ class KeyboardHumanPlayerService(BasePlayerService):
             else:
                 valid_locations[location] = [tile_placement]
 
-        # _ 1 2 _ | _ _ _ 7
-        # 8 x x x | x x x _
-        # _ x x x | x _ x _
-        # _ x x27 | C _ x _
-        # _ x x x | D x x _
-        # _ _ _ _ | _ _ _ _
-
-        index: int = 0
-        tiles_map: List[Tuple[List[str], List[str]]] = []
-
-        for y in range(self.height):
-            line_map_readable: List[str] = []
-            line_map_number: List[str] = []
-            for x in range(self.width):
-                tile_type_at_index: TileTypeEnum = self.tiles[index].tile_type
-                if (index % self.width) == math.floor(self.width / 2):
-                    line_map_readable.append("|")
-                    line_map_number.append("|")
-                is_tile_type_unavailable: bool = tile_type_at_index is TileTypeEnum.unavailable
-                is_location_valid: bool = index in valid_locations
-
-                tile_value_readable: str
-                tile_value_number: str
-
-                if is_location_valid:
-                    if not (tile_type_at_index is TileTypeEnum.furnishedDwelling
-                            or tile_type_at_index is TileTypeEnum.furnishedCavern):
-                        tile_value_readable = tile_type_at_index.name[0].rjust(2)
-                    else:
-                        tile_value_readable = self.tiles[index].tile.name[:2]
-                    tile_value_number = str(index).rjust(2)
-                elif not is_tile_type_unavailable:
-                    tile_value_readable = " _"
-                    tile_value_number = " _"
-                else:
-                    tile_value_readable = "  "
-                    tile_value_number = "  "
-
-                line_map_readable.append(tile_value_readable)
-                line_map_number.append(tile_value_number)
-
-                index += 1
-            tiles_map.append((line_map_readable, line_map_number))
-
-        for line_map_readable in tiles_map:
-            print(" ".join(line_map_readable[0]), end="    ")
-            print(" ".join(line_map_readable[1]))
+        additional_information = self._create_map_for_tile_placement(valid_locations)
+        if isinstance(additional_information, str):
+            print(additional_information)
+        else:
+            color_print(additional_information[0], additional_information[1])
 
         def validate_location(chosen_location: str) -> bool:
             location_is_valid: bool = chosen_location.isdigit()
@@ -678,4 +604,55 @@ class KeyboardHumanPlayerService(BasePlayerService):
             resources_to_use.append(answers[resource_name])
 
         result: ResultLookup[List[ResourceTypeEnum]] = ResultLookup(True, resources_to_use)
+        return result
+
+    def _create_map_for_tile_placement(self, valid_locations) -> Printable:
+        # _ 1 2 _ | _ _ _ 7
+        # 8 x x x | x x x _
+        # _ x x x | x _ x _
+        # _ x x27 | C _ x _
+        # _ x x x | D x x _
+        # _ _ _ _ | _ _ _ _
+
+        index: int = 0
+        tiles_map: List[Tuple[List[str], List[str]]] = []
+
+        for y in range(self.height):
+            line_map_readable: List[str] = []
+            line_map_number: List[str] = []
+            for x in range(self.width):
+                tile_type_at_index: TileTypeEnum = self.tiles[index].tile_type
+                if (index % self.width) == math.floor(self.width / 2):
+                    line_map_readable.append("|")
+                    line_map_number.append("|")
+                is_tile_type_unavailable: bool = tile_type_at_index is TileTypeEnum.unavailable
+                is_location_valid: bool = index in valid_locations
+
+                tile_value_readable: str
+                tile_value_number: str
+
+                if is_location_valid:
+                    if not (tile_type_at_index is TileTypeEnum.furnishedDwelling
+                            or tile_type_at_index is TileTypeEnum.furnishedCavern):
+                        tile_value_readable = tile_type_at_index.name[0:2]
+    #                        tile_value_readable = tile_type_at_index.name[:2].rjust(2)
+                    else:
+                        tile_value_readable = self.tiles[index].tile.name[:2]
+                    tile_value_number = str(index).rjust(2)
+                elif not is_tile_type_unavailable:
+                    tile_value_readable = " _"
+                    tile_value_number = " _"
+                else:
+                    tile_value_readable = "  "
+                    tile_value_number = "  "
+
+                line_map_readable.append(tile_value_readable)
+                line_map_number.append(tile_value_number)
+
+                index += 1
+            tiles_map.append((line_map_readable, line_map_number))
+
+        result = ""
+        for line_map_readable in tiles_map:
+            result += f"{' '.join(line_map_readable[0])}    {' '.join(line_map_readable[1])}\r\n"
         return result
