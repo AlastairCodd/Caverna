@@ -306,19 +306,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
         from common.services.tile_service import TileService
         tile_service: TileService = TileService()
 
-        is_outdoors_tile: bool = tile_service.is_tile_placed_outside(tile.tile_type)
-        requisites: List[TileTypeEnum] = tile_service.outdoor_tiles \
-            if is_outdoors_tile \
-            else [tile for tile in TileTypeEnum if tile not in tile_service.outdoor_tiles]
-
-        valid_locations: List[int] = tile_service.get_available_locations_for_single(self, tile.tile_type, requisites)
-
-        # _ 1 2 _ | _ _ _ 7
-        # 8 x x x | x x x _
-        # _ x x x | x _ x _
-        # _ x x27 | C _ x _
-        # _ x x x | D x x _
-        # _ _ _ _ | _ _ _ _
+        valid_locations: List[int] = tile_service.get_available_locations_for_single(self, tile.tile_type)
 
         index: int = 0
         tiles_map: List[Tuple[List[str], List[str]]] = []
@@ -390,12 +378,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
         from common.services.tile_service import TileService
         tile_service: TileService = TileService()
 
-        is_outdoors_tile: bool = tile_service.is_tile_placed_outside(tile_type)
-        requisites: List[TileTypeEnum] = tile_service.outdoor_tiles \
-            if is_outdoors_tile \
-            else [tile for tile in TileTypeEnum if tile not in tile_service.outdoor_tiles]
-
-        locations_for_twin: List[TileTwinPlacementLookup] = tile_service.get_available_locations_for_twin(self, requisites_override=requisites)
+        locations_for_twin: List[TileTwinPlacementLookup] = tile_service.get_available_locations_for_twin(self, tile_type)
         valid_locations: Dict[int, List[TileTwinPlacementLookup]] = {}
         for tile_placement in locations_for_twin:
             location: int = tile_placement.location
