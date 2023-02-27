@@ -29,7 +29,7 @@ class CannotAffordActionError(object):
 
         result = f"{self._who} cannot afford {self._what}{newline_separator}(cost: "
         result += ", ".join(f"{cost} {resource.name}" for (resource, cost) in self._cost.items())
-        result += f",{newline_separator}{self._who} has: "
+        result += f", {self._who} has: "
         result += ", ".join(f"{cost} {resource.name}" for (resource, cost) in self._has.items())
         result += ")"
         return result
