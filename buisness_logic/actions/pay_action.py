@@ -1,12 +1,12 @@
 from typing import Dict, cast
 
 from common.entities.dwarf import Dwarf
-from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
+from core.repositories.base_player_repository import BasePlayerRepository
 from core.baseClasses.base_card import BaseCard
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.baseClasses.base_action import BaseAction
-
+from buisness_logic.actions.cannot_afford_action_error import CannotAffordActionError
 
 class PayAction(BaseAction):
     def __init__(self, items_to_pay: Dict[ResourceTypeEnum, int]):
@@ -35,18 +35,20 @@ class PayAction(BaseAction):
         if player is None:
             raise ValueError("Player cannot be null")
 
-        result: ResultLookup[int]
         if not player.has_more_resources_than(self._items_to_pay):
-            result = ResultLookup(errors="Player does not have sufficient resources")
-        else:
-            player.take_resources(self._items_to_pay)
-            result = ResultLookup(True, sum(self._items_to_pay.values()))
+            return ResultLookup(errors=[CannotAffordActionError("Player", "to pay", self._items_to_pay, player.resources)])
+
+        player.take_resources(self._items_to_pay)
+        result = ResultLookup(True, sum(self._items_to_pay.values()))
         return result
 
     def new_turn_reset(self):
         pass
 
-    def __str__(self):
+    def __str__(self) -> str:
+        return "Pay " + ", ".join(f"{count} {resource.name}" for (resource, count) in self._items_to_pay.items())
+
+    def __repr__(self):
         result = "PayAction("
         count = 0
         for resource in self._items_to_pay:
