@@ -318,16 +318,14 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 location_is_valid = int(chosen_location) in valid_locations
             return location_is_valid
 
-        questions: List[Dict[str, Any]] = [create_question(
-            QuestionTypeEnum.input,
-            location_name,
-            "Choose a location",
-            validator=validate_location
-        )]
+        location = inquirer.number(
+            message="Choose a location",
+            min_allowed=min(valid_locations),
+            max_allowed=max(valid_locations),
+            validate=validate_location
+        ).execute()
 
-        answers = prompt(questions)
-
-        result: ResultLookup[int] = ResultLookup(True, int(answers[location_name]))
+        result: ResultLookup[int] = ResultLookup(True, int(location))
 
         return result
 
@@ -362,31 +360,26 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 location_is_valid = int(chosen_location) in valid_locations
             return location_is_valid
 
-        questions: List[Dict[str, Any]] = [create_question(
-            QuestionTypeEnum.input,
-            location_name,
-            "Choose a location",
-            validator=validate_location
-        )]
+        location = inquirer.number(
+            message="Choose a location",
+            min_allowed=min(valid_locations),
+            max_allowed=max(valid_locations),
+            validate=validate_location
+        ).execute()
 
-        def direction_choices(current_answers: Dict[str, Any]) -> List[Dict[str, Any]]:
-            return [
+        if location is None:
+            return ResultLookup("Choosing location cancelled")
+
+        placement = inquirer.select(
+            message="Pick a direction",
+            choices=[
                 {"name": placement.direction.name,
                  "value": placement}
                 for placement in
-                valid_locations[int(current_answers[location_name])]]
+                valid_locations[int(location)]
+            ]).execute()
 
-        direction_question: Dict[str, Any] = create_question(
-            QuestionTypeEnum.list,
-            direction_name,
-            "Pick a direction",
-            choices=direction_choices
-        )
-        questions.append(direction_question)
-
-        answers = prompt(questions)
-
-        result: ResultLookup[TileTwinPlacementLookup] = ResultLookup(True, answers[direction_name])
+        result: ResultLookup[TileTwinPlacementLookup] = ResultLookup(True, placement)
 
         return result
 
