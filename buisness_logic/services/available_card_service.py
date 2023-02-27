@@ -18,10 +18,13 @@ class AvailableCardService(object):
             player: BasePlayerRepository) -> List[BaseCard]:
         cards_which_are_used_by_someone_else: List[BaseCard] = []
         for card in cards:
-            if card.is_active:
-                if not self.is_card_used_by_player(card, player):
-                    if not isinstance(card, ImitationCard):
-                        cards_which_are_used_by_someone_else.append(card)
+            if not card.is_active:
+                continue
+            if self.is_card_used_by_player(card, player):
+                continue
+            if isinstance(card, ImitationCard):
+                continue
+            cards_which_are_used_by_someone_else.append(card)
 
         return cards_which_are_used_by_someone_else
 
@@ -29,17 +32,15 @@ class AvailableCardService(object):
             self,
             card: BaseCard,
             player: BasePlayerRepository) -> bool:
-        result: bool
 
         if card.is_active:
-            result = False
-        else:
-            result: bool = False
-            for dwarf in player.dwarves:
-                if dwarf.is_active:
-                    result = dwarf.current_card_id == card.id
-                    if result:
-                        break
+            return False
+
+        for dwarf in player.dwarves:
+            if not dwarf.is_active:
+                continue
+            if dwarf.current_card_id == card.id:
+                return True
 
         return result
 
@@ -50,12 +51,11 @@ class AvailableCardService(object):
             raise ValueError("Unused Available Cards cannot be None")
         imitation_cards_available: List[ImitationCard] = [card for card in unused_available_cards if isinstance(card, ImitationCard)]
 
-        result: ResultLookup[ImitationCard]
-        if any(imitation_cards_available):
-            imitation_card: ImitationCard = sorted(imitation_cards_available, key=lambda card: card.amount_of_food)[0]
-            result = ResultLookup(True, imitation_card)
-        else:
-            result = ResultLookup(errors="No imitation cards are available")
+        if not any(imitation_cards_available):
+            return ResultLookup(errors="No imitation cards are available")
+
+        imitation_card: ImitationCard = sorted(imitation_cards_available, key=lambda card: card.amount_of_food)[0]
+        result = ResultLookup(True, imitation_card)
         return result
 
     def can_use_card_already_in_use(
