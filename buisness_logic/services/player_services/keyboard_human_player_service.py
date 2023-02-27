@@ -254,22 +254,17 @@ class KeyboardHumanPlayerService(BasePlayerService):
         if len(possible_tiles) == 0:
             raise ValueError("Possible Tiles cannot be empty")
 
-        choices: List[Dict[str, Any]] = [
-            {"name": tile.name,
-             "value": tile}
-            for tile in possible_tiles]
+        prompt = inquirer.select(
+            message="Pick a tile to build",
+            choices=[
+                {"name": tile.name,
+                 "value": tile}
+                for tile in possible_tiles
+            ])
 
-        tile_to_build_name: str = "tile_to_build"
-        questions: List[Dict[str, Any]] = [
-            create_question(
-                QuestionTypeEnum.list,
-                tile_to_build_name,
-                "Pick a tile to build",
-                choices=choices
-            )
-        ]
-        answers: Dict[str, Any] = prompt(questions)
-        result: ResultLookup[BaseTile] = ResultLookup(True, answers[tile_to_build_name])
+        tile_to_build = prompt.execute()
+
+        result: ResultLookup[BaseTile] = ResultLookup(tile_to_build is not None, tile_to_build)
         return result
 
     def get_player_choice_expedition_reward(
