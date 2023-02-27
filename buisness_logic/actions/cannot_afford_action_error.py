@@ -33,3 +33,16 @@ class CannotAffordActionError(object):
         result += ", ".join(f"{cost} {resource.name}" for (resource, cost) in self._has.items())
         result += ")"
         return result
+
+    # don't include player resources here, because they might change depending on ordering, and that wouldn't result in a different error
+    def __hash__(self):
+        return hash((self._who, self._what, *(tuple(self._cost))))
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, CannotAffordActionError):
+            return false
+        result = self._who == other._who and \
+                 self._what == other._what and \
+                 self._cost == other._cost
+
+        return result
