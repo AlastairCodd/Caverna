@@ -10,3 +10,4 @@ bugs:
 tile placement shows u for tiles only accessible with tile effect
  - also suggests you might be able to place a tile on the starting dwelling
 trying to do something impossible still increments player count, should probably give you a second choice
+tiles are already built when they're not
