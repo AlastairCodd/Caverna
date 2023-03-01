@@ -1,4 +1,4 @@
-from typing import Dict, List, Callable
+from typing import Dict, List, Callable, Optional
 
 from buisness_logic.actions.breed_animals_action import BreedAnimalsAction
 from buisness_logic.actions.feed_dwarves_action import FeedDwarvesAction
@@ -25,6 +25,8 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
             HarvestTypeEnum.OneFoodPerDwarf: lambda _: ActionChoiceLookup([FeedDwarvesAction(1)]),
             HarvestTypeEnum.EitherFieldPhaseOrBreedingPhase: self._handle_either_field_of_breeding_harvest
         }
+        self._harvest_type_this_round: Optional[HarvestTypeEnum] = None
+        self._use_harvest_action_instead_of_breeding: Optional[boolean] = None
 
     def set_player_choice(
             self,
@@ -33,6 +35,7 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
         if turn_descriptor is None:
             raise ValueError("Turn Descriptor may not be None")
+        self._harvest_type_this_round = turn_descriptor.harvest_type
         harvest_action_choice_lookup: ActionChoiceLookup = self._harvest_type_action_dictionary[turn_descriptor.harvest_type](player)
         return ResultLookup(True, harvest_action_choice_lookup)
 
@@ -45,7 +48,8 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
         return result
 
     def new_turn_reset(self) -> None:
-        pass
+        self._harvest_type_this_round = None
+        self._use_harvest_action_instead_of_breeding = None
 
     # noinspection PyUnusedLocal
     def _handle_full_harvest(
@@ -70,10 +74,10 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
             turn_descriptor) -> ActionChoiceLookup:
         if player is None:
             raise ValueError("Player may not be None")
-        use_harvest_action_instead_of_breeding: bool = player.get_player_choice_use_harvest_action_instead_of_breeding(turn_descriptor)
+        self._use_harvest_action_instead_of_breeding: bool = player.get_player_choice_use_harvest_action_instead_of_breeding(turn_descriptor)
 
         result: ActionChoiceLookup
-        if use_harvest_action_instead_of_breeding:
+        if self._use_harvest_action_instead_of_breeding:
             harvest_field_action: HarvestFieldAction = HarvestFieldAction()
             feed_dwarves_action: FeedDwarvesAction = FeedDwarvesAction()
 
@@ -92,3 +96,19 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
 
             result = ActionChoiceLookup(actions, [feeding_dwarves_precedes_breeding_animals_constraint])
         return result
+
+    def __str__(self) -> str:
+        if self._harvest_type_this_round is None:
+            return "Resolve harvest"
+        if self._harvest_type_this_round == HarvestTypeEnum.Harvest:
+            return "Resolve full harvest"
+        if self._harvest_type_this_round == HarvestTypeEnum.OneFoodPerDwarf:
+            return "Resolve harvest by feeding each dwarf one food"
+        if self._harvest_type_this_round == HarvestTypeEnum.NoHarvest:
+            return "Resolve non-harvest harvest"
+
+        if self._use_harvest_action_instead_of_breeding is None:
+            return "Resolve harvest with either farming or breeding animals"
+        if self._use_harvest_action_instead_of_breeding:
+            return "Resolve harvest where player chose to farm"
+        return "Resolve harvest where player chose to breed animals"
