@@ -41,4 +41,19 @@ class DwarfCardActionCombinationLookup(object):
         return result
 
     def __str__(self) -> str:
-        return f"dwarf: {self._dwarf.weapon_level}  card: {self._card.name}  actions: {self._actions}"
+        return self.__format__(0)
+
+    def __format__(self, format_spec) -> str:
+        newline_separator = " "
+        try:
+            num_spaces = int(format_spec)
+            if num_spaces != 0:
+                newline_separator = "\r\n" + " " * num_spaces
+        except ValueError:
+             pass
+
+        result = "" if format_spec is None else f"Chosen Dwarf/Card/Action Combination{newline_separator}"
+        result += f"dwarf with weapon: {self._dwarf.weapon_level}"
+        result += f"{newline_separator}card: {self._card.name}"
+        result += f"{newline_separator}actions: {self._actions}"
+        return result

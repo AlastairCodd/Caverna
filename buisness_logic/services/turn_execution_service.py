@@ -43,7 +43,7 @@ class TurnExecutionService(object):
         success &= chosen_turn_descriptor_result.flag
         errors.extend(chosen_turn_descriptor_result.errors)
 
-        print(chosen_turn_descriptor_result.value.choice)
+        print(f"[VRB] {chosen_turn_descriptor_result.value.choice:4}")
 
         choice: DwarfCardActionCombinationLookup = chosen_turn_descriptor_result.value.choice
 
