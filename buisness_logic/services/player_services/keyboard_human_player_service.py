@@ -2,6 +2,7 @@ import math
 from enum import Enum
 from typing import List, Tuple, Optional, Dict, Any, Union, Callable
 
+from InquirerPy.utils import color_print
 from InquirerPy import inquirer, prompt
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
@@ -260,7 +261,28 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 {"name": tile.name,
                  "value": tile}
                 for tile in possible_tiles
-            ])
+            ],
+            long_instruction="Navigate with arrow keys, press c to see the cost of the currently selected tile"
+        )
+
+        prompt.last_card_to_show_cost = None
+
+        @prompt.register_kb("c")
+        def _handle_cost(event):
+            if prompt.last_card_to_show_cost == prompt.result_value:
+                return
+            prompt.last_card_to_show_cost = prompt.result_value
+            text = [("", "  "), ("", prompt.result_value.name), ("", " costs: ")]
+
+            # handle free items? nothing currently free but it could be...
+            for (i, (resource, amount)) in enumerate(prompt.result_value.cost.items()):
+                text.append(("class:amount", str(amount)))
+                text.append(("", " "))
+                text.append(("class:resource", resource.name))
+                if i < len(prompt.result_value.cost) - 1:
+                    text.append(("", ", "))
+
+            color_print(text, style={"amount": "yellow"})
 
         tile_to_build = prompt.execute()
 
