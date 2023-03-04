@@ -184,23 +184,17 @@ class KeyboardHumanPlayerService(BasePlayerService):
             for card in available_cards
         ]
 
-        card_to_use_name: str = "card_to_use"
-        confirm_use_name: str = "confirm_card"
-
         has_picked_card: bool = False
-        card_answer: Dict[str, Any] = {}
 
         while not has_picked_card:
-            card_question: Dict[str, Any] = create_question(
-                QuestionTypeEnum.list,
-                card_to_use_name,
-                "Pick a card",
+            card_question = inquirer.select(
+                message="Pick a card",
                 choices=choices
             )
 
-            card_answer = prompt(card_question)
+            self._add_keybinding_that_shows_resources(card_question)
 
-            card_to_use: BaseCard = card_answer[card_to_use_name]
+            card_to_use: BaseCard = card_question.execute()
 
             card_description: List[str] = [f"Confirm that you'd like to use {card_to_use.name}?"]
             if card_to_use.actions is not None:
@@ -214,7 +208,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
             has_picked_card = inquirer.confirm(message="", default=True).execute()
 
-        result: ResultLookup[BaseCard] = ResultLookup(True, card_answer[card_to_use_name])
+        result: ResultLookup[BaseCard] = ResultLookup(True, card_to_use)
         return result
 
     def get_player_choice_dwarf_to_use_out_of_order(
@@ -295,6 +289,8 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
             append_resources(text, prompt.result_value.cost, lambda text: text.append(("", "nothing")))
             color_print(text, style={"amount": "yellow"})
+
+        self._add_keybinding_that_shows_resources(prompt)
 
         tile_to_build = prompt.execute()
 
@@ -558,6 +554,29 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
         result: ResultLookup[List[ResourceTypeEnum]] = ResultLookup(True, resources_to_use)
         return result
+
+    def _add_keybinding_that_shows_resources(
+            self,
+            prompt: 'InquirerPy.base.simple.BaseSimplePrompt') -> None:
+        prompt.has_shown_resources = False
+
+        @prompt.register_kb("r")
+        def _handle_resources(event):
+            if prompt.has_shown_resources:
+                return
+            prompt.has_shown_resources = True
+
+            text = [
+                ("class:pointer", "❯ "),
+                ("", "resources available to player ("),
+                ("class:player", self.descriptor),
+                ("", ") at start of turn: ")
+            ]
+            append_resources(text, self.resources, lambda text: text.append(("", "none")))
+            color_print(text, style={
+                "pointer": "#e5c07b",
+                "amount": "#61afef",
+                "player": "ansimagenta"})
 
     def _create_map_for_tile_placement(self, valid_locations) -> Printable:
         # _ 1 2 _ | _ _ _ 7
