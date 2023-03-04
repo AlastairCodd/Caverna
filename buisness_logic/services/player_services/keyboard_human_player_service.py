@@ -21,7 +21,26 @@ from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
-Printable = str | Tuple[List[Tuple[str, str]], Optional[Dict[str, str]]]
+FormattedText = List[Tuple[str, str]]
+Styles = Dict[str, str]
+Printable = str | Tuple[FormattedText, Optional[Styles]]
+
+
+def append_resources(
+        text: FormattedText,
+        resources: Dict[ResourceTypeEnum, int],
+        if_empty: Optional[Callable[[FormattedText], None]]) -> None:
+    if len(resources) == 0 or all(amount == 0 for amount in resources.values()):
+        if if_empty is not None:
+            if_empty(text)
+        return
+
+    for (i, (resource, amount)) in enumerate(resources.items()):
+        text.append(("class:amount", str(amount)))
+        text.append(("", " "))
+        text.append(("class:resource", resource.name))
+        if i < len(resources) - 1:
+            text.append(("", ", "))
 
 
 class QuestionTypeEnum(Enum):
@@ -274,14 +293,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             prompt.last_card_to_show_cost = prompt.result_value
             text = [("", "  "), ("", prompt.result_value.name), ("", " costs: ")]
 
-            # handle free items? nothing currently free but it could be...
-            for (i, (resource, amount)) in enumerate(prompt.result_value.cost.items()):
-                text.append(("class:amount", str(amount)))
-                text.append(("", " "))
-                text.append(("class:resource", resource.name))
-                if i < len(prompt.result_value.cost) - 1:
-                    text.append(("", ", "))
-
+            append_resources(text, prompt.result_value.cost, lambda text: text.append(("", "nothing")))
             color_print(text, style={"amount": "yellow"})
 
         tile_to_build = prompt.execute()
