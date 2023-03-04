@@ -2,6 +2,7 @@ import math
 from enum import Enum
 from typing import List, Tuple, Optional, Dict, Any, Union, Callable
 
+#from InquirerPy.utils import patched_print
 from InquirerPy.utils import color_print
 from InquirerPy import inquirer, prompt
 
@@ -363,9 +364,6 @@ class KeyboardHumanPlayerService(BasePlayerService):
             self,
             tile_type: TileTypeEnum,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[TileTwinPlacementLookup]:
-        location_name: str = "location_to_use"
-        direction_name: str = "direction_to_point"
-
         from common.services.tile_service import TileService
         tile_service: TileService = TileService()
 
@@ -390,12 +388,51 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 location_is_valid = int(chosen_location) in valid_locations
             return location_is_valid
 
-        location = inquirer.number(
+        prompt = inquirer.number(
             message="Choose a location",
             min_allowed=min(valid_locations),
             max_allowed=max(valid_locations),
-            validate=validate_location
-        ).execute()
+            validate=validate_location,
+            instruction="Use ↑/↓ to pick the location"
+        )
+
+        def _handle_next_location(event):
+            #patched_print("spin up")
+            #patched_print(f" {event=}")
+            #patched_print(f" {prompt._whole_buffer=}")
+            #patched_print(f" {prompt._integral_buffer=}")
+            current_location = int(prompt._whole_buffer.text)
+            has_current_location_been_found = False
+            for location in valid_locations:
+                if location == current_location:
+                    has_current_location_been_found = True
+                    continue
+                if has_current_location_been_found:
+                    prompt._whole_buffer.text = str(location)
+                    return
+            prompt._whole_buffer.text = str(max(valid_locations))
+
+        def _handle_previous_location(event):
+            #patched_print("spin down")
+            #patched_print(f" {event=}")
+            #patched_print(f" {prompt._whole_buffer=}")
+            #patched_print(f" {prompt._integral_buffer=}")
+            current_location = int(prompt._whole_buffer.text)
+            has_current_location_been_found = False
+            for location in reversed(valid_locations):
+                if location == current_location:
+                    has_current_location_been_found = True
+                    continue
+                if has_current_location_been_found:
+                    prompt._whole_buffer.text = str(location)
+                    return
+            prompt._whole_buffer.text = str(min(valid_locations))
+
+        prompt.kb_func_lookup["up"][0]["func"] = _handle_next_location
+        prompt.kb_func_lookup["down"][0]["func"] = _handle_previous_location
+        del prompt.kb_func_lookup["input"][0]
+
+        location = prompt.execute()
 
         if location is None:
             return ResultLookup("Choosing location cancelled")
