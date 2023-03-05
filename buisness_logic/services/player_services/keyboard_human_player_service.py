@@ -110,12 +110,13 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def get_player_choice_weapon_level(
             self,
             turn_descriptor: TurnDescriptorLookup) -> int:
-        weapon_level = inquirer.number(
+        weapon_level_prompt = inquirer.number(
             message="How much ore would you like to spend on equipping your dwarf with a weapon?",
             min_allowed=1,
-            max_allowed=8
-        ).execute()
-        return int(weapon_level)
+            max_allowed=8)
+        self._add_keybinding_that_shows_resources(weapon_level_prompt)
+
+        return int(weapon_level_prompt.execute())
 
     def get_player_choice_animals_to_breed(
             self,
