@@ -473,32 +473,49 @@ class KeyboardHumanPlayerService(BasePlayerService):
             tile_cost: Dict[ResourceTypeEnum, int],
             possible_effects: List[BaseTilePurchaseEffect],
             turn_descriptor: TurnDescriptorLookup) -> Dict[BaseTilePurchaseEffect, int]:
-        use_any_effects_name: str = "use_any_effects_name"
-        effects_to_use_name: str = "effects_to_use_name"
-
         possible_effects: List[Dict[str, BaseTilePurchaseEffect]] = []
 
-        questions: List[Dict[str, Any]] = [
-            create_question(
-                QuestionTypeEnum.confirm,
-                use_any_effects_name,
-                f"Use effects to reduce tile cost?\nCost: {tile_cost}"
-            ),
-            create_question(
-                QuestionTypeEnum.checkbox,
-                effects_to_use_name,
-                "Pick effects to use",
-                choices=possible_effects,
-                when=lambda current_answers: current_answers[use_any_effects_name]
-            ),
-            ]
+        use_effects = True
+        has_ever_shown_cost = False
 
-        answers: Dict[str, Any] = prompt(questions)
+        while use_effects:
+            use_effects_prompt = inquirer.confirm(
+                message="Use effects to reduce cost?",
+                default=False,
+                instruction="(y/N)" if has_ever_shown_cost else "(y/N/c)",
+                mandatory=has_ever_shown_cost)
 
-        result: Dict[BaseTilePurchaseEffect, int] = {}
-        if answers[use_any_effects_name]:
-            raise NotImplementedError()
-        return result
+            use_effects_prompt.has_shown_cost = has_ever_shown_cost
+
+            @use_effects_prompt.register_kb("c")
+            def _handle_cost(event):
+                if use_effects_prompt.has_shown_cost:
+                    return
+                use_effects_prompt.has_shown_cost = True
+                text = [("", "  Tile costs: ")]
+
+                append_resources(text, tile_cost, lambda text: text.append(("", "nothing")))
+                color_print(text, style={"amount": "yellow"})
+                use_effects_prompt._handle_skip(event)
+
+            use_effects = use_effects_prompt.execute()
+
+            has_ever_shown_cost |= use_effects_prompt.has_shown_cost
+
+            if use_effects is None:
+                use_effects = True
+                continue
+
+            if use_effects:
+                effects_to_use = inquirer.checkbox(
+                    message="Pick effects to use",
+                    choices=[],
+                    mandatory=False
+                ).execute()
+
+                if effects_to_use is not None:
+                    return {effect: 1 for effect in effects_to_use}
+        return {}
 
     def get_player_choice_use_harvest_action_instead_of_breeding(
             self,
