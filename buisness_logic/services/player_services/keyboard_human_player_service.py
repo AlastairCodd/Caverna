@@ -208,7 +208,10 @@ class KeyboardHumanPlayerService(BasePlayerService):
             confirm_message: str = "\n".join(card_description)
             print(confirm_message)
 
-            has_picked_card = inquirer.confirm(message="", default=True).execute()
+            pick_card_question = inquirer.confirm(message="", default=True)
+            self._add_keybinding_that_shows_resources(pick_card_question)
+
+            has_picked_card = pick_card_question.execute()
 
         result: ResultLookup[BaseCard] = ResultLookup(True, card_to_use)
         return result
