@@ -154,12 +154,15 @@ class TileService(object):
             tile: BaseTile) -> bool:
         if tile is None:
             raise ValueError("Tile may not be None")
-        result: bool = tile.tile_type in self._unique_tile_funcs
-        if not result:
-            result = tile.tile_type in self._inseparable_twin_tile_funcs
-        if not result:
-            result = any(map(lambda x: x.id == tile.id, turn_descriptor.tiles))
-        return result
+        if tile.tile_type in self._unique_tile_funcs:
+            return True
+        if tile.tile_type in self._inseparable_twin_tile_funcs:
+            return True
+        for available_tile in turn_descriptor.tiles:
+            if available_tile.id == tile.id:
+                return True
+        print("cant find tile", tile, list(map(lambda x: x.name, turn_descriptor.tiles)))
+        return False
 
     def can_place_tile_at_location(
             self,
