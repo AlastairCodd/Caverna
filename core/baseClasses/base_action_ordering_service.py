@@ -11,7 +11,7 @@ from core.baseClasses.base_card import BaseCard
 
 class ActionOrderingService(metaclass=ABCMeta):
     @abstractmethod
-    def calculated_best_order(
+    def calculate_best_order(
             self,
             actions: ActionChoiceLookup,
             player: BasePlayerRepository,

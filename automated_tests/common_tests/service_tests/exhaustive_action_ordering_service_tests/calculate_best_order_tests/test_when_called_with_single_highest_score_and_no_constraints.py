@@ -50,7 +50,7 @@ class test_when_called_with_single_highest_score_and_no_constraints(Given_An_Exh
             current_dwarf,
             actions)
 
-        self._result: ResultLookup[List[BaseAction]] = self.SUT.calculated_best_order(
+        self._result: ResultLookup[List[BaseAction]] = self.SUT.calculate_best_order(
             action_choice_lookup,
             player,
             current_card,

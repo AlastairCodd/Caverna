@@ -40,7 +40,7 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
             else:
                 self._permutation_ordering_services = [permutation_ordering_services]
 
-    def calculated_best_order(
+    def calculate_best_order(
             self,
             actions: ActionChoiceLookup,
             player: BasePlayerRepository,

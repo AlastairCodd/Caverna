@@ -30,7 +30,7 @@ class ActionInvokeService(object):
             raise ValueError
 
         actions_best_order: ResultLookup[List[BaseAction]] = self._action_ordering_service \
-            .calculated_best_order(
+            .calculate_best_order(
             actions,
             player,
             current_card,
