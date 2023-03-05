@@ -313,12 +313,16 @@ class KeyboardHumanPlayerService(BasePlayerService):
         def expedition_reward_validator(rewards: List[BaseAction]) -> bool:
             return len(rewards) <= expedition_level
 
-        chosen_rewards: List[BaseAction] = inquirer.select(
+        chosen_rewards_prompt = inquirer.checkbox(
              message="Pick an expedition reward",
              choices=choices,
-             multiselect=True,
-             validate=expedition_reward_validator
-        ).execute()
+             validate=expedition_reward_validator,
+             invalid_message="should be only one reward" if expedition_level == 1 else f"should be at most {expedition_level} selected"
+        )
+
+        self._add_keybinding_that_shows_resources(chosen_rewards_prompt)
+
+        chosen_rewards: List[BaseAction] = chosen_rewards_prompt.execute()
 
         result: ResultLookup[List[BaseAction]] = ResultLookup(True, chosen_rewards)
         return result
