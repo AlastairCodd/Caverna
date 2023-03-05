@@ -7,6 +7,7 @@ from buisness_logic.services.most_resources_permutation_ordering_service import 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.forges.list_permutation_forge import ListPermutationForge
 from common.prototypes.player_prototype import PlayerPrototype
 from common.prototypes.card_prototype import CardPrototype
@@ -16,6 +17,8 @@ from core.baseClasses.base_action_ordering_service import ActionOrderingService
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_prototype import BaseImmutablePrototype
 from core.baseClasses.base_permutation_ordering_service import BasePermutationOrderingService
+from core.baseClasses.base_tile import BaseTile
+from core.exceptions.invalid_operation_error import InvalidOperationError
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
@@ -40,12 +43,15 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
             else:
                 self._permutation_ordering_services = [permutation_ordering_services]
 
+        self._turn_descriptor_tiles: Optional[List[BaseTile]] = None
+
     def calculate_best_order(
             self,
             actions: ActionChoiceLookup,
             player: BasePlayerRepository,
             current_card: BaseCard,
-            current_dwarf: Dwarf) -> ResultLookup[List[BaseAction]]:
+            current_dwarf: Dwarf,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
         if actions is None:
             raise ValueError
         if player is None:
@@ -61,6 +67,8 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
         permutation: List[BaseAction]
         permutations: Iterable[List[BaseAction]] = self._permutation_forge.generate_list_permutations(actions.actions)
 
+        self._cache_turn_descriptor_state(turn_descriptor)
+
         for permutation in permutations:
             if not all(constraint.passes_condition(permutation) for constraint in actions.constraints):
                 continue
@@ -68,6 +76,8 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
             player_copy: BasePlayerRepository = self._player_prototype.clone(player)
             card_copy: BaseCard = self._card_prototype.clone(current_card)
             dwarf_copy: Dwarf = self._dwarf_prototype.clone(current_dwarf)
+
+            self._reset_turn_descriptor(turn_descriptor)
 
             success: bool = True
             successes: int = 0
@@ -96,6 +106,8 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
                 permutation_result: ResultLookup[int] = ResultLookup(success, successes, errors_for_permutation)
                 unsuccessful_permutations.append(permutation_result)
 
+        self.reset(turn_descriptor)
+
         permutation_ordering_service: BasePermutationOrderingService
         ranked_results: List[Tuple[List[BaseAction], int, BasePlayerRepository]] = successful_permutations
 
@@ -118,3 +130,19 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
 
         # if we've exhausted all ordering services, just pick a permutation at random
         return ResultLookup(True, ordering_result.value[0][0])
+
+    def reset(self, turn_descriptor: TurnDescriptorLookup) -> None:
+        self._reset_turn_descriptor(turn_descriptor)
+        self._turn_descriptor_tiles = None
+
+    def _cache_turn_descriptor_state(self, turn_descriptor: TurnDescriptorLookup) -> None:
+        if self._turn_descriptor_tiles is not None:
+            raise InvalidOperationError("cannot call _cache_turn_descriptor_state multiple times without reset()ing")
+        self._turn_descriptor_tiles = list(turn_descriptor.tiles)
+
+    def _reset_turn_descriptor(self, turn_descriptor: TurnDescriptorLookup) -> None:
+        if self._turn_descriptor_tiles is None:
+            raise InvalidOperationError("must call _cache_turn_descriptor_state before _reset_turn_descriptor_state")
+        turn_descriptor.tiles.clear()
+        turn_descriptor.tiles.extend(self._turn_descriptor_tiles)
+

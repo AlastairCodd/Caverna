@@ -3,6 +3,7 @@ from typing import List
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.exhaustive_action_ordering_service import ExhaustiveActionOrderingService
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_action_ordering_service import ActionOrderingService
@@ -19,7 +20,8 @@ class ActionInvokeService(object):
             actions: ActionChoiceLookup,
             player: BasePlayerRepository,
             current_card: BaseCard,
-            current_dwarf: Dwarf) -> ResultLookup[int]:
+            current_dwarf: Dwarf,
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
         if actions is None:
             raise ValueError
         if player is None:
@@ -34,7 +36,8 @@ class ActionInvokeService(object):
             actions,
             player,
             current_card,
-            current_dwarf)
+            current_dwarf,
+            turn_descriptor)
 
         if not actions_best_order.flag:
             errors = ["Ordering Service could not find valid ordering"]

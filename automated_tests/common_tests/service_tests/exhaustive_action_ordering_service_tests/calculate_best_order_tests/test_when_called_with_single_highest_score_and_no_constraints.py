@@ -4,8 +4,10 @@ from automated_tests.common_tests.service_tests.exhaustive_action_ordering_servi
     Given_An_ExhaustiveActionOrderingService
 from automated_tests.mocks.mock_card import MockCard
 from automated_tests.mocks.mock_player import MockPlayer
+from automated_tests.mocks.mock_tile import MockTile
 from buisness_logic.actions.give_dwarf_a_weapon_action import GiveDwarfAWeaponAction
 from buisness_logic.actions.go_on_an_expedition_action import GoOnAnExpeditionAction
+from buisness_logic.actions.place_a_single_tile_action import PlaceASingleTileAction
 from buisness_logic.actions.take_accumulated_items_action import TakeAccumulatedItemsAction
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -23,8 +25,9 @@ from core.enums.harvest_type_enum import HarvestTypeEnum
 class test_when_called_with_single_highest_score_and_no_constraints(Given_An_ExhaustiveActionOrderingService):
     def because(self) -> None:
         action1_take_items: BaseAction = TakeAccumulatedItemsAction()
-        action2_get_weapon: BasePlayerChoiceAction = GiveDwarfAWeaponAction()
-        action3_expedition: BasePlayerChoiceAction = GoOnAnExpeditionAction(level=2)
+        action2_place_tile: BasePlayerChoiceAction = PlaceASingleTileAction()
+        action3_get_weapon: BasePlayerChoiceAction = GiveDwarfAWeaponAction()
+        action4_expedition: BasePlayerChoiceAction = GoOnAnExpeditionAction(level=2)
 
         actions: List[BaseAction] = [action1_take_items, action2_get_weapon, action3_expedition]
         constraints: List[BaseConstraint] = []
@@ -37,15 +40,19 @@ class test_when_called_with_single_highest_score_and_no_constraints(Given_An_Exh
         player: MockPlayer = MockPlayer(resources=resources)
         action_conditional: Conditional = Conditional(
             ActionCombinationEnum.AndOr,
-            action1_take_items,
+            Conditional(
+                ActionCombinationEnum.AndThen,
+                action1_take_items,
+                action2_place_tile),
             Conditional(
                 ActionCombinationEnum.AndOr,
-                action2_get_weapon,
-                action3_expedition))
+                action3_get_weapon,
+                action4_expedition))
         current_card: BaseCard = MockCard(actions=action_conditional, resources={ResourceTypeEnum.ore: 3})
         current_dwarf: Dwarf = Dwarf()
+        turn_descriptor
 
-        self.initialise_actions(
+        turn_descriptor = self.initialise_actions(
             player,
             current_dwarf,
             actions)
@@ -54,13 +61,14 @@ class test_when_called_with_single_highest_score_and_no_constraints(Given_An_Exh
             action_choice_lookup,
             player,
             current_card,
-            current_dwarf)
+            current_dwarf,
+            turn_descriptor)
 
     def initialise_actions(
             self,
             player: MockPlayer,
             dwarf: Dwarf,
-            actions: List[BaseAction]):
+            actions: List[BaseAction]) -> TurnDescriptorLookup:
 
         player.get_player_choice_weapon_level_returns(lambda info_turn_descriptor: 3)
 
@@ -70,7 +78,7 @@ class test_when_called_with_single_highest_score_and_no_constraints(Given_An_Exh
 
         turn_descriptor: TurnDescriptorLookup = TurnDescriptorLookup(
             [MockCard(), MockCard()],
-            [],
+            [MockTile()],
             0,
             0,
             HarvestTypeEnum.NoHarvest)
@@ -81,6 +89,8 @@ class test_when_called_with_single_highest_score_and_no_constraints(Given_An_Exh
                     player,
                     dwarf,
                     turn_descriptor)
+
+        return turn_descriptor
 
     def test_then_result_should_not_be_null(self) -> None:
         self.assertIsNotNone(self._result)

@@ -92,7 +92,8 @@ class TurnExecutionService(object):
             full_action_choice,
             player,
             choice.card,
-            choice.dwarf)
+            choice.dwarf,
+            turn_descriptor)
 
         success &= invoked_result.flag
         errors.extend(invoked_result.errors)
