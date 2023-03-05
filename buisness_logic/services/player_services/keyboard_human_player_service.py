@@ -351,18 +351,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
         else:
             color_print(additional_information[0], additional_information[1])
 
-        def validate_location(chosen_location: str) -> bool:
-            location_is_valid: bool = chosen_location.isdigit()
-            if location_is_valid:
-                location_is_valid = int(chosen_location) in valid_locations
-            return location_is_valid
-
-        location = inquirer.number(
-            message="Choose a location",
-            min_allowed=min(valid_locations),
-            max_allowed=max(valid_locations),
-            validate=validate_location
-        ).execute()
+        location = self._create_prompt_for_tile_placement(valid_locations).execute()
 
         result: ResultLookup[int] = ResultLookup(True, int(location))
 
@@ -390,55 +379,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
         else:
             color_print(additional_information[0], additional_information[1])
 
-        def validate_location(chosen_location: str) -> bool:
-            location_is_valid: bool = chosen_location.isdigit()
-            if location_is_valid:
-                location_is_valid = int(chosen_location) in valid_locations
-            return location_is_valid
-
-        prompt = inquirer.number(
-            message="Choose a location",
-            min_allowed=min(valid_locations),
-            max_allowed=max(valid_locations),
-            validate=validate_location,
-            instruction="Use ↑/↓ to pick the location"
-        )
-
-        def _handle_next_location(event):
-            #patched_print("spin up")
-            #patched_print(f" {event=}")
-            #patched_print(f" {prompt._whole_buffer=}")
-            #patched_print(f" {prompt._integral_buffer=}")
-            current_location = int(prompt._whole_buffer.text)
-            has_current_location_been_found = False
-            for location in valid_locations:
-                if location == current_location:
-                    has_current_location_been_found = True
-                    continue
-                if has_current_location_been_found:
-                    prompt._whole_buffer.text = str(location)
-                    return
-            prompt._whole_buffer.text = str(max(valid_locations))
-
-        def _handle_previous_location(event):
-            #patched_print("spin down")
-            #patched_print(f" {event=}")
-            #patched_print(f" {prompt._whole_buffer=}")
-            #patched_print(f" {prompt._integral_buffer=}")
-            current_location = int(prompt._whole_buffer.text)
-            has_current_location_been_found = False
-            for location in reversed(valid_locations):
-                if location == current_location:
-                    has_current_location_been_found = True
-                    continue
-                if has_current_location_been_found:
-                    prompt._whole_buffer.text = str(location)
-                    return
-            prompt._whole_buffer.text = str(min(valid_locations))
-
-        prompt.kb_func_lookup["up"][0]["func"] = _handle_next_location
-        prompt.kb_func_lookup["down"][0]["func"] = _handle_previous_location
-        del prompt.kb_func_lookup["input"][0]
+        prompt = self._create_prompt_for_tile_placement(valid_locations)
 
         location = prompt.execute()
 
@@ -673,3 +614,56 @@ class KeyboardHumanPlayerService(BasePlayerService):
         for line_map_readable in tiles_map:
             result += f"{' '.join(line_map_readable[0])}    {' '.join(line_map_readable[1])}\r\n"
         return result
+
+    def _create_prompt_for_tile_placement(self, valid_locations):
+        def validate_location(chosen_location: str) -> bool:
+            location_is_valid: bool = chosen_location.isdigit()
+            if location_is_valid:
+                location_is_valid = int(chosen_location) in valid_locations
+            return location_is_valid
+
+        prompt = inquirer.number(
+            message="Choose a location",
+            min_allowed=min(valid_locations),
+            max_allowed=max(valid_locations),
+            validate=validate_location,
+            instruction="Use ↑/↓ to pick the location"
+        )
+
+        def _handle_next_location(event):
+            #patched_print("spin up")
+            #patched_print(f" {event=}")
+            #patched_print(f" {prompt._whole_buffer=}")
+            #patched_print(f" {prompt._integral_buffer=}")
+            current_location = int(prompt._whole_buffer.text)
+            has_current_location_been_found = False
+            for location in valid_locations:
+                if location == current_location:
+                    has_current_location_been_found = True
+                    continue
+                if has_current_location_been_found:
+                    prompt._whole_buffer.text = str(location)
+                    return
+            prompt._whole_buffer.text = str(max(valid_locations))
+
+        def _handle_previous_location(event):
+            #patched_print("spin down")
+            #patched_print(f" {event=}")
+            #patched_print(f" {prompt._whole_buffer=}")
+            #patched_print(f" {prompt._integral_buffer=}")
+            current_location = int(prompt._whole_buffer.text)
+            has_current_location_been_found = False
+            for location in reversed(valid_locations):
+                if location == current_location:
+                    has_current_location_been_found = True
+                    continue
+                if has_current_location_been_found:
+                    prompt._whole_buffer.text = str(location)
+                    return
+            prompt._whole_buffer.text = str(min(valid_locations))
+
+        prompt.kb_func_lookup["up"][0]["func"] = _handle_next_location
+        prompt.kb_func_lookup["down"][0]["func"] = _handle_previous_location
+        del prompt.kb_func_lookup["input"][0]
+
+        return prompt
