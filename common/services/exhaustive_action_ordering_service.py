@@ -6,17 +6,17 @@ from buisness_logic.services.most_points_permutation_ordering_service import Mos
 from buisness_logic.services.most_resources_permutation_ordering_service import MostResourcesPermutationOrderingService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from common.prototypes.card_prototype import CardPrototype
-from common.prototypes.dwarf_prototype import DwarfPrototype
-from core.baseClasses.base_prototype import BaseImmutablePrototype
-from core.repositories.base_player_repository import BasePlayerRepository
 from common.entities.result_lookup import ResultLookup
 from common.forges.list_permutation_forge import ListPermutationForge
 from common.prototypes.player_prototype import PlayerPrototype
+from common.prototypes.card_prototype import CardPrototype
+from common.prototypes.dwarf_prototype import DwarfPrototype
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_action_ordering_service import ActionOrderingService
 from core.baseClasses.base_card import BaseCard
+from core.baseClasses.base_prototype import BaseImmutablePrototype
 from core.baseClasses.base_permutation_ordering_service import BasePermutationOrderingService
+from core.repositories.base_player_repository import BasePlayerRepository
 
 
 class ExhaustiveActionOrderingService(ActionOrderingService):
