@@ -10,7 +10,7 @@ from core.baseClasses.base_permutation_ordering_service import BasePermutationOr
 class MostPointsPermutationOrderingService(BasePermutationOrderingService):
     def __init__(self):
         self._point_scoring_service: PointCalculationService = PointCalculationService()
-        self._min_score: int = 0
+        self._min_score: int = -500
 
     def find_best_permutation(
             self,
@@ -39,8 +39,6 @@ class MostPointsPermutationOrderingService(BasePermutationOrderingService):
         result: ResultLookup[List[Tuple[List[BaseAction], int, BasePlayerRepository]]]
         if len(best_permutations) == 1:
             result = ResultLookup(True, best_permutations)
-        elif len(best_permutations) == 0:
-            result = ResultLookup(errors=f"No permutations with score greater than {self._min_score}")
         else:
             result = ResultLookup(False, best_permutations, f"{len(best_permutations)} permutations exist with the same score {current_max_points}")
 
