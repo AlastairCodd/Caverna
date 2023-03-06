@@ -18,6 +18,7 @@ class BaseTile(metaclass=ABCMeta):
         :param name: The name of the tile. This cannot be null.
         :param tile_id: The unique id of the tile.
         :param tile_type: The type of the tile.
+        :param base_points: The number of points this tile is worth, without considering any effects. Defaults to zero.
         :param cost: The unaltered cost of purchasing the tile. If this is null, the tile is free.
         :param effects: The effects which the tile causes. If this is null, the tile has no effects.
         """
@@ -74,7 +75,7 @@ class BaseSpecificTile(BaseTile, metaclass=ABCMeta):
             base_points: int = 0,
             cost: Optional[Dict[ResourceTypeEnum, int]] = None,
             effects: Optional[List[BaseEffect]] = None,
-            colour: TileColourEnum = TileColourEnum.Brown):
+            colour: TileColourEnum = TileColourEnum.Green):
         """Constructor for base Specific Tile class.
         :param name: The name of the tile. This cannot be null.
         :param tile_id: The unique id of the tile.

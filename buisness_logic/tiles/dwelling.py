@@ -24,7 +24,7 @@ class BaseDwelling(BaseSpecificTile, metaclass=ABCMeta):
             base_points,
             cost,
             effects,
-            TileColourEnum.Green
+            TileColourEnum.Brown
         )
 
 
