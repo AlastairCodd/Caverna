@@ -25,7 +25,7 @@ class MiningCaveTile(BaseSpecificTile):
             base_points=2,
             cost={ResourceTypeEnum.wood: 3,
                   ResourceTypeEnum.stone: 2},
-            effects=[food_effects.DiscountEffect(self._conditional)])
+            effects=[food_effects.DiscountEffect(self._conditional, "one food per donkey in a mine")])
 
     def _conditional(self, player: BasePlayerRepository) -> int:
         number_of_mines_player_has: int = player.get_number_of_tiles_of_type(TileTypeEnum.mine)

@@ -17,3 +17,17 @@ class ChangeDecisionVerb(BaseEffect):
         if combination == self._change_from:
             result = self._change_to
         return result
+
+    def __format__(self, format_spec):
+        text = [
+            ("", self._change_from.name),
+            ("", " becomes "),
+            ("", self._change_to.name),
+            ("", " for you"),
+        ]
+
+        if format_spec == "pp":
+            return text
+        if format_spec.isspace():
+            return "".join(e[1] for e in text)
+        raise ValueError("format parameter must be 'pp' or whitespace/empty")

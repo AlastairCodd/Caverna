@@ -58,6 +58,17 @@ class ReceiveOnPurchaseEffect(
         result: bool = player.give_resources(self._items_to_receive)
         return result
 
+    def __format__(self, format_spec):
+       text = [("", "receive ")]
+
+       for (resource, amount) in self._receive.items():
+           text.append(("class:count", str(amount)))
+           text.append(("", " "))
+           text.append(("", resource.name))
+           text.append(("", ", "))
+
+       text.append(("", "immediately, on purchase"))
+
 
 class ReceiveOnConvertFromEffect(BaseEffect):
     def __init__(
@@ -108,6 +119,32 @@ class ReceiveProportionalOnPurchaseEffect(
             return self._give_player_resources(player, resources_to_give).flag
         else:
             return True
+
+    def __format__(self, format_spec):
+       text = [("", "receive ")]
+
+       for (i, (resource, amount)) in enumerate(self._receive.items()):
+           text.append(("class:count", str(amount)))
+           text.append(("", " "))
+           text.append(("", resource.name))
+           if i != len(self._receive) - 1:
+               text.append(("", ", "))
+
+       text.append(("", " for every "))
+
+       for (resource, amount) in self._proportional_to.items():
+           text.append(("class:count", str(amount)))
+           text.append(("", " "))
+           text.append(("", resource.name))
+           text.append(("", ", "))
+
+       text.append(("", "immediately, on purchase"))
+
+       if format_spec == "pp":
+          return text
+       if format_spec.isspace():
+          return "".join(e[1] for e in text)
+       raise ValueError("format parameter must be 'pp' or whitespace/empty")
 
 
 class ReceiveConditionallyAtStartOfTurnEffect(
@@ -164,16 +201,40 @@ class ReceiveForTurnsEffect(
             result = ResultLookup(True, 0, f"Action has been used for {self._number_of_turns} turns, and is exhausted.")
         return result
 
+    def __format__(self, format_spec):
+        text = [
+            ("", "at the beginning of the next "),
+            ("class:count", str(self._number_of_turns)),
+            ("", " turns, receive "),
+        ]
+
+        for (i, (resource, amount)) in enumerate(self._resources.items()):
+            text.append(("class:count", str(amount)))
+            text.append(("", " "))
+            text.append(("", resource.name))
+            if i != len(self._resources) - 1:
+                text.append(("", ", "))
+
+        if format_spec == "pp":
+            return text
+        if format_spec.isspace():
+            return "".join(e[1] for e in text)
+        raise ValueError("format parameter must be 'pp' or whitespace/empty")
+
 
 class ReceiveWhenBreedingEffect(
         BaseEffect,
         BaseReceiveEventService):
     def __init__(
             self,
-            conditional: Callable[[List[ResourceTypeEnum]], Dict[ResourceTypeEnum, int]]) -> None:
+            conditional: Callable[[List[ResourceTypeEnum]], Dict[ResourceTypeEnum, int]],
+            conditional_repr: str) -> None:
         if conditional is None:
             raise ValueError("Conditional cannot be None")
+        if conditional_repr is None or conditional_repr.isspace():
+            raise ValueErorr("conditional representation cannot be null or whitespace")
         self._conditional: Callable[[List[ResourceTypeEnum]], Dict[ResourceTypeEnum, int]] = conditional
+        self._conditional_repr: str = conditional_repr
 
     def invoke(
             self,
@@ -192,3 +253,8 @@ class ReceiveWhenBreedingEffect(
             result = ResultLookup(True, 0)
 
         return result
+
+    def __str__(self):
+       # FIXME: make class abstract, and require implementations to overload
+       #        for colour reasons
+       return f"receive {self._conditional_repr}"

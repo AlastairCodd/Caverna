@@ -45,6 +45,9 @@ class FurnishTunnelsEffect(ChangeRequisiteEffect):
             [TileTypeEnum.furnishedCavern, TileTypeEnum.furnishedDwelling],
             [TileTypeEnum.tunnel, TileTypeEnum.deepTunnel])
 
+    def __str__(self):
+        return "Allow tunnels to be furnished"
+
 
 class TwinTilesOverhangEffect(ChangeRequisiteEffect):
     def __init__(self):
@@ -57,3 +60,19 @@ class TwinTilesOverhangEffect(ChangeRequisiteEffect):
             self,
             twin_tiles,
             [TileTypeEnum.unavailable])
+
+    def __format__(self, format_spec):
+        text = [
+            ("", "Twin tiles may overhang the edge of the board"),
+            ("", " (receive "),
+            ("class:count", str(2)),
+            ("", " "),
+            ("", "coins"),
+            ("", " every time this is done)")
+        ]
+
+        if format_spec == "pp":
+            return text
+        if format_spec.isspace():
+            return "".join(e[1] for e in text)
+        raise ValueError("format parameter must be 'pp' or whitespace/empty")

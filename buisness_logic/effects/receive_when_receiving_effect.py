@@ -30,3 +30,19 @@ class ReceiveWhenReceivingEffect(BaseEffect):
 
         resources_to_give: Dict[ResourceTypeEnum, int] = {r: amount_to_receive_multiplier * self._items_to_receive[r] for r in self._items_to_receive}
         return resources_to_give
+
+    def __format__(self, format_spec):
+        text = [("", "receive ")]
+
+        for (i, (resource, amount)) in enumerate(self._when_receiving_items.items()):
+           text.append(("class:count", str(amount)))
+           text.append(("", " "))
+           text.append(("", resource.name))
+           if i != len(self._when_receiving_items) - 1:
+               text.append(("", ", "))
+
+        if format_spec == "pp":
+            return text
+        if format_spec.isspace():
+            return "".join(e[1] for e in text)
+        raise ValueError("format parameter must be 'pp' or whitespace/empty")

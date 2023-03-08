@@ -39,6 +39,28 @@ class SubstituteFoodForDwarfEffect(FoodPerDwarfEffect):
             value_to_process.clear()
             value_to_process.update(self._substitute_with)
 
+    def __format__(self, format_spec):
+       text = [
+           ("", "you made feed "),
+           ("class:count", str(1)),
+           ("", " "),
+           ("", "dwarf"),
+           ("", " with "),
+       ]
+
+       for (i, (resource, amount)) in enumerate(self._substitute_with.items()):
+           text.append(("class:count", str(amount)))
+           text.append(("", " "))
+           text.append(("", resource.name))
+           if i != len(self._substitute_with) - 1:
+               text.append(("", ", "))
+
+       if format_spec == "pp":
+          return text
+       if format_spec.isspace():
+          return "".join(e[1] for e in text)
+       raise ValueError("format parameter must be 'pp' or whitespace/empty")
+
 
 class FoodGlobalEffect(BaseFoodEffect, metaclass=ABCMeta):
     @abstractmethod
@@ -52,10 +74,14 @@ class FoodGlobalEffect(BaseFoodEffect, metaclass=ABCMeta):
 class DiscountEffect(FoodGlobalEffect):
     def __init__(
             self,
-            conditional: Callable[[BasePlayerRepository], int]) -> None:
+            conditional: Callable[[BasePlayerRepository], int],
+            per_condition_repr: str) -> None:
         if conditional is None:
             raise ValueError("Conditional may not be None")
+        if per_condition_repr is None or per_condition_repr.isspace():
+            raise ValueError("per condition representation may not be null or whitespace")
         self._conditional: Callable[[BasePlayerRepository], int] = conditional
+        self._per_condition_repr: str = per_condition_repr
 
     def invoke(
             self,
@@ -69,3 +95,17 @@ class DiscountEffect(FoodGlobalEffect):
         if ResourceTypeEnum.food in resources:
             discount_amount: int = self._conditional(player)
             resources[ResourceTypeEnum.food] -= min(resources[ResourceTypeEnum.food], discount_amount)
+
+    def __format__(self, format_spec):
+       text = [
+           ("", "discount when feeding "),
+           ("", "dwarfs"),
+           ("", " of "),
+           ("class:count", self._per_condition_repr),
+       ]
+
+       if format_spec == "pp":
+          return text
+       if format_spec.isspace():
+          return "".join(e[1] for e in text)
+       raise ValueError("format parameter must be 'pp' or whitespace/empty")

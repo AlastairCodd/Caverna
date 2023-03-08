@@ -24,5 +24,34 @@ class ConvertEffect(BaseEffect):
     def output(self) -> Dict[ResourceTypeEnum, int]:
         return self._output
 
-    def __str__(self):
+    def __str__(self) -> str:
+        return self.__format__(" ")
+
+    def __format__(self, format_spec) -> str:
+        text = [("", "Convert ")]
+        for (i, (resource, amount)) in enumerate(self._input.items()):
+            text.append(("class:count", str(amount)))
+            text.append(("", " "))
+            text.append(("", resource.name))
+            if i == len(self._input) - 1:
+                break
+            text.append(("", ", "))
+
+        text.append(("", " into "))
+
+        for (i, (resource, amount)) in enumerate(self._output.items()):
+            text.append(("class:count", str(amount)))
+            text.append(("", " "))
+            text.append(("", resource.name))
+            if i == len(self._output) - 1:
+                break
+            text.append(("", ", "))
+
+        if format_spec == "pp":
+            return text
+        if format_spec.isspace():
+            return "".join(e[1] for e in text)
+        raise ValueError("format parameter must be 'pp' or whitespace/empty")
+
+    def __repr__(self):
         return f"ConvertEffect({self._input}, {self._output})"

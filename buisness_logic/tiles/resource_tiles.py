@@ -73,7 +73,7 @@ class QuarryTile(BaseSpecificTile):
             self, "Quarry", tile_ids.QuarryTileId,
             base_points=2,
             cost={ResourceTypeEnum.wood: 1},
-            effects=[ReceiveWhenBreedingEffect(self._condition)])
+            effects=[ReceiveWhenBreedingEffect(self._condition, "one stone for each newborn donkey")])
 
     def _condition(
             self,
@@ -90,7 +90,7 @@ class BreedingCaveTile(BaseSpecificTile):
             cost={
                 ResourceTypeEnum.grain: 1,
                 ResourceTypeEnum.stone: 1},
-            effects=[ReceiveWhenBreedingEffect(self._condition)])
+            effects=[ReceiveWhenBreedingEffect(self._condition, "1/2/3/5 food when breeding 1/2/3/4 animals")])
         self._conversion_effect: Dict[int, int] = {
             1: 1,
             2: 2,
