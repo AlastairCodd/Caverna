@@ -5,4 +5,6 @@ __all__ = [
     "game_change_tiles",
     "point_tiles",
     "purchase_tiles",
-    "resource_tiles"]
+    "resource_tiles",
+    "food_tiles",
+]

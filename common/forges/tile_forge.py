@@ -4,7 +4,6 @@ from core.baseClasses.base_tile import BaseTile
 
 
 class TileForge(object):
-    
     def create_all_tiles(self) -> List[BaseTile]:
         """Returns a list containing a single instance of all of the tiles"""
         tiles = [
@@ -28,6 +27,8 @@ class TileForge(object):
             dwelling.MixedDwelling(),
             dwelling.CoupleDwelling(),
             dwelling.AdditionalDwelling(),
+            food_tiles.WorkingCaveTile(),
+            food_tiles.MiningCaveTile(),
             game_change_tiles.WorkRoomTile(),
             game_change_tiles.GuestRoomTile(),
             game_change_tiles.OfficeRoomTile(),
@@ -52,5 +53,10 @@ class TileForge(object):
             resource_tiles.MinerTile(),
             resource_tiles.WoodSupplierTile(),
             resource_tiles.StoneSupplierTile(),
-            resource_tiles.RubySupplierTile(),]
+            resource_tiles.RubySupplierTile(),
+            resource_tiles.DogSchoolTile(),
+            resource_tiles.QuarryTile(),
+            resource_tiles.BreedingCaveTile(),
+            resource_tiles.SeamTile(),
+        ]
         return tiles
