@@ -211,7 +211,7 @@ class WeaponStorageTile(BaseConditionalPointTile):
             tile_entity: TileEntity) -> PointLookup:
         if player is None:
             raise ValueError(str(player))
-        return PointLookup(len([d for d in player.dwarves if d.has_weapon]))
+        return PointLookup(3 * len(d for d in player.dwarves if d.has_weapon))
 
     def append_formatted_conditional_points(self, text) -> None:
         text.append(("", "is worth "))
