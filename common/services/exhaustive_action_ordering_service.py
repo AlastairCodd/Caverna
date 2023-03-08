@@ -113,6 +113,7 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
 
         if not any(ranked_results):
             errors: List[str] = ["There is not a permutation which allows for all actions to be performed"]
+            print(f"permutations considered: {len(unsuccessful_permutations)}")
             for partition in unsuccessful_permutations:
                 errors.extend(partition.errors)
             errors = list(set(errors))
