@@ -43,6 +43,10 @@ class BaseConditionalPointTile(BaseSpecificTile, metaclass=ABCMeta):
             tile_entity: TileEntity) -> PointLookup:
         pass
 
+    @abstractmethod
+    def append_formatted_conditional_points(self, text) -> None:
+        pass
+
 
 class WeavingParlorTile(BaseConditionalPointTile):
     def __init__(self):
@@ -61,6 +65,12 @@ class WeavingParlorTile(BaseConditionalPointTile):
             raise ValueError(str(player))
         return PointLookup(player.resources[ResourceTypeEnum.sheep])
 
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "1"))
+        text.append(("", " point per "))
+        text.append(("", "sheep"))
+
 
 class MilkingParlorTile(BaseConditionalPointTile):
     def __init__(self):
@@ -78,6 +88,12 @@ class MilkingParlorTile(BaseConditionalPointTile):
         if player is None:
             raise ValueError(str(player))
         return PointLookup(player.resources[ResourceTypeEnum.cow])
+
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "1"))
+        text.append(("", " point per "))
+        text.append(("", "cow"))
 
 
 class StateParlorTile(BaseConditionalPointTile):
@@ -109,6 +125,13 @@ class StateParlorTile(BaseConditionalPointTile):
         result = 4 * number_of_adjacent_dwellings
         return PointLookup(result)
 
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "4"))
+        text.append(("", " points per "))
+        text.append(("", "dwelling"))
+        text.append(("", " adjacent to this tile"))
+
 
 class StoneStorageTile(BaseConditionalPointTile):
     def __init__(self):
@@ -123,6 +146,12 @@ class StoneStorageTile(BaseConditionalPointTile):
         if player is None:
             raise ValueError(str(player))
         return PointLookup(player.resources[ResourceTypeEnum.stone])
+
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "1"))
+        text.append(("", " point per "))
+        text.append(("", "stone"))
 
 
 class OreStorageTile(BaseConditionalPointTile):
@@ -139,6 +168,13 @@ class OreStorageTile(BaseConditionalPointTile):
             raise ValueError(str(player))
         return PointLookup(math.floor(player.resources[ResourceTypeEnum.ore] / 2))
 
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "1"))
+        text.append(("", " point for every "))
+        text.append(("class:count", "2"))
+        text.append(("", " ore"))
+
 
 class MainStorageTile(BaseConditionalPointTile):
     def __init__(self):
@@ -154,6 +190,14 @@ class MainStorageTile(BaseConditionalPointTile):
             raise ValueError(str(player))
         return PointLookup(len([t for t in player.tiles.values() if t.colour == TileColourEnum.Yellow]))
 
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "1"))
+        text.append(("", " point for every "))
+        text.append(("", "yellow"))
+        text.append(("", " tile"))
+        text.append(("", " (including this)"))
+
 
 class WeaponStorageTile(BaseConditionalPointTile):
     def __init__(self):
@@ -168,6 +212,15 @@ class WeaponStorageTile(BaseConditionalPointTile):
         if player is None:
             raise ValueError(str(player))
         return PointLookup(len([d for d in player.dwarves if d.has_weapon]))
+
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "3"))
+        text.append(("", " points "))
+        text.append(("class:count", "for each"))
+        text.append(("", " "))
+        text.append(("", "dwarf"))
+        text.append(("", " with a weapon"))
 
 
 class SuppliesStorageTile(BaseConditionalPointTile):
@@ -187,6 +240,15 @@ class SuppliesStorageTile(BaseConditionalPointTile):
         else:
             result = 0
         return PointLookup(result)
+
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "8"))
+        text.append(("", " points if and only if "))
+        text.append(("class:count", "every"))
+        text.append(("", " "))
+        text.append(("", "dwarf"))
+        text.append(("", " has a weapon"))
 
 
 class BroomChamberTile(BaseConditionalPointTile):
@@ -210,6 +272,20 @@ class BroomChamberTile(BaseConditionalPointTile):
         else:
             return PointLookup()
 
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "5"))
+        text.append(("", " points if you have "))
+        text.append(("class:count", "5"))
+        text.append(("", " "))
+        text.append(("", "dwarves"))
+        text.append(("", " or "))
+        text.append(("class:point_count", "10"))
+        text.append(("", " points if you have "))
+        text.append(("class:count", "6"))
+        text.append(("", " "))
+        text.append(("", "dwarves"))
+
 
 class TreasureChamberTile(BaseConditionalPointTile):
     def __init__(self):
@@ -224,6 +300,12 @@ class TreasureChamberTile(BaseConditionalPointTile):
         if player is None:
             raise ValueError(str(player))
         return PointLookup(player.resources[ResourceTypeEnum.ruby])
+
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "1"))
+        text.append(("", " point per "))
+        text.append(("", "ruby"))
 
 
 class FoodChamberTile(BaseConditionalPointTile):
@@ -241,6 +323,12 @@ class FoodChamberTile(BaseConditionalPointTile):
 
         result = min(player.resources[ResourceTypeEnum.veg], player.resources[ResourceTypeEnum.grain]) * 2
         return PointLookup(result)
+
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "1"))
+        text.append(("", " point per pair of "))
+        text.append(("", "vegetable and grain"))
 
 
 class PrayerChamberTile(BaseConditionalPointTile):
@@ -261,6 +349,15 @@ class PrayerChamberTile(BaseConditionalPointTile):
             result = 8
         return PointLookup(result)
 
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "8"))
+        text.append(("", " points if and only if "))
+        text.append(("class:count", "no"))
+        text.append(("", " "))
+        text.append(("", "dwarves"))
+        text.append(("", " have weapons"))
+
 
 class WritingChamberTile(BaseConditionalPointTile):
     def __init__(self):
@@ -273,6 +370,11 @@ class WritingChamberTile(BaseConditionalPointTile):
             player: BasePlayerRepository,
             tile_entity: TileEntity) -> PointLookup:
         return PointLookup(0, 0, 7)
+
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "negates up to "))
+        text.append(("class:point_count", "7"))
+        text.append(("", " negative points"))
 
 
 class FodderChamberTile(BaseConditionalPointTile):
@@ -292,3 +394,10 @@ class FodderChamberTile(BaseConditionalPointTile):
         result: int = math.floor(number_of_farm_animals / 3)
 
         return PointLookup(result)
+
+    def append_formatted_conditional_points(self, text) -> None:
+        text.append(("", "is worth "))
+        text.append(("class:point_count", "1"))
+        text.append(("", " point for every "))
+        text.append(("class:count", "3"))
+        text.append(("", " farm animals"))
