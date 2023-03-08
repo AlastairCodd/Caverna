@@ -272,6 +272,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             raise ValueError("Possible Tiles cannot be None")
         if len(possible_tiles) == 0:
             raise ValueError("Possible Tiles cannot be empty")
+        from buisness_logic.tiles.point_tiles import BaseConditionalPointTile
 
         prompt = inquirer.select(
             message="Pick a tile to build",
@@ -283,17 +284,66 @@ class KeyboardHumanPlayerService(BasePlayerService):
             long_instruction="Navigate with arrow keys, press c to see the cost of the currently selected tile"
         )
 
-        prompt.last_card_to_show_cost = None
+        prompt.last_tile_to_show_cost = None
 
         @prompt.register_kb("c")
         def _handle_cost(event):
-            if prompt.last_card_to_show_cost == prompt.result_value:
+            current_tile = prompt.result_value
+            if prompt.last_tile_to_show_cost == current_tile:
                 return
-            prompt.last_card_to_show_cost = prompt.result_value
-            text = [("", "  "), ("", prompt.result_value.name), ("", " costs: ")]
+            prompt.last_tile_to_show_cost = current_tile
+            text = [("", "  "), ("", current_tile.name), ("", " costs: ")]
 
-            append_resources(text, prompt.result_value.cost, lambda text: text.append(("", "nothing")))
+            append_resources(text, current_tile.cost, lambda text: text.append(("", "nothing")))
             color_print(text, style={"amount": "yellow"})
+
+        prompt.last_tile_to_show_description = None
+
+        @prompt.register_kb("d")
+        def _handle_description(event):
+            current_tile = prompt.result_value
+            if prompt.last_tile_to_show_description == current_tile:
+                return
+            prompt.last_tile_to_show_description = current_tile
+            text = [
+                ("", "  "),
+                ("", f"{current_tile.name} ("),
+                (f"class:{current_tile.colour.name.lower()}", "◆"),
+                ("", ")"),
+            ]
+
+            any_effects = any(current_tile.effects)
+            if any_effects:
+                text.append(("", " has effects: "))
+                for (i, effect) in enumerate(current_tile.effects):
+                    text.extend(effect.__format__("pp"))
+                    if i < len(current_tile.effects) - 1:
+                        text.append(("", ", "))
+
+            if current_tile.base_points > 0:
+                if any_effects:
+                    text.append(("", "; and"))
+                text.append(("", " is worth "))
+                text.append(("class:point_count", str(current_tile.base_points)))
+                text.append(("", " points unconditionally" if current_tile.base_points > 1 else " point unconditionally"))
+                # cannot be both a conditional point tile and have base points
+            elif isinstance(current_tile, BaseConditionalPointTile):
+                if any_effects:
+                    text.append(("", "; and"))
+                text.append(("", " "))
+                current_tile.append_formatted_conditional_points(text)
+            text.append(("", "."))
+
+            color_print(
+                text,
+                style={
+                    "count": "yellow",
+                    "point_count": "#61afef",
+                    "green": "#90aa86",
+                    "yellow": "#ff9f1c",
+                    "brown": "#6f1a07"
+                }
+            )
 
         self._add_keybinding_that_shows_resources(prompt)
 
