@@ -18,18 +18,18 @@ from core.services.base_player_service import BasePlayerService
 
 class WeeklyMarketAction(BasePlayerChoiceAction):
     def __init__(self) -> None:
-        self._purchasable_items: List[Tuple[ResourceTypeEnum, int]] = [
-            (ResourceTypeEnum.dog, 2),
-            (ResourceTypeEnum.sheep, 1),
-            (ResourceTypeEnum.donkey, 1),
-            (ResourceTypeEnum.boar, 2),
-            (ResourceTypeEnum.cow, 3),
-            (ResourceTypeEnum.wood, 1),
-            (ResourceTypeEnum.stone, 1),
-            (ResourceTypeEnum.ore, 1),
-            (ResourceTypeEnum.grain, 1),
-            (ResourceTypeEnum.veg, 2),
-        ]
+        self._purchasable_items: Dict[ResourceTypeEnum, int] = {
+            ResourceTypeEnum.dog: 2,
+            ResourceTypeEnum.sheep: 1,
+            ResourceTypeEnum.donkey: 1,
+            ResourceTypeEnum.boar: 2,
+            ResourceTypeEnum.cow: 3,
+            ResourceTypeEnum.wood: 1,
+            ResourceTypeEnum.stone: 1,
+            ResourceTypeEnum.ore: 1,
+            ResourceTypeEnum.grain: 1,
+            ResourceTypeEnum.veg: 2,
+        }
 
     def set_player_choice(
             self,
@@ -58,19 +58,19 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
         constraints: List[BaseConstraint] = []
 
         for resource in market_items_result.value:
-            if resource in self._purchasable_items:
-                pay_action: PayAction = PayAction({ResourceTypeEnum.coin: self._purchasable_items[resource][1]})
-                receive_action: ReceiveAction = ReceiveAction({resource: 1})
-
-                precedes_constraints: PrecedesConstraint = PrecedesConstraint(pay_action, receive_action)
-
-                actions.append(pay_action)
-                actions.append(receive_action)
-
-                constraints.append(precedes_constraints)
-            else:
+            if resource not in self._purchasable_items:
                 success = False
                 errors.append(f"{resource.name} cannot be purchased at market")
+                continue
+            pay_action: PayAction = PayAction({ResourceTypeEnum.coin: self._purchasable_items[resource]})
+            receive_action: ReceiveAction = ReceiveAction({resource: 1})
+
+            precedes_constraints: PrecedesConstraint = PrecedesConstraint(pay_action, receive_action)
+
+            actions.append(pay_action)
+            actions.append(receive_action)
+
+            constraints.append(precedes_constraints)
 
         action_choice: ActionChoiceLookup = ActionChoiceLookup(actions, constraints)
         result = ResultLookup(success, action_choice, errors)
