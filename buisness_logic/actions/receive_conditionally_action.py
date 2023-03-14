@@ -12,11 +12,15 @@ class ReceiveConditionallyAction(BaseReceiveAction):
     def __init__(
             self,
             condition: Callable[[BasePlayerRepository], int],
-            items_to_receive: Dict[ResourceTypeEnum, int]) -> None:
+            items_to_receive: Dict[ResourceTypeEnum, int],
+            condition_readable: str) -> None:
         if condition is None:
             raise ValueError("Condition cannot be null")
+        if condition_readable is None or condition_readable.isspace():
+            raise ValueError("condition_readable must not be null")
 
         self._condition: Callable[[BasePlayerRepository], int] = condition
+        self._condition_readable: str = condition_readable
         BaseReceiveAction.__init__(self, items_to_receive)
 
     def invoke(
@@ -46,11 +50,24 @@ class ReceiveConditionallyAction(BaseReceiveAction):
         pass
 
     def __str__(self) -> str:
-        result = "Receive "
-        for resource in self._items_to_receive:
-            result += f"{self._items_to_receive[resource]} {resource.name} "
-        result += "for each time the condition is met"
-        return result
+        return self.__format__("")
+
+    def __format__(self, format_spec):
+        text = [("", "Receive ")]
+
+        for (i, (resource, amount)) in enumerate(self._items_to_receive.items()):
+            text.append(("class:count", str(amount)))
+            text.append(("", " "))
+            text.append(("class:resource", resource.name))
+            if i != len(self._items_to_receive) - 1:
+                text.append(("", ", "))
+
+        text.append(("", " "))
+        text.append(("", self._condition_readable))
+
+        if "pp" in format_spec:
+            return text
+        return "".join(e[1] for e in text)
 
     def __repr__(self) -> str:
         result = "ReceiveConditionallyAction("

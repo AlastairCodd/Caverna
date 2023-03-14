@@ -16,7 +16,7 @@ class OreDeliveryCard(BaseResourceContainingCard):
             Conditional(
                 ActionCombinationEnum.AndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
-                receive_conditionally_action.ReceiveConditionallyAction(self._condition, {ResourceTypeEnum.ore: 2})
+                receive_conditionally_action.ReceiveConditionallyAction(self._condition, {ResourceTypeEnum.ore: 2}, "for each ore mine")
         ))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

@@ -21,7 +21,8 @@ class BaseOreMiningCard(BaseResourceContainingCard, metaclass=ABCMeta):
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 receive_conditionally_action.ReceiveConditionallyAction(
                     self._condition,
-                    {ResourceTypeEnum.ore: 1}
+                    {ResourceTypeEnum.ore: 2},
+                    "for each ore mine"
                 )))
 
     def _condition(self, player: BasePlayerRepository) -> int:
@@ -29,7 +30,7 @@ class BaseOreMiningCard(BaseResourceContainingCard, metaclass=ABCMeta):
             raise ValueError(str(player))
         tile_container = cast(TileContainer, player)
         number_of_tiles: int = tile_container.get_number_of_tiles_of_type(TileTypeEnum.oreMineDeepTunnelTwin)
-        return number_of_tiles * 2
+        return number_of_tiles
 
 
 class OreMiningTwoCard(BaseOreMiningCard):

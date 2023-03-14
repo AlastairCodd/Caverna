@@ -18,7 +18,8 @@ class RubyMiningCard(BaseResourceContainingCard):
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 receive_conditionally_action.ReceiveConditionallyAction(
                     self._condition,
-                    {ResourceTypeEnum.ruby: 1})
+                    {ResourceTypeEnum.ruby: 1},
+                    "if you have at least one ruby mine")
             ))
 
     def _condition(self, player: BasePlayerRepository) -> int:
