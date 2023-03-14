@@ -39,8 +39,7 @@ class FamilyLifeCard(BaseCard):
             if wish_for_children_card is not None and urgent_wish_for_children_card is not None:
                 break
 
-        if wish_for_children_card is not None and urgent_wish_for_children_card is not None:
-            wish_for_children_card.hide_card()
-            urgent_wish_for_children_card.reveal_card(cards)
-        else:
+        if wish_for_children_card is None or urgent_wish_for_children_card is None:
             raise InvalidOperationError("Wish for Children or Urgent Wish for Children missing")
+        wish_for_children_card.hide_card()
+        urgent_wish_for_children_card.reveal_card(cards)
