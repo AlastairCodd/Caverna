@@ -221,15 +221,23 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
             card_to_use: BaseCard = card_question.execute()
 
-            card_description: List[str] = [f"Confirm that you'd like to use {card_to_use.name}?"]
+            newline_separator = "\r\n"
+            card_description = [
+                ("", "Confirm that you'd like to use "),
+                ("class:identifier", card_to_use.name),
+                ("", "?"),
+                ("", newline_separator),
+            ]
             if card_to_use.actions is not None:
-                card_description.append("  Actions: ")
-                card_description.append(f"    {card_to_use.actions:4}")
+                card_description.append(("", "  Actions:"))
+                card_description.append(("", f"{newline_separator}    "))
+                card_description.extend(card_to_use.actions.__format__("4pp"))
             if isinstance(card_to_use, ResourceContainer) and card_to_use.has_resources:
-                card_description.append("  Resources: ")
-                card_description.extend([f"    {resource.name}: {amount}" for resource, amount in card_to_use.resources.items()])
-            confirm_message: str = "\n".join(card_description)
-            print(confirm_message)
+                card_description.append(("", f"{newline_separator}  "))
+                card_description.append(("", "Resources: "))
+                card_description.append(("", f"{newline_separator}    "))
+                append_resources(card_description, card_to_use.resources, None)
+            color_print(card_description, style={"count": "yellow"})
 
             pick_card_question = inquirer.confirm(message="", default=True)
             self._add_keybinding_that_shows_resources(pick_card_question)
