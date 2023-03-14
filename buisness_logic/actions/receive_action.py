@@ -39,6 +39,19 @@ class ReceiveAction(BaseReceiveAction):
 
         return result
 
+    def __format__(self, format_spec):
+        text = [("", "Receive ")]
+        for (i, (resource, amount)) in enumerate(self._items_to_receive.items()):
+            text.append(("class:amount", str(amount)))
+            text.append(("", " "))
+            text.append(("class:resource", resource.name))
+            if i != len(self._items_to_receive) - 1:
+                text.append(("", ", "))
+
+        if "pp" in format_spec:
+            return text
+        return "".join(e[1] for e in text)
+
     def __eq__(self, other) -> bool:
         result: bool = isinstance(other, ReceiveAction)
 

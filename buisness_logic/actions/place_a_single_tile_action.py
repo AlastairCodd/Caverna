@@ -243,24 +243,27 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
             TileTypeEnum.tunnel: "Tunnel",
             TileTypeEnum.deepTunnel: "Deep Tunnel",
             TileTypeEnum.pasture: "Pasture",
-            TileTypeEnum.furnishedCavern: "Furnished Cavern",
-            TileTypeEnum.furnishedDwelling: "Furnished Dwelling",
             TileTypeEnum.oreMine: "Ore Mine",
             TileTypeEnum.rubyMine: "Ruby Mine",
         }
 
-        result: str = "Place a "
+        result: str
         cost: Dict[ResourceTypeEnum, int] = {}
 
         if self._specific_tile_generation_method is not None or self._tile_service.does_tile_type_have_unique_tile(self._tile_type):
             specific_tile: BaseTile = self._specific_tile_generation_method() \
                 if self._specific_tile_generation_method is not None \
                 else self._tile_service.get_unique_tile_generation_method(self._tile_type)()
-            result += specific_tile.name
+            result = f"Place a {specific_tile.name}"
 
             cost = self._tile_service.get_cost_of_tile(specific_tile, self._tile_cost_override).value
         else:
-            result += tile_type_displayable[self._tile_type]
+            if self._tile_type is TileTypeEnum.furnishedCavern:
+                result = "Furnish a cavern"
+            elif self._tile_type is TileTypeEnum.furnishedDwelling:
+                result = "Furnish a dwelling"
+            else:
+                result = f"Place a {tile_type_displayable[self._tile_type]}"
 
             if self._tile_cost_override is not None:
                 cost = self._tile_cost_override

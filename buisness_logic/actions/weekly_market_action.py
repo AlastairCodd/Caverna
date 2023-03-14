@@ -88,22 +88,45 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
         pass
 
     def __str__(self) -> str:
-        return self.__format__(0)
+        return self.__format__("")
 
     def __format__(self, format_spec) -> str:
         newline_separator = ""
         long_separator = separator = " "
 
         try:
-            num_spaces = int(format_spec)
-            if num_spaces != 0:
+            num_spaces = int(format_spec.strip("p"))
+            if num_spaces != 0 and not format_spec.isspace():
                 newline_separator = "\r\n"
                 separator = " " * num_spaces
                 long_separator = " " * num_spaces * 2
         except ValueError:
             pass
 
-        result = f"buy from{newline_separator}{long_separator}"
-        result += f",{newline_separator}{long_separator}".join(f"{resource.name} ({cost} coin{('s' if cost > 1 else '')})" for (resource, cost) in self._purchasable_items)
-        result += f"{newline_separator}{separator}(maximum of one purchase per resource)"
-        return result
+        text = [
+            ("", "buy from"),
+            ("", f"{newline_separator}{long_separator}")
+        ]
+
+        for (i, (resource, cost)) in enumerate(self._purchasable_items.items()):
+            text.append(("class:resource:", resource.name))
+            text.append(("", " ("))
+            text.append(("class:count", str(cost)))
+            text.append(("", " "))
+            if cost > 1:
+                text.append(("class:resource", "coins"))
+            else:
+                text.append(("class:resource", "coin"))
+            text.append(("", ")"))
+            if i != len(self._purchasable_items) - 1:
+                text.append(("", ","))
+                text.append(("", f"{newline_separator}{long_separator}"))
+
+        text.append(("", f"{newline_separator}{separator}"))
+        text.append(("", "(maximum of "))
+        text.append(("class:count", "one"))
+        text.append(("", " purchase per resource)"))
+
+        if "pp" in format_spec:
+            return text
+        return "".join(e[1] for e in text)

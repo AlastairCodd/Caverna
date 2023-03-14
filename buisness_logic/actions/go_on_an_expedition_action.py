@@ -154,7 +154,18 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
         self._chosen_actions_and_levels.clear()
 
     def __str__(self) -> str:
-        return f"Go on a level {self._level} expedition"
+        return self.__format__("")
+
+    def __format__(self, format_spec):
+        text = [
+            ("", "Go on a level "),
+            ("class:count", str(self._level)),
+            ("", " expedition"),
+        ]
+
+        if "pp" in format_spec:
+            return text
+        return "".join(e[1] for e in text)
 
     def _get_weapon_level_required_to_perform_action(self, action: BaseAction) -> int:
         for (level, actions) in self._expedition_actions.items():
