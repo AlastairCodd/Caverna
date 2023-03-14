@@ -29,16 +29,15 @@ class UpgradeAllWeaponsAction(BaseAction):
         errors: List[str] = []
 
         for dwarf in player.dwarves:
-            if dwarf.has_weapon:
-                increase_level_result: ResultLookup[int] = dwarf.weapon.increase_level()
-                if increase_level_result.flag:
-                    successes += 1
-                else:
-                    for error in increase_level_result.errors:
-                        errors.append(error)
+            if not dwarf.has_weapon:
+                continue
+            increase_level_result: ResultLookup[int] = dwarf.weapon.increase_level()
+            errors.extend(increase_level_result.errors)
 
-        # TODO: Consider changing the success value of this -- may cause failures.
-        result: ResultLookup[int] = ResultLookup(successes > 0, successes, errors)
+            if increase_level_result.flag:
+                successes += 1
+
+        result: ResultLookup[int] = ResultLookup(len(errors) == 0, successes, errors)
         return result
 
     def new_turn_reset(self):
