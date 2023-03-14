@@ -11,6 +11,7 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.defaults.tile_container_default import TileContainerDefault
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
+from common.entities.resources_to_sow_lookup import ResourcesToSow
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
@@ -579,33 +580,28 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
     def get_player_choice_resources_to_sow(
             self,
-            number_of_resources_to_sow: int,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
-        print("Resources at start of turn")
-        print(f"Grain: {self.get_resources_of_type(ResourceTypeEnum.grain)}")
-        print(f"Veg: {self.get_resources_of_type(ResourceTypeEnum.veg)}")
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ResourcesToSow]:
+        grain_to_sow_prompt = inquirer.number(
+            message="How many grain do you wish to sow",
+            min_allowed=0,
+            max_allowed=2)
 
-        resources_to_use: List[ResourceTypeEnum] = []
+        self._add_keybinding_that_shows_resources(grain_to_sow_prompt)
+        self._add_keybinding_that_shows_round_info(grain_to_sow_prompt, turn_descriptor)
 
-        resource_name: str = "resource_to_use"
-        choices: List[Dict[str, Any]] = [
-            {"name": choice.name,
-             "value": choice, }
-            for choice in [ResourceTypeEnum.grain, ResourceTypeEnum.veg]]
+        grain_to_sow = int(grain_to_sow_prompt.execute())
 
-        questions = [
-            create_question(
-                QuestionTypeEnum.list,
-                resource_name,
-                "Choose resource to build",
-                choices=choices)
-        ]
+        veg_to_sow_prompt = inquirer.number(
+            message="How many veg do you wish to sow",
+            min_allowed=0,
+            max_allowed=2)
 
-        for _ in range(number_of_resources_to_sow):
-            answers: Dict[str, Any] = prompt(questions)
-            resources_to_use.append(answers[resource_name])
+        self._add_keybinding_that_shows_resources(veg_to_sow_prompt)
+        self._add_keybinding_that_shows_round_info(veg_to_sow_prompt, turn_descriptor)
 
-        result: ResultLookup[List[ResourceTypeEnum]] = ResultLookup(True, resources_to_use)
+        veg_to_sow = int(veg_to_sow_prompt.execute())
+
+        result: ResultLookup[ResourcesToSow] = ResultLookup(True, ResourcesToSow(grain_to_sow, veg_to_sow))
         return result
 
     def _add_keybinding_that_shows_resources(

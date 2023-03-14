@@ -313,8 +313,7 @@ class ActionChoicePlayerService(BasePlayerService):
 
     def get_player_choice_resources_to_sow(
             self,
-            number_of_resources_to_sow: int,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ResourcesToSow]:
         resources_to_sow: List[ResourceTypeEnum]
         _, resources_to_sow = self._resource_to_sow_action_choice_processor_service.process_action_choice_for_resources_to_sow()
 
