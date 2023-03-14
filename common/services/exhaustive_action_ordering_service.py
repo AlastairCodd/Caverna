@@ -68,9 +68,13 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
         permutations: Iterable[List[BaseAction]] = self._permutation_forge.generate_list_permutations(actions.actions)
 
         self._cache_turn_descriptor_state(turn_descriptor)
+        permutation_index: int = 0
 
         for permutation in permutations:
             if not all(constraint.passes_condition(permutation) for constraint in actions.constraints):
+                print(f"permutation {permutation_index} does not pass constraints")
+                print()
+                permutation_index += 1
                 continue
             # The cloned player for testing shouldn't need to make any decisions
             player_copy: BasePlayerRepository = self._player_prototype.clone(player)
@@ -83,6 +87,8 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
             successes: int = 0
             errors_for_permutation: List[str] = []
 
+            print(f"considering permutation {permutation_index}")
+
             action: BaseAction
             for action in permutation:
                 action_result: ResultLookup[int]
@@ -94,8 +100,10 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
                 errors_for_permutation.extend(action_result.errors)
 
                 if action_result.flag:
+                    print(f"  success: permutation {action:4}")
                     successes += action_result.value
                 else:
+                    print(f"  *** FAIL: permutation {action:4}")
                     success = False
                     break
 
@@ -105,6 +113,8 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
             else:
                 permutation_result: ResultLookup[int] = ResultLookup(success, successes, errors_for_permutation)
                 unsuccessful_permutations.append(permutation_result)
+            print()
+            permutation_index += 1
 
         self.reset(turn_descriptor)
 
