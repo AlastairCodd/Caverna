@@ -9,6 +9,7 @@ __all__ = [
     "place_a_stable_action",
     "place_a_single_tile_action",
     "place_a_twin_tile_action",
+    "place_fences_action",
     "receive_action",
     "receive_conditionally_action",
     "sow_action",

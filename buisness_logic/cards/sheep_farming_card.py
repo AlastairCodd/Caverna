@@ -13,13 +13,7 @@ class SheepFarmingCard(BaseResourceContainingCard):
             self, "Sheep Farming", card_ids.SheepFarmingCardId, 1,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                Conditional(
-                    ActionCombinationEnum.AndOr,
-                    Conditional(
-                        ActionCombinationEnum.AndOr,
-                        place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.pasture),
-                        place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.pastureTwin)),
-                    place_a_stable_action.PlaceAStableAction()),
+                place_fences_action.PlaceFencesAndStableAction(),
                 take_accumulated_items_action.TakeAccumulatedItemsAction()))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

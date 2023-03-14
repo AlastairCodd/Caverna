@@ -287,6 +287,30 @@ class KeyboardHumanPlayerService(BasePlayerService):
         result: ResultLookup[ActionChoiceLookup] = ResultLookup(True, answer[name])
         return result
 
+    def get_player_choice_fences_to_build(
+            self,
+            place_pasture_action: BaseAction,
+            place_twin_pasture_action: BaseAction,
+            place_stable_action: Optional[BaseAction],
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
+        if place_pasture_action is None:
+            raise ValueError("place_pasture_action")
+        if place_twin_pasture_action is None:
+            raise ValueError("place_twin_pasture_action")
+
+        choices = [place_pasture_action, place_twin_pasture_action]
+        if place_stable_action is not None:
+            choices.append(place_stable_action)
+
+        prompt = inquirer.checkbox(
+            message="Which fields would you like to build?",
+            choices=choices)
+
+        self._add_keybinding_that_shows_resources(prompt)
+        self._add_keybinding_that_shows_round_info(prompt, turn_descriptor)
+
+        return ResultLookup(True, prompt.execute())
+
     def get_player_choice_tile_to_build(
             self,
             possible_tiles: List[BaseTile],

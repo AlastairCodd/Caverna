@@ -14,10 +14,7 @@ class FenceBuildingSmallCard(BaseResourceContainingCard):
             actions=Conditional(
                 ActionCombinationEnum.OrAndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
-                Conditional(
-                    ActionCombinationEnum.AndOr,
-                    place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.pasture),
-                    place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.pastureTwin))))
+                place_fences_action.PlaceFencesAction()))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         self.give_resource(ResourceTypeEnum.wood, 1)
@@ -32,10 +29,7 @@ class FenceBuildingLargeCard(BaseResourceContainingCard):
             actions=Conditional(
                 ActionCombinationEnum.OrAndThen,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
-                Conditional(
-                    ActionCombinationEnum.AndOr,
-                    place_a_single_tile_action.PlaceASingleTileAction(TileTypeEnum.pasture),
-                    place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.pastureTwin))))
+                place_fences_action.PlaceFencesAction()))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         amount_of_wood: int = 1 if self.has_resources else 2

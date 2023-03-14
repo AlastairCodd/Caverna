@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
@@ -132,6 +132,22 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         :param available_action_choices: The possible action choices which may be chosen. This cannot be null, or empty.
         :param turn_descriptor: The description of game state. This cannot be null, or empty.
         :returns: The action choice the player has chosen to take."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_player_choice_fences_to_build(
+            self,
+            place_pasture_action: BaseAction,
+            place_twin_pasture_action: BaseAction,
+            place_stable_action: Optional[BaseAction],
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
+        """Gets user choice for which fence building actions to take.
+
+        :param place_pasture_action: The action which may be taken, allowing the player to place a single pasture. This cannot be null.
+        :param place_twin_pasture_action: The action which may be taken, allowing the player to place a twin pasture. This cannot be null.
+        :param place_stable_action: The action which may be taken, allowing the player to place a stable action. This may be null, in which case the user cannot perform this action.
+        :param turn_descriptor: The description of game state. This cannot be null.
+        :returns: The fence building actions the player has chosen to take."""
         raise NotImplementedError()
 
     @abstractmethod

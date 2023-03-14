@@ -206,6 +206,14 @@ class ActionChoicePlayerService(BasePlayerService):
 
         return result
 
+    def get_player_choice_fences_to_build(
+            self,
+            place_pasture_action: BaseAction,
+            place_twin_pasture_action: BaseAction,
+            place_stable_action: Optional[BaseAction],
+            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseAction]]:
+        return ResultLookup(errors="Not Implemented")
+
     def get_player_choice_tile_to_build(
             self,
             possible_tiles: List[BaseTile],
