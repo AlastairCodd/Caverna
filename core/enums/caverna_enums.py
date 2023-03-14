@@ -60,7 +60,7 @@ class ActionCombinationEnum(Enum):
     AndOr = auto()
     And = auto()
     AndThenOr = auto()
-    OrAndThen = auto
+    OrAndThenStrict = auto()
     Or = auto()
     AndThen = auto()
 

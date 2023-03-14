@@ -12,7 +12,7 @@ class LoggingOneCard(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Logging", card_ids.LoggingOneCardId,
             actions=Conditional(
-                ActionCombinationEnum.OrAndThen,
+                ActionCombinationEnum.AndThenOr,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 go_on_an_expedition_action.GoOnAnExpeditionAction(1)))
 
@@ -27,7 +27,7 @@ class LoggingThreeCard(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Logging", card_ids.LoggingThreeCardId,
             actions=Conditional(
-                ActionCombinationEnum.OrAndThen,
+                ActionCombinationEnum.AndThenOr,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 go_on_an_expedition_action.GoOnAnExpeditionAction(1)))
 

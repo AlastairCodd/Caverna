@@ -13,7 +13,7 @@ class DriftMining2Card(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Drift Mining 2", card_ids.DriftMining2CardId,
             actions=Conditional(
-                ActionCombinationEnum.AndThen,
+                ActionCombinationEnum.AndThenOr,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.cavernTunnelTwin)))
 

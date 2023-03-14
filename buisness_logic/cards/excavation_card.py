@@ -12,7 +12,7 @@ class ExcavationTwoCard(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Excavation", card_ids.ExcavationTwoStoneCardId,
             actions=Conditional(
-                ActionCombinationEnum.AndThen,
+                ActionCombinationEnum.OrAndThenStrict,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 Conditional(
                     ActionCombinationEnum.Or,
@@ -31,7 +31,7 @@ class ExcavationOneCard(BaseResourceContainingCard):
         BaseResourceContainingCard.__init__(
             self, "Excavation", card_ids.ExcavationOneStoneCardId,
             actions=Conditional(
-                ActionCombinationEnum.AndThen,
+                ActionCombinationEnum.OrAndThenStrict,
                 take_accumulated_items_action.TakeAccumulatedItemsAction(),
                 Conditional(
                     ActionCombinationEnum.Or,

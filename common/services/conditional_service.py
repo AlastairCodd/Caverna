@@ -21,7 +21,7 @@ class ConditionalService(object):
             ActionCombinationEnum.AndOr: self._combine_and_or,
             ActionCombinationEnum.And: self._combine_and,
             ActionCombinationEnum.AndThenOr: self._combine_and_then_or,
-            ActionCombinationEnum.OrAndThen: self._combine_or_and_then,
+            ActionCombinationEnum.OrAndThenStrict: self._combine_or_and_then_strict,
             ActionCombinationEnum.Or: self._combine_or,
             ActionCombinationEnum.AndThen: self._combine_and_then}
 
@@ -119,7 +119,7 @@ class ConditionalService(object):
     def _combine_and_then_or(self, left: Iterable[ActionChoiceLookup], right: Iterable[ActionChoiceLookup]) \
             -> List[ActionChoiceLookup]:
         """Combine the left and right lists in an and then way. (left or right)
-        a AND_THEN_OR b = [ab, b]
+        a AND_THEN_OR b = [ab, a, b]
 
         :param left: an enumerable of base actions. This cannot be null.
         :param right: an enumerable of base actions. This cannot be null.
@@ -132,9 +132,34 @@ class ConditionalService(object):
 
         result: List[ActionChoiceLookup] = self._combine_and_then(left, right)
 
+        for l in left:
+            if l not in result:
+                result.append(l)
         for r in right:
             if r not in result:
                 result.append(r)
+
+        return result
+
+    def _combine_or_and_then_strict(self, left: Iterable[ActionChoiceLookup], right: Iterable[ActionChoiceLookup]) \
+            -> List[ActionChoiceLookup]:
+        """Combine the left and right lists in or an and then way. (left or right)
+        a AND_THEN_OR b = [ab, a]
+
+        :param left: an enumerable of base actions. This cannot be null.
+        :param right: an enumerable of base actions. This cannot be null.
+
+        :returns: A list containing the possible combined actions. This will never be null."""
+        if left is None:
+            raise ValueError("left")
+        if right is None:
+            raise ValueError("right")
+
+        result: List[ActionChoiceLookup] = self._combine_and_then(left, right)
+
+        for l in left:
+            if l not in result:
+                result.append(l)
 
         return result
 
@@ -195,29 +220,6 @@ class ConditionalService(object):
 
                 result_lookup: ActionChoiceLookup = ActionChoiceLookup(result_actions, result_constraints)
                 result.append(result_lookup)
-
-        return result
-
-    def _combine_or_and_then(
-            self,
-            left: Iterable[ActionChoiceLookup],
-            right: Iterable[ActionChoiceLookup]) -> List[ActionChoiceLookup]:
-        """Combine the left and right lists in an and then way. (left or right)
-        a OR_AND_THEN b = [a, ab]
-
-        :param left: an enumerable of base actions. This cannot be null.
-        :param right: an enumerable of base actions. This cannot be null.
-
-        :returns: A list containing the possible combined actions. This will never be null."""
-        if left is None:
-            raise ValueError("left")
-        if right is None:
-            raise ValueError("right")
-
-        result: List[ActionChoiceLookup] = self._combine_and_then(left, right)
-
-        for l in left:
-            result.append(l)
 
         return result
 
