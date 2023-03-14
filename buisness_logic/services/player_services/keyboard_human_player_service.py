@@ -631,6 +631,31 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 "amount": "#61afef",
                 "player": "ansimagenta"})
 
+    def _add_keybinding_that_shows_round_info(
+            self,
+            prompt: 'InquirerPy.base.simple.BaseSimplePrompt',
+            turn_descriptor: TurnDescriptorLookup) -> None:
+        prompt.has_shown_round_info = False
+
+        @prompt.register_kb("q")
+        def _handle_resources(event):
+            if prompt.has_shown_round_info:
+                return
+            prompt.has_shown_round_info = True
+
+            text = [
+                ("class:pointer", "❯ "),
+                ("", "round"),
+                ("class:round", str(turn_descriptor.round_index + 1)),
+                ("", " "),
+                ("class:player", self.descriptor),
+            ]
+            append_resources(text, self.resources, lambda text: text.append(("", "none")))
+            color_print(text, style={
+                "pointer": "#98c379",
+                "amount": "#61afef",
+                "player": "ansimagenta"})
+
     def _create_map_for_tile_placement(self, valid_locations) -> Printable:
         # _ 1 2 _ | _ _ _ 7
         # 8 x x x | x x x _
