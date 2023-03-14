@@ -72,8 +72,7 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
 
         for permutation in permutations:
             if not all(constraint.passes_condition(permutation) for constraint in actions.constraints):
-                print(f"permutation {permutation_index} does not pass constraints")
-                print()
+                #print(f"permutation {permutation_index} does not pass constraints")
                 permutation_index += 1
                 continue
             # The cloned player for testing shouldn't need to make any decisions
