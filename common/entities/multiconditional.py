@@ -19,6 +19,7 @@ class Conditional(Resettable):
         self._condition1: Union[BaseAction, 'Conditional'] = condition1
         self._condition2: Union[BaseAction, 'Conditional'] = condition2
         self._type: ActionCombinationEnum = combination_type
+        self._logging = True
 
     def get_left_branch(self) -> Union[BaseAction, 'Conditional']:
         if self._condition1 is self:
@@ -41,14 +42,90 @@ class Conditional(Resettable):
         return self.__format__("")
 
     def __format__(self, format_spec) -> str:
-        type_to_string: Dict[ActionCombinationEnum, Callable[[Any, Any], str]] = {
-            ActionCombinationEnum.EitherOr: lambda c1, c2: f"Either {self._condition1:{format_spec}} or {self._condition2:{format_spec}}",
-            ActionCombinationEnum.AndOr: lambda c1, c2: f"{self._condition1:{format_spec}} and/or {self._condition2:{format_spec}}",
-            ActionCombinationEnum.And: lambda c1, c2: f"{self._condition1:{format_spec}} and {self._condition2:{format_spec}}",
-            ActionCombinationEnum.AndThenOr: lambda c1, c2: f"{self._condition1:{format_spec}} and then/or {self._condition2:{format_spec}}",
-            ActionCombinationEnum.OrAndThen: lambda c1, c2: f"{self._condition1:{format_spec}} and then {self._condition2:{format_spec}}, or {self._condition1:{format_spec}}",
-            ActionCombinationEnum.Or: lambda c1, c2: f"{self._condition1:{format_spec}} or {self._condition2:{format_spec}}",
-            ActionCombinationEnum.AndThen: lambda c1, c2: f"{self._condition1:{format_spec}} and then {self._condition2:{format_spec}}",
-        }
-        result: str = type_to_string[self._type](self._condition1, self._condition2)
-        return result
+        # this is a mess. even if the consumer doesn't want it as tuple pairs, we
+        #    still enforce that it is, and then turn it back. which is what we do
+        #    for each of the individual methods too, but not to this weird extent
+
+        left_formatted = self._ensure_colour_printable(self._condition1.__format__(format_spec))
+        right_formatted = self._ensure_colour_printable(self._condition2.__format__(format_spec))
+
+        newline_separator = " "
+        try:
+            num_spaces_on_newline = int(format_spec.strip("pp"))
+            if num_spaces_on_newline != 0:
+                newline_separator = "\r\n" + " " * num_spaces_on_newline
+        except ValueError:
+            pass
+
+        result = self._get_colour_printable(left_formatted, right_formatted, newline_separator)
+        if "pp" in format_spec:
+            return result
+        return "".join(e[1] for e in result)
+
+    def _ensure_colour_printable(self, formatted):
+        if isinstance(formatted, list):
+            return formatted
+        if self._logging:
+            print(f"[WRN] forcing colour printable result: action={formatted}")
+        return [("", formatted)]
+
+    def _get_colour_printable(self, left_formatted, right_formatted, newline_separator):
+        if self._type is ActionCombinationEnum.EitherOr:
+            text = [("", "Either ")]
+            text.extend(left_formatted)
+            text.append(("", " or"))
+            text.append(("", newline_separator))
+            text.extend(right_formatted)
+            return text
+        if self._type is ActionCombinationEnum.AndOr:
+            text = []
+            text.extend(left_formatted)
+            text.append(("", " and "))
+            text.extend(right_formatted)
+            text.append(("", " or"))
+            text.append(("", newline_separator))
+            text.extend(left_formatted)
+            text.append(("", " or"))
+            text.append(("", newline_separator))
+            text.extend(right_formatted)
+            return text
+        if self._type is ActionCombinationEnum.And:
+            text = []
+            text.extend(left_formatted)
+            text.append(("", " and "))
+            text.extend(right_formatted)
+            return text
+        if self._type is ActionCombinationEnum.AndThenOr:
+            text = []
+            text.extend(left_formatted)
+            text.append(("", " and then "))
+            text.extend(right_formatted)
+            text.append(("", " or"))
+            text.append(("", newline_separator))
+            text.extend(left_formatted)
+            text.append(("", " or"))
+            text.append(("", newline_separator))
+            text.extend(right_formatted)
+            return text
+        if self._type is ActionCombinationEnum.OrAndThenStrict:
+            text = []
+            text.extend(left_formatted)
+            text.append(("", " and then "))
+            text.extend(right_formatted)
+            text.append(("", " or"))
+            text.append(("", newline_separator))
+            text.extend(left_formatted)
+            return text
+        if self._type is ActionCombinationEnum.Or:
+            text = []
+            text.extend(left_formatted)
+            text.append(("", " or"))
+            text.append(("", newline_separator))
+            text.extend(right_formatted)
+            return text
+        if self._type is ActionCombinationEnum.AndThen:
+            text = []
+            text.extend(left_formatted)
+            text.append(("", " and then "))
+            text.extend(right_formatted)
+            return text
