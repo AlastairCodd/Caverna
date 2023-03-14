@@ -106,7 +106,29 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def get_player_choice_market_items_to_purchase(
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
-        raise NotImplementedError()
+        choices  = [
+            ResourceTypeEnum.dog,
+            ResourceTypeEnum.sheep,
+            ResourceTypeEnum.donkey,
+            ResourceTypeEnum.boar,
+            ResourceTypeEnum.cow,
+            ResourceTypeEnum.wood,
+            ResourceTypeEnum.stone,
+            ResourceTypeEnum.ore,
+            ResourceTypeEnum.grain,
+            ResourceTypeEnum.veg,
+        ]
+
+        chosen_purchases_prompt = inquirer.checkbox(
+             message="Pick market items to buy",
+             choices=choices)
+
+        self._add_keybinding_that_shows_resources(chosen_purchases_prompt)
+
+        chosen_rewards: List[ResourceTypeEnum] = chosen_purchases_prompt.execute()
+
+        result: ResultLookup[List[ResourceTypeEnum]] = ResultLookup(True, chosen_rewards)
+        return result
 
     def get_player_choice_weapon_level(
             self,
