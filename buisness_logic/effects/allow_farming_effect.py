@@ -1,5 +1,6 @@
 from typing import Dict, Optional, List
 
+from buisness_logic.actions.cannot_afford_action_error import CannotAffordActionError
 from buisness_logic.actions.receive_action import ReceiveAction
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_effect import BaseEffect
@@ -46,7 +47,7 @@ class AllowFarmingEffect(BaseEffect):
             errors.append("Tile has already been planted.")
 
         if not player.has_more_resources_than({resource_type: 1}):
-            errors.append(f"Player does not have sufficient resources to plant {resource_type}")
+            errors.append(CannotAffordActionError("Player", f"to sow {resource_type.name}", {resource: 1}, player.resources))
 
         result: ResultLookup[bool]
         success: bool = len(errors) == 0
