@@ -50,6 +50,8 @@ class TurnExecutionService(object):
         untested_actions: List[BaseAction] = []
         untested_actions.extend(choice.actions.actions)
 
+        harvest_action: Optional[BaseAction] = None
+
         if is_players_final_turn:
             harvest_action: BaseAction = ResolveHarvestAction()
             untested_actions.append(harvest_action)
@@ -61,6 +63,8 @@ class TurnExecutionService(object):
 
         action: BaseAction
         for action in untested_actions:
+            if harvest_action is not None and not isinstance(action, ResolveHarvestAction):
+                constraints_on_actions.append(PrecedesConstraint(action, harvest_action))
             if not isinstance(action, BasePlayerChoiceAction):
                 actions_to_take.append(action)
                 continue
