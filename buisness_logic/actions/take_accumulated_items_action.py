@@ -37,4 +37,9 @@ class TakeAccumulatedItemsAction(BaseReceiveEventService, BaseAction):
         pass
 
     def __str__(self) -> str:
+        return self.__format__("")
+
+    def __format__(self, format_spec):
+        if "pp" in format_spec:
+            return [("", "Take accumulated items")]
         return "Take accumulated items"
