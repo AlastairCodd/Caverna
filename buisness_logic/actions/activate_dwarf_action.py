@@ -50,6 +50,9 @@ class ActivateDwarfAction(BaseAction):
     def __str__(self) -> str:
         return "Activate Dwarf Action"
 
+    def __repr__(self) -> str:
+        return "ActivateDwarfAction()"
+
     @property
     def card_to_activate(self) -> Optional[BaseCard]:
         return self._card_to_activate

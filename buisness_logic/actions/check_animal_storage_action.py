@@ -264,3 +264,6 @@ class CheckAnimalStorageAction(BasePlayerChoiceAction):
 
     def __eq__(self, other) -> bool:
         return isinstance(other, self.__class__)
+
+    def __repr__(self) -> str:
+        return "CheckAnimalStorageAction()"

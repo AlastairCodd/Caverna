@@ -221,6 +221,9 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
             result += ")"
         return result
 
+    def __repr__(self) -> str:
+        return f"PlaceATwinTileAction(tile_type={self._tile_type}, override_cost={self._tile_cost_override})"
+
     def _does_player_have_effects(
             self,
             player: BasePlayerRepository) -> ResultLookup[bool]:

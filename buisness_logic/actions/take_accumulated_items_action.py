@@ -43,3 +43,6 @@ class TakeAccumulatedItemsAction(BaseReceiveEventService, BaseAction):
         if "pp" in format_spec:
             return [("", "Take accumulated items")]
         return "Take accumulated items"
+
+    def __repr__(self) -> str:
+        return "TakeAccumulatedItemsAction()"

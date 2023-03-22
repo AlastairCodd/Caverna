@@ -52,6 +52,9 @@ class ReceiveAction(BaseReceiveAction):
             return text
         return "".join(e[1] for e in text)
 
+    def __repr__(self) -> str:
+        return f"ReceiveAction({self._items_to_receive!r})"
+
     def __eq__(self, other) -> bool:
         result: bool = isinstance(other, ReceiveAction)
 

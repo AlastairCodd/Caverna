@@ -130,3 +130,6 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
         if "pp" in format_spec:
             return text
         return "".join(e[1] for e in text)
+
+    def __repr__(self) -> str:
+        return "WeeklyMarketAction()"

@@ -61,6 +61,13 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
         if current_dwarf is None:
             raise ValueError
 
+        print(f"[DBG] ordering {len(actions.actions)} actions")
+        for action in actions.actions:
+            print(f"[VRB]   {action!r}")
+        print(f"[DBG] with {len(actions.constraints)} constraints")
+        for constraint in actions.constraints:
+            print(f"[VRB]   {constraint!r}")
+
         successful_permutations: List[Tuple[List[BaseAction], int, BasePlayerRepository]] = []
         unsuccessful_permutations: List[ResultLookup[int]] = []
 

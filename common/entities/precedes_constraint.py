@@ -46,5 +46,5 @@ class PrecedesConstraint(BaseConstraint):
         else:
             return False
 
-    def __str__(self) -> str:
-        return f"PrecedesConstraint({self._action_one}, {self._action_two})"
+    def __repr__(self) -> str:
+        return f"PrecedesConstraint({self._action_one!r}, {self._action_two!r})"
