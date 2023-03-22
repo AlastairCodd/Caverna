@@ -1,6 +1,7 @@
 from typing import List
 
 from buisness_logic.actions.resolve_harvest_action import ResolveHarvestAction
+from buisness_logic.actions.check_animal_storage_action import CheckAnimalStorageAction
 from buisness_logic.services.turn_transfer_service import TurnTransferService, ChosenDwarfCardActionCombinationAndEquivalentLookup
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf_card_action_combination_lookup import DwarfCardActionCombinationLookup
@@ -56,6 +57,7 @@ class TurnExecutionService(object):
             harvest_action: BaseAction = ResolveHarvestAction()
             untested_actions.append(harvest_action)
 
+        has_check_for_animal_storage = False
         actions_to_take: List[BaseAction] = []
         constraints_on_actions: List[BaseConstraint] = []
 
@@ -65,6 +67,11 @@ class TurnExecutionService(object):
         for action in untested_actions:
             if harvest_action is not None and not isinstance(action, ResolveHarvestAction):
                 constraints_on_actions.append(PrecedesConstraint(action, harvest_action))
+            if isinstance(action, CheckAnimalStorageAction):
+                if not has_check_for_animal_storage:
+                    has_check_for_animal_storage = True
+                    actions_to_take.append(action)
+                continue
             if not isinstance(action, BasePlayerChoiceAction):
                 actions_to_take.append(action)
                 continue

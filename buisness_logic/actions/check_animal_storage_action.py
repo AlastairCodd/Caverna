@@ -6,10 +6,10 @@ from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_entity import TileEntity
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from common.entities.unique_constraint import UniqueConstraint
 from common.forges.integer_partition_forge import IntegerPartitionForge
 from common.services.integer_partition_permutation_forge import IntegerPartitionPermutationForge
 from common.services.resource_layout_polynomial_checker import ResourceLayoutPolynomialChecker
+from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.baseClasses.base_tile import BaseTwinTile
@@ -19,7 +19,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 from core.services.resource_layout_check_service import ResourceLayoutCheckService
 
 
-class CheckAnimalStorageAction(BasePlayerChoiceAction):
+class CheckAnimalStorageAction(BaseAction):
     def __init__(self) -> None:
         self._resource_layout_checker: ResourceLayoutCheckService = ResourceLayoutPolynomialChecker()
         # self._resource_layout_checker: ResourceLayoutCheckService = ResourceLayoutExhaustiveChecker()
@@ -30,18 +30,6 @@ class CheckAnimalStorageAction(BasePlayerChoiceAction):
             TileTypeEnum.meadow,
             TileTypeEnum.pasture,
         ]
-
-    def set_player_choice(
-            self,
-            player: BasePlayerRepository,
-            dwarf: Dwarf,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[ActionChoiceLookup]:
-        result: ResultLookup[ActionChoiceLookup] = ResultLookup(
-            True,
-            ActionChoiceLookup(
-                [],
-                [UniqueConstraint(self)]))
-        return result
 
     def invoke(
             self,
