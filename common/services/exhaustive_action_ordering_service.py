@@ -106,10 +106,10 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
                 errors_for_permutation.extend(action_result.errors)
 
                 if action_result.flag:
-                    print(f"  success: permutation {action:4}")
+                    print(f"  success: action {action:4}")
                     successes += action_result.value
                 else:
-                    print(f"  *** FAIL: permutation {action:4}")
+                    print(f"  *** FAIL: action {action:4}")
                     success = False
                     break
 
@@ -129,7 +129,7 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
 
         if not any(ranked_results):
             errors: List[str] = ["There is not a permutation which allows for all actions to be performed"]
-            print(f"permutations considered: {len(unsuccessful_permutations)}")
+            print(f"permutations considered: {len(unsuccessful_permutations)}/{permutation_index}")
             for partition in unsuccessful_permutations:
                 errors.extend(partition.errors)
             errors = list(set(errors))

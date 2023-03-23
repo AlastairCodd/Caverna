@@ -253,5 +253,8 @@ class CheckAnimalStorageAction(BaseAction):
     def __eq__(self, other) -> bool:
         return isinstance(other, self.__class__)
 
+    def __str__(self) -> str:
+        return "Confirm player has room for all animals"
+
     def __repr__(self) -> str:
         return "CheckAnimalStorageAction()"
