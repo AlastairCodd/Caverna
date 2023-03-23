@@ -135,7 +135,7 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
         if current_dwarf is None:
             raise ValueError("Current dwarf may not be none")
         if len(self._chosen_actions_and_levels) == 0:
-            raise ValueError("Must have made choice for actions to perform")
+            return ResultLookup(False, "Must have made choice for actions to perform")
 
         errors: List[str] = []
 
