@@ -1,5 +1,7 @@
 import math
 from enum import Enum
+from shutil import get_terminal_size
+from textwrap import wrap
 from typing import List, Tuple, Optional, Dict, Any, Union, Callable
 
 #from InquirerPy.utils import patched_print
@@ -43,6 +45,23 @@ def append_resources(
         text.append(("class:resource", resource.name))
         if i < len(resources) - 1:
             text.append(("", ", "))
+
+def wrap_styled_text_to_fit_current_terminal(
+        text: FormattedText,
+        amount_to_indent_by: int = 0) -> FormattedText:
+    terminal_width = get_terminal_size().columns
+    number_of_new_elements = 0
+    for (i, (style, styled_element)) in enumerate(text):
+        wrapped: List[str] = wrap(
+            styled_element,
+            terminal_width,
+            subsequent_indent=' ' * amount_to_indent_by)
+        if len(wrapped) == 1:
+            continue
+        for (j, wrapped_element) in enumerate(wrapped):
+            text[i + number_of_new_elements + j] = (style, wrapped_element)
+        number_of_new_elements += len(wrapped)
+    return text
 
 
 class QuestionTypeEnum(Enum):
@@ -237,6 +256,8 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 card_description.append(("", "Resources: "))
                 card_description.append(("", f"{newline_separator}    "))
                 append_resources(card_description, card_to_use.resources, None)
+
+            wrap_styled_text_to_fit_current_terminal(card_description, 6)
             color_print(card_description, style={"count": "yellow"})
 
             pick_card_question = inquirer.confirm(message="", default=True)
