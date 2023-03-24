@@ -125,17 +125,21 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def get_player_choice_market_items_to_purchase(
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
-        choices  = [
-            ResourceTypeEnum.dog,
-            ResourceTypeEnum.sheep,
-            ResourceTypeEnum.donkey,
-            ResourceTypeEnum.boar,
-            ResourceTypeEnum.cow,
-            ResourceTypeEnum.wood,
-            ResourceTypeEnum.stone,
-            ResourceTypeEnum.ore,
-            ResourceTypeEnum.grain,
-            ResourceTypeEnum.veg,
+        choices: List[Dict[str, Any]] = [
+            {'name': reward.name,
+             'value': reward}
+            for reward in [
+                ResourceTypeEnum.dog,
+                ResourceTypeEnum.sheep,
+                ResourceTypeEnum.donkey,
+                ResourceTypeEnum.boar,
+                ResourceTypeEnum.cow,
+                ResourceTypeEnum.wood,
+                ResourceTypeEnum.stone,
+                ResourceTypeEnum.ore,
+                ResourceTypeEnum.grain,
+                ResourceTypeEnum.veg,
+            ]
         ]
 
         chosen_purchases_prompt = inquirer.checkbox(
