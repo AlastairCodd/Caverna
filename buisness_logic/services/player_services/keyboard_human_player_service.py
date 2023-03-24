@@ -38,7 +38,7 @@ def append_resources(
         return
 
     for (i, (resource, amount)) in enumerate(resources.items()):
-        text.append(("class:amount", str(amount)))
+        text.append(("class:count", str(amount)))
         text.append(("", " "))
         text.append(("class:resource", resource.name))
         if i < len(resources) - 1:
@@ -350,7 +350,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             text = [("", "  "), ("", current_tile.name), ("", " costs: ")]
 
             append_resources(text, current_tile.cost, lambda text: text.append(("", "nothing")))
-            color_print(text, style={"amount": "yellow"})
+            color_print(text, style={"count": "yellow"})
 
         prompt.last_tile_to_show_description = None
 
@@ -600,7 +600,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 text = [("", "  Tile costs: ")]
 
                 append_resources(text, tile_cost, lambda text: text.append(("", "nothing")))
-                color_print(text, style={"amount": "yellow"})
+                color_print(text, style={"count": "yellow"})
                 use_effects_prompt._handle_skip(event)
 
             use_effects = use_effects_prompt.execute()
@@ -678,7 +678,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             append_resources(text, self.resources, lambda text: text.append(("", "none")))
             color_print(text, style={
                 "pointer": "#e5c07b",
-                "amount": "#61afef",
+                "count": "#61afef",
                 "player": "ansimagenta"})
 
     def _add_keybinding_that_shows_round_info(
@@ -703,7 +703,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             append_resources(text, self.resources, lambda text: text.append(("", "none")))
             color_print(text, style={
                 "pointer": "#98c379",
-                "amount": "#61afef",
+                "count": "#61afef",
                 "player": "ansimagenta"})
 
     def _create_map_for_tile_placement(self, valid_locations) -> Printable:

@@ -42,7 +42,7 @@ class ReceiveAction(BaseReceiveAction):
     def __format__(self, format_spec):
         text = [("", "Receive ")]
         for (i, (resource, amount)) in enumerate(self._items_to_receive.items()):
-            text.append(("class:amount", str(amount)))
+            text.append(("class:count", str(amount)))
             text.append(("", " "))
             text.append(("class:resource", resource.name))
             if i != len(self._items_to_receive) - 1:
