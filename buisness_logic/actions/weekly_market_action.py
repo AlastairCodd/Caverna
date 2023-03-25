@@ -41,7 +41,7 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
         if turn_descriptor is None:
             raise ValueError("Turn descriptor may not be None")
 
-        market_items_result: ResultLookup[List[ResourceTypeEnum]] = player.get_player_choice_market_items_to_purchase(turn_descriptor)
+        market_items_result: ResultLookup[List[ResourceTypeEnum]] = player.get_player_choice_market_items_to_purchase(self._purchasable_items, turn_descriptor)
 
         result: ResultLookup[ActionChoiceLookup]
 

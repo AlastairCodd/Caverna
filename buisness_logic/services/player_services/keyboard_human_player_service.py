@@ -124,31 +124,65 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
     def get_player_choice_market_items_to_purchase(
             self,
+            purchasable_items: Dict[ResourceTypeEnum, int],
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
         choices: List[Dict[str, Any]] = [
-            {'name': reward.name,
+            {'name': f"{reward.name} ({cost})",
              'value': reward}
-            for reward in [
-                ResourceTypeEnum.dog,
-                ResourceTypeEnum.sheep,
-                ResourceTypeEnum.donkey,
-                ResourceTypeEnum.boar,
-                ResourceTypeEnum.cow,
-                ResourceTypeEnum.wood,
-                ResourceTypeEnum.stone,
-                ResourceTypeEnum.ore,
-                ResourceTypeEnum.grain,
-                ResourceTypeEnum.veg,
-            ]
-        ]
+             for (reward, cost) in purchasable_items.items()]
 
         chosen_purchases_prompt = inquirer.checkbox(
              message="Pick market items to buy",
              choices=choices)
 
+        @chosen_purchases_prompt.register_kb("t")
+        def _handle_total(event):
+            total_cost: int = 0
+            chosen_items: List[ResourceTypeEnum] = chosen_purchases_prompt.result_value
+
+            text = [("", "total cost of ")]
+            for (i, reward) in enumerate(chosen_items):
+                total_cost += purchasable_items[cost]
+                text.append(("class:resource", resource.name))
+                if i == len(chosen_items) - 1:
+                    continue
+                if i == len(chosen_items) - 2:
+                    text.append(("", " and "))
+                    continue
+                text.append(("", ", "))
+            text.append(("", " is "))
+            text.append(("class:cost", total_cost))
+
+            # FIXME: this is a pretty long message, would benefit from being forced to multilines
+            color_print(text, style={"count": "yellow"})
+            _warn_if_total_cost_is_more_than_expected_allowed(total_cost)
+
         self._add_keybinding_that_shows_resources(chosen_purchases_prompt)
 
+        def _warn_if_total_cost_of_purchases_is_more_than_expected_allowed(
+                purchases: List[ResourceTypeEnum]) -> None:
+            total_cost: int = sum(purchasable_items[resource] for resource in chosen_rewards)
+            _warn_if_total_cost_is_more_than_expected_allowed(total_cost)
+
+        def _warn_if_total_cost_is_more_than_expected_allowed(
+                total_cost: int) -> None:
+            expected_budget: int = self.get_resources_of_type(ResourceTypeEnum.coin) + 4
+            if total_cost <= expected_budget:
+                return
+            # cost of currently selected items is 4, and anticipated amount of coins available (without performing any conversions) is only 4
+            warning = [
+                ("class:warning", "cost of currently chosen market items is "),
+                ("class:count", str(total_cost)),
+                ("class:warning", " and anticipated amount of coins available "),
+                ("class:aside", "(assuming no conversions are performed) "),
+                ("class:warning", "is only "),
+                ("class:count", str(expected_budget)),
+            ]
+            color_print(warning, style={"warning": "red", "count": "yellow", "aside": "italic"})
+
         chosen_rewards: List[ResourceTypeEnum] = chosen_purchases_prompt.execute()
+
+        _warn_if_total_cost_of_purchases_is_more_than_expected_allowed(chosen_rewards)
 
         result: ResultLookup[List[ResourceTypeEnum]] = ResultLookup(True, chosen_rewards)
         return result

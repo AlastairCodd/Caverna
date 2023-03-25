@@ -105,6 +105,7 @@ class ActionChoicePlayerService(BasePlayerService):
 
     def get_player_choice_market_items_to_purchase(
             self,
+            _unused_market_choices,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
         items_to_purchase: List[ResourceTypeEnum]
         _, items_to_purchase = self._market_items_to_purchase_action_choice_processor_service.process_action_choice_for_market_items()
