@@ -47,7 +47,7 @@ class AllowFarmingEffect(BaseEffect):
             errors.append("Tile has already been planted.")
 
         if not player.has_more_resources_than({resource_type: 1}):
-            errors.append(CannotAffordActionError("Player", f"to sow {resource_type.name}", {resource: 1}, player.resources))
+            errors.append(CannotAffordActionError("Player", f"to sow {resource_type.name}", {resource_type: 1}, player.resources))
 
         result: ResultLookup[bool]
         success: bool = len(errors) == 0

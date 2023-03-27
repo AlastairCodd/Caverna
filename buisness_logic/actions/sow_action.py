@@ -81,6 +81,8 @@ class SowAction(BasePlayerChoiceAction):
         errors: List[str] = []
 
         for (i, effect) in enumerate(farming_effects):
+            if i >= number_of_resources_to_sow:
+                break
             resource = ResourceTypeEnum.grain if i < self._resources_to_sow.grain else ResourceTypeEnum.veg
             plant_resource_result: ResultLookup[bool] = effect.plant_resource(player, resource)
 
@@ -89,8 +91,6 @@ class SowAction(BasePlayerChoiceAction):
 
             if plant_resource_result.flag:
                 successes += 1
-            if i >= number_of_resources_to_sow:
-                break
 
         result: ResultLookup[int] = ResultLookup(success, successes, errors)
         return result
