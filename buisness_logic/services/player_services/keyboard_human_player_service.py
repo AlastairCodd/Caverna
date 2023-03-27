@@ -8,6 +8,7 @@ from typing import List, Tuple, Optional, Dict, Any, Union, Callable
 from InquirerPy.utils import color_print
 from InquirerPy import inquirer, prompt
 
+from buisness_logic.actions.receive_action import ReceiveAction
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.defaults.tile_container_default import TileContainerDefault
@@ -482,11 +483,43 @@ class KeyboardHumanPlayerService(BasePlayerService):
         def expedition_reward_validator(rewards: List[BaseAction]) -> bool:
             return len(rewards) <= expedition_level
 
+        def transform(_) -> str:
+            text = []
+            non_receive_rewards: List[BaseAction] = []
+            receive_rewards: List[ReceiveAction] = []
+
+            for reward in chosen_rewards_prompt.result_value:
+                if isinstance(reward, ReceiveAction):
+                    receive_rewards.append(reward)
+                    continue
+                non_receive_rewards.append(reward)
+
+            if len(receive_rewards) > 0:
+                text.append("Receive ")
+                for (i, reward) in enumerate(receive_rewards):
+                    for (j, (item, amount)) in enumerate(reward._items_to_receive.items()):
+                        text.append(f"{amount} {item.name}")
+                        if j != len(reward._items_to_receive) - 1:
+                            text.append(" and ")
+                    if i != len(receive_rewards) - 1:
+                        text.append(" and ")
+                if len(non_receive_rewards) > 0:
+                    text.append(", and then ")
+
+            for (i, reward) in enumerate(non_receive_rewards):
+                text.append(str(reward))
+                if i != len(non_receive_rewards) - 1:
+                    text.append(" and ")
+
+            return "".join(text)
+
         chosen_rewards_prompt = inquirer.checkbox(
-             message="Pick an expedition reward",
-             choices=choices,
-             validate=expedition_reward_validator,
-             invalid_message="should be only one reward" if expedition_level == 1 else f"should be at most {expedition_level} selected"
+            message="Pick an expedition reward",
+            choices=choices,
+            validate=expedition_reward_validator,
+            instruction="Use ↑/↓ to pick the rewards, and press space to select",
+            invalid_message="should be only one reward" if expedition_level == 1 else f"should be at most {expedition_level} selected",
+            transformer=transform
         )
 
         self._add_keybinding_that_shows_resources(chosen_rewards_prompt)
