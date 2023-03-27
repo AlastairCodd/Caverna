@@ -395,7 +395,8 @@ class KeyboardHumanPlayerService(BasePlayerService):
                  "value": tile}
                 for tile in possible_tiles
             ],
-            long_instruction="Navigate with arrow keys, press c to see the cost of the currently selected tile"
+            instruction="Use ↑/↓ to pick the tile",
+            long_instruction="'c' shows the cost of the currently selected tile, 'd' shows a description of its effects, 'r' to see current resources"
         )
 
         prompt.last_tile_to_show_cost = None
