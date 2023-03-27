@@ -12,6 +12,11 @@ tile placement shows u for tiles only accessible with tile effect
 trying to do something impossible still increments player count, should probably give you a second choice
 tiles are already built when they're not
 if there's no valid place to build a tile, the keyboard human player service throws up
+weekly market action output seems like it's not actually requiring the constraints pass? weird.
 
 nice to haves:
 changing the location to build could change the location map to highlight the currently chosen location
+should probably warn if you try and do an action that you're not expected to be able to do
+ - cant sow, no resources
+ - cant build, no space
+ - cant expore, no weapon
