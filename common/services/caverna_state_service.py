@@ -1,5 +1,7 @@
 from typing import Optional, List
 
+from InquirerPy.utils import color_print
+
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from core.baseClasses.base_card import BaseCard
@@ -149,6 +151,8 @@ class CavernaStateService(object):
 
         self._players_in_order = self._players[self.starting_player_index_next_round:] \
             + self._players[:self.starting_player_index_next_round]
+
+        color_print([("", f"Round {self.round_index + 1}")], style={"": "underline bold"})
 
     def get_next_player(
             self,
