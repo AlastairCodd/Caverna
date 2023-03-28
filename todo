@@ -14,7 +14,6 @@ bugs:
 * tiles are already built when they're not
 * if there's no valid place to build a tile, the keyboard human player service throws up
 * weekly market action output seems like it's not actually requiring the constraints pass? weird.
-* place a single tile doesn't reset
 
 nice to haves:
 * changing the location to build could change the location map to highlight the currently chosen location

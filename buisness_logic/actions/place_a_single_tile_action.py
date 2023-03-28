@@ -39,6 +39,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
         self._tile_requisites_override: Optional[List[TileTypeEnum]] = override_requisite
         self._tile_cost_override: Optional[Dict[ResourceTypeEnum, int]] = override_cost
 
+        self._chosen_tile_generation_method: Optional[Callable[[], BaseTile]] = None
         self._tile_location: int = -1
         self._effects_to_use: Dict[BaseTilePurchaseEffect, int] = {}
         self._turn_descriptor: Optional[TurnDescriptorLookup] = None
@@ -56,11 +57,13 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
 
         primary_tile: BaseTile
 
-        if self._specific_tile_generation_method is None:
+        if self._specific_tile_generation_method is not None:
+            self._chosen_tile_generation_method = self._specific_tile_generation_method
+        else:
             does_tile_have_unique_type: bool = self._tile_service.does_tile_type_have_unique_tile(self._tile_type)
 
             if does_tile_have_unique_type:
-                self._specific_tile_generation_method = self._tile_service \
+                self._chosen_tile_generation_method = self._tile_service \
                     .get_unique_tile_generation_method(self._tile_type)
 
             else:
@@ -74,10 +77,10 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
                 errors.extend(specific_tile_to_build_result.errors)
 
                 if specific_tile_to_build_result.flag:
-                    self._specific_tile_generation_method = lambda: specific_tile_to_build_result.value
+                    self._chosen_tile_generation_method = lambda: specific_tile_to_build_result.value
                 else:
-                    self._specific_tile_generation_method = lambda: None
-        primary_tile = self._specific_tile_generation_method()
+                    self._chosen_tile_generation_method = lambda: None
+        primary_tile = self._chosen_tile_generation_method()
 
         if success:
             location_to_build_result: ResultLookup[int] = player \
@@ -128,7 +131,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
             raise ValueError("Player choice has not been made")
         if self._tile_location < 0 or self._tile_location > player.tile_count:
             raise IndexError(f"Tile must be placed within bounds (0<={self._tile_location}<={player.tile_count})")
-        if self._specific_tile_generation_method is None:
+        if self._chosen_tile_generation_method is None:
             raise ValueError("Must choose a tile to place (_specific_tile_generation_method)")
 
         result: ResultLookup[int]
@@ -138,11 +141,11 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
 
         errors.extend(has_effects_result.errors)
 
-        specific_tile: BaseTile = self._specific_tile_generation_method()
-        is_tile_available: bool = self._tile_service.is_tile_available(self._turn_descriptor, specific_tile)
+        chosen_tile: BaseTile = self._chosen_tile_generation_method()
+        is_tile_available: bool = self._tile_service.is_tile_available(self._turn_descriptor, chosen_tile)
         can_place_tile_at_chosen_location: bool = self._tile_service.can_place_tile_at_location(
             player,
-            specific_tile,
+            chosen_tile,
             self._tile_location,
             self._tile_requisites_override)
 
@@ -153,7 +156,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
             errors.append(f"Chosen location {self._tile_location} is invalid")
 
         actual_cost_of_tile_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service.get_cost_of_tile(
-            specific_tile,
+            chosen_tile,
             self._tile_cost_override,
             self._effects_to_use)
         errors.extend(actual_cost_of_tile_result.errors)
@@ -168,7 +171,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
         if success:
             was_tile_placed_successfully_result: ResultLookup[bool] = self._tile_service.place_single_tile(
                 player,
-                specific_tile,
+                chosen_tile,
                 self._tile_location,
                 self._tile_requisites_override)
 
@@ -178,11 +181,11 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
             if success:
                 success = player.take_resources(actual_cost_of_tile_result.value)
 
-                for effect in specific_tile.effects:
+                for effect in chosen_tile.effects:
                     if isinstance(effect, BaseOnPurchaseEffect):
                         success &= effect.invoke(player)
 
-                self._turn_descriptor.tiles.remove(specific_tile)
+                self._turn_descriptor.tiles.remove(chosen_tile)
 
         result: ResultLookup[int] = ResultLookup(success, 1 if success else 0, errors)
         return result
@@ -190,6 +193,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
     def new_turn_reset(self) -> None:
         self._tile_location = -1
         self._effects_to_use = {}
+        self._chosen_tile_generation_method = None
         self._turn_descriptor = None
 
     def _should_get_effects_to_use_on_cost(
