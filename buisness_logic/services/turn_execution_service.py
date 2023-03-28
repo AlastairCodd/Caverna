@@ -1,7 +1,8 @@
 from typing import List
 
-from buisness_logic.actions.resolve_harvest_action import ResolveHarvestAction
 from buisness_logic.actions.check_animal_storage_action import CheckAnimalStorageAction
+from buisness_logic.actions.convert_action import ConvertAction
+from buisness_logic.actions.resolve_harvest_action import ResolveHarvestAction
 from buisness_logic.services.turn_transfer_service import TurnTransferService, ChosenDwarfCardActionCombinationAndEquivalentLookup
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf_card_action_combination_lookup import DwarfCardActionCombinationLookup
@@ -48,7 +49,7 @@ class TurnExecutionService(object):
 
         choice: DwarfCardActionCombinationLookup = chosen_turn_descriptor_result.value.choice
 
-        untested_actions: List[BaseAction] = []
+        untested_actions: List[BaseAction] = [ConvertAction()]
         untested_actions.extend(choice.actions.actions)
 
         harvest_action: Optional[BaseAction] = None
