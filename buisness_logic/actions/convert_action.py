@@ -29,12 +29,13 @@ class ConvertAction(BaseReceiveEventService, BasePlayerChoiceAction):
 
         convert_single_actions: List[ConvertSingleAction] = []
         for resources_to_be_converted, amount_of_resource_to_convert, resource_to_be_convert_into in conversions_to_perform:
-            if amount_of_resource_to_convert > 0:
-                convert_single_action: ConvertSingleAction = ConvertSingleAction(
-                    resources_to_be_converted,
-                    resource_to_be_convert_into,
-                    amount_of_resource_to_convert)
-                convert_single_actions.append(convert_single_action)
+            if amount_of_resource_to_convert == 0:
+                continue
+            convert_single_action: ConvertSingleAction = ConvertSingleAction(
+                resources_to_be_converted,
+                resource_to_be_convert_into,
+                amount_of_resource_to_convert)
+            convert_single_actions.append(convert_single_action)
 
         result: ResultLookup[ActionChoiceLookup] = ResultLookup(True, ActionChoiceLookup(convert_single_actions))
         return result

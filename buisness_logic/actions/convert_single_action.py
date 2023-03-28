@@ -42,41 +42,41 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
 
         required_conversion_effects: Dict[int, ConvertEffect] = self._get_required_conversion_effects(player)
         if len(required_conversion_effects) == 0:
-            result = ResultLookup(errors=f"Player does not have effect allowing conversion from {self._convert_from} to {self._convert_from}")
-        else:
-            errors: List[str] = []
+            return ResultLookup(errors=f"Player does not have effect allowing conversion from {self._convert_from} to {self._convert_from}")
 
-            conversions_to_use: Dict[ConvertEffect, int] = self._get_conversion_effect_to_use(required_conversion_effects)
+        errors: List[str] = []
 
-            resources_to_take: Dict[ResourceTypeEnum, int] = {}
-            resources_to_give: Dict[ResourceTypeEnum, int] = {}
-            for effect, number_of_times_to_use in conversions_to_use.items():
-                for resource in effect.input:
-                    resources_to_take[resource] = effect.input[resource] * number_of_times_to_use + resources_to_take.get(resource, 0)
-                for resource in effect.output:
-                    resources_to_give[resource] = effect.output[resource] * number_of_times_to_use + resources_to_give.get(resource, 0)
+        conversions_to_use: Dict[ConvertEffect, int] = self._get_conversion_effect_to_use(required_conversion_effects)
 
-            receive_on_convert_from_effects: List[ReceiveOnConvertFromEffect] = player.get_effects_of_type(ReceiveOnConvertFromEffect)
+        resources_to_take: Dict[ResourceTypeEnum, int] = {}
+        resources_to_give: Dict[ResourceTypeEnum, int] = {}
+        for effect, number_of_times_to_use in conversions_to_use.items():
+            for resource in effect.input:
+                resources_to_take[resource] = effect.input[resource] * number_of_times_to_use + resources_to_take.get(resource, 0)
+            for resource in effect.output:
+                resources_to_give[resource] = effect.output[resource] * number_of_times_to_use + resources_to_give.get(resource, 0)
 
-            for effect in receive_on_convert_from_effects:
-                if effect.convert_from_item in resources_to_take:
-                    number_of_times_taken: int = resources_to_take[effect.convert_from_item]
-                    for resource in effect.items_to_receive:
-                        resources_to_give[resource] = effect.items_to_receive[resource] * number_of_times_taken + resources_to_give.get(resource, 0)
+        receive_on_convert_from_effects: List[ReceiveOnConvertFromEffect] = player.get_effects_of_type(ReceiveOnConvertFromEffect)
 
-            does_player_have_more_resources_than_taken: bool = player.has_more_resources_than(resources_to_take)
-            if not does_player_have_more_resources_than_taken:
-                errors.append("Player does not have sufficient resources to convert from")
+        for effect in receive_on_convert_from_effects:
+            if effect.convert_from_item in resources_to_take:
+                number_of_times_taken: int = resources_to_take[effect.convert_from_item]
+                for resource in effect.items_to_receive:
+                    resources_to_give[resource] = effect.items_to_receive[resource] * number_of_times_taken + resources_to_give.get(resource, 0)
 
-            if len(errors) == 0:
-                success: bool = player.take_resources(resources_to_take)
+        does_player_have_more_resources_than_taken: bool = player.has_more_resources_than(resources_to_take)
+        if not does_player_have_more_resources_than_taken:
+            errors.append("Player does not have sufficient resources to convert from")
 
-                if success:
-                    result = self._give_player_resources(player, resources_to_give)
-                else:
-                    result = ResultLookup(errors="DEV ERROR: Taking resources failed.")
+        if len(errors) == 0:
+            success: bool = player.take_resources(resources_to_take)
+
+            if success:
+                result = self._give_player_resources(player, resources_to_give)
             else:
-                result = ResultLookup(errors=errors)
+                result = ResultLookup(errors="DEV ERROR: Taking resources failed.")
+        else:
+            result = ResultLookup(errors=errors)
         return result
 
     def new_turn_reset(self) -> None:
@@ -95,13 +95,15 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
             # CONFIG: consider using this if can convert none of some resource can be lost
             are_converting_from_same: bool = all(resource in self._convert_from for resource in effect.input)
             # are_converting_from_same: bool = Counter(effect.input.keys()) == Counter(self._convert_from)
-            if are_converting_from_same:
-                # CONFIG: consider using this if gaining non-asked for resources is desired
-                # are_converting_to_same: bool = all(resource in effect.output for resource in self._convert_to)
-                are_converting_to_same: bool = Counter(effect.output.keys()) == Counter(self._convert_to)
-                if are_converting_to_same:
-                    number_of_times_input_is_converted_in_effect: int = min(effect.input.values())
-                    required_conversion_effects[number_of_times_input_is_converted_in_effect] = effect
+            if not are_converting_from_same:
+                continue
+            # CONFIG: consider using this if gaining non-asked for resources is desired
+            # are_converting_to_same: bool = all(resource in effect.output for resource in self._convert_to)
+            are_converting_to_same: bool = Counter(effect.output.keys()) == Counter(self._convert_to)
+            if not are_converting_to_same:
+                continue
+            number_of_times_input_is_converted_in_effect: int = min(effect.input.values())
+            required_conversion_effects[number_of_times_input_is_converted_in_effect] = effect
 
         return required_conversion_effects
 
@@ -121,31 +123,32 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
             number_of_times_input_is_converted_in_effect, effect_to_use = next(iter(conversion_effects.items()))
 
             number_of_times_to_use_effect: int = math.floor(self._number_of_times / number_of_times_input_is_converted_in_effect)
-            result = {effect_to_use: number_of_times_to_use_effect}
-        else:
-            remaining_times: int = self._number_of_times
-            current_index: int = self._number_of_times
-            result = {}
+            return {effect_to_use: number_of_times_to_use_effect}
 
-            while remaining_times > 0:
-                if current_index in conversion_effects:
-                    number_of_times_to_use_conversion_effect: int = math.floor(remaining_times / current_index)
-                    result[conversion_effects[current_index]] = number_of_times_to_use_conversion_effect
-                    remaining_times -= number_of_times_to_use_conversion_effect * current_index
+        remaining_times: int = self._number_of_times
+        current_index: int = self._number_of_times
+        result = {}
 
-                current_index -= 1
+        while remaining_times > 0:
+            if current_index in conversion_effects:
+                number_of_times_to_use_conversion_effect: int = math.floor(remaining_times / current_index)
+                result[conversion_effects[current_index]] = number_of_times_to_use_conversion_effect
+                remaining_times -= number_of_times_to_use_conversion_effect * current_index
+
+            current_index -= 1
 
         return result
 
     def __eq__(self, other) -> bool:
-        if isinstance(other, self.__class__):
-            are_converting_from_same: bool = Counter(other._convert_from) == Counter(self._convert_from)
-            are_converting_to_same: bool = Counter(other._convert_to) == Counter(self._convert_to)
-            are_converting_same_number_of_times: bool = other._number_of_times == self._number_of_times
-            result: bool = are_converting_to_same and are_converting_from_same and are_converting_same_number_of_times
-            return result
-        else:
+        if not isinstance(other, self.__class__):
             return False
 
-    def __str__(self):
+        are_converting_from_same: bool = Counter(other._convert_from) == Counter(self._convert_from)
+        are_converting_to_same: bool = Counter(other._convert_to) == Counter(self._convert_to)
+        are_converting_same_number_of_times: bool = other._number_of_times == self._number_of_times
+
+        result: bool = are_converting_to_same and are_converting_from_same and are_converting_same_number_of_times
+        return result
+
+    def __repr__(self):
         return f"{self.__class__}({self._convert_from}, {self._convert_to}, {self._number_of_times})"
