@@ -4,11 +4,12 @@ from shutil import get_terminal_size
 from textwrap import wrap
 from typing import List, Tuple, Optional, Dict, Any, Union, Callable
 
-#from InquirerPy.utils import patched_print
+from InquirerPy.utils import patched_print
 from InquirerPy.utils import color_print
 from InquirerPy import inquirer, prompt
 
 from buisness_logic.actions.receive_action import ReceiveAction
+from buisness_logic.effects.conversion_effects import ConvertEffect
 from buisness_logic.effects.food_effects import BaseFoodEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.defaults.tile_container_default import TileContainerDefault
@@ -121,7 +122,35 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def get_player_choice_conversions_to_perform(
             self,
             turn_descriptor: TurnDescriptorLookup) -> List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]]:
-        pass
+        wishes_to_convert_anything_into_food = inquirer.confirm(message="Would you like to convert any resources into food?").execute()
+
+        if not wishes_to_convert_anything_into_food:
+            return []
+        food_conversion_choices: List[Dict[str, Any]] = [
+            {'name': ", ".join(resource.name for resource in convert_effect.input),
+             'value': convert_effect}
+             for convert_effect in self.get_effects_of_type(ConvertEffect)
+             if ResourceTypeEnum.food in convert_effect.output]
+        patched_print(food_conversion_choices)
+
+        chosen_food_conversions = inquirer.checkbox(
+            message="Pick conversions to perform",
+            long_instruction="Use 'space' to select conversions to perform",
+            choices=food_conversion_choices).execute()
+
+        conversions_to_perform: List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]] = []
+        for conversion in chosen_food_conversions:
+            number_of_conversions_to_perform = inquirer.number(
+                message=f"How many of the input ({conversion}) would you like to convert?",
+                filter=lambda result: int(result)).execute()
+            if number_of_conversions_to_perform <= 0:
+                continue
+            conversions_to_perform.append((
+                conversion.input.keys(),
+                number_of_conversions_to_perform,
+                conversion.output.keys()))
+        patched_print(conversions_to_perform)
+        return conversions_to_perform
 
     def get_player_choice_market_items_to_purchase(
             self,
