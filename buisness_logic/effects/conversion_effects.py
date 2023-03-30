@@ -49,9 +49,9 @@ class ConvertEffect(BaseEffect):
 
         if format_spec == "pp":
             return text
-        if format_spec.isspace():
+        if not format_spec:
             return "".join(e[1] for e in text)
-        raise ValueError("format parameter must be 'pp' or whitespace/empty")
+        raise ValueError(f"format parameter must be 'pp' or whitespace/empty, was {format_spec!r}")
 
     def __repr__(self):
         return f"ConvertEffect({self._input}, {self._output})"
