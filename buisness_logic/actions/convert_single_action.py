@@ -59,24 +59,23 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
         receive_on_convert_from_effects: List[ReceiveOnConvertFromEffect] = player.get_effects_of_type(ReceiveOnConvertFromEffect)
 
         for effect in receive_on_convert_from_effects:
-            if effect.convert_from_item in resources_to_take:
-                number_of_times_taken: int = resources_to_take[effect.convert_from_item]
-                for resource in effect.items_to_receive:
-                    resources_to_give[resource] = effect.items_to_receive[resource] * number_of_times_taken + resources_to_give.get(resource, 0)
+            if effect.convert_from_item not in resources_to_take:
+                continue
+            number_of_times_taken: int = resources_to_take[effect.convert_from_item]
+            for resource in effect.items_to_receive:
+                resources_to_give[resource] = effect.items_to_receive[resource] * number_of_times_taken + resources_to_give.get(resource, 0)
 
         does_player_have_more_resources_than_taken: bool = player.has_more_resources_than(resources_to_take)
         if not does_player_have_more_resources_than_taken:
             errors.append("Player does not have sufficient resources to convert from")
 
-        if len(errors) == 0:
-            success: bool = player.take_resources(resources_to_take)
+        if len(errors) > 0:
+            return ResultLookup(errors=errors)
 
-            if success:
-                result = self._give_player_resources(player, resources_to_give)
-            else:
-                result = ResultLookup(errors="DEV ERROR: Taking resources failed.")
-        else:
-            result = ResultLookup(errors=errors)
+        if not player.take_resources(resources_to_take):
+            return ResultLookup(errors="DEV ERROR: Taking resources failed.")
+
+        result = self._give_player_resources(player, resources_to_give)
         return result
 
     def new_turn_reset(self) -> None:
@@ -116,8 +115,6 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
         if number_of_conversion_effects == 0:
             raise ValueError("Must have at least one conversion effect")
 
-        result: Dict[ConvertEffect, int]
-
         if number_of_conversion_effects == 1:
             effect_to_use: ConvertEffect
             number_of_times_input_is_converted_in_effect, effect_to_use = next(iter(conversion_effects.items()))
@@ -127,7 +124,8 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
 
         remaining_times: int = self._number_of_times
         current_index: int = self._number_of_times
-        result = {}
+
+        result: Dict[ConvertEffect, int] = {}
 
         while remaining_times > 0:
             if current_index in conversion_effects:
