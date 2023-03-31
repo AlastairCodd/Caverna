@@ -135,6 +135,9 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
 
             current_index -= 1
 
+            if current_index == 0:
+                break
+
         return result
 
     def __eq__(self, other) -> bool:
