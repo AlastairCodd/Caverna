@@ -150,5 +150,39 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
         result: bool = are_converting_to_same and are_converting_from_same and are_converting_same_number_of_times
         return result
 
+    def __str__(self) -> str:
+        return self.__format__(" ")
+
+    def __format__(self, format_spec):
+        text = [("", "Convert ")]
+        for (i, resource) in enumerate(self._convert_from):
+            text.append(("class:resource", resource.name))
+            if i == len(self._convert_from) - 2:
+                text.append(("", " and "))
+                continue
+            if i != len(self._convert_from) - 1:
+                text.append(("", ", "))
+
+        text.append(("", " into "))
+
+        for (i, resource) in enumerate(self._convert_to):
+            text.append(("class:resource", resource.name))
+            if i == len(self._convert_to) - 2:
+                text.append(("", " and "))
+                continue
+            if i != len(self._convert_to) - 1:
+                text.append(("", ", "))
+
+        if self._number_of_times != 1:
+            text.append(("", " (x"))
+            text.append(("class:count", str(self._number_of_times)))
+            text.append(("", ")"))
+
+        if "pp" in format_spec:
+            return text
+        if format_spec.isspace or not format_spec:
+            return "".join(e[1] for e in text)
+        raise ValueError(f"format spec must be either pp or whitespace, was {format_spec!r}")
+
     def __repr__(self):
         return f"{self.__class__}({self._convert_from}, {self._convert_to}, {self._number_of_times})"
