@@ -67,12 +67,12 @@ class TwinTilesOverhangEffect(ChangeRequisiteEffect):
             ("", " (receive "),
             ("class:count", str(2)),
             ("", " "),
-            ("", "coins"),
+            ("class:resource", "coins"),
             ("", " every time this is done)")
         ]
 
         if format_spec == "pp":
             return text
-        if format_spec.isspace():
+        if format_spec.isspace() or not format_spec:
             return "".join(e[1] for e in text)
         raise ValueError("format parameter must be 'pp' or whitespace/empty")
