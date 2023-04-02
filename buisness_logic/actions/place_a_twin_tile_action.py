@@ -128,72 +128,68 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
             errors.append(f"Secondary Tile in Twin Tile ({secondary_tile.name}) has already been built")
 
         cost: Dict[ResourceTypeEnum, int] = {}
-        was_cost_calculated_successfully: bool = False
 
         if self._tile_cost_override is None:
             actual_cost_of_primary_tile_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service.get_cost_of_tile(
                 primary_tile,
                 effects_to_use=self._effects_to_use)
-            errors.extend(actual_cost_of_primary_tile_result.errors)
+            if not actual_cost_of_primary_tile_result.flag:
+                return ResultLookup(errors=actual_cost_of_primary_tile_result.errors)
 
-            actual_cost_of_secondary_tile_result: ResultLookup[Dict[ResourceTypeEnum, int]]
+            actual_cost_of_secondary_tile: Dict[ResourceTypeEnum, int]
             if not is_twin_tile_inseparable:
                 actual_cost_of_secondary_tile_result = self._tile_service.get_cost_of_tile(
                     secondary_tile,
                     self._tile_cost_override,
                     self._effects_to_use)
+                if not actual_cost_of_secondary_tile_result.flag:
+                    return ResultLookup(errors=actual_cost_of_secondary_tile_result.errors)
+                actual_cost_of_secondary_tile = actual_cost_of_secondary_tile_result.value
             else:
-                actual_cost_of_secondary_tile_result = ResultLookup(True, {})
-            errors.extend(actual_cost_of_secondary_tile_result.errors)
+                actual_cost_of_secondary_tile = {}
 
-            if actual_cost_of_primary_tile_result.flag and actual_cost_of_secondary_tile_result.flag:
-                was_cost_calculated_successfully = True
-                cost = {}
-                for resource in actual_cost_of_primary_tile_result.value:
-                    cost.setdefault(resource, 0)
-                    cost[resource] += actual_cost_of_primary_tile_result.value[resource]
-                for resource in actual_cost_of_secondary_tile_result.value:
-                    cost.setdefault(resource, 0)
-                    cost[resource] += actual_cost_of_primary_tile_result.value[resource]
+            cost = {}
+
+            for resource in actual_cost_of_primary_tile_result.value:
+                cost.setdefault(resource, 0)
+                cost[resource] += actual_cost_of_primary_tile_result.value[resource]
+            for resource in actual_cost_of_secondary_tile_result.value:
+                cost.setdefault(resource, 0)
+                cost[resource] += actual_cost_of_primary_tile_result.value[resource]
         else:
             overridden_cost_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service.get_cost_of_tile(
                 cost_override=self._tile_cost_override,
                 effects_to_use=self._effects_to_use)
 
-            errors.extend(overridden_cost_result.errors)
+            if not overridden_cost_result.flag:
+                return ResultLookup(cost=overridden_cost_result.errors)
 
-            if overridden_cost_result.flag:
-                was_cost_calculated_successfully = True
-                cost = overridden_cost_result.value
+            cost = overridden_cost_result.value
 
-        if was_cost_calculated_successfully:
-            can_player_afford_tile: bool = player.has_more_resources_than(cost)
-            if not can_player_afford_tile:
-                errors.append(CannotAffordActionError("Player", "tile", cost, player.resources))
+        can_player_afford_tile: bool = player.has_more_resources_than(cost)
+        if not can_player_afford_tile:
+            return ResultLookup(errors=CannotAffordActionError("Player", "tile", cost, player.resources))
 
-        success: bool = len(errors) == 0
-        if success:
-            was_tile_placed_successfully_result: ResultLookup[bool] = self._tile_service.place_twin_tile(
-                player,
-                self._tile_type,
-                primary_tile,
-                secondary_tile,
-                self._tile_location,
-                self._tile_direction)
+        was_tile_placed_successfully_result: ResultLookup[bool] = self._tile_service.place_twin_tile(
+            player,
+            self._tile_type,
+            primary_tile,
+            secondary_tile,
+            self._tile_location,
+            self._tile_direction)
 
-            success = was_tile_placed_successfully_result.flag
-            errors.extend(was_tile_placed_successfully_result.errors)
+        if not was_tile_placed_successfully_result.flag:
+            return ResultLookup(errors=was_tile_placed_successfully_result.errors)
 
-            if success:
-                success = player.take_resources(cost)
+        success = player.take_resources(cost)
 
-                for effect in primary_tile.effects:
-                    if isinstance(effect, BaseOnPurchaseEffect):
-                        success &= effect.invoke(player)
-                if not is_twin_tile_inseparable:
-                    for effect in secondary_tile.effects:
-                        if isinstance(effect, BaseOnPurchaseEffect):
-                            success &= effect.invoke(player)
+        for effect in primary_tile.effects:
+            if isinstance(effect, BaseOnPurchaseEffect):
+                success &= effect.invoke(player)
+        if not is_twin_tile_inseparable:
+            for effect in secondary_tile.effects:
+                if isinstance(effect, BaseOnPurchaseEffect):
+                    success &= effect.invoke(player)
 
         result: ResultLookup[int] = ResultLookup(success, 2 if success else 0, errors)
         return result
