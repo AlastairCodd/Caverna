@@ -1,14 +1,16 @@
 from typing import List, Optional, Callable, Dict
 
 from buisness_logic.actions.cannot_afford_action_error import CannotAffordActionError
+from buisness_logic.actions.receive_action import ReceiveAction
 from buisness_logic.effects.base_effects import BaseOnPurchaseEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
+from common.entities.precedes_constraint import PrecedesConstraint
 from common.entities.result_lookup import ResultLookup
+from common.services.tile_service import TileService
 from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from common.services.tile_service import TileService
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.baseClasses.base_tile import BaseTile
@@ -60,12 +62,18 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
                 ActionChoiceLookup([]),
                 location_to_build_result.errors)
 
-        self._tile_location = location_to_build_result.value[0]
-
         if location_to_build_result.value[1] is None:
             return ResultLookup(errors="Must have direction when placing twin tile")
 
-        self._tile_direction = location_to_build_result.value[1]
+        resources_from_constructing_tile_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service \
+            .get_resources_taken_when_placing_twin_tile_at_location(
+                player,
+                location_to_build_result.value)
+
+        if not resources_from_constructing_tile_result.flag:
+            return ResultLookup(errors=resources_from_constructing_tile_result.errors)
+
+        self._tile_location, self._tile_direction = location_to_build_result.value
 
         default_cost = self._get_cost()
         if any(default_cost):
@@ -78,10 +86,13 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
 
         self._turn_descriptor = turn_descriptor
 
-        result: ResultLookup[ActionChoiceLookup] = ResultLookup(
-            True,
-            ActionChoiceLookup([]))
-        return result
+        if len(resources_from_constructing_tile_result.value) == 0:
+            return ResultLookup(True, ActionChoiceLookup([]))
+
+        receive_action = ReceiveAction(resources_from_constructing_tile_result.value)
+        precedes_constraint = PrecedesConstraint(self, receive_action)
+
+        return ResultLookup(True, ActionChoiceLookup([receive_action], [precedes_constraint]))
 
     def invoke(
             self,

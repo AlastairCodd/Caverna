@@ -2,6 +2,7 @@ from typing import List, Dict, Iterable, Tuple, Optional, Callable, cast
 
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
+from buisness_logic.effects.receive_on_covering_effect import ReceiveOnCoveringEffect
 from buisness_logic.tiles.mine_tiles import *
 from buisness_logic.tiles.outdoor_tiles import *
 from common.defaults.tile_requisite_default import TileRequisiteDefault
@@ -229,6 +230,36 @@ class TileService(object):
 
         result: bool = TileTwinPlacementLookup(location, direction) in possible_locations
         return result
+
+    def get_resources_taken_when_placing_twin_tile_at_location(
+            self,
+            player: TileContainer,
+            location_to_build_tile: TileTwinPlacementLookup) -> ResultLookup[Dict[ResourceTypeEnum, int]]:
+        if player is None:
+            raise ValueError("Player may not be None")
+        if location_to_build_tile is None:
+            raise ValueError("Location to build tile must not be None")
+        location, direction = location_to_build_tile
+        location_of_secondary_tile: int = location + self._direction_offset[direction](player)
+
+        primary_tile: TileEntity
+        secondary_tile: TileEntity
+
+        try:
+            primary_tile = player.get_tile_at_location(location)
+            secondary_tile = player.get_tile_at_location(location_of_secondary_tile)
+        except IndexError as err:
+            return ResultLookup(errors=err)
+
+        resources: Dict[ResourceTypeEnum, int] = {}
+        for effect in primary_tile.get_effects_of_type(ReceiveOnCoveringEffect):
+            for (resource, amount) in effect.resources.items():
+                resources[resource] = resources.get(resource, 0) + amount
+        for effect in secondary_tile.get_effects_of_type(ReceiveOnCoveringEffect):
+            for (resource, amount) in effect.resources.items():
+                resources[resource] = resources.get(resource, 0) + amount
+
+        return ResultLookup(True, resources)
 
     def get_cost_of_tile(
             self,
