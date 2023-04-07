@@ -1,10 +1,12 @@
 from typing import List, Dict, Optional, Callable
 
 from buisness_logic.actions.cannot_afford_action_error import CannotAffordActionError
+from buisness_logic.actions.receive_action import ReceiveAction
 from buisness_logic.effects.base_effects import BaseOnPurchaseEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
+from common.entities.precedes_constraint import PrecedesConstraint
 from common.entities.result_lookup import ResultLookup
 from common.services.tile_service import TileService
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
@@ -79,6 +81,13 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
         if not location_to_build_result.flag:
             return ResultLookup(errors=location_to_build_result.errors)
 
+        resources_from_constructing_tile_result: ResultLookup[Dict[ResourceTyeEnum, int]] = self._tile_service \
+            .get_resources_taken_when_placing_tile_at_location(
+                player,
+                location_to_build_result.value)
+
+        if not resources_from_constructing_tile_result.flag:
+            return ResultLookup(errors=resources_from_constructing_tile_result.errors)
 
         self._tile_location = location_to_build_result.value
 
@@ -101,7 +110,13 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
 
         self._turn_descriptor = turn_descriptor
 
-        return ResultLookup(True, ActionChoiceLookup([]))
+        if len(resources_from_constructing_tile_result.value) == 0:
+            return ResultLookup(True, ActionChoiceLookup([]))
+
+        receive_action = ReceiveAction(resources_from_constructing_tile_result.value)
+        precedes_constraint = PrecedesConstraint(self, receive_action)
+
+        return ResultLookup(True, ActionChoiceLookup([receive_action], [precedes_constraint]))
 
     def invoke(
             self,
@@ -168,7 +183,8 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
                     if isinstance(effect, BaseOnPurchaseEffect):
                         success &= effect.invoke(player)
 
-                self._turn_descriptor.tiles.remove(chosen_tile)
+                if not self._tile_service.does_tile_type_have_unique_tile(self._tile_type):
+                    self._turn_descriptor.tiles.remove(chosen_tile)
 
         result: ResultLookup[int] = ResultLookup(success, 1 if success else 0, errors)
         return result
