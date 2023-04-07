@@ -6,8 +6,8 @@ from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
-from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.tile_service import TileService
+from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.baseClasses.base_tile import BaseTile
@@ -52,73 +52,56 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
         if player is None:
             raise ValueError("player cannot be none")
 
-        success: bool = True
-        errors: List[str] = []
-
-        primary_tile: BaseTile
-
         if self._specific_tile_generation_method is not None:
             self._chosen_tile_generation_method = self._specific_tile_generation_method
+        elif self._tile_service.does_tile_type_have_unique_tile(self._tile_type):
+            self._chosen_tile_generation_method = self._tile_service \
+                .get_unique_tile_generation_method(self._tile_type)
         else:
-            does_tile_have_unique_type: bool = self._tile_service.does_tile_type_have_unique_tile(self._tile_type)
+            possible_tiles: List[BaseTile] = self._tile_service \
+                .get_possible_tiles(turn_descriptor.tiles, self._tile_type)
+            specific_tile_to_build_result: ResultLookup[BaseTile] = player.get_player_choice_tile_to_build(
+                possible_tiles,
+                turn_descriptor)
 
-            if does_tile_have_unique_type:
-                self._chosen_tile_generation_method = self._tile_service \
-                    .get_unique_tile_generation_method(self._tile_type)
+            if not specific_tile_to_build_result.flag:
+                self._chosen_tile_generation_method = lambda: None
+                return ResultLookup(errors=specific_tile_to_build_result.errors)
+            self._chosen_tile_generation_method = lambda: specific_tile_to_build_result.value
 
-            else:
-                possible_tiles: List[BaseTile] = self._tile_service \
-                    .get_possible_tiles(turn_descriptor.tiles, self._tile_type)
-                specific_tile_to_build_result: ResultLookup[BaseTile] = player.get_player_choice_tile_to_build(
-                    possible_tiles,
-                    turn_descriptor)
+        primary_tile: BaseTile = self._chosen_tile_generation_method()
 
-                success = specific_tile_to_build_result.flag
-                errors.extend(specific_tile_to_build_result.errors)
-
-                if specific_tile_to_build_result.flag:
-                    self._chosen_tile_generation_method = lambda: specific_tile_to_build_result.value
-                else:
-                    self._chosen_tile_generation_method = lambda: None
-        primary_tile = self._chosen_tile_generation_method()
-
-        if success:
-            location_to_build_result: ResultLookup[int] = player \
-                .get_player_choice_location_to_build(
+        location_to_build_result: ResultLookup[int] = player \
+            .get_player_choice_location_to_build(
                 primary_tile,
                 turn_descriptor)
 
-            success = location_to_build_result.flag
-            errors.extend(location_to_build_result.errors)
+        if not location_to_build_result.flag:
+            return ResultLookup(errors=location_to_build_result.errors)
 
-            if location_to_build_result.flag:
-                self._tile_location = location_to_build_result.value
 
-        if success:
-            should_get_effects_to_use_on_cost: bool = self._should_get_effects_to_use_on_cost(primary_tile)
+        self._tile_location = location_to_build_result.value
 
-            if should_get_effects_to_use_on_cost:
-                tile_cost_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service.get_cost_of_tile(
-                    primary_tile,
-                    self._tile_cost_override)
+        should_get_effects_to_use_on_cost: bool = self._should_get_effects_to_use_on_cost(primary_tile)
 
-                possible_purchase_effects: List[BaseTilePurchaseEffect] = self._tile_service.get_purchase_effects(player, turn_descriptor.tiles)
+        if should_get_effects_to_use_on_cost:
+            # the flag for this result will never be false, because we're not passing any effects
+            tile_cost_result: ResultLookup[Dict[ResourceTypeEnum, int]] = self._tile_service.get_cost_of_tile(
+                primary_tile,
+                self._tile_cost_override)
 
-                self._effects_to_use = player.get_player_choice_effects_to_use_for_cost_discount(
-                    tile_cost_result.value,
-                    possible_purchase_effects,
-                    turn_descriptor)
-            else:
-                self._effects_to_use = {}
+            possible_purchase_effects: List[BaseTilePurchaseEffect] = self._tile_service.get_purchase_effects(player, turn_descriptor.tiles)
 
-        if success:
-            self._turn_descriptor = turn_descriptor
+            self._effects_to_use = player.get_player_choice_effects_to_use_for_cost_discount(
+                tile_cost_result.value,
+                possible_purchase_effects,
+                turn_descriptor)
+        else:
+            self._effects_to_use = {}
 
-        result: ResultLookup[ActionChoiceLookup] = ResultLookup(
-            success,
-            ActionChoiceLookup([]),
-            errors)
-        return result
+        self._turn_descriptor = turn_descriptor
+
+        return ResultLookup(True, ActionChoiceLookup([]))
 
     def invoke(
             self,
