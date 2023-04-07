@@ -105,6 +105,9 @@ class FeedDwarvesAction(BasePlayerChoiceAction):
     def new_turn_reset(self) -> None:
         self._effects_to_use.clear()
 
+    def __repr__(self) -> str:
+        return "FeedDwarvesAction()" if self._amount_of_food_required_per_dwarf == 2 else f"FeedDwarvesAction({self._amount_of_food_required_per_dwarf})"
+
     def _does_player_have_effects(
             self,
             player: BasePlayerRepository) -> ResultLookup[bool]:

@@ -167,6 +167,9 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
             return text
         return "".join(e[1] for e in text)
 
+    def __repr__(self) -> str:
+        return f"GoOnAnExpeditionAction({self._level})"
+
     def _get_weapon_level_required_to_perform_action(self, action: BaseAction) -> int:
         for (level, actions) in self._expedition_actions.items():
             if action in actions:

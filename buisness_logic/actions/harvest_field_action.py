@@ -38,3 +38,6 @@ class HarvestFieldAction(BaseAction, BaseReceiveEventService):
 
     def new_turn_reset(self) -> None:
         pass
+
+    def __repr__(self) -> str:
+        return "HarvestFieldAction()"

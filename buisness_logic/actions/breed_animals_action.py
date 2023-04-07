@@ -135,3 +135,6 @@ class BreedAnimalsAction(BaseReceiveAction):
 
     def new_turn_reset(self):
         self._animals_to_reproduce = None
+
+    def __repr__(self) -> str:
+        return f"BreedAnimalsAction({self._maximum_number_of_animals_to_reproduce})"
