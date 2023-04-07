@@ -193,7 +193,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             animals_which_can_reproduce: List[ResourceTypeEnum],
             possible_number_of_animals_to_reproduce: int,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[ResourceTypeEnum]]:
-        pass
+        return ResultLookup(True, [])
 
     def get_player_choice_use_dwarf_out_of_order(
             self,
@@ -642,12 +642,12 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def get_player_choice_use_harvest_action_instead_of_breeding(
             self,
             turn_descriptor: TurnDescriptorLookup) -> bool:
-        pass
+        return True
 
     def get_player_choice_effect_to_use_for_feeding_dwarves(
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[List[BaseFoodEffect]]:
-        pass
+        return ResultLookup(True, [])
 
     def get_player_choice_resources_to_sow(
             self,
