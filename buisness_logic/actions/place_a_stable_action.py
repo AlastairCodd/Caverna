@@ -110,7 +110,7 @@ class PlaceAStableAction(BasePlayerChoiceAction):
             success = was_tile_placed_successfully_result
 
             if success:
-                success = player.take_resources(actual_cost_of_tile_result.value)
+                success = player.take_resources(actual_cost_of_stable_result.value)
 
         result: ResultLookup[int] = ResultLookup(success, 1 if success else 0, errors)
         return result
