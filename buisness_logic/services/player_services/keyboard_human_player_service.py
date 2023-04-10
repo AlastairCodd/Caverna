@@ -526,7 +526,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
         location = self._create_prompt_for_tile_placement(valid_locations).execute()
 
-        result: ResultLookup[int] = ResultLookup(True, int(location))
+        result: ResultLookup[int] = ResultLookup(True, location)
 
         return result
 
@@ -552,12 +552,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
         else:
             color_print(additional_information[0], additional_information[1])
 
-        prompt = self._create_prompt_for_tile_placement(valid_locations)
-
-        location = prompt.execute()
-
-        if location is None:
-            return ResultLookup("Choosing location cancelled")
+        location: int = self._create_prompt_for_tile_placement(valid_locations).execute()
 
         placement = inquirer.select(
             message="Pick a direction",
@@ -565,7 +560,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 {"name": placement.direction.name,
                  "value": placement}
                 for placement in
-                valid_locations[int(location)]
+                valid_locations[location]
             ]).execute()
 
         result: ResultLookup[TileTwinPlacementLookup] = ResultLookup(True, placement)
@@ -583,10 +578,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
         else:
             color_print(additional_information[0], additional_information[1])
 
-        location = self._create_prompt_for_tile_placement(valid_locations).execute()
-
-        if location is None:
-            return ResultLookup(errors="Dialog Cancelled")
+        location: int = self._create_prompt_for_tile_placement(valid_locations).execute()
 
         return ResultLookup(True, location)
 
@@ -786,6 +778,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             min_allowed=min(valid_locations),
             max_allowed=max(valid_locations),
             validate=validate_location,
+            filter=lambda result: int(result),
             instruction="Use ↑/↓ to pick the location"
         )
 
