@@ -66,46 +66,6 @@ def wrap_styled_text_to_fit_current_terminal(
     return text
 
 
-class QuestionTypeEnum(Enum):
-    confirm = 0,
-    list = 1,
-    input = 2,
-    checkbox = 3,
-
-
-def create_question(
-        question_type: QuestionTypeEnum,
-        name: str,
-        message: str,
-        choices: Optional[Union[List[Union[str, Dict[str, Any]]], Callable[[Dict[str, Any]], List[Dict[str, Any]]]]] = None,
-        validator: Optional[Callable[[Any], bool]] = None,
-        default: Optional[Any] = None,
-        when: Optional[Callable[[Dict[str, Any]], bool]] = None) -> Dict[str, Any]:
-    type_name: str = {
-        QuestionTypeEnum.confirm: "confirm",
-        QuestionTypeEnum.list: "list",
-        QuestionTypeEnum.input: "input",
-        QuestionTypeEnum.checkbox: "checkbox",
-    }[question_type]
-
-    result: Dict[str, Any] = {
-        "type": type_name,
-        "message": message,
-        "name": name,
-    }
-
-    if choices is not None:
-        result["choices"] = choices
-    if validator is not None:
-        result["validate"] = validator
-    if default is not None:
-        result["default"] = default
-    if when is not None:
-        result["when"] = when
-
-    return result
-
-
 class KeyboardHumanPlayerService(BasePlayerService):
     def __init__(
             self,
@@ -241,16 +201,12 @@ class KeyboardHumanPlayerService(BasePlayerService):
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[bool]:
         if dwarves is None:
             raise ValueError("Dwarves may not be None")
-        name = "use_dwarf_out_of_order"
-        question: Dict[str, Any] = create_question(
-            QuestionTypeEnum.confirm,
-            "Use Dwarf out of Order?",
-            name,
-            default=False
-        )
 
-        answer = prompt(question)
-        result: ResultLookup[bool] = ResultLookup(answer[name], answer[name])
+        use_dwarf_out_of_order = inquirer.confirm(
+            "Use Dwarf out of Order?",
+            default=False).execute()
+
+        result: ResultLookup[bool] = ResultLookup(True, use_dwarf_out_of_order)
         return result
 
     def get_player_choice_use_card_already_in_use(
@@ -346,16 +302,11 @@ class KeyboardHumanPlayerService(BasePlayerService):
             for dwarf in dwarves
         ]
 
-        name = "card_to_use"
-        question: Dict[str, Any] = create_question(
-            QuestionTypeEnum.list,
-            name,
+        dwarf_to_use = inquirer.select(
             "Pick a Dwarf",
-            choices=choices
-        )
+            choices=choices).execute()
 
-        answer = prompt(question)
-        result: ResultLookup[Dwarf] = ResultLookup(True, answer[name])
+        result: ResultLookup[Dwarf] = ResultLookup(True, dwarf_to_use)
         return result
 
     def get_player_choice_actions_to_use(
@@ -372,16 +323,11 @@ class KeyboardHumanPlayerService(BasePlayerService):
              "value": choice, }
             for choice in available_action_choices]
 
-        name = "actions_to_use"
-        question: Dict[str, Any] = create_question(
-            QuestionTypeEnum.list,
-            name,
-            "Choose some actions to use",
-            choices=choices
-        )
+        actions_to_use = inquirer.select(
+            message="Choose some actions to use",
+            choices=choices).execute()
 
-        answer = prompt(question)
-        result: ResultLookup[ActionChoiceLookup] = ResultLookup(True, answer[name])
+        result: ResultLookup[ActionChoiceLookup] = ResultLookup(True, actions_to_use)
         return result
 
     def get_player_choice_fences_to_build(
@@ -629,71 +575,20 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def get_player_choice_location_to_build_stable(
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
-        index: int = 0
-        tiles_map: List[Tuple[List[str], List[str]]] = []
+        valid_locations: List[int] = [location for (location, tile) in self.tiles.items() if tile.tile_type != TileTypeEnum.unavailable]
 
-        for y in range(self.height):
-            line_map_readable: List[str] = []
-            line_map_number: List[str] = []
-            for x in range(self.width):
-                tile_type_at_index: TileTypeEnum = self.tiles[index].tile_type
-                if (index % self.width) == math.floor(self.width / 2):
-                    line_map_readable.append("|")
-                    line_map_number.append("|")
-                is_tile_type_unavailable: bool = tile_type_at_index is TileTypeEnum.unavailable
-
-                tile_value_readable: str
-                tile_value_number: str
-
-                if not is_tile_type_unavailable:
-                    if not (tile_type_at_index is TileTypeEnum.furnishedDwelling
-                            or tile_type_at_index is TileTypeEnum.furnishedCavern):
-                        tile_value_readable = tile_type_at_index.name[0].rjust(2)
-                    else:
-                        tile_value_readable = self.tiles[index].tile.name[:2]
-                    tile_value_number = str(index).rjust(2)
-                else:
-                    tile_value_readable = "  "
-                    tile_value_number = "  "
-
-                line_map_readable.append(tile_value_readable)
-                line_map_number.append(tile_value_number)
-
-                index += 1
-            tiles_map.append((line_map_readable, line_map_number))
-
-        for line_map_readable in tiles_map:
-            print(" ".join(line_map_readable[0]), end="    ")
-            print(" ".join(line_map_readable[1]))
-
-        location_name: str = "location_to_use"
-
-        def validate_location(chosen_location: str) -> bool:
-            location_is_valid: bool = chosen_location.isspace() or chosen_location == "" or chosen_location.isdigit()
-            if chosen_location.isdigit():
-                location_is_valid = 0 <= int(chosen_location) < self.tile_count
-            return location_is_valid
-
-        questions: List[Dict[str, Any]] = [
-            create_question(
-                QuestionTypeEnum.input,
-                location_name,
-                "Choose a location",
-                validator=validate_location
-            )
-        ]
-
-        answers: Dict[str, Any] = prompt(questions)
-
-        location_to_build = answers[location_name]
-        result: ResultLookup[int]
-
-        if location_to_build.isdigit():
-            result = ResultLookup(True, int(location_to_build))
+        additional_information = self._create_map_for_tile_placement(valid_locations)
+        if isinstance(additional_information, str):
+            print(additional_information)
         else:
-            result = ResultLookup(errors="Dialog Cancelled")
+            color_print(additional_information[0], additional_information[1])
 
-        return result
+        location = self._create_prompt_for_tile_placement(valid_locations).execute()
+
+        if location is None:
+            return ResultLookup(errors="Dialog Cancelled")
+
+        return ResultLookup(True, location)
 
     def get_player_choice_effects_to_use_for_cost_discount(
             self,
