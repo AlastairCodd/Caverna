@@ -86,12 +86,39 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
         if not wishes_to_convert_anything_into_food:
             return []
-        food_conversion_choices: List[Dict[str, Any]] = [
-            {'name': ", ".join(resource.name for resource in convert_effect.input),
-             'value': convert_effect}
-             for convert_effect in self.get_effects_of_type(ConvertEffect)
-             if ResourceTypeEnum.food in convert_effect.output]
-        patched_print(food_conversion_choices)
+        possible_resources_to_convert_into_food: Dict[ResourceTypeEnum, List[Tuple[int, ConvertEffect]]] = {}
+        other_food_conversion_effects: List[ConvertEffect] = []
+        for convert_effect in self.get_effects_of_type(ConvertEffect):
+            if ResourceTypeEnum.food not in convert_effect.output:
+                continue
+            if len(convert_effect.input) > 1:
+                raise NotImplementedError("Do not currently support converting from multiple different input into food")
+                #other_food_conversion_effects.append(convert_effect)
+                #continue
+            input_resource: ResourceTypeEnum
+            number_of_input_to_convert: int
+            input_resource, number_of_input_to_convert = next(iter(convert_effect.input.items()))
+            effects_for_input = possible_resources_to_convert_into_food \
+                .get(input_resource, [])
+            effects_for_input.append((number_of_input_to_convert, convert_effect))
+            possible_resources_to_convert_into_food[input_resource] = effects_for_input
+
+        food_conversion_choices: List[Dict[str, Any]] = []
+            #{'name': ", ".join(resource.name for resource in convert_effect.input),
+            # 'value': convert_effect}
+            #for convert_effect in other_food_conversion_effects]
+
+        food_conversion_choices.extend(
+            {'name': f"{resource.name}",
+             'value': counts[0][1]}
+            for (resource, counts) in possible_resources_to_convert_into_food.items()
+            if len(counts) == 1)
+
+        food_conversion_choices.extend(
+            {'name': f"{resource.name} (" + ", ".join(f"x{count}" for (count, _) in counts) + ")",
+             'value': [effect for (_, effect) in counts]}
+            for (resource, counts) in possible_resources_to_convert_into_food.items()
+            if len(counts) > 1)
 
         chosen_food_conversions = inquirer.checkbox(
             message="Pick conversions to perform",
@@ -100,15 +127,37 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
         conversions_to_perform: List[Tuple[List[ResourceTypeEnum], int, List[ResourceTypeEnum]]] = []
         for conversion in chosen_food_conversions:
-            number_of_conversions_to_perform = inquirer.number(
-                message=f"How many of the input ({conversion}) would you like to convert?",
-                filter=lambda result: int(result)).execute()
-            if number_of_conversions_to_perform <= 0:
-                continue
-            conversions_to_perform.append((
-                conversion.input.keys(),
-                number_of_conversions_to_perform,
-                conversion.output.keys()))
+            if isinstance(conversion, ConvertEffect):
+                input_resource: ResourceTypeEnum = next(iter(conversion.input))
+                number_of_conversions_to_perform = inquirer.number(
+                    message=f"How many of the input ({input_resource.name}) would you like to convert?",
+                    filter=lambda result: int(result)).execute()
+                if number_of_conversions_to_perform <= 0:
+                   continue
+                conversions_to_perform.append((
+                    [input_resource],
+                    number_of_conversions_to_perform,
+                    [ResourceTypeEnum.food]))
+            else:
+                # inputs are currently guaranteed to all be equivalent, excepting count, due to exception above
+                #    which asserts that only one input is permitted
+                effects: List[ConversionEffect] = conversion
+                # grab from a random conversion
+                input_resource: ResourceTypeEnum = next(iter(effects[0].input))
+                minimal_amount_of_input_resource = min(effect.input[input_resource] for effect in effects)
+                number_of_conversions_to_perform = inquirer.number(
+                    message=f"How many of the input ({input_resource.name}) would you like to convert?",
+                    filter=lambda result: int(result) if result is not None else 0,
+                    # this could be better, by allowing spin down to zero and only validating that number
+                    min_allowed=minimal_amount_of_input_resource,
+                    raise_keyboard_interrupt=False,
+                    mandatory=False).execute()
+                if number_of_conversions_to_perform <= 0:
+                   continue
+                conversions_to_perform.append((
+                    [input_resource],
+                    number_of_conversions_to_perform,
+                    [ResourceTypeEnum.food]))
         patched_print(conversions_to_perform)
         return conversions_to_perform
 
