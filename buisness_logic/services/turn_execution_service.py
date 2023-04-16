@@ -49,8 +49,9 @@ class TurnExecutionService(object):
 
         choice: DwarfCardActionCombinationLookup = chosen_turn_descriptor_result.value.choice
 
-        untested_actions: List[BaseAction] = [ConvertAction()]
+        untested_actions: List[BaseAction] = []
         untested_actions.extend(choice.actions.actions)
+        untested_actions.append(ConvertAction())
 
         harvest_action: Optional[BaseAction] = None
 
