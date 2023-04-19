@@ -22,25 +22,32 @@ class ListPermutationForge(object):
             raise ValueError
         if index < 0:
             raise IndexError
-        if math.factorial(len(list_to_permute)) < index:
+        number_of_items_to_permute = len(list_to_permute)
+        number_of_items_to_permute_excluding_first_factorial = math.factorial(number_of_items_to_permute - 1)
+        number_of_items_to_permute_factorial = number_of_items_to_permute_excluding_first_factorial * number_of_items_to_permute
+        if number_of_items_to_permute_factorial < index:
             raise IndexError
 
-        if len(list_to_permute) == 0:
+        if number_of_items_to_permute == 0:
             if index == 0:
                 return []
             else:
                 raise IndexError("Cannot have non-zero index when given list is empty")
 
-        if len(list_to_permute) == 1:
+        if number_of_items_to_permute == 1:
             if index == 0:
                 return list_to_permute
             else:
                 raise IndexError("Cannot have non-zero index when given list is contains only one element")
 
-        taken_index: int = math.floor(index / math.factorial(len(list_to_permute) - 1))
+        taken_index: int = math.floor(index / number_of_items_to_permute_excluding_first_factorial)
+
         result: List[T] = [list_to_permute[taken_index]]
+
         remaining_list: List[T] = list_to_permute[:taken_index] + list_to_permute[taken_index+1:]
-        remaining_index: int = index % math.factorial(len(remaining_list))
+        remaining_index: int = index % number_of_items_to_permute_excluding_first_factorial
+
         permuted_remaining_list: List[T] = self.generate_list_permutation_for_index(remaining_list, remaining_index)
+
         result += permuted_remaining_list
         return result
