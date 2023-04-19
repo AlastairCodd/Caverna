@@ -97,6 +97,9 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
             result = ActionChoiceLookup(actions, [feeding_dwarves_precedes_breeding_animals_constraint])
         return result
 
+    def __repr__(self) -> str:
+        return "ResolveHarvestAction()"
+
     def __str__(self) -> str:
         if self._harvest_type_this_round is None:
             return "Resolve harvest"

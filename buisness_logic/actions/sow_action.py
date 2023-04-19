@@ -98,6 +98,9 @@ class SowAction(BasePlayerChoiceAction):
     def new_turn_reset(self):
         self._resources_to_sow = None
 
+    def __repr__(self) -> str:
+        return "SowAction()"
+
     def __str__(self) -> str:
         return self.__format__("")
 
