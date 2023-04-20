@@ -78,7 +78,7 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
         permutation_index: int = 0
 
         for permutation in permutations:
-            if not all(constraint.passes_condition(permutation) for constraint in actions.constraints):
+            if not self._does_pass_all_constraints(permutation, actions.constraints):
                 #print(f"permutation {permutation_index} does not pass constraints")
                 permutation_index += 1
                 continue
@@ -163,3 +163,5 @@ class ExhaustiveActionOrderingService(ActionOrderingService):
         turn_descriptor.tiles.clear()
         turn_descriptor.tiles.extend(self._turn_descriptor_tiles)
 
+    def _does_pass_all_constraints(self, permutation, constraints) -> bool:
+        return all(constraint.passes_condition(permutation) for constraint in constraints)
