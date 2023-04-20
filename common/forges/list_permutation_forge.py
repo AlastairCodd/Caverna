@@ -1,3 +1,4 @@
+from functools import cache
 import math
 from typing import TypeVar, List, Generator
 
@@ -23,10 +24,6 @@ class ListPermutationForge(object):
         if index < 0:
             raise IndexError
         number_of_items_to_permute = len(list_to_permute)
-        number_of_items_to_permute_excluding_first_factorial = math.factorial(number_of_items_to_permute - 1)
-        number_of_items_to_permute_factorial = number_of_items_to_permute_excluding_first_factorial * number_of_items_to_permute
-        if number_of_items_to_permute_factorial < index:
-            raise IndexError
 
         if number_of_items_to_permute == 0:
             if index == 0:
@@ -40,14 +37,20 @@ class ListPermutationForge(object):
             else:
                 raise IndexError("Cannot have non-zero index when given list is contains only one element")
 
-        taken_index: int = math.floor(index / number_of_items_to_permute_excluding_first_factorial)
+        taken_index: int
+        remaining_index: int
+        taken_index, remaining_index = self._get_indicies(index, number_of_items_to_permute)
 
         result: List[T] = [list_to_permute[taken_index]]
 
         remaining_list: List[T] = list_to_permute[:taken_index] + list_to_permute[taken_index+1:]
-        remaining_index: int = index % number_of_items_to_permute_excluding_first_factorial
-
         permuted_remaining_list: List[T] = self.generate_list_permutation_for_index(remaining_list, remaining_index)
 
         result += permuted_remaining_list
         return result
+
+    @cache
+    def _get_indicies(self, index: int, number_of_items_to_permute: int) -> tuple[int, int]:
+        number_of_items_to_permute_excluding_first_factorial = math.factorial(number_of_items_to_permute - 1)
+
+        return divmod(index, number_of_items_to_permute_excluding_first_factorial)
