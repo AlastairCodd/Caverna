@@ -15,6 +15,9 @@ class PrecedesConstraint(BaseConstraint):
         self._action_two: BaseAction = action_two
 
     def passes_condition(self, actions: List[BaseAction]) -> bool:
+        return self.get_index_of_first_action_which_fails_constraint(actions) != -1
+
+    def get_index_of_first_action_which_fails_constraint(self, actions: List[BaseAction]) -> int:
         if actions is None:
             raise ValueError
 
@@ -32,10 +35,12 @@ class PrecedesConstraint(BaseConstraint):
             if action_one_location != -1 and action_two_location != -1:
                 break
 
-        result: bool = action_one_location != -1 and \
-            action_two_location != -1 and \
-            action_one_location < action_two_location
-        return result
+        if action_one_location == -1 or action_two_location == -1:
+            return -1
+
+        if action_one_location < action_two_location:
+            return -1
+        return action_two_location
 
     def __eq__(self, other) -> bool:
         if isinstance(other, PrecedesConstraint):
