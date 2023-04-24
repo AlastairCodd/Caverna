@@ -1,10 +1,10 @@
-from buisness_logic.cards.slash_and_burn_card import SlashAndBurnCard
+from buisness_logic.cards.weekly_market_card import WeeklyMarketCard
 from buisness_logic.services.turn_execution_service import TurnExecutionService
 from common.entities.resources_to_sow_lookup import ResourcesToSow
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from core.enums.caverna_enums import TileDirectionEnum
+from core.enums.caverna_enums import TileDirectionEnum, ResourceTypeEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
@@ -12,7 +12,7 @@ from core.services.base_player_service import BasePlayerService
 def main():
     turn_execution_service = TurnExecutionService()
 
-    card = SlashAndBurnCard()
+    card = WeeklyMarketCard()
     player = DeterministicPlayer(card)
 
     turn_descriptor = TurnDescriptorLookup(
@@ -32,7 +32,6 @@ class DeterministicPlayer(BasePlayerService):
 
     def __init__(self, card: BaseCard):
         from common.defaults.tile_container_default import TileContainerDefault
-        from core.enums.caverna_enums import ResourceTypeEnum
         BasePlayerService.__init__(self, 0, "Test", 0, TileContainerDefault())
 
         self._card = card
@@ -55,10 +54,13 @@ class DeterministicPlayer(BasePlayerService):
         return ResultLookup(True, ResourcesToSow(2, 0))
 
     def get_player_choice_conversions_to_perform(self, turn_descriptor):
-        return []
+        return [
+            ([ResourceTypeEnum.coin], 2, [ResourceTypeEnum.food]),
+            ([ResourceTypeEnum.sheep], 1, [ResourceTypeEnum.food]),
+        ]
 
-    def get_player_choice_market_items_to_purchase(self, turn_descriptor):
-        raise NotImplementedError()
+    def get_player_choice_market_items_to_purchase(self, _items_to_purchase, turn_descriptor):
+        return ResultLookup(True, [ResourceTypeEnum.sheep, ResourceTypeEnum.donkey])
 
     def get_player_choice_weapon_level(self, turn_descriptor):
         raise NotImplementedError()
@@ -106,7 +108,7 @@ class DeterministicPlayer(BasePlayerService):
         raise NotImplementedError()
 
     def get_player_choice_location_to_build_twin(self, tile_type, turn_descriptor):
-        return ResultLookup(True, TileTwinPlacementLookup(26, TileDirectionEnum.up))
+        raise NotImplementedError()
 
     def get_player_choice_location_to_build_stable(self, turn_descriptor):
         raise NotImplementedError()
