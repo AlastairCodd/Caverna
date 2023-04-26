@@ -165,11 +165,15 @@ class PruningActionOrderingService(ActionOrderingService):
         turn_descriptor.tiles.extend(self._turn_descriptor_tiles)
 
     def _does_pass_all_constraints(self, permutation, constraints) -> bool:
+        index_of_first_action = 100 # arbitrary large number, shouldn't ever have 100 actions
         for constraint in constraints:
             fails_to_pass_constraint_at_index = constraint.get_index_of_first_action_which_fails_constraint(permutation)
             if fails_to_pass_constraint_at_index == -1:
                 continue
+            if index_of_first_action > fails_to_pass_constraint_at_index:
+                index_of_first_action = fails_to_pass_constraint_at_index
             #print(f"failed constraint {constraint!r}, marking {fails_to_pass_constraint_at_index}")
-            self._permutation_forge.mark_last_permutation_as_invalid(fails_to_pass_constraint_at_index)
-            return False
-        return True
+        if index_of_first_action == 100:
+            return True
+        self._permutation_forge.mark_last_permutation_as_invalid(index_of_first_action)
+        return False
