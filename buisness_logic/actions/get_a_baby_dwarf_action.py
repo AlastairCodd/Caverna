@@ -10,6 +10,9 @@ from core.constants import game_constants
 
 
 class GetABabyDwarfAction(BaseAction):
+    def __init__(self) -> None:
+        BaseAction.__init__(self, "GetABabyDwarfAction")
+
     def invoke(
             self,
             player: BasePlayerRepository,

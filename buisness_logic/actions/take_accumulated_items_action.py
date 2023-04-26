@@ -8,6 +8,9 @@ from core.containers.resource_container import ResourceContainer
 
 
 class TakeAccumulatedItemsAction(BaseReceiveEventService, BaseAction):
+    def __init__(self) -> None:
+        BaseAction.__init__(self, "TakeAccumulatedItemsAction")
+
     def invoke(
             self,
             player: BasePlayerRepository,

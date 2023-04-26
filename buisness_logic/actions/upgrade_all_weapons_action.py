@@ -8,6 +8,9 @@ from core.baseClasses.base_card import BaseCard
 
 
 class UpgradeAllWeaponsAction(BaseAction):
+    def __init__(self) -> None:
+        BaseAction.__init__(self, "UpgradeAllWeaponsAction")
+
     def invoke(
             self,
             player: BasePlayerRepository,

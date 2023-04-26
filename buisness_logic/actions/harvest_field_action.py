@@ -10,6 +10,9 @@ from core.repositories.base_player_repository import BasePlayerRepository
 
 
 class HarvestFieldAction(BaseAction, BaseReceiveEventService):
+    def __init__(self) -> None:
+        BaseAction.__init__(self, "HarvestFieldAction")
+
     def invoke(
             self,
             player: BasePlayerRepository,

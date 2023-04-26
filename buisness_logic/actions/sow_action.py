@@ -6,6 +6,7 @@ from common.entities.dwarf import Dwarf
 from common.entities.resources_to_sow_lookup import ResourcesToSow
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.enums.caverna_enums import ResourceTypeEnum
@@ -17,6 +18,7 @@ class SowAction(BasePlayerChoiceAction):
     def __init__(self) -> None:
         """Sow action which allows a number of food resources to be planted, and their amount increased."""
         self._resources_to_sow: Optional[ResourcesToSow] = None
+        BaseAction.__init__(self, "SowAction")
 
     def set_player_choice(
             self,

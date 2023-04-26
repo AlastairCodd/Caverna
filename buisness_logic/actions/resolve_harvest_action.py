@@ -27,6 +27,7 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
         }
         self._harvest_type_this_round: Optional[HarvestTypeEnum] = None
         self._use_harvest_action_instead_of_breeding: Optional[boolean] = None
+        BaseAction.__init__(self, "ResolveHarvestAction")
 
     def set_player_choice(
             self,

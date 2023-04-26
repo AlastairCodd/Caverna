@@ -22,7 +22,7 @@ class BreedAnimalsAction(BaseReceiveAction):
         self._maximum_number_of_animals_to_reproduce = maximum
 
         self._animals_to_reproduce: Optional[List[ResourceTypeEnum]] = None
-        BaseReceiveAction.__init__(self, {animal: 1 for animal in resource_types.farm_animals})
+        BaseReceiveAction.__init__(self, "BreedAnimalsAction", {animal: 1 for animal in resource_types.farm_animals})
 
     def set_player_choice(
             self,

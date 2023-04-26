@@ -30,6 +30,7 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
             ResourceTypeEnum.grain: 1,
             ResourceTypeEnum.veg: 2,
         }
+        BaseAction.__init__(self, "WeeklyMarketAction")
 
     def set_player_choice(
             self,

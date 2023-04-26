@@ -16,6 +16,7 @@ class PayAction(BaseAction):
             if items_to_pay[item] < 0:
                 raise ValueError(f"Cannot pay a negative amount of items (item: {item}, amount: {items_to_pay[item]})")
         self._items_to_pay: Dict[ResourceTypeEnum, int] = items_to_pay
+        BaseAction.__init__(self, "PayAction")
 
     def invoke(
             self,

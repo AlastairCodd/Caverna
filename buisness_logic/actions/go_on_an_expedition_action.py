@@ -64,6 +64,7 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
         self._upgrade_dwarf_weapon_action: BaseAction = UpgradeDwarfWeaponAction()
 
         self._chosen_actions_and_levels: List[Tuple[BaseAction, int]] = []
+        BaseAction.__init__(self, "GoOnAnExpeditionAction")
 
     def set_player_choice(
             self,

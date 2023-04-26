@@ -10,7 +10,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 
 class ReceiveAction(BaseReceiveAction):
     def __init__(self, items_to_receive: Dict[ResourceTypeEnum, int]) -> None:
-        BaseReceiveAction.__init__(self, items_to_receive)
+        BaseReceiveAction.__init__(self, "ReceiveAction", items_to_receive)
 
     def invoke(
             self,

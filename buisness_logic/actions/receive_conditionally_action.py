@@ -21,7 +21,7 @@ class ReceiveConditionallyAction(BaseReceiveAction):
 
         self._condition: Callable[[BasePlayerRepository], int] = condition
         self._condition_readable: str = condition_readable
-        BaseReceiveAction.__init__(self, items_to_receive)
+        BaseReceiveAction.__init__(self, "ReceiveConditionallyAction", items_to_receive)
 
     def invoke(
             self,

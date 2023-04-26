@@ -11,6 +11,7 @@ from common.entities.result_lookup import ResultLookup
 from common.services.tile_service import TileService
 from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.baseClasses.base_tile import BaseTile
@@ -42,6 +43,7 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         self._tile_direction: Optional[TileDirectionEnum] = None
         self._effects_to_use: Dict[BaseTilePurchaseEffect, int] = {}
         self._turn_descriptor: Optional[TurnDescriptorLookup] = None
+        BaseAction.__init__(self, "PlaceATwinTileAction")
 
     def set_player_choice(
             self,

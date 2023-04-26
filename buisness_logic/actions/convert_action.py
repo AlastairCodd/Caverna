@@ -14,6 +14,9 @@ from core.services.base_player_service import BasePlayerService
 
 
 class ConvertAction(BaseReceiveEventService, BasePlayerChoiceAction):
+    def __init__(self) -> None:
+        BasePlayerChoiceAction.__init__(self, "ConvertAction")
+
     def set_player_choice(
             self,
             player: BasePlayerService,

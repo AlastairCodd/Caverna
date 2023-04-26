@@ -7,12 +7,16 @@ from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.enums.caverna_enums import TileTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
 class PlaceFencesAction(BasePlayerChoiceAction):
+    def __init__(self) -> None:
+        BaseAction.__init__(self, "PlaceFencesAction")
+
     def set_player_choice(
             self,
             player: BasePlayerService,
@@ -83,6 +87,9 @@ class PlaceFencesAction(BasePlayerChoiceAction):
 
 
 class PlaceFencesAndStableAction(BasePlayerChoiceAction):
+    def __init__(self) -> None:
+        BaseAction.__init__(self, "PlaceFencesAndStable")
+
     def set_player_choice(
             self,
             player: BasePlayerService,

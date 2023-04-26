@@ -22,6 +22,7 @@ class FeedDwarvesAction(BasePlayerChoiceAction):
             raise ValueError("Amount of Food Required per dwarf must be positive")
         self._amount_of_food_required_per_dwarf: int = amount_of_food_required_per_dwarf
         self._effects_to_use: List[BaseFoodEffect] = []
+        BasePlayerChoiceAction.__init__(self, "FeedDwarvesAction")
 
     def set_player_choice(
             self,

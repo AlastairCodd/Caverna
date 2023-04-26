@@ -19,10 +19,12 @@ from core.repositories.base_player_repository import BasePlayerRepository
 class BaseReceiveAction(BasePlayerChoiceAction, BaseReceiveEventService, metaclass=ABCMeta):
     def __init__(
             self,
+            name: str,
             items_to_receive: Dict[ResourceTypeEnum, int]) -> None:
         if items_to_receive is None:
             raise ValueError("Items to Receive cannot be None")
         self._items_to_receive: Dict[ResourceTypeEnum] = items_to_receive
+        BaseAction.__init__(self, name)
 
     def set_player_choice(
             self,

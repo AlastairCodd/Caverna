@@ -30,6 +30,7 @@ class CheckAnimalStorageAction(BaseAction):
             TileTypeEnum.meadow,
             TileTypeEnum.pasture,
         ]
+        BaseAction.__init__(self, "CheckAnimalStorageAction")
 
     def invoke(
             self,

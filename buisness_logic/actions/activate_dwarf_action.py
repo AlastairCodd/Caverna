@@ -12,6 +12,7 @@ class ActivateDwarfAction(BaseAction):
             self,
             card_to_activate: Optional[BaseCard] = None) -> None:
         self._card_to_activate: Optional[BaseCard] = card_to_activate
+        BaseAction.__init__(self, "ActivateDwarfAction")
 
     def invoke(
             self,

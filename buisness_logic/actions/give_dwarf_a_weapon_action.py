@@ -7,6 +7,7 @@ from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.entities.weapon import Weapon
+from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.enums.caverna_enums import ResourceTypeEnum
@@ -17,6 +18,7 @@ from core.services.base_player_service import BasePlayerService
 class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
     def __init__(self):
         self._level_of_weapon: Optional[int] = None
+        BaseAction.__init__(self, "GiveDwarfAWeaponAction")
 
     def set_player_choice(
             self,

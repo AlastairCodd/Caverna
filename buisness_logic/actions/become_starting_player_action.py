@@ -10,6 +10,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 class BecomeStartingPlayerAction(BaseAction):
     def __init__(self):
         self._starting_player_next_turn: Optional[BasePlayerRepository] = None
+        BaseAction.__init__(self, "BecomeStartingPlayerAction")
 
     def invoke(
             self,

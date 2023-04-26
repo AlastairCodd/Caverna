@@ -7,6 +7,7 @@ from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.tile_service import TileService
+from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.constants import game_constants
@@ -26,6 +27,7 @@ class PlaceAStableAction(BasePlayerChoiceAction):
         self._tile_location: int = -1
         self._effects_to_use: Dict[BaseTilePurchaseEffect, int] = {}
         self._turn_descriptor: Optional[TurnDescriptorLookup] = None
+        BaseAction.__init__(self, "PlaceAStableAction")
 
     def set_player_choice(
             self,
