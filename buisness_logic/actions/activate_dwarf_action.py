@@ -57,3 +57,6 @@ class ActivateDwarfAction(BaseAction):
     @property
     def card_to_activate(self) -> Optional[BaseCard]:
         return self._card_to_activate
+
+    def __hash__(self) -> int:
+        return hash(self.__repr__())

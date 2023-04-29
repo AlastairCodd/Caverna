@@ -138,3 +138,6 @@ class BreedAnimalsAction(BaseReceiveAction):
 
     def __repr__(self) -> str:
         return f"BreedAnimalsAction({self._maximum_number_of_animals_to_reproduce})"
+
+    def __hash__(self) -> int:
+        return hash(self.__repr__())

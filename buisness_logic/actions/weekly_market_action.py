@@ -134,3 +134,6 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
 
     def __repr__(self) -> str:
         return "WeeklyMarketAction()"
+
+    def __hash__(self) -> int:
+        return hash(self.__repr__())

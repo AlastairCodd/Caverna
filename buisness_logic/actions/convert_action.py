@@ -56,3 +56,6 @@ class ConvertAction(BaseReceiveEventService, BasePlayerChoiceAction):
 
     def __repr__(self) -> str:
         return "ConvertAction()"
+
+    def __hash__(self) -> int:
+        return hash(self.__repr__())

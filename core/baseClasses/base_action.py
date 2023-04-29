@@ -25,3 +25,7 @@ class BaseAction(Resettable, metaclass=ABCMeta):
 
     def __format__(self, format_spec) -> str:
         return str(self)
+
+    @abstractmethod
+    def __hash__(self) -> int:
+        raise NotImplemented()

@@ -259,3 +259,6 @@ class CheckAnimalStorageAction(BaseAction):
 
     def __repr__(self) -> str:
         return "CheckAnimalStorageAction()"
+
+    def __hash__(self) -> int:
+        return hash(self.__repr__())

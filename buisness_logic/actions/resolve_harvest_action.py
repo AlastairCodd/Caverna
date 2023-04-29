@@ -116,3 +116,6 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
         if self._use_harvest_action_instead_of_breeding:
             return "Resolve harvest where player chose to farm"
         return "Resolve harvest where player chose to breed animals"
+
+    def __hash__(self) -> int:
+        return hash(self.__repr__())

@@ -69,3 +69,6 @@ class PayAction(BaseAction):
                 result = self._items_to_pay == cast_other._items_to_pay
 
         return result
+
+    def __hash__(self) -> int:
+        return hash(tuple(["Pay", *self._items_to_pay.items()]))

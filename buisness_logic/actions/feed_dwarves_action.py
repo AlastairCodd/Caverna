@@ -125,3 +125,6 @@ class FeedDwarvesAction(BasePlayerChoiceAction):
 
         success: bool = len(errors) == 0
         return ResultLookup(success, success, errors)
+
+    def __hash__(self) -> int:
+        return hash(self.__repr__())

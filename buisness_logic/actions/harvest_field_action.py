@@ -44,3 +44,6 @@ class HarvestFieldAction(BaseAction, BaseReceiveEventService):
 
     def __repr__(self) -> str:
         return "HarvestFieldAction()"
+
+    def __hash__(self) -> int:
+        return hash(self.__repr__())
