@@ -187,7 +187,7 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
         raise ValueError(f"format spec must be either pp or whitespace, was {format_spec!r}")
 
     def __repr__(self):
-        return f"{self.__class__}({self._convert_from}, {self._convert_to}, {self._number_of_times})"
+        return f"ConvertSingleAction({self._convert_from}, {self._convert_to}, {self._number_of_times})"
 
     def __hash__(self) -> int:
         return hash(tuple(["Convert", *self._convert_from, *self._convert_to, self._number_of_times]))
