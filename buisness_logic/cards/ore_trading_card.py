@@ -14,15 +14,15 @@ class OreTradingCard(BaseCard):
                 ActionCombinationEnum.AndThenOr,
                 Conditional(
                     ActionCombinationEnum.AndThen,
-                    pay_action.PayAction({ResourceTypeEnum.ore: 2}),
+                    pay_action.PayAction({ResourceTypeEnum.ore: 2}, ResourceTypeEnum.food),
                     receive_action.ReceiveAction({ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 1})),
                 Conditional(
                     ActionCombinationEnum.AndThenOr,
                     Conditional(
                         ActionCombinationEnum.AndThen,
-                        pay_action.PayAction({ResourceTypeEnum.ore: 2}),
+                        pay_action.PayAction({ResourceTypeEnum.ore: 2}, ResourceTypeEnum.food),
                         receive_action.ReceiveAction({ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 1})),
                     Conditional(
                         ActionCombinationEnum.AndThen,
-                        pay_action.PayAction({ResourceTypeEnum.ore: 2}),
+                        pay_action.PayAction({ResourceTypeEnum.ore: 2}, ResourceTypeEnum.food),
                         receive_action.ReceiveAction({ResourceTypeEnum.coin: 2, ResourceTypeEnum.food: 1})))))

@@ -73,7 +73,7 @@ class CompleteDwarfPlayerChoiceTransferService(BaseDwarfPlayerChoiceTransferServ
                         dwarf = player_choice_use_dwarf_out_of_order.value
 
                         if dwarf.weapon_level != lowest_level_of_dwarves:
-                            pay_dwarf_cost_action: BaseAction = PayAction({ResourceTypeEnum.ruby: 1})
+                            pay_dwarf_cost_action: BaseAction = PayAction({ResourceTypeEnum.ruby: 1}, dwarf)
                             additional_actions.append(pay_dwarf_cost_action)
                     else:
                         success = False

@@ -68,7 +68,7 @@ class CompleteCardPlayerChoiceTransferService(BaseCardPlayerChoiceTransferServic
                 turn_descriptor)
 
             if imitation_card.amount_of_food > 0:
-                take_food_action: BaseAction = PayAction({ResourceTypeEnum.food: imitation_card.amount_of_food})
+                take_food_action: BaseAction = PayAction({ResourceTypeEnum.food: imitation_card.amount_of_food}, imitation_card)
                 additional_actions.append(take_food_action)
 
             activate_dwarf_action: BaseAction = ActivateDwarfAction(imitation_card)

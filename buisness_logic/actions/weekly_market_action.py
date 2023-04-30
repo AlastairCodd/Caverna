@@ -63,7 +63,7 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
                 success = False
                 errors.append(f"{resource.name} cannot be purchased at market")
                 continue
-            pay_action: PayAction = PayAction({ResourceTypeEnum.coin: self._purchasable_items[resource]})
+            pay_action: PayAction = PayAction({ResourceTypeEnum.coin: self._purchasable_items[resource]}, resource)
             receive_action: ReceiveAction = ReceiveAction({resource: 1})
 
             precedes_constraints: PrecedesConstraint = PrecedesConstraint(pay_action, receive_action)

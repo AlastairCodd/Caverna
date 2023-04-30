@@ -1,4 +1,4 @@
-from typing import Dict, cast
+from typing import Dict, cast, Any
 
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
@@ -9,13 +9,14 @@ from core.baseClasses.base_action import BaseAction
 from buisness_logic.actions.cannot_afford_action_error import CannotAffordActionError
 
 class PayAction(BaseAction):
-    def __init__(self, items_to_pay: Dict[ResourceTypeEnum, int]):
+    def __init__(self, items_to_pay: Dict[ResourceTypeEnum, int], paying_for: Any):
         if items_to_pay is None:
             raise ValueError("Items to pay may not be null")
         for item in items_to_pay:
             if items_to_pay[item] < 0:
                 raise ValueError(f"Cannot pay a negative amount of items (item: {item}, amount: {items_to_pay[item]})")
         self._items_to_pay: Dict[ResourceTypeEnum, int] = items_to_pay
+        self._paying_for: Any = paying_for
         BaseAction.__init__(self, "PayAction")
 
     def invoke(
@@ -57,18 +58,17 @@ class PayAction(BaseAction):
             count += 1
             if count != len(self._items_to_pay):
                 result += ", "
-        result += ")"
+        result += f", {self._paying_for!r})"
         return result
 
     def __eq__(self, other) -> bool:
-        result: bool = isinstance(other, PayAction)
+        if self is other:
+            return True
+        if not isinstance(other, PayAction):
+            return False
+        cast_other: PayAction = cast(PayAction, other)
 
-        if result:
-            cast_other: PayAction = cast(PayAction, other)
-            if self is not other:
-                result = self._items_to_pay == cast_other._items_to_pay
-
-        return result
+        return self._items_to_pay == cast_other._items_to_pay and self._paying_for == cast_other._paying_for
 
     def __hash__(self) -> int:
-        return hash(tuple(["Pay", *self._items_to_pay.items()]))
+        return hash(tuple(["Pay", *self._items_to_pay.items(), self._paying_for]))
