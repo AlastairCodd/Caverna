@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from buisness_logic.actions.check_animal_storage_action import CheckAnimalStorageAction
 from buisness_logic.actions.convert_action import ConvertAction
@@ -11,15 +11,16 @@ from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from common.services.action_invoke_service import ActionInvokeService
 from core.baseClasses.base_action import BaseAction
+from core.baseClasses.base_action_ordering_service import ActionOrderingService
 from core.baseClasses.base_constraint import BaseConstraint
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.services.base_player_service import BasePlayerService
 
 
 class TurnExecutionService(object):
-    def __init__(self) -> None:
+    def __init__(self, action_ordering_service: Optional[ActionOrderingService] = None) -> None:
         self._turn_transfer_service: TurnTransferService = TurnTransferService()
-        self._action_invoke_service: ActionInvokeService = ActionInvokeService()
+        self._action_invoke_service: ActionInvokeService = ActionInvokeService(action_ordering_service)
 
     def take_turn(
             self,

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -12,8 +12,10 @@ from core.repositories.base_player_repository import BasePlayerRepository
 
 
 class ActionInvokeService(object):
-    def __init__(self):
-        self._action_ordering_service: ActionOrderingService = BulkActionOrderingService()
+    def __init__(
+            self,
+            action_ordering_service: Optional[ActionOrderingService] = None) -> None:
+        self._action_ordering_service: ActionOrderingService = action_ordering_service if action_ordering_service is not None else BulkActionOrderingService()
 
     def invoke(
             self,
