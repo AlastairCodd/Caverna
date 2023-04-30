@@ -9,8 +9,20 @@ from core.enums.harvest_type_enum import HarvestTypeEnum
 from core.services.base_player_service import BasePlayerService
 
 
-def main():
-    turn_execution_service = TurnExecutionService()
+def main_exhaustive():
+    from common.services.exhaustive_action_ordering_service import ExhaustiveActionOrderingService
+    main(ExhaustiveActionOrderingService())
+
+def main_pruning():
+    from common.services.pruning_action_ordering_service import PruningActionOrderingService
+    main(PruningActionOrderingService())
+
+def main_bulk():
+    from common.services.bulk_action_ordering_service import BulkActionOrderingService
+    main(BulkActionOrderingService())
+
+def main(ordering_service = None):
+    turn_execution_service = TurnExecutionService(ordering_service)
 
     card = WeeklyMarketCard()
     player = DeterministicPlayer(card)
@@ -141,4 +153,6 @@ class DeterministicPlayer(BasePlayerService):
 if __name__ == "__main__":
     import cProfile
 
-    cProfile.run("main()", "turn_execution_service_profile")
+#    cProfile.run("main_exhaustive()", "profiles/turn_execution_service_profile.exhaustive")
+    cProfile.run("main_pruning()", "profiles/turn_execution_service_profile.pruning")
+    cProfile.run("main_bulk()", "profiles/turn_execution_service_profile.bulk")
