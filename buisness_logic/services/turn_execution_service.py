@@ -54,22 +54,20 @@ class TurnExecutionService(object):
         untested_actions.extend(choice.actions.actions)
         untested_actions.append(ConvertAction())
 
-        harvest_action: Optional[BaseAction] = None
-
-        if is_players_final_turn:
-            harvest_action: BaseAction = ResolveHarvestAction()
-            untested_actions.append(harvest_action)
-
         has_check_for_animal_storage = False
         actions_to_take: List[BaseAction] = []
         constraints_on_actions: List[BaseConstraint] = []
 
         constraints_on_actions.extend(choice.actions.constraints)
 
+        if is_players_final_turn:
+            harvest_action: BaseAction = ResolveHarvestAction()
+            untested_actions.append(harvest_action)
+            for action in choice.actions.actions:
+                constraints_on_actions.append(PrecedesConstraint(action, harvest_action))
+
         action: BaseAction
         for action in untested_actions:
-            if harvest_action is not None and not isinstance(action, ResolveHarvestAction):
-                constraints_on_actions.append(PrecedesConstraint(action, harvest_action))
             if isinstance(action, CheckAnimalStorageAction):
                 if not has_check_for_animal_storage:
                     has_check_for_animal_storage = True
