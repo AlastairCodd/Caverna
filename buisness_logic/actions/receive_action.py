@@ -11,6 +11,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 class ReceiveAction(BaseReceiveAction):
     def __init__(self, items_to_receive: Dict[ResourceTypeEnum, int]) -> None:
         BaseReceiveAction.__init__(self, "ReceiveAction", items_to_receive)
+        self._hash = self._precompute_hash()
 
     def invoke(
             self,
@@ -65,5 +66,9 @@ class ReceiveAction(BaseReceiveAction):
 
         return result
 
-    def __hash__(self):
+    def _precompute_hash(self):
         return hash(("receive action", tuple(self._items_to_receive)))
+
+    def __hash__(self) -> int:
+        return self._hash
+

@@ -15,6 +15,7 @@ from core.services.base_player_service import BasePlayerService
 
 class PlaceFencesAction(BasePlayerChoiceAction):
     def __init__(self) -> None:
+        self._hash = hash(("place fences"))
         BaseAction.__init__(self, "PlaceFencesAction")
 
     def set_player_choice(
@@ -85,9 +86,13 @@ class PlaceFencesAction(BasePlayerChoiceAction):
             return text
         return "".join(e[1] for e in text)
 
+    def __hash__(self) -> int:
+        return self._hash
+
 
 class PlaceFencesAndStableAction(BasePlayerChoiceAction):
     def __init__(self) -> None:
+        self._hash = hash(("place fences and stable"))
         BaseAction.__init__(self, "PlaceFencesAndStable")
 
     def set_player_choice(
@@ -169,3 +174,6 @@ class PlaceFencesAndStableAction(BasePlayerChoiceAction):
         if "pp" in format_spec:
             return text
         return "".join(e[1] for e in text)
+
+    def __hash__(self) -> int:
+        return self._hash

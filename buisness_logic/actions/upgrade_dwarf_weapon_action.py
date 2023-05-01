@@ -9,6 +9,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 
 class UpgradeDwarfWeaponAction(BaseAction):
     def __init__(self) -> None:
+        self._hash = hash("upgrade dwarf weapon")
         BaseAction.__init__(self, "UpgradeDwarfWeaponAction")
 
     def invoke(
@@ -50,7 +51,7 @@ class UpgradeDwarfWeaponAction(BaseAction):
         return isinstance(other, UpgradeDwarfWeaponAction)
 
     def __hash__(self) -> int:
-        return 1
+        return self._hash
 
     def __str__(self) -> str:
         return "UpgradeDwarfWeaponAction()"

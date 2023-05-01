@@ -30,6 +30,8 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
             ResourceTypeEnum.grain: 1,
             ResourceTypeEnum.veg: 2,
         }
+
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "WeeklyMarketAction")
 
     def set_player_choice(
@@ -135,5 +137,8 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
     def __repr__(self) -> str:
         return "WeeklyMarketAction()"
 
-    def __hash__(self) -> int:
+    def _precompute_hash(self) -> int:
         return hash(self.__repr__())
+
+    def __hash__(self) -> int:
+        return self._hash

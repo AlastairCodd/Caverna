@@ -29,6 +29,8 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
         self._convert_from: List[ResourceTypeEnum] = convert_from
         self._convert_to: List[ResourceTypeEnum] = convert_to
         self._number_of_times: int = number_of_times
+
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "ConvertSingleAction")
 
     def invoke(
@@ -189,5 +191,8 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
     def __repr__(self):
         return f"ConvertSingleAction({self._convert_from}, {self._convert_to}, {self._number_of_times})"
 
-    def __hash__(self) -> int:
+    def _precompute_hash(self) -> int:
         return hash(tuple(["Convert", *self._convert_from, *self._convert_to, self._number_of_times]))
+
+    def __hash__(self) -> int:
+        return self._hash

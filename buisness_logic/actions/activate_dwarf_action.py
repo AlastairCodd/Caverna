@@ -12,6 +12,8 @@ class ActivateDwarfAction(BaseAction):
             self,
             card_to_activate: Optional[BaseCard] = None) -> None:
         self._card_to_activate: Optional[BaseCard] = card_to_activate
+
+        self._hash: int = self._precompute_hash()
         BaseAction.__init__(self, "ActivateDwarfAction")
 
     def invoke(
@@ -58,5 +60,8 @@ class ActivateDwarfAction(BaseAction):
     def card_to_activate(self) -> Optional[BaseCard]:
         return self._card_to_activate
 
-    def __hash__(self) -> int:
+    def _precompute_hash(self) -> int:
         return hash(self.__repr__())
+
+    def __hash__(self) -> int:
+        return self._hash

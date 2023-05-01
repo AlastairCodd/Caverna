@@ -18,6 +18,8 @@ class SowAction(BasePlayerChoiceAction):
     def __init__(self) -> None:
         """Sow action which allows a number of food resources to be planted, and their amount increased."""
         self._resources_to_sow: Optional[ResourcesToSow] = None
+
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "SowAction")
 
     def set_player_choice(
@@ -121,3 +123,9 @@ class SowAction(BasePlayerChoiceAction):
         if "pp" in format_spec:
             return text
         return "".join(e[1] for e in text)
+
+    def _precompute_hash(self) -> int:
+        return hash(("sow"))
+
+    def __hash__(self) -> int:
+        return self._hash

@@ -18,6 +18,8 @@ from core.services.base_player_service import BasePlayerService
 class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
     def __init__(self):
         self._level_of_weapon: Optional[int] = None
+
+        self._hash = hash(("give dwarf weapon"))
         BaseAction.__init__(self, "GiveDwarfAWeaponAction")
 
     def set_player_choice(
@@ -96,3 +98,6 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
 
     def __str__(self) -> str:
         return "Give dwarf a weapon action"
+
+    def __hash__(self) -> int:
+        return self._hash

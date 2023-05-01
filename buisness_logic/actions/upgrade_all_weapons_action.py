@@ -9,6 +9,7 @@ from core.baseClasses.base_card import BaseCard
 
 class UpgradeAllWeaponsAction(BaseAction):
     def __init__(self) -> None:
+        self._hash = hash("upgrade all weapons")
         BaseAction.__init__(self, "UpgradeAllWeaponsAction")
 
     def invoke(
@@ -57,3 +58,6 @@ class UpgradeAllWeaponsAction(BaseAction):
 
     def __repr__(self) -> str:
         return "UpgradeAllWeaponsAction()"
+
+    def __hash__(self) -> int:
+        return self._hash

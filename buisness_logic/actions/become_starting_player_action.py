@@ -10,6 +10,8 @@ from core.repositories.base_player_repository import BasePlayerRepository
 class BecomeStartingPlayerAction(BaseAction):
     def __init__(self):
         self._starting_player_next_turn: Optional[BasePlayerRepository] = None
+
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "BecomeStartingPlayerAction")
 
     def invoke(
@@ -43,3 +45,9 @@ class BecomeStartingPlayerAction(BaseAction):
 
     def __str__(self) -> str:
         return "Become Starting Player"
+
+    def _precompute_hash(self) -> int:
+        return hash(("starting player"))
+
+    def __hash__(self) -> int:
+        return self._hash

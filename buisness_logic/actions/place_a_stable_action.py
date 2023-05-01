@@ -27,6 +27,8 @@ class PlaceAStableAction(BasePlayerChoiceAction):
         self._tile_location: int = -1
         self._effects_to_use: Dict[BaseTilePurchaseEffect, int] = {}
         self._turn_descriptor: Optional[TurnDescriptorLookup] = None
+
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "PlaceAStableAction")
 
     def set_player_choice(
@@ -167,3 +169,9 @@ class PlaceAStableAction(BasePlayerChoiceAction):
             return "Place a stable (for free)"
         result: str = "Place a stable (for " + " and ".join([f"{amount} {resource.name}" for resource, amount in self._stable_cost.items()]) + ")"
         return result
+
+    def _precompute_hash(self) -> int:
+        return hash(("place stable", *self._stable_cost.items()))
+
+    def __hash__(self) -> int:
+        return self._hash

@@ -11,6 +11,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 
 class HarvestFieldAction(BaseAction, BaseReceiveEventService):
     def __init__(self) -> None:
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "HarvestFieldAction")
 
     def invoke(
@@ -45,5 +46,8 @@ class HarvestFieldAction(BaseAction, BaseReceiveEventService):
     def __repr__(self) -> str:
         return "HarvestFieldAction()"
 
-    def __hash__(self) -> int:
+    def _precompute_hash(self) -> int:
         return hash(self.__repr__())
+
+    def __hash__(self) -> int:
+        return self._hash

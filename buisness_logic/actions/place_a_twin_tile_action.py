@@ -43,6 +43,8 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         self._tile_direction: Optional[TileDirectionEnum] = None
         self._effects_to_use: Dict[BaseTilePurchaseEffect, int] = {}
         self._turn_descriptor: Optional[TurnDescriptorLookup] = None
+
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "PlaceATwinTileAction")
 
     def set_player_choice(
@@ -283,3 +285,12 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
             total[resource] = total.get(resource, 0) + amount
 
         return total
+
+    def _precompute_hash(self) -> int:
+        return hash((
+            "place twin",
+            self._tile_type,
+            *(self._tile_cost_override.items() if self._tile_cost_override is not None else [])))
+
+    def __hash__(self) -> int:
+        return self._hash

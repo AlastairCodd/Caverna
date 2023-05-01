@@ -46,6 +46,8 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
         self._tile_location: int = -1
         self._effects_to_use: Dict[BaseTilePurchaseEffect, int] = {}
         self._turn_descriptor: Optional[TurnDescriptorLookup] = None
+
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "PlaceASingleTileAction")
 
     def set_player_choice(
@@ -284,5 +286,13 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
 
         return result
 
-    def __hash__(self):
-        return hash(("place single", self._tile_type, self._specific_tile_generation_method, self._tile_requisites_override, self._tile_cost_override))
+    def _precompute_hash(self) -> int:
+        return hash(
+            ("place single",
+            self._tile_type,
+            self._specific_tile_generation_method,
+            *(self._tile_requisites_override if self._tile_requisites_override is not None else []),
+            *(self._tile_cost_override.items() if self._tile_cost_override is not None else [])))
+
+    def __hash__(self) -> int:
+        return self._hash

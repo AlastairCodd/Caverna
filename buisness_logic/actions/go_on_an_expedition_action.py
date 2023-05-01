@@ -64,6 +64,8 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
         self._upgrade_dwarf_weapon_action: BaseAction = UpgradeDwarfWeaponAction()
 
         self._chosen_actions_and_levels: List[Tuple[BaseAction, int]] = []
+
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "GoOnAnExpeditionAction")
 
     def set_player_choice(
@@ -176,3 +178,9 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
             if action in actions:
                 return level
         raise Exception(f"Could not find action {action:r} in actions {self._expedition_actions}")
+
+    def _precompute_hash(self) -> int:
+        return hash(("go on expedition"))
+
+    def __hash__(self) -> int:
+        return self._hash

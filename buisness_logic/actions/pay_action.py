@@ -17,6 +17,8 @@ class PayAction(BaseAction):
                 raise ValueError(f"Cannot pay a negative amount of items (item: {item}, amount: {items_to_pay[item]})")
         self._items_to_pay: Dict[ResourceTypeEnum, int] = items_to_pay
         self._paying_for: Any = paying_for
+
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "PayAction")
 
     def invoke(
@@ -70,5 +72,8 @@ class PayAction(BaseAction):
 
         return self._items_to_pay == cast_other._items_to_pay and self._paying_for == cast_other._paying_for
 
-    def __hash__(self) -> int:
+    def _precompute_hash(self) -> int:
         return hash(tuple(["Pay", *self._items_to_pay.items(), self._paying_for]))
+
+    def __hash__(self) -> int:
+        return self._hash

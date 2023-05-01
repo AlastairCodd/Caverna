@@ -22,6 +22,8 @@ class FeedDwarvesAction(BasePlayerChoiceAction):
             raise ValueError("Amount of Food Required per dwarf must be positive")
         self._amount_of_food_required_per_dwarf: int = amount_of_food_required_per_dwarf
         self._effects_to_use: List[BaseFoodEffect] = []
+
+        self._hash = self._precompute_hash()
         BasePlayerChoiceAction.__init__(self, "FeedDwarvesAction")
 
     def set_player_choice(
@@ -126,5 +128,8 @@ class FeedDwarvesAction(BasePlayerChoiceAction):
         success: bool = len(errors) == 0
         return ResultLookup(success, success, errors)
 
-    def __hash__(self) -> int:
+    def _precompute_hash(self) -> int:
         return hash(self.__repr__())
+
+    def __hash__(self) -> int:
+        return self._hash

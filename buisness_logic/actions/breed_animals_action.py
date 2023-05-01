@@ -22,6 +22,8 @@ class BreedAnimalsAction(BaseReceiveAction):
         self._maximum_number_of_animals_to_reproduce = maximum
 
         self._animals_to_reproduce: Optional[List[ResourceTypeEnum]] = None
+
+        self._hash = self._precompute_hash()
         BaseReceiveAction.__init__(self, "BreedAnimalsAction", {animal: 1 for animal in resource_types.farm_animals})
 
     def set_player_choice(
@@ -139,5 +141,8 @@ class BreedAnimalsAction(BaseReceiveAction):
     def __repr__(self) -> str:
         return f"BreedAnimalsAction({self._maximum_number_of_animals_to_reproduce})"
 
-    def __hash__(self) -> int:
+    def _precompute_hash(self) -> int:
         return hash(self.__repr__())
+
+    def __hash__(self) -> int:
+        return self._hash

@@ -27,6 +27,8 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
         }
         self._harvest_type_this_round: Optional[HarvestTypeEnum] = None
         self._use_harvest_action_instead_of_breeding: Optional[boolean] = None
+
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "ResolveHarvestAction")
 
     def set_player_choice(
@@ -117,5 +119,8 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
             return "Resolve harvest where player chose to farm"
         return "Resolve harvest where player chose to breed animals"
 
-    def __hash__(self) -> int:
+    def _precompute_hash(self) -> int:
         return hash(self.__repr__())
+
+    def __hash__(self) -> int:
+        return self._hash

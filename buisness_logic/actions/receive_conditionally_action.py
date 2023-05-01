@@ -21,7 +21,9 @@ class ReceiveConditionallyAction(BaseReceiveAction):
 
         self._condition: Callable[[BasePlayerRepository], int] = condition
         self._condition_readable: str = condition_readable
+
         BaseReceiveAction.__init__(self, "ReceiveConditionallyAction", items_to_receive)
+        self._hash = self._precompute_hash()
 
     def invoke(
             self,
@@ -81,3 +83,8 @@ class ReceiveConditionallyAction(BaseReceiveAction):
 
         return result
 
+    def _precompute_hash(self) -> int:
+        return hash(("receive conditionally", self._condition, self._condition_readable, *self._items_to_receive))
+
+    def __hash__(self) -> int:
+        return self._hash

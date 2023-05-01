@@ -30,6 +30,8 @@ class CheckAnimalStorageAction(BaseAction):
             TileTypeEnum.meadow,
             TileTypeEnum.pasture,
         ]
+
+        self._hash = self._precompute_hash()
         BaseAction.__init__(self, "CheckAnimalStorageAction")
 
     def invoke(
@@ -260,5 +262,9 @@ class CheckAnimalStorageAction(BaseAction):
     def __repr__(self) -> str:
         return "CheckAnimalStorageAction()"
 
-    def __hash__(self) -> int:
+    def _precompute_hash(self) -> int:
         return hash(self.__repr__())
+
+    def __hash__(self) -> int:
+        return self._hash
+
