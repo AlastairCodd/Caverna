@@ -10,6 +10,8 @@ class PrecedesConstraint(BaseConstraint):
             raise ValueError
         if action_two is None:
             raise ValueError
+        if action_one == action_two:
+            raise ValueError("actions cannot be equal")
 
         self._action_one: BaseAction = action_one
         self._action_two: BaseAction = action_two

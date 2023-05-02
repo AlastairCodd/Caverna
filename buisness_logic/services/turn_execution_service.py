@@ -1,10 +1,11 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from buisness_logic.actions.check_animal_storage_action import CheckAnimalStorageAction
 from buisness_logic.actions.convert_action import ConvertAction
 from buisness_logic.actions.resolve_harvest_action import ResolveHarvestAction
 from buisness_logic.services.turn_transfer_service import TurnTransferService, ChosenDwarfCardActionCombinationAndEquivalentLookup
 from common.entities.action_choice_lookup import ActionChoiceLookup
+from common.entities.dwarf import Dwarf
 from common.entities.dwarf_card_action_combination_lookup import DwarfCardActionCombinationLookup
 from common.entities.precedes_constraint import PrecedesConstraint
 from common.entities.result_lookup import ResultLookup
@@ -60,12 +61,6 @@ class TurnExecutionService(object):
 
         constraints_on_actions.extend(choice.actions.constraints)
 
-        if is_players_final_turn:
-            harvest_action: BaseAction = ResolveHarvestAction()
-            untested_actions.append(harvest_action)
-            for action in choice.actions.actions:
-                constraints_on_actions.append(PrecedesConstraint(action, harvest_action))
-
         action: BaseAction
         for action in untested_actions:
             if isinstance(action, CheckAnimalStorageAction):
@@ -76,27 +71,36 @@ class TurnExecutionService(object):
             if not isinstance(action, BasePlayerChoiceAction):
                 actions_to_take.append(action)
                 continue
-            set_result: ResultLookup[ActionChoiceLookup] = action.set_player_choice(
+
+            handle_result = self._handle_action(
+                action,
                 player,
                 choice.dwarf,
-                turn_descriptor)
+                turn_descriptor,
+                actions_to_take,
+                constraints_on_actions,
+                untested_actions)
 
-            success &= set_result.flag
-            errors.extend(set_result.errors)
-
-            if not set_result.flag:
-                continue
-            constraints_on_actions.extend(set_result.value.constraints)
-            actions_to_take.append(action)
-
-            new_action: BaseAction
-            for new_action in set_result.value.actions:
-                untested_actions.append(new_action)
-                new_constraint: BaseConstraint = PrecedesConstraint(action, new_action)
-                constraints_on_actions.append(new_constraint)
+            success &= handle_result.flag
+            errors.extend(handle_result.errors)
 
         if not success:
             return ResultLookup(errors=errors)
+
+        if is_players_final_turn:
+            harvest_result = self._handle_harvest(
+                action,
+                player,
+                choice.dwarf,
+                turn_descriptor,
+                actions_to_take,
+                constraints_on_actions,
+                has_check_for_animal_storage)
+
+            errors.extend(harvest_result.errors)
+
+            if not harvest_result.flag:
+                return ResultLookup(errors=errors)
 
         full_action_choice: ActionChoiceLookup = ActionChoiceLookup(actions_to_take, constraints_on_actions)
 
@@ -114,3 +118,110 @@ class TurnExecutionService(object):
             count = invoked_result.value
 
         return ResultLookup(success, count, errors)
+
+    def _handle_action(
+            self,
+            action: BaseAction,
+            player: BasePlayerService,
+            dwarf: Dwarf,
+            turn_descriptor: TurnDescriptorLookup,
+            actions_to_take: List[BaseAction],
+            constraints_on_actions: List[BaseConstraint],
+            untested_actions: List[BaseAction]) -> ResultLookup[Any]:
+        set_result: ResultLookup[ActionChoiceLookup] = action.set_player_choice(
+            player,
+            dwarf,
+            turn_descriptor)
+
+        if not set_result.flag:
+            return set_result
+        constraints_on_actions.extend(set_result.value.constraints)
+        actions_to_take.append(action)
+
+        self._constrain_children_of_action_to_happen_after_action(
+            action,
+            set_result.value.actions,
+            untested_actions,
+            constraints_on_actions)
+
+        return set_result
+
+    def _handle_harvest(
+            self,
+            action: BaseAction,
+            player: BasePlayerService,
+            dwarf: Dwarf,
+            turn_descriptor: TurnDescriptorLookup,
+            actions_to_take: List[BaseAction],
+            constraints_on_actions: List[BaseConstraint],
+            has_check_for_animal_storage: bool) -> ResultLookup[Any]:
+        harvest_action: BaseAction = ResolveHarvestAction()
+
+        set_result = harvest_action.set_player_choice(
+            player,
+            dwarf,
+            turn_descriptor)
+
+        if not set_result.flag:
+            return ResultLookup(errors=set_result.errors)
+
+        # enforce that harvest happens after other actions
+        for action in actions_to_take:
+            # don't require that harvest must happen after check animal, bcs sometimes we get more animals during harvest
+            if isinstance(action, CheckAnimalStorageAction):
+                continue
+            constraints_on_actions.append(PrecedesConstraint(action, harvest_action))
+        actions_to_take.append(harvest_action)
+
+        success = True
+        errors = []
+        untested_actions = []
+
+        self._constrain_children_of_action_to_happen_after_action(
+            harvest_action,
+            set_result.value.actions,
+            untested_actions,
+            constraints_on_actions)
+
+        constraints_on_actions.extend(set_result.value.constraints)
+
+        for action in untested_actions:
+            if isinstance(action, CheckAnimalStorageAction):
+                if not has_check_for_animal_storage:
+                    has_check_for_animal_storage = True
+                    actions_to_take.append(action)
+                continue
+            if not isinstance(action, BasePlayerChoiceAction):
+                actions_to_take.append(action)
+                continue
+
+            handle_result = self._handle_action(
+                action,
+                player,
+                dwarf,
+                turn_descriptor,
+                actions_to_take,
+                constraints_on_actions,
+                untested_actions)
+
+            success &= handle_result.flag
+            errors.extend(handle_result.errors)
+
+        return ResultLookup(True, None, errors)
+
+    def _constrain_children_of_action_to_happen_after_action(
+            self,
+            parent_action: BaseAction,
+            child_actions: list[BaseAction],
+            untested_actions: list[BaseAction],
+            constraints_on_actions: list[BaseConstraint]) -> None:
+        child_action: BaseAction
+        for child_action in child_actions:
+            untested_actions.append(child_action)
+            if isinstance(child_action, CheckAnimalStorageAction):
+                # the constraint that "check animal storage" happens after "receive animal" is enforced
+                #    in the action themselves -- no point duplicating the constraint here
+                #    (there wouldn't be any side effects, its just messy)
+                continue
+            new_constraint: BaseConstraint = PrecedesConstraint(parent_action, child_action)
+            constraints_on_actions.append(new_constraint)
