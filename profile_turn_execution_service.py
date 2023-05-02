@@ -154,5 +154,5 @@ if __name__ == "__main__":
     import cProfile
 
 #    cProfile.run("main_exhaustive()", "profiles/turn_execution_service_profile.exhaustive")
-    cProfile.run("main_pruning()", "profiles/turn_execution_service_profile.pruning")
+#    cProfile.run("main_pruning()", "profiles/turn_execution_service_profile.pruning")
     cProfile.run("main_bulk()", "profiles/turn_execution_service_profile.bulk")
