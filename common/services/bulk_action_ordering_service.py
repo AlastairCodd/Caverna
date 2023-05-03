@@ -45,6 +45,7 @@ class BulkActionOrderingService(ActionOrderingService):
                 self._permutation_ordering_services = [permutation_ordering_services]
 
         self._turn_descriptor_tiles: Optional[List[BaseTile]] = None
+        self._debug_flag_do_not_invoke_actions: bool = True
 
     def calculate_best_order(
             self,
@@ -85,6 +86,10 @@ class BulkActionOrderingService(ActionOrderingService):
                 #print(f"permutation {permutation_index} does not pass constraints")
                 permutation_index += 1
                 continue
+            if self._debug_flag_do_not_invoke_actions:
+                permutation_index += 1
+                continue
+
             # The cloned player for testing shouldn't need to make any decisions
             player_copy: BasePlayerRepository = self._player_prototype.clone(player)
             card_copy: BaseCard = self._card_prototype.clone(current_card)
