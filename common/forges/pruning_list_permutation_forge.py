@@ -1,4 +1,3 @@
-from functools import cache
 import math
 from typing import TypeVar, List, Generator
 
@@ -73,7 +72,6 @@ class PruningListPermutationForge(object):
         #   for i in n
         #     divmod(
 
-    @cache
     def _get_indicies(self, index: int, number_of_items_to_permute: int) -> tuple[int, int]:
         number_of_items_to_permute_excluding_first_factorial = math.factorial(number_of_items_to_permute - 1)
 
