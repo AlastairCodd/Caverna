@@ -19,6 +19,9 @@ class PruningListPermutationForge(object):
         # this will be immediately incremented on entering the loop
         self._index = -1
 
+        if number_of_permutations > 50_000_000:
+            number_of_permutations = 50_000_000
+
         while self._index < number_of_permutations:
             self._index += 1
             yield self.generate_list_permutation_for_index(list_to_permute, self._index, self._number_of_items_to_permute)

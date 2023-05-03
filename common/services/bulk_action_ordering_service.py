@@ -45,7 +45,7 @@ class BulkActionOrderingService(ActionOrderingService):
                 self._permutation_ordering_services = [permutation_ordering_services]
 
         self._turn_descriptor_tiles: Optional[List[BaseTile]] = None
-        self._debug_flag_do_not_invoke_actions: bool = True
+        self._debug_flag_do_not_invoke_actions: bool = False
 
     def calculate_best_order(
             self,

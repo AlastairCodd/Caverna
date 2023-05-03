@@ -27,14 +27,7 @@ class ConstraintValidator(object):
         index_of_first_action_that_fails_to_pass_constraint = 100 # arbitrary large number, shouldn't ever have 100 actions
 
         for (must_precede, actions) in self._constraints:
-            index_that_must_precede = actions_with_index[must_precede]
-            for action in actions:
-                index_of_action = actions_with_index[action]
-                # action index shouldn't ever be equal to preceding action index
-                if index_of_action > index_that_must_precede:
-                    continue
-                if index_of_first_action_that_fails_to_pass_constraint > index_of_action:
-                    index_of_first_action_that_fails_to_pass_constraint = index_of_action
+            index_of_first_action_that_fails_to_pass_constraint = self._get_first_action_which_fails_to_pass_constraint(must_precede, actions, actions_with_index, index_of_first_action_that_fails_to_pass_constraint)
         return -1 if index_of_first_action_that_fails_to_pass_constraint == 100 else index_of_first_action_that_fails_to_pass_constraint
 
     def _get_condensed_constraint_to_append_to(self, constraint) -> CondensedConstraint:
@@ -44,3 +37,31 @@ class ConstraintValidator(object):
         new_condensed = CondensedConstraint(constraint._action_one, [])
         self._constraints.append(new_condensed)
         return new_condensed
+
+    def _get_first_action_which_fails_to_pass_constraint(
+            self,
+            must_precede,
+            actions,
+            actions_with_index,
+            index_of_first_action_that_fails_to_pass_constraint) -> int:
+        index_that_must_precede = self._get_index_of_action(actions_with_index, must_precede)
+        for action in actions:
+            index_of_action = self._get_index_of_action(actions_with_index, action)
+            index_of_first_action_that_fails_to_pass_constraint = self._get_new_index_constraint(index_of_action, index_that_must_precede, index_of_first_action_that_fails_to_pass_constraint)
+        return index_of_first_action_that_fails_to_pass_constraint
+
+    def _get_index_of_action(self, actions_with_index, action) -> int:
+        return actions_with_index[action]
+
+    # rename me when you're not so tired
+    def _get_new_index_constraint(
+            self,
+            index_of_action,
+            index_that_must_precede,
+            index_of_first_action_that_fails_to_pass_constraint) -> int:
+        # action index shouldn't ever be equal to preceding action index
+        if index_of_action > index_that_must_precede:
+            return index_of_first_action_that_fails_to_pass_constraint
+        if index_of_first_action_that_fails_to_pass_constraint > index_of_action:
+            return index_of_action
+        return index_of_first_action_that_fails_to_pass_constraint
