@@ -21,6 +21,10 @@ def main_bulk():
     from common.services.bulk_action_ordering_service import BulkActionOrderingService
     main(BulkActionOrderingService())
 
+def main_allocation_free():
+    from common.services.allocation_free_action_ordering_service import AllocationFreeActionOrderingService
+    main(AllocationFreeActionOrderingService())
+
 def main(ordering_service = None):
     turn_execution_service = TurnExecutionService(ordering_service)
 
@@ -156,3 +160,4 @@ if __name__ == "__main__":
 #    cProfile.run("main_exhaustive()", "profiles/turn_execution_service_profile.exhaustive")
 #    cProfile.run("main_pruning()", "profiles/turn_execution_service_profile.pruning")
     cProfile.run("main_bulk()", "profiles/turn_execution_service_profile.bulk")
+    cProfile.run("main_allocation_free()", "profiles/turn_execution_service_profile.allocationless")
