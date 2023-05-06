@@ -1,10 +1,12 @@
 import math
 from typing import TypeVar, List, Generator
 
+from core.forges.base_list_permutation_forge import BaseListPermutationForge
+
 T = TypeVar("T")
 
 
-class PruningListPermutationForge(object):
+class PruningListPermutationForge(BaseListPermutationForge):
     def __init__(self):
         self._logging: bool = False
 
@@ -76,8 +78,6 @@ class PruningListPermutationForge(object):
             print(f"pruning from {first_invalid_item_in_permutation=}, {increment_by=}")
 
         # this service works by counting from 0 to n!, where n is the number of items
-        #   for i in n
-        #     divmod(
 
     def _get_indicies(self, index: int, number_of_items_to_permute: int) -> tuple[int, int]:
         number_of_items_to_permute_excluding_first_factorial = math.factorial(number_of_items_to_permute - 1)

@@ -4,7 +4,7 @@ from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from common.services.bulk_action_ordering_service import BulkActionOrderingService
+from common.services.configurable_action_ordering_service import ConfigurableActionOrderingService
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_action_ordering_service import ActionOrderingService
 from core.baseClasses.base_card import BaseCard
@@ -15,7 +15,7 @@ class ActionInvokeService(object):
     def __init__(
             self,
             action_ordering_service: Optional[ActionOrderingService] = None) -> None:
-        self._action_ordering_service: ActionOrderingService = action_ordering_service if action_ordering_service is not None else BulkActionOrderingService()
+        self._action_ordering_service: ActionOrderingService = action_ordering_service if action_ordering_service is not None else ConfigurableActionOrderingService()
 
     def invoke(
             self,

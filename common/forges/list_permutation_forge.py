@@ -2,10 +2,12 @@ from functools import cache
 import math
 from typing import TypeVar, List, Generator
 
+from core.forges.base_list_permutation_forge import BaseListPermutationForge
+
 T = TypeVar("T")
 
 
-class ListPermutationForge(object):
+class ListPermutationForge(BaseListPermutationForge):
     def generate_list_permutations(
             self,
             list_to_permute: List[T]) -> Generator[List[T], None, None]:

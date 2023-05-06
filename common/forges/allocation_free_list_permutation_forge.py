@@ -1,10 +1,12 @@
 import math
 from typing import TypeVar, List, Generator
 
+from core.forges.base_list_permutation_forge import BaseListPermutationForge
+
 T = TypeVar("T")
 
 
-class AllocationFreeListPermutationForge(object):
+class AllocationFreeListPermutationForge(BaseListPermutationForge):
     def __init__(self):
         self._logging: bool = False
 

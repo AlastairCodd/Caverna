@@ -1,40 +1,48 @@
 from functools import reduce
-from typing import List, Iterable, Tuple, Union, Optional, Set
+from typing import List, Iterable, Tuple, Union, Optional, Callable
 
 from buisness_logic.actions.activate_dwarf_action import ActivateDwarfAction
-from buisness_logic.services.most_points_permutation_ordering_service import MostPointsPermutationOrderingService
-from buisness_logic.services.most_resources_permutation_ordering_service import MostResourcesPermutationOrderingService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from common.forges.allocation_free_list_permutation_forge import AllocationFreeListPermutationForge
 from common.prototypes.player_prototype import PlayerPrototype
 from common.prototypes.card_prototype import CardPrototype
 from common.prototypes.dwarf_prototype import DwarfPrototype
-from common.services.constraint_validator import ConstraintValidator
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_action_ordering_service import ActionOrderingService
 from core.baseClasses.base_card import BaseCard
+from core.baseClasses.base_constraint import BaseConstraint
 from core.baseClasses.base_prototype import BaseImmutablePrototype
 from core.baseClasses.base_permutation_ordering_service import BasePermutationOrderingService
 from core.baseClasses.base_tile import BaseTile
+from core.forges.base_list_permutation_forge import BaseListPermutationForge
+from core.services.base_constraint_validator import BaseConstraintValidator
 from core.exceptions.invalid_operation_error import InvalidOperationError
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
-class AllocationFreeActionOrderingService(ActionOrderingService):
+class ConfigurableActionOrderingService(ActionOrderingService):
     def __init__(
             self,
-            permutation_ordering_services: Union[List[BasePermutationOrderingService], BasePermutationOrderingService, None] = None):
+            permutation_ordering_services: Union[List[BasePermutationOrderingService], BasePermutationOrderingService, None] = None,
+            permutation_forge: Optional[BaseListPermutationForge] = None,
+            constraint_validator_func: Optional[Callable[List[BaseConstraint], BaseConstraintValidator]] = None):
         self._player_prototype: BaseImmutablePrototype[BasePlayerRepository] = PlayerPrototype()
         self._card_prototype: BaseImmutablePrototype[BaseCard] = CardPrototype()
         self._dwarf_prototype: BaseImmutablePrototype[Dwarf] = DwarfPrototype()
 
-        self._permutation_forge: AllocationFreeListPermutationForge = AllocationFreeListPermutationForge()
+        self._permutation_forge: BaseListPermutationForge
+        if permutation_forge is None:
+            from common.forges.pruning_list_permutation_forge import PruningListPermutationForge
+            self._permutation_forge = PruningListPermutationForge()
+        else:
+            self._permutation_forge = permutation_forge
 
         self._permutation_ordering_services: List[BasePermutationOrderingService]
         if permutation_ordering_services is None:
+            from buisness_logic.services.most_points_permutation_ordering_service import MostPointsPermutationOrderingService
+            from buisness_logic.services.most_resources_permutation_ordering_service import MostResourcesPermutationOrderingService
             self._permutation_ordering_services = [
                 MostPointsPermutationOrderingService(),
                 MostResourcesPermutationOrderingService()]
@@ -43,6 +51,13 @@ class AllocationFreeActionOrderingService(ActionOrderingService):
                 self._permutation_ordering_services = list(permutation_ordering_services)
             else:
                 self._permutation_ordering_services = [permutation_ordering_services]
+
+        self._constraint_validator_func: Callable[List[BaseConstraint], BaseConstraintValidator]
+        if constraint_validator_func is None:
+            from common.services.collating_constraint_validator import CollatingConstraintValidator
+            self._constraint_validator_func = lambda constraints: CollatingConstraintValidator(constraints)
+        else:
+            self._constraint_validator_func = constraint_validator_func
 
         self._turn_descriptor_tiles: Optional[List[BaseTile]] = None
         self._debug_flag_do_not_invoke_actions: bool = False
@@ -79,7 +94,7 @@ class AllocationFreeActionOrderingService(ActionOrderingService):
         self._cache_turn_descriptor_state(turn_descriptor)
         permutation_index: int = 0
 
-        constraint_validator: ConstraintValidator = ConstraintValidator(actions.constraints)
+        constraint_validator = self._constraint_validator_func(actions.constraints)
 
         for permutation in permutations:
             if not self._does_pass_all_constraints(permutation, constraint_validator):
@@ -175,7 +190,7 @@ class AllocationFreeActionOrderingService(ActionOrderingService):
     def _does_pass_all_constraints(
             self,
             permutation: List[BaseAction],
-            constraint_validator: ConstraintValidator) -> bool:
+            constraint_validator: BaseConstraintValidator) -> bool:
         index_of_first_action = constraint_validator.get_index_of_first_action_which_fails_constraints(permutation)
         if index_of_first_action == -1:
             return True
