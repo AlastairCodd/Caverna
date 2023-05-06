@@ -31,6 +31,15 @@ def main_allocation_free_list_permutation():
 
     main(ordering_service)
 
+def main_single_loop_validator():
+    from common.services.single_loop_constraint_validator import SingleLoopConstraintValidator
+    from common.services.configurable_action_ordering_service import ConfigurableActionOrderingService
+
+    validator = None
+    ordering_service = ConfigurableActionOrderingService(
+        constraint_validator_func = lambda constraints: SingleLoopConstraintValidator(constraints))
+
+    main(ordering_service)
 
 def main(ordering_service = None):
     turn_execution_service = TurnExecutionService(ordering_service)
@@ -168,3 +177,4 @@ if __name__ == "__main__":
 #    cProfile.run("main_pruning()", "profiles/turn_execution_service_profile.pruning")
 #    cProfile.run("main_configurable()", "profiles/turn_execution_service_profile.configurable")
     cProfile.run("main_allocation_free_list_permutation()", "profiles/turn_execution_service_profile.alloc_free_permutations")
+#    cProfile.run("main_single_loop_validator()", "profiles/turn_execution_service_profile.single_loop_validator")
