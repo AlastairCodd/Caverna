@@ -19,6 +19,7 @@ class CollatingConstraintValidator(BaseConstraintValidator):
             if not isinstance(constraint, PrecedesConstraint):
                 raise ValueError("Constraint validator only works for precedes constraints")
             self._get_condensed_constraint_to_append_to(constraint).actions.append(constraint._action_two)
+        self._logging: bool = False
 
     def get_index_of_first_action_which_fails_constraints(
             self,
@@ -26,6 +27,8 @@ class CollatingConstraintValidator(BaseConstraintValidator):
         actions_with_index: Dict[BaseAction, int] = {action: i for (i, action) in enumerate(permutation)}
 
         index_of_first_action_that_fails_to_pass_constraint = 100 # arbitrary large number, shouldn't ever have 100 actions
+        if self._logging:
+            constraint: PrecedesConstraint
 
         for (must_precede, actions) in self._constraints:
             index_that_must_precede = actions_with_index[must_precede]
@@ -36,9 +39,13 @@ class CollatingConstraintValidator(BaseConstraintValidator):
                 if index_of_first_action_that_fails_to_pass_constraint <= index_of_action:
                     continue
                 index_of_first_action_that_fails_to_pass_constraint = index_of_action
+                if self._logging:
+                    constraint = PrecedesConstraint(must_precede, action)
 
         if index_of_first_action_that_fails_to_pass_constraint == 100:
             return -1
+        if self._logging:
+            print(constraint, index_of_first_action_that_fails_to_pass_constraint)
         return index_of_first_action_that_fails_to_pass_constraint
 
     def _get_condensed_constraint_to_append_to(self, constraint) -> CondensedConstraint:
