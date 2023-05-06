@@ -50,19 +50,16 @@ class AllocationFreeListPermutationForge(object):
 
         previous_remainder = index
         current_offsets = list(range(number_of_items_to_permute))
-        readable = [0 for _ in range(number_of_items_to_permute)]
 
         #print(f"generating permutation for index {index}")
 
         for i in range(number_of_items_to_permute):
             index_in_remaining_list, previous_remainder = self._get_indicies(previous_remainder, number_of_items_to_permute - i)
             index_in_complete_list = current_offsets[index_in_remaining_list]
-            readable[i] = index_in_complete_list
             #print(f"{index_in_remaining_list=} {previous_remainder=} {index_in_complete_list=}")
-            self._update_offsets(index_in_remaining_list, current_offsets, number_of_items_to_permute)
+            current_offsets.pop(index_in_remaining_list)
             self._result[i] = list_to_permute[index_in_complete_list]
 
-        #print(f"{readable=}")
         return self._result
 
     def mark_last_permutation_as_invalid(
@@ -85,6 +82,3 @@ class AllocationFreeListPermutationForge(object):
         number_of_items_to_permute_excluding_first_factorial = self._factorial_cache[number_of_items_to_permute - 1]
 
         return divmod(index, number_of_items_to_permute_excluding_first_factorial)
-
-    def _update_offsets(self, index, current_offsets, number_of_items_to_permute) -> None:
-        current_offsets.pop(index)
