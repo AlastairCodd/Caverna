@@ -6,6 +6,8 @@ T = TypeVar("T")
 
 class AllocationFreeListPermutationForge(object):
     def __init__(self):
+        self._logging: bool = False
+
         self._index: int = -1
         self._number_of_items_to_permute: int = -1
         self._factorial_cache: Optional[List[int]] = None
@@ -71,8 +73,9 @@ class AllocationFreeListPermutationForge(object):
         #   same position. this is equivalent to incrementing by ...UNKNOWN.
         # this assumption only holds for precedes constraints, i think?
         increment_by = self._factorial_cache[self._number_of_items_to_permute - first_invalid_item_in_permutation - 1]
-        #print(f"incrementing by {increment_by}=({self._number_of_items_to_permute} - {first_invalid_item_in_permutation} - 1)!")
         self._index += increment_by
+        if self._logging:
+            print(f"pruning from {first_invalid_item_in_permutation=}, {increment_by=}")
 
         # this service works by counting from 0 to n!, where n is the number of items
         #   for i in n
