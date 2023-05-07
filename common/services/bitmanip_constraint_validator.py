@@ -19,8 +19,10 @@ class BitmanipConstraintValidator(object):
             self._constraints.setdefault(constraint._action_one, [])
             self._constraints.setdefault(constraint._action_two, [])
 
-            self._constraints[constraint._action_one].append((i, True))
-            self._constraints[constraint._action_two].append((i, False))
+            offset = 1 << i
+
+            self._constraints[constraint._action_one].append((i, True, offset))
+            self._constraints[constraint._action_two].append((i, False, offset))
 
     def get_index_of_first_action_which_fails_constraints(
             self,
@@ -33,8 +35,7 @@ class BitmanipConstraintValidator(object):
             constraints_on_action = self._constraints[action]
             #print(i, "action", repr(action))
             #print("constraints", constraints_on_action)
-            for (constraint_index, is_first_action) in constraints_on_action:
-                offset = 1 << constraint_index
+            for (constraint_index, is_first_action, offset) in constraints_on_action:
                 #print(f"{offset=:b}")
                 if already_considered & offset != 0:
                     #print(" ", constraint_index, "skipped")
