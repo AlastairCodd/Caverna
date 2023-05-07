@@ -116,7 +116,7 @@ class ConfigurableActionOrderingService(ActionOrderingService):
             successes: int = 0
             errors_for_permutation: List[str] = []
 
-            print(f"considering permutation {permutation_index}")
+            #print(f"considering permutation {permutation_index}")
 
             action: BaseAction
             for (i, action) in enumerate(permutation):
@@ -129,10 +129,10 @@ class ConfigurableActionOrderingService(ActionOrderingService):
                 errors_for_permutation.extend(action_result.errors)
 
                 if action_result.flag:
-                    print(f"  success: action {action:4}")
+                    #print(f"  success: action {action:4}")
                     successes += action_result.value
                 else:
-                    print(f"  *** FAIL: action {action:4}")
+                    #print(f"  *** FAIL: action {action:4}")
                     success = False
                     self._permutation_forge.mark_last_permutation_as_invalid(i)
                     break
@@ -143,7 +143,7 @@ class ConfigurableActionOrderingService(ActionOrderingService):
             else:
                 permutation_result: ResultLookup[int] = ResultLookup(success, successes, errors_for_permutation)
                 unsuccessful_permutations.append(permutation_result)
-            print()
+            #print()
             permutation_index += 1
 
         self.reset(turn_descriptor)

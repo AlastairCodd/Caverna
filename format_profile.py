@@ -11,5 +11,18 @@ filename = str(parser.parse_args().filename)
 
 pstats.Stats(filename) \
     .strip_dirs() \
-    .sort_stats(pstats.SortKey.TIME) \
-    .print_stats(.1)
+    .sort_stats(pstats.SortKey.CUMULATIVE) \
+    .print_stats()
+
+#possible SortKey values
+# TIME
+# CUMULATIVE
+
+# CALLS
+# PCALLS
+
+# FILENAME
+# LINE
+# NAME
+# NFL (name/file/line)
+# STDNAME (standard name?)

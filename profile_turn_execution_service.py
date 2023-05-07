@@ -25,7 +25,6 @@ def main_allocation_free_list_permutation():
     from common.forges.allocation_free_list_permutation_forge import AllocationFreeListPermutationForge
     from common.services.configurable_action_ordering_service import ConfigurableActionOrderingService
 
-    validator = None
     ordering_service = ConfigurableActionOrderingService(
         permutation_forge = AllocationFreeListPermutationForge())
 
@@ -47,6 +46,18 @@ def main_bitmanipulation_validator():
 
     validator = None
     ordering_service = ConfigurableActionOrderingService(
+        constraint_validator_func = lambda constraints: BitmanipConstraintValidator(constraints))
+
+    main(ordering_service)
+
+def main_current_fastest():
+    from common.services.bitmanip_constraint_validator import BitmanipConstraintValidator
+    from common.forges.allocation_free_list_permutation_forge import AllocationFreeListPermutationForge
+    from common.services.configurable_action_ordering_service import ConfigurableActionOrderingService
+
+    validator = None
+    ordering_service = ConfigurableActionOrderingService(
+        permutation_forge = AllocationFreeListPermutationForge(),
         constraint_validator_func = lambda constraints: BitmanipConstraintValidator(constraints))
 
     main(ordering_service)
@@ -188,4 +199,5 @@ if __name__ == "__main__":
 #    cProfile.run("main_configurable()", "profiles/turn_execution_service_profile.configurable")
 #    cProfile.run("main_allocation_free_list_permutation()", "profiles/turn_execution_service_profile.alloc_free_permutations")
 #    cProfile.run("main_single_loop_validator()", "profiles/turn_execution_service_profile.single_loop_validator")
-    cProfile.run("main_bitmanipulation_validator()", "profiles/turn_execution_service_profile.bitmanip_validator")
+#    cProfile.run("main_bitmanipulation_validator()", "profiles/turn_execution_service_profile.bitmanip_validator")
+    cProfile.run("main_current_fastest()", "profiles/turn_execution_service_profile")
