@@ -33,7 +33,8 @@ class TileContainer(object):
         tile_container_default.assign(self._tiles)
 
     def get_number_of_tiles_of_type(self, tile_type: TileTypeEnum) -> int:
-        return len([t for t in self._tiles.values() if t.tile_type == tile_type])
+        # i hate python
+        return sum(1 for t in self._tiles.values() if t.tile_type == tile_type)
 
     @property
     def tile_count(self) -> int:
