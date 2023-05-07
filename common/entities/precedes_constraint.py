@@ -45,13 +45,10 @@ class PrecedesConstraint(BaseConstraint):
         return action_two_location
 
     def __eq__(self, other) -> bool:
-        if isinstance(other, PrecedesConstraint):
-            action_one_equal: bool = other._action_one == self._action_one
-            action_two_equal: bool = other._action_two == self._action_two
-            result: bool = action_one_equal and action_two_equal
-            return result
-        else:
-            return False
+        action_one_equal: bool = other._action_one == self._action_one
+        action_two_equal: bool = other._action_two == self._action_two
+        result: bool = action_one_equal and action_two_equal
+        return result
 
     def __repr__(self) -> str:
         return f"PrecedesConstraint({self._action_one!r}, {self._action_two!r})"
