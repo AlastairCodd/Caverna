@@ -33,6 +33,25 @@ class TileContainerPrototype(BasePrototype[TileContainer]):
 
         for i in range(source.tile_count):
             source_tile: Optional[BaseTile] = source.get_specific_tile_at_location(i)
-            if source_tile is not None:
+            if source_tile is None:
+                continue
+            target_tile = target.get_specific_tile_at_location(i)
+
+            # if the new target is empty and the source is not, set the new one
+            if target_tile is None:
                 new_tile_clone: BaseTile = self._tile_prototype.clone(source_tile)
                 target.tiles[i].set_tile(new_tile_clone)
+                continue
+
+            # specific case for transparent tile
+            if source_tile.id == target_tile.id == -1:
+                # could check that the effects are equal but that seems overkill
+                #    you (the player) can't do anything to create a tile with id
+                #    of -1 (as those are only transparent tiles (inb4...)), so
+                #    this should be sufficient
+                continue
+
+            # TODO: other specific cases?
+
+            new_tile_clone: BaseTile = self._tile_prototype.clone(source_tile)
+            target.tiles[i].set_tile(new_tile_clone)
