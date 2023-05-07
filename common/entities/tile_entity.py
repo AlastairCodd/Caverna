@@ -1,4 +1,4 @@
-from typing import List, Optional, Generic, TypeVar
+from typing import List, Optional, Generic, TypeVar, Callable
 
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseTile, BaseSpecificTile
@@ -12,14 +12,14 @@ class TileEntity(object):
             self,
             tile_id: int,
             tile_type: TileTypeEnum,
-            base_tile: Optional[BaseTile] = None,
-            has_stable: bool = False):
+            on_change_callback: Optional[Callable[[int, BaseTile], None]]):
         self._id = tile_id
         self._tile_type: TileTypeEnum = tile_type
-        self._specific_tile: Optional[BaseTile] = base_tile
-        self._has_effects = False if base_tile is None else len(base_tile.effects) > 0
+        self._specific_tile: Optional[BaseTile] = None
+        self._has_effects = False
 
-        self._has_stable: bool = has_stable
+        self._has_stable: bool = False
+        self._on_change_callback = on_change_callback
 
     @property
     def id(self):
@@ -79,6 +79,9 @@ class TileEntity(object):
         self._specific_tile = base_tile
         self._tile_type = base_tile.tile_type
         self._has_effects = len(self._specific_tile.effects) > 0
+
+        if self._on_change_callback is not None:
+            self._on_change_callback(self._id, self._specific_tile)
 
     def give_stable(self) -> bool:
         result: bool = False

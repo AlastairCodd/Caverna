@@ -1,19 +1,23 @@
-from typing import Dict, List
+from typing import Dict, List, Optional, Callable
 
 from buisness_logic.tiles.dwelling import EntryLevelDwelling
 from buisness_logic.tiles.mine_tiles import CavernTile
 from buisness_logic.tiles.transparent_tile import TransparentTile
 from common.entities.tile_entity import TileEntity
+from core.baseClasses.base_tile import BaseTile
 from core.baseClasses.base_tile_container_default import BaseTileContainerDefault
 from core.constants import game_constants
 from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum
 
 
 class TileContainerDefault(BaseTileContainerDefault):
-    def __init__(self) -> None:
+    def __init__(
+            self,
+            on_tile_changed_callback: Optional[Callable[[int, BaseTile], None]] = None) -> None:
         self._last_row_index: int = game_constants.default_board_tile_count - game_constants.default_board_width
         self._first_column_index: int = 0
         self._last_column_index: int = game_constants.default_board_width - 1
+        self._on_tile_changed_callback = on_tile_changed_callback
 
     def assign(
             self,
@@ -41,13 +45,18 @@ class TileContainerDefault(BaseTileContainerDefault):
 
             tiles_types.append(tile_type)
 
-        tiles: Dict[int, TileEntity] = {tile_id: TileEntity(tile_id, tiles_types[tile_id])
-                                        for tile_id in range(len(tiles_types))}
+        tiles: Dict[int, TileEntity] = {
+            tile_id: TileEntity(tile_id, tiles_types[tile_id], self._on_tile_changed_callback)
+            for tile_id
+            in range(len(tiles_types))}
         self._assign_specific_initial_tile_overrides(tiles)
 
         tile_collection.update(tiles)
 
         return tile_collection
+
+    def set_on_tile_changed_callback(self, callback: Callable[[], None]) -> None:
+        self._on_tile_changed_callback = callback
 
     def _assign_specific_initial_tile_overrides(
             self,

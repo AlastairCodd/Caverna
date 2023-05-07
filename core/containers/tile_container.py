@@ -28,6 +28,8 @@ class TileContainer(object):
         self._tile_count: int = height * width
 
         self._tiles: Dict[int, TileEntity] = {}
+
+        tile_container_default.set_on_tile_changed_callback(self._on_tile_changed_callback)
         tile_container_default.assign(self._tiles)
 
     def get_number_of_tiles_of_type(self, tile_type: TileTypeEnum) -> int:
@@ -87,3 +89,6 @@ class TileContainer(object):
             raise ValueError("Effect Type may not be none")
         result = [effect for tile in self._tiles.values() if tile.has_effects for effect in tile.effects if isinstance(effect, effect_type)]
         return result
+
+    def _on_tile_changed_callback(self, tile_id: int, tile) -> None:
+        pass
