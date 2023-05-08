@@ -29,6 +29,7 @@ class TileContainer(object):
 
         self._tiles: Dict[int, TileEntity] = {}
 
+        self._cached_effects: Dict[T, List[T]] = {}
         tile_container_default.set_on_tile_changed_callback(self._on_tile_changed_callback)
         tile_container_default.assign(self._tiles)
 
@@ -88,8 +89,11 @@ class TileContainer(object):
         """Get a list of all of the effects which extend a certain base effect in this container"""
         if effect_type is None:
             raise ValueError("Effect Type may not be none")
+        if effect_type in self._cached_effects:
+            return self._cached_effects[effect_type]
         result = [effect for tile in self._tiles.values() if tile.has_effects for effect in tile.effects if isinstance(effect, effect_type)]
+        self._cached_effects[effect_type] = result
         return result
 
     def _on_tile_changed_callback(self, tile_id: int, tile) -> None:
-        pass
+        self._cached_effects.clear()
