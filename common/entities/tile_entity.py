@@ -17,6 +17,7 @@ class TileEntity(object):
         self._id = tile_id
         self._tile_type: TileTypeEnum = tile_type
         self._specific_tile: Optional[BaseTile] = base_tile
+        self._has_effects = False if base_tile is None else len(base_tile.effects) > 0
 
         self._has_stable: bool = has_stable
 
@@ -30,12 +31,7 @@ class TileEntity(object):
 
     @property
     def has_effects(self) -> bool:
-        result: bool
-        if self._specific_tile is None:
-            result = False
-        else:
-            result = len(self._specific_tile.effects) > 0
-        return result
+        return self._has_effects
 
     @property
     def effects(self) -> List[BaseEffect]:
@@ -71,12 +67,9 @@ class TileEntity(object):
         """Get a list of all of the effects which extend a certain base effect"""
         if effect_type is None:
             raise ValueError("Effect Type may not be none")
-        result: List[T]
-        if self._specific_tile is None or len(self._specific_tile.effects) == 0:
-            result = []
-        else:
-            result = [effect for effect in self._specific_tile.effects if isinstance(effect, effect_type)]
-        return result
+        if not self._has_effects:
+            return []
+        return [effect for effect in self._specific_tile.effects if isinstance(effect, effect_type)]
 
     def set_tile(
             self,
@@ -85,6 +78,7 @@ class TileEntity(object):
         #     raise ValueError("Cannot set specific tile; already has a tile")
         self._specific_tile = base_tile
         self._tile_type = base_tile.tile_type
+        self._has_effects = len(self._specific_tile.effects) > 0
 
     def give_stable(self) -> bool:
         result: bool = False
