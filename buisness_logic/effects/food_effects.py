@@ -23,6 +23,7 @@ class SubstituteFoodForDwarfEffect(FoodPerDwarfEffect):
         if substitute_with is None:
             raise ValueError("Cannot substitute with nothing")
         self._substitute_with: Dict[ResourceTypeEnum, int] = substitute_with
+        BaseEffect.__init__(self, False)
 
     def invoke(
             self,
@@ -82,6 +83,7 @@ class DiscountEffect(FoodGlobalEffect):
             raise ValueError("per condition representation may not be null or whitespace")
         self._conditional: Callable[[BasePlayerRepository], int] = conditional
         self._per_condition_repr: str = per_condition_repr
+        BaseEffect.__init__(self, False)
 
     def invoke(
             self,

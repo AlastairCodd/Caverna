@@ -17,6 +17,7 @@ class ReceiveWhenReceivingEffect(BaseEffect):
 
         self._items_to_receive: Dict[ResourceTypeEnum, int] = items_to_receive
         self._when_receiving_items: Dict[ResourceTypeEnum, int] = when_receiving_items
+        BaseEffect.__init__(self, False)
 
     def invoke(
             self,

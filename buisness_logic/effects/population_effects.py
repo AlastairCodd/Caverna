@@ -10,6 +10,7 @@ class BasePopulationEffect(BaseEffect, metaclass=ABCMeta):
 class IncreasePopulationCapacityEffect(BasePopulationEffect):
     def __init__(self, increase_capacity_by: int = 1):
         self._increase_capacity_by = increase_capacity_by
+        BaseEffect.__init__(self, False)
 
     @property
     def capacity(self) -> int:
@@ -19,6 +20,7 @@ class IncreasePopulationCapacityEffect(BasePopulationEffect):
 class IncreasePopulationMaximumEffect(BasePopulationEffect):
     def __init__(self, raise_maximum_by: int = 1):
         self._raise_maximum_by = raise_maximum_by
+        BaseEffect.__init__(self, False)
 
     @property
     def raise_maximum_population_by(self) -> int:

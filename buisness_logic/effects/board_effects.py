@@ -26,6 +26,7 @@ class ChangeRequisiteEffect(BaseBoardEffect):
 
         self._tiles: List[TileTypeEnum] = tiles
         self._newRequisites: List[TileTypeEnum] = new_requisites
+        BaseEffect.__init__(self, False)
 
     def invoke(
             self,

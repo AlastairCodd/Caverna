@@ -23,6 +23,7 @@ class StoreAnyAnimalEffect(BaseAnimalStorageEffect):
             quantity: int):
         """Add storage capacity for some number of any type of animal"""
         self._quantity: int = quantity
+        BaseEffect.__init__(self, False)
 
     def get_animal_storage_buckets(
             self,
@@ -98,7 +99,7 @@ class StoreConditionalAnimalEffect(BaseAnimalStorageEffect):
         self._animal_type: ResourceTypeEnum = animal_type
         self._condition: Callable[[BasePlayerRepository], int] = condition
         self._condition_repr: str = condition_repr
-        BaseEffect.__init__(self)
+        BaseEffect.__init__(self, False)
 
     def get_animal_storage_buckets(
             self,
@@ -150,6 +151,7 @@ class ChangeAnimalStorageBaseEffect(BaseEffect):
         self._animals_which_can_be_stored: Dict[ResourceTypeEnum, int] = animals_which_can_be_stored
         self._condition: Callable[[BasePlayerRepository, TileEntity], int] = condition
         self._condition_repr: str = condition_repr
+        BaseEffect.__init__(self, False)
 
     def get_animal_storage_buckets_for_tile(
             self,

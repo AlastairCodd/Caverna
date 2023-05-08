@@ -15,6 +15,7 @@ class ConvertEffect(BaseEffect):
         """
         self._input: Dict[ResourceTypeEnum, int] = input_items
         self._output: Dict[ResourceTypeEnum, int] = output_items
+        BaseEffect.__init__(self, False)
 
     @property
     def input(self) -> Dict[ResourceTypeEnum, int]:

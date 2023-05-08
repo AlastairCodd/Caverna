@@ -32,6 +32,7 @@ class BaseOccursForSeveralTurnsEffect(
         if number_of_turns < 1:
             raise IndexError("Number of turns must be positive")
         self._number_of_turns: int = number_of_turns
+        BaseEffect.__init__(self, True)
 
     def new_turn_reset(self) -> None:
         if self._number_of_turns > 0:
@@ -51,6 +52,7 @@ class ReceiveOnPurchaseEffect(
         if items_to_receive is None:
             raise ValueError("Items to Receive may not be null")
         self._items_to_receive: Dict[ResourceTypeEnum, int] = items_to_receive
+        BaseEffect.__init__(self, False)
 
     def invoke(self, player: BasePlayerRepository) -> bool:
         if player is None:
@@ -79,6 +81,7 @@ class ReceiveOnConvertFromEffect(BaseEffect):
             raise ValueError("Items to Receive may not be null")
         self._items_to_receive: Dict[ResourceTypeEnum, int] = items_to_receive
         self._convert_from_item: ResourceTypeEnum = when_converting_from
+        BaseEffect.__init__(self, False)
 
     @property
     def items_to_receive(self) -> Dict[ResourceTypeEnum, int]:
@@ -103,6 +106,7 @@ class ReceiveProportionalOnPurchaseEffect(
 
         self._receive: Dict[ResourceTypeEnum, int] = receive
         self._proportional_to: Dict[ResourceTypeEnum, int] = proportional_to
+        BaseEffect.__init__(self, False)
 
     # TODO: this needs to be run through the ActionOrderingService, and so should be returned in the get_player_choice method
     # Or does it... this is invoked _immediately_ after the tile is purchased, and with the vanilla tile set there is only ever one receive per tile
@@ -165,6 +169,7 @@ class ReceiveConditionallyAtStartOfTurnEffect(
             raise ValueError("Condition")
         self._received: Dict[ResourceTypeEnum, int] = received
         self._condition: Callable[[BasePlayerRepository], int] = condition
+        BaseEffect.__init__(self, False)
 
     def invoke(
             self,
@@ -235,6 +240,7 @@ class ReceiveWhenBreedingEffect(
             raise ValueErorr("conditional representation cannot be null or whitespace")
         self._conditional: Callable[[List[ResourceTypeEnum]], Dict[ResourceTypeEnum, int]] = conditional
         self._conditional_repr: str = conditional_repr
+        BaseEffect.__init__(self, False)
 
     def invoke(
             self,

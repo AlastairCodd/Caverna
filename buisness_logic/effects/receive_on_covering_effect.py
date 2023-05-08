@@ -13,6 +13,7 @@ class ReceiveOnCoveringEffect(BaseEffect):
             raise ValueError("Items to receive cannot be null")
 
         self._items_to_receive: Dict[ResourceTypeEnum, int] = items_to_receive
+        BaseEffect.__init__(self, False)
 
     @property
     def resources(self) -> Dict[ResourceTypeEnum, int]:
