@@ -63,7 +63,7 @@ class ReceiveOnPurchaseEffect(
     def __format__(self, format_spec):
        text = [("", "receive ")]
 
-       for (resource, amount) in self._receive.items():
+       for (resource, amount) in self._items_to_receive.items():
            text.append(("class:count", str(amount)))
            text.append(("", " "))
            text.append(("", resource.name))
