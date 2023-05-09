@@ -456,7 +456,15 @@ class KeyboardHumanPlayerService(BasePlayerService):
             if any_effects:
                 text.append(("", " has effects: "))
                 for (i, effect) in enumerate(current_tile.effects):
-                    text.extend(effect.__format__("pp"))
+                    formatted = effect.__format__("pp")
+                    if isinstance(formatted, str):
+                        patched_print(f"format for {effect!r} returned string")
+                        text.append(("", formatted))
+                    elif formatted is not None:
+                        text.extend(formatted)
+                    else:
+                        patched_print(f"format for {effect!r} invalid")
+                        text.append(("", repr(effect)))
                     if i < len(current_tile.effects) - 1:
                         text.append(("", ", "))
 
