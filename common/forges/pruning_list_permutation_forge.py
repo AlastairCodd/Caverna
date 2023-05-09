@@ -26,7 +26,7 @@ class PruningListPermutationForge(BaseListPermutationForge):
         if number_of_permutations > 500_000:
             number_of_permutations = 500_000
 
-        while self._index < number_of_permutations:
+        while self._index < number_of_permutations - 1:
             self._index += 1
             yield self.generate_list_permutation_for_index(list_to_permute, self._index, self._number_of_items_to_permute)
 
