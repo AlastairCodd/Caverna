@@ -112,6 +112,40 @@ class AllowSubstitutionForPurchaseEffect(BaseTilePurchaseEffect):
 
         return new_price
 
+    def __str__(self) -> str:
+        return __format__(self, "")
+
+    def __format__(self, format_spec):
+        text = [("", "Allow ")]
+        for (i, (resource, amount)) in enumerate(self._substitute_for.items()):
+            text.append(("class:count", str(amount)))
+            text.append(("", " "))
+            text.append(("class:resource", resource.name))
+            if amount != 1:
+                text.append(("class:resource", "s"))
+            if i != len(self._substitute_for) - 1:
+                text.append(("", ", "))
+
+        text.append(("", " to be substituted with "))
+
+        for (i, (resource, amount)) in enumerate(self._substitute_with.items()):
+            text.append(("class:count", str(amount)))
+            text.append(("", " "))
+            text.append(("class:resource", resource.name))
+            if amount != 1:
+                text.append(("class:resource", "s"))
+            if i != len(self._substitute_with) - 1:
+                text.append(("", ", "))
+
+        text.append(("", " when purchasing "))
+        text.append(("", "tiles"))
+
+        if "pp" in format_spec:
+            return text
+        if format_spec.isispace or not format_spec:
+            return "".join(e[1] for e in text)
+        raise ValueError(f"format spec must be either pp or whitespace, was {format_spec!r}")
+
 
 class BaseWeaponPurchaseEffect(BaseEffect, metaclass=ABCMeta):
     @abstractmethod
