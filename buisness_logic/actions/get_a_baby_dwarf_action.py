@@ -12,7 +12,7 @@ from core.constants import game_constants
 class GetABabyDwarfAction(BaseAction):
     def __init__(self) -> None:
         self._hash = hash(("get baby dwarf"))
-        BaseAction.__init__(self, "GetABabyDwarfAction")
+        BaseAction.__init__(self, "GetABabyDwarfAction", True, False, False)
 
     def invoke(
             self,

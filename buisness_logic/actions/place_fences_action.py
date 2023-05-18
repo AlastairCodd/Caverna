@@ -16,7 +16,7 @@ from core.services.base_player_service import BasePlayerService
 class PlaceFencesAction(BasePlayerChoiceAction):
     def __init__(self) -> None:
         self._hash = hash(("place fences"))
-        BaseAction.__init__(self, "PlaceFencesAction")
+        BaseAction.__init__(self, "PlaceFencesAction", False, False, False)
 
     def set_player_choice(
             self,
@@ -93,7 +93,7 @@ class PlaceFencesAction(BasePlayerChoiceAction):
 class PlaceFencesAndStableAction(BasePlayerChoiceAction):
     def __init__(self) -> None:
         self._hash = hash(("place fences and stable"))
-        BaseAction.__init__(self, "PlaceFencesAndStable")
+        BaseAction.__init__(self, "PlaceFencesAndStable", False, False, False)
 
     def set_player_choice(
             self,

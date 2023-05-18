@@ -32,7 +32,7 @@ class CheckAnimalStorageAction(BaseAction):
         ]
 
         self._hash = self._precompute_hash()
-        BaseAction.__init__(self, "CheckAnimalStorageAction")
+        BaseAction.__init__(self, "CheckAnimalStorageAction", False, False, False)
 
     def invoke(
             self,

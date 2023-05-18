@@ -29,7 +29,7 @@ class PlaceAStableAction(BasePlayerChoiceAction):
         self._turn_descriptor: Optional[TurnDescriptorLookup] = None
 
         self._hash = self._precompute_hash()
-        BaseAction.__init__(self, "PlaceAStableAction")
+        BaseAction.__init__(self, "PlaceAStableAction", True, False, False)
 
     def set_player_choice(
             self,

@@ -31,7 +31,7 @@ class ConvertSingleAction(BaseAction, BaseReceiveEventService):
         self._number_of_times: int = number_of_times
 
         self._hash = self._precompute_hash()
-        BaseAction.__init__(self, "ConvertSingleAction")
+        BaseAction.__init__(self, "ConvertSingleAction", True, False, False)
 
     def invoke(
             self,

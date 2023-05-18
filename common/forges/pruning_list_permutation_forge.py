@@ -23,8 +23,8 @@ class PruningListPermutationForge(BaseListPermutationForge):
         # this will be immediately incremented on entering the loop
         self._index = -1
 
-        if number_of_permutations > 500_000:
-            number_of_permutations = 500_000
+#        if number_of_permutations > 500_000:
+#            number_of_permutations = 500_000
 
         while self._index < number_of_permutations - 1:
             self._index += 1

@@ -12,7 +12,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 class HarvestFieldAction(BaseAction, BaseReceiveEventService):
     def __init__(self) -> None:
         self._hash = self._precompute_hash()
-        BaseAction.__init__(self, "HarvestFieldAction")
+        BaseAction.__init__(self, "HarvestFieldAction", True, False, False)
 
     def invoke(
             self,

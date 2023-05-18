@@ -7,7 +7,6 @@ from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.enums.caverna_enums import ResourceTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
@@ -24,7 +23,7 @@ class FeedDwarvesAction(BasePlayerChoiceAction):
         self._effects_to_use: List[BaseFoodEffect] = []
 
         self._hash = self._precompute_hash()
-        BasePlayerChoiceAction.__init__(self, "FeedDwarvesAction")
+        BasePlayerChoiceAction.__init__(self, "FeedDwarvesAction", True, False, False)
 
     def set_player_choice(
             self,
@@ -49,8 +48,8 @@ class FeedDwarvesAction(BasePlayerChoiceAction):
     def invoke(
             self,
             player: BasePlayerRepository,
-            active_card: BaseCard,
-            current_dwarf: Dwarf) -> ResultLookup[int]:
+            unused_active_card,
+            unused_current_dwarf) -> ResultLookup[int]:
         if player is None:
             raise ValueError("Player may not be None")
 

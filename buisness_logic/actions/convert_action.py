@@ -16,7 +16,7 @@ from core.services.base_player_service import BasePlayerService
 class ConvertAction(BaseReceiveEventService, BasePlayerChoiceAction):
     def __init__(self) -> None:
         self._hash = self._precompute_hash()
-        BasePlayerChoiceAction.__init__(self, "ConvertAction")
+        BasePlayerChoiceAction.__init__(self, "ConvertAction", False, False, False)
 
     def set_player_choice(
             self,

@@ -19,7 +19,7 @@ class PayAction(BaseAction):
         self._paying_for: Any = paying_for
 
         self._hash = self._precompute_hash()
-        BaseAction.__init__(self, "PayAction")
+        BaseAction.__init__(self, "PayAction", True, False, False)
 
     def invoke(
             self,

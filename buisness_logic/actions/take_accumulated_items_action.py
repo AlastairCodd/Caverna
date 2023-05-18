@@ -10,7 +10,7 @@ from core.containers.resource_container import ResourceContainer
 class TakeAccumulatedItemsAction(BaseReceiveEventService, BaseAction):
     def __init__(self) -> None:
         self._hash = hash("take accumulated items")
-        BaseAction.__init__(self, "TakeAccumulatedItemsAction")
+        BaseAction.__init__(self, "TakeAccumulatedItemsAction", True, True, False)
 
     def invoke(
             self,

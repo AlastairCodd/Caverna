@@ -12,7 +12,7 @@ class BecomeStartingPlayerAction(BaseAction):
         self._starting_player_next_turn: Optional[BasePlayerRepository] = None
 
         self._hash = self._precompute_hash()
-        BaseAction.__init__(self, "BecomeStartingPlayerAction")
+        BaseAction.__init__(self, "BecomeStartingPlayerAction", False, True, False)
 
     def invoke(
             self,

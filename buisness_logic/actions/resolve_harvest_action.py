@@ -29,7 +29,7 @@ class ResolveHarvestAction(BasePlayerChoiceAction):
         self._use_harvest_action_instead_of_breeding: Optional[boolean] = None
 
         self._hash = self._precompute_hash()
-        BaseAction.__init__(self, "ResolveHarvestAction")
+        BaseAction.__init__(self, "ResolveHarvestAction", False, False, False)
 
     def set_player_choice(
             self,

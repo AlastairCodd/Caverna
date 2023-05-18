@@ -14,7 +14,12 @@ class ActivateDwarfAction(BaseAction):
         self._card_to_activate: Optional[BaseCard] = card_to_activate
 
         self._hash: int = self._precompute_hash()
-        BaseAction.__init__(self, "ActivateDwarfAction")
+        BaseAction.__init__(
+            self,
+            "ActivateDwarfAction",
+            False,
+            True,
+            True)
 
     def invoke(
             self,

@@ -48,7 +48,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
         self._turn_descriptor: Optional[TurnDescriptorLookup] = None
 
         self._hash = self._precompute_hash()
-        BaseAction.__init__(self, "PlaceASingleTileAction")
+        BaseAction.__init__(self, "PlaceASingleTileAction", True, False, False)
 
     def set_player_choice(
             self,

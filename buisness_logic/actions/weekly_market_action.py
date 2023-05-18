@@ -32,7 +32,7 @@ class WeeklyMarketAction(BasePlayerChoiceAction):
         }
 
         self._hash = self._precompute_hash()
-        BaseAction.__init__(self, "WeeklyMarketAction")
+        BaseAction.__init__(self, "WeeklyMarketAction", False, False, False)
 
     def set_player_choice(
             self,

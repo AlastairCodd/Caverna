@@ -20,7 +20,7 @@ class GiveDwarfAWeaponAction(BasePlayerChoiceAction):
         self._level_of_weapon: Optional[int] = None
 
         self._hash = hash(("give dwarf weapon"))
-        BaseAction.__init__(self, "GiveDwarfAWeaponAction")
+        BaseAction.__init__(self, "GiveDwarfAWeaponAction", True, False, True)
 
     def set_player_choice(
             self,

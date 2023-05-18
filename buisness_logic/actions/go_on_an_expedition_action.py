@@ -66,7 +66,7 @@ class GoOnAnExpeditionAction(BasePlayerChoiceAction):
         self._chosen_actions_and_levels: List[Tuple[BaseAction, int]] = []
 
         self._hash = self._precompute_hash()
-        BaseAction.__init__(self, "GoOnAnExpeditionAction")
+        BaseAction.__init__(self, "GoOnAnExpeditionAction", False, False, False) # read only access of current dwarves
 
     def set_player_choice(
             self,

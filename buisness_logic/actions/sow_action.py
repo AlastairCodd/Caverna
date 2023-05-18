@@ -20,7 +20,7 @@ class SowAction(BasePlayerChoiceAction):
         self._resources_to_sow: Optional[ResourcesToSow] = None
 
         self._hash = self._precompute_hash()
-        BaseAction.__init__(self, "SowAction")
+        BaseAction.__init__(self, "SowAction", True, False, False)
 
     def set_player_choice(
             self,

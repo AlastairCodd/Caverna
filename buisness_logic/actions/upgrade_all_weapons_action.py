@@ -10,7 +10,7 @@ from core.baseClasses.base_card import BaseCard
 class UpgradeAllWeaponsAction(BaseAction):
     def __init__(self) -> None:
         self._hash = hash("upgrade all weapons")
-        BaseAction.__init__(self, "UpgradeAllWeaponsAction")
+        BaseAction.__init__(self, "UpgradeAllWeaponsAction", True, False, True)
 
     def invoke(
             self,
