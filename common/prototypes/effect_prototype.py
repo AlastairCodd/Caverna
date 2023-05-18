@@ -15,12 +15,10 @@ class EffectPrototype(BaseImmutablePrototype[BaseEffect]):
         if source is None:
             raise ValueError("Source may not be None")
 
-        result: BaseEffect
-        if source.__class__ in self._complex_effect_generation_methods:
-            result = self._complex_effect_generation_methods[source.__class__](source)
-        else:
-            result = source
+        if not source.holds_state:
+            return source
 
+        result = self._complex_effect_generation_methods[source.__class__](source)
         return result
 
     def _clone_allow_farming_effect(
