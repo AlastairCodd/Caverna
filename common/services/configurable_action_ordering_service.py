@@ -96,6 +96,8 @@ class ConfigurableActionOrderingService(ActionOrderingService):
 
         constraint_validator = self._constraint_validator_func(actions.constraints)
 
+        activate_dwarf_action: ActivateDwarfAction = [action for action in actions.actions if isinstance(action, ActivateDwarfAction)][0]
+
         for permutation in permutations:
             if not self._does_pass_all_constraints(permutation, constraint_validator):
                 #print(f"permutation {permutation_index} does not pass constraints")
@@ -121,21 +123,22 @@ class ConfigurableActionOrderingService(ActionOrderingService):
             action: BaseAction
             for (i, action) in enumerate(permutation):
                 action_result: ResultLookup[int]
-                if isinstance(action, ActivateDwarfAction):
-                    action_result = ResultLookup(True, 1)
-                else:
-                    action_result = action.invoke(player_copy, card_copy, dwarf_copy)
+                if action is activate_dwarf_action:
+                    successes += 1
+                    continue
+
+                action_result = action.invoke(player_copy, card_copy, dwarf_copy)
 
                 errors_for_permutation.extend(action_result.errors)
 
-                if action_result.flag:
-                    #print(f"  success: action {action:4}")
-                    successes += action_result.value
-                else:
+                if not action_result.flag:
                     #print(f"  *** FAIL: action {action:4}")
                     success = False
                     self._permutation_forge.mark_last_permutation_as_invalid(i)
                     break
+
+                #print(f"  success: action {action:4}")
+                successes += action_result.value
 
             if success:
                 success_result: Tuple[List[BaseAction], int, BasePlayerRepository] = (permutation, successes, player_copy)
