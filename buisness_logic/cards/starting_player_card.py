@@ -13,7 +13,7 @@ class StartingPlayerRubyCard(BaseResourceContainingCard):
             self, "Starting Player", card_ids.StartingPlayerRubyCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 Conditional(
                     ActionCombinationEnum.AndThen,
                     become_starting_player_action.BecomeStartingPlayerAction(),
@@ -31,7 +31,7 @@ class StartingPlayerOreCard(BaseResourceContainingCard):
             self, "Starting Player", card_ids.StartingPlayerOreCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 Conditional(
                     ActionCombinationEnum.AndThen,
                     become_starting_player_action.BecomeStartingPlayerAction(),

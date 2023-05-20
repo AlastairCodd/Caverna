@@ -18,7 +18,7 @@ class BaseOreMiningCard(BaseResourceContainingCard, metaclass=ABCMeta):
             self, "Ore Mining", tile_id,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 receive_conditionally_action.ReceiveConditionallyAction(
                     self._condition,
                     {ResourceTypeEnum.ore: 2},

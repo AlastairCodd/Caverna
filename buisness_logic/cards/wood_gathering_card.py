@@ -10,7 +10,7 @@ class WoodGatheringCard(BaseResourceContainingCard):
     def __init__(self) -> None:
         BaseResourceContainingCard.__init__(
             self, "Wood Gathering", card_ids.WoodGatheringCardId,
-            actions=TakeAccumulatedItemsAction())
+            actions=TakeAccumulatedItemsAction(False))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         newResources = {ResourceTypeEnum.wood: 1}

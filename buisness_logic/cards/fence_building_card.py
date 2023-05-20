@@ -13,7 +13,7 @@ class FenceBuildingSmallCard(BaseResourceContainingCard):
             self, "Fence Building", card_ids.FenceBuildingSmallCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 place_fences_action.PlaceFencesAction()))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
@@ -28,7 +28,7 @@ class FenceBuildingLargeCard(BaseResourceContainingCard):
             self, "Fence Building", card_ids.FenceBuildingLargeCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 place_fences_action.PlaceFencesAction()))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

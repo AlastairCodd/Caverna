@@ -13,7 +13,7 @@ class ForestExplorationFoodCard(BaseResourceContainingCard):
             self, "Forest Exploration", card_ids.ForestExplorationFoodCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 receive_action.ReceiveAction({ResourceTypeEnum.food: 2})))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
@@ -29,7 +29,7 @@ class ForestExplorationVegCard(BaseResourceContainingCard):
             self, "Forest Exploration", card_ids.ForestExplorationVegCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 receive_action.ReceiveAction({ResourceTypeEnum.veg: 1})))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

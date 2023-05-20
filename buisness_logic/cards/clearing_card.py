@@ -15,7 +15,7 @@ class ClearingCard(BaseResourceContainingCard):
             self, "Clearing", card_ids.ClearingCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.meadowFieldTwin)))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

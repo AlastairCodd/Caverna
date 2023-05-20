@@ -1,16 +1,36 @@
+from buisness_logic.actions.check_animal_storage_action import CheckAnimalStorageAction
 from buisness_logic.services.base_receive_event_service import BaseReceiveEventService
+from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
-from core.baseClasses.base_action import BaseAction
-from core.repositories.base_player_repository import BasePlayerRepository
+from common.entities.precedes_constraint import PrecedesConstraint
 from common.entities.result_lookup import ResultLookup
+from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.baseClasses.base_card import BaseCard
 from core.containers.resource_container import ResourceContainer
+from core.repositories.base_player_repository import BasePlayerRepository
 
 
-class TakeAccumulatedItemsAction(BaseReceiveEventService, BaseAction):
-    def __init__(self) -> None:
+class TakeAccumulatedItemsAction(BaseReceiveEventService, BasePlayerChoiceAction):
+    def __init__(
+            self,
+            is_receiving_farm_animals: bool) -> None:
         self._hash = hash("take accumulated items")
-        BaseAction.__init__(self, "TakeAccumulatedItemsAction", True, True, False)
+        self._is_receiving_farm_animals = is_receiving_farm_animals
+        BasePlayerChoiceAction.__init__(self, "TakeAccumulatedItemsAction", True, True, False)
+
+    def set_player_choice(
+            self,
+            unused_player,
+            unused_dwarf,
+            unused_turn_descriptor) -> ResultLookup[ActionChoiceLookup]:
+        action_choice: ActionChoiceLookup
+        if self._is_receiving_farm_animals:
+            action: BaseAction = CheckAnimalStorageAction()
+            precedes_constraint: BaseConstraint = PrecedesConstraint(self, action)
+            action_choice = ActionChoiceLookup([action], [precedes_constraint])
+        else:
+            action_choice = ActionChoiceLookup([])
+        return ResultLookup(True, action_choice)
 
     def invoke(
             self,

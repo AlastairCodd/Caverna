@@ -13,7 +13,7 @@ class LoggingOneCard(BaseResourceContainingCard):
             self, "Logging", card_ids.LoggingOneCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 go_on_an_expedition_action.GoOnAnExpeditionAction(1)))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
@@ -28,7 +28,7 @@ class LoggingThreeCard(BaseResourceContainingCard):
             self, "Logging", card_ids.LoggingThreeCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 go_on_an_expedition_action.GoOnAnExpeditionAction(1)))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

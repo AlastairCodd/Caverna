@@ -15,7 +15,7 @@ class DonkeyFarmingCard(BaseResourceContainingCard):
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
                 place_fences_action.PlaceFencesAndStableAction(),
-                take_accumulated_items_action.TakeAccumulatedItemsAction()))
+                take_accumulated_items_action.TakeAccumulatedItemsAction(True)))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         self.give_resource(ResourceTypeEnum.donkey, 1)

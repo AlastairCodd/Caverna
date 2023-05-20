@@ -10,7 +10,7 @@ class DepotCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
             self, "Depot", card_ids.DepotCardId,
-            actions=take_accumulated_items_action.TakeAccumulatedItemsAction())
+            actions=take_accumulated_items_action.TakeAccumulatedItemsAction(False))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         newResources = {
@@ -25,7 +25,7 @@ class LargeDepotCard(BaseResourceContainingCard):
     def __init__(self):
         BaseResourceContainingCard.__init__(
             self, "Large Depot", card_ids.LargeDepotCardId,
-            actions=take_accumulated_items_action.TakeAccumulatedItemsAction())
+            actions=take_accumulated_items_action.TakeAccumulatedItemsAction(False))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
         amount_of_wood: int = 1 if self.has_resources else 2

@@ -14,7 +14,7 @@ class RubyDeliveryCard(BaseResourceContainingCard):
             self, "Ruby Delivery", card_ids.RubyDeliveryCardId, 4,
             Conditional(
                 ActionCombinationEnum.AndThen,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 receive_conditionally_action.ReceiveConditionallyAction(
                     self._condition,
                     {ResourceTypeEnum.ruby: 1},

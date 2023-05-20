@@ -13,7 +13,7 @@ class ExcavationTwoCard(BaseResourceContainingCard):
             self, "Excavation", card_ids.ExcavationTwoStoneCardId,
             actions=Conditional(
                 ActionCombinationEnum.OrAndThenStrict,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 Conditional(
                     ActionCombinationEnum.Or,
                     place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.cavernTunnelTwin),
@@ -32,7 +32,7 @@ class ExcavationOneCard(BaseResourceContainingCard):
             self, "Excavation", card_ids.ExcavationOneStoneCardId,
             actions=Conditional(
                 ActionCombinationEnum.OrAndThenStrict,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 Conditional(
                     ActionCombinationEnum.Or,
                     place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.cavernTunnelTwin),

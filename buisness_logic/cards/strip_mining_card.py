@@ -14,7 +14,7 @@ class StripMiningCard(BaseResourceContainingCard):
             self, "Strip Mining", card_ids.StripMiningCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThen,
-                TakeAccumulatedItemsAction(),
+                TakeAccumulatedItemsAction(False),
                 ReceiveAction({ResourceTypeEnum.wood: 2})
             ))
 

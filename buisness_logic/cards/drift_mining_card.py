@@ -13,7 +13,7 @@ class DriftMiningTwoStoneCard(BaseResourceContainingCard):
             self, "Drift Mining", card_ids.DriftMiningTwoStoneCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.cavernTunnelTwin)))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:
@@ -28,7 +28,7 @@ class DriftMiningOneStoneCard(BaseResourceContainingCard):
             self, "Drift Mining", card_ids.DriftMiningOneStoneCardId,
             actions=Conditional(
                 ActionCombinationEnum.AndThenOr,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 place_a_twin_tile_action.PlaceATwinTileAction(TileTypeEnum.cavernTunnelTwin)))
 
     def refill_action(self) -> Dict[ResourceTypeEnum, int]:

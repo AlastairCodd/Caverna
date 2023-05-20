@@ -15,7 +15,7 @@ class OreDeliveryCard(BaseResourceContainingCard):
             self, "Ore Delivery", card_ids.OreDeliveryCardId, 3,
             Conditional(
                 ActionCombinationEnum.AndThen,
-                take_accumulated_items_action.TakeAccumulatedItemsAction(),
+                take_accumulated_items_action.TakeAccumulatedItemsAction(False),
                 receive_conditionally_action.ReceiveConditionallyAction(self._condition, {ResourceTypeEnum.ore: 2}, "for each ore mine")
         ))
 
