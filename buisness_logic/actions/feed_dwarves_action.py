@@ -85,23 +85,26 @@ class FeedDwarvesAction(BasePlayerChoiceAction):
         for resource, amount_of_resource_required in resources_required.items():
             amount_of_resource_player_has: int = player.get_resources_of_type(resource)
 
-            if resource == ResourceTypeEnum.food:
-                food_deficit: int = amount_of_resource_required - amount_of_resource_player_has
-                if food_deficit > 0:
-                    resources_to_take[resource] = amount_of_resource_player_has
-                    resources_to_give[ResourceTypeEnum.begging_marker] = food_deficit * 3
-            elif amount_of_resource_required > amount_of_resource_player_has:
+            if resource != ResourceTypeEnum.food:
                 errors.append(f"Effect was used to attempt to feed dwarves with {amount_of_resource_required}, only had {amount_of_resource_player_has}")
+                continue
+            if amount_of_resource_required <= amount_of_resource_player_has:
+                continue
+            food_deficit: int = amount_of_resource_required - amount_of_resource_player_has
+            if food_deficit > 0:
+                resources_to_take[resource] = amount_of_resource_player_has
+                resources_to_give[ResourceTypeEnum.begging_marker] = food_deficit * 3
 
         result: ResultLookup[int]
-        if len(errors) == 0:
-            success: bool = player.take_resources(resources_to_take)
-            if len(resources_to_give) > 0 and success:
-                success = player.give_resources(resources_to_give)
+        if len(errors) != 0:
+            return ResultLookup(errors=errors)
 
-            result = ResultLookup(success, sum(resources_to_take.values()))
-        else:
-            result = ResultLookup(errors=errors)
+        success: bool = player.take_resources(resources_to_take)
+
+        if len(resources_to_give) > 0 and success:
+            success = player.give_resources(resources_to_give)
+
+        result = ResultLookup(success, sum(resources_to_take.values()))
         return result
 
     def new_turn_reset(self) -> None:

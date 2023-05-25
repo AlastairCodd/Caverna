@@ -57,7 +57,7 @@ class ResourceContainer(object):
 
     def take_resource(self, resource_type: ResourceTypeEnum, amount: int) -> int:
         if amount <= 0:
-            raise ValueError("Amount must be positive")
+            raise ValueError(f"Can only take a positive amount ({amount=}) of resources ({resource_type.name})")
 
         current_amount: int = self._resources.setdefault(resource_type, 0)
         if current_amount < amount:
@@ -73,9 +73,12 @@ class ResourceContainer(object):
 
         success: bool = self.has_more_resources_than(resources)
 
-        if success:
-            for resource in resources:
-                self.take_resource(resource, resources[resource])
+        if not success:
+            return False
+        for (resource, amount) in resources.items():
+            if amount == 0:
+                continue
+            self.take_resource(resource, amount)
         return success
 
     def clear_resources(self) -> bool:
