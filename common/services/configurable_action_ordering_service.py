@@ -145,7 +145,7 @@ class ConfigurableActionOrderingService(ActionOrderingService):
                 successes += action_result.value
 
             if success:
-                success_result: Tuple[List[BaseAction], int, BasePlayerRepository] = (permutation, successes, player_copy)
+                success_result: Tuple[List[BaseAction], int, BasePlayerRepository] = (list(permutation), successes, player_copy)
                 successful_permutations.append(success_result)
             else:
                 permutation_result: ResultLookup[int] = ResultLookup(success, successes, errors_for_permutation)
