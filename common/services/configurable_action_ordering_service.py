@@ -118,12 +118,16 @@ class ConfigurableActionOrderingService(ActionOrderingService):
             successes: int = 0
             errors_for_permutation: List[str] = []
 
-            #print(f"considering permutation {permutation_index}")
+            #print(f"[DBG] considering permutation {permutation_index}")
 
             action: BaseAction
             for (i, action) in enumerate(permutation):
+                if not success: 
+                    #print(f"[DBG]        _: action {i}: {action:4}")
+                    continue
                 action_result: ResultLookup[int]
                 if action is activate_dwarf_action:
+                    #print(f"[DBG]  success: action {i} {action:4}")
                     successes += 1
                     continue
 
@@ -132,12 +136,12 @@ class ConfigurableActionOrderingService(ActionOrderingService):
                 errors_for_permutation.extend(action_result.errors)
 
                 if not action_result.flag:
-                    #print(f"  *** FAIL: action {action:4}")
+                    #print(f"[DBG] *** FAIL: action {i} {action:4}")
                     success = False
                     self._permutation_forge.mark_last_permutation_as_invalid(i)
                     break
 
-                #print(f"  success: action {action:4}")
+                #print(f"[DBG]  success: action {i} {action:4}")
                 successes += action_result.value
 
             if success:
@@ -146,7 +150,7 @@ class ConfigurableActionOrderingService(ActionOrderingService):
             else:
                 permutation_result: ResultLookup[int] = ResultLookup(success, successes, errors_for_permutation)
                 unsuccessful_permutations.append(permutation_result)
-            #print()
+            #print("[VRB]")
             permutation_index += 1
 
         self.reset(turn_descriptor)
@@ -154,13 +158,19 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         permutation_ordering_service: BasePermutationOrderingService
         ranked_results: List[Tuple[List[BaseAction], int, BasePlayerRepository]] = successful_permutations
 
-        print(f"permutations considered: {len(unsuccessful_permutations)}/{permutation_index}")
-        if not any(ranked_results):
+        number_of_successful_permutations = len(successful_permutations)
+        number_of_unsuccessful_permutations = len(unsuccessful_permutations)
+        total_permutations_that_passed_constraints = number_of_successful_permutations + number_of_unsuccessful_permutations 
+        print(f"[INF] permutations considered: {total_permutations_that_passed_constraints}/{permutation_index} passed the constraint check, {number_of_successful_permutations}/{total_permutations_that_passed_constraints} are possible")
+        if not any(successful_permutations):
             errors: List[str] = ["There is not a permutation which allows for all actions to be performed"]
             for partition in unsuccessful_permutations:
                 errors.extend(partition.errors)
             errors = list(set(errors))
             return ResultLookup(errors=errors)
+
+        permutation_ordering_service: BasePermutationOrderingService
+        ranked_results: List[Tuple[List[BaseAction], int, BasePlayerRepository]] = successful_permutations
 
         for permutation_ordering_service in self._permutation_ordering_services:
             ordering_result: ResultLookup[List[Tuple[List[BaseAction], int, BasePlayerRepository]]] = permutation_ordering_service \
@@ -198,4 +208,11 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         if index_of_first_action == -1:
             return True
         self._permutation_forge.mark_last_permutation_as_invalid(index_of_first_action)
+#        print(f"[DBG] permutation does not pass constraints; failed at {index_of_first_action}")
+#        for action in permutation[:index_of_first_action]:
+#            print(f"[DBG]          action {action:8}")
+#        print(f"[DBG] ## fail: action {permutation[index_of_first_action]:8}")
+#        for action in permutation[index_of_first_action+1:]:
+#            print(f"[DBG] skipped: action {action:8}")
+#        print("[VRB]")
         return False
