@@ -22,13 +22,11 @@ class AllocationFreeListPermutationForge(BaseListPermutationForge):
         self._number_of_items_to_permute: int = len(list_to_permute)
         self._factorial_cache = [math.factorial(i) for i in range(self._number_of_items_to_permute)]
 
-        number_of_permutations: int = self._factorial_cache[-1]
+        number_of_permutations: int = self._factorial_cache[-1] * self._number_of_items_to_permute
+        print(f"{self._number_of_items_to_permute=}, {number_of_permutations=}")
         # this will be immediately incremented on entering the loop
         self._index = -1
         self._result = [0 for _ in self._factorial_cache]
-
-        if number_of_permutations > 50_000_000:
-            number_of_permutations = 50_000_000
 
         while self._index < number_of_permutations - 1:
             self._index += 1
