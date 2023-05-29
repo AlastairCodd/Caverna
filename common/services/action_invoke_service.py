@@ -1,4 +1,5 @@
 from typing import List, Optional
+import logging
 
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -8,6 +9,7 @@ from common.services.configurable_action_ordering_service import ConfigurableAct
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_action_ordering_service import ActionOrderingService
 from core.baseClasses.base_card import BaseCard
+from core.constants.logging import DollarMessage as __
 from core.repositories.base_player_repository import BasePlayerRepository
 
 
@@ -46,12 +48,12 @@ class ActionInvokeService(object):
             errors.extend(actions_best_order.errors)
             return ResultLookup(errors=errors)
 
-        print("> returned valid action ordering")
+        logging.info("> returned valid action ordering")
 
         successful_actions: int = 0
 
         for action in actions_best_order.value:
-            print(f"  > Invoking {action}")
+            logging.info(__("  > Invoking {action}", action=action))
 
             invoke_result: ResultLookup[int] = action.invoke(
                 player,
@@ -64,7 +66,7 @@ class ActionInvokeService(object):
                 errors.extend(invoke_result.errors)
                 return ResultLookup(errors=errors)
 
-            print(f"    > Success, {invoke_result.value} actions")
+            logging.debug(__("    > Success, {successes} actions", successes=invoke_result.value))
             successful_actions += invoke_result.value
 
         result: ResultLookup[int] = ResultLookup(True, successful_actions)

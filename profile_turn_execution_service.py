@@ -193,6 +193,14 @@ class DeterministicPlayer(BasePlayerService):
 
 if __name__ == "__main__":
     import cProfile
+    import logging
+    from core.constants.logging import VERBOSE_LOG_LEVEL
+
+    logging.basicConfig(
+#            filename="profiles/debug.log",
+            format='[%(levelname)-8s] %(message)s',
+            level=VERBOSE_LOG_LEVEL)
+    logging.addLevelName(VERBOSE_LOG_LEVEL, "VERBOSE")
 
 #    cProfile.run("main_exhaustive()", "profiles/turn_execution_service_profile.exhaustive")
 #    cProfile.run("main_pruning()", "profiles/turn_execution_service_profile.pruning")

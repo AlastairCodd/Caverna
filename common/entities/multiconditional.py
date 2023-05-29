@@ -1,4 +1,5 @@
 from typing import Dict, Callable, Any, Union
+import warnings
 
 from core.baseClasses.base_action import BaseAction
 from core.enums.caverna_enums import ActionCombinationEnum
@@ -19,7 +20,6 @@ class Conditional(Resettable):
         self._condition1: Union[BaseAction, 'Conditional'] = condition1
         self._condition2: Union[BaseAction, 'Conditional'] = condition2
         self._type: ActionCombinationEnum = combination_type
-        self._logging = True
 
     def get_left_branch(self) -> Union[BaseAction, 'Conditional']:
         if self._condition1 is self:
@@ -65,8 +65,7 @@ class Conditional(Resettable):
     def _ensure_colour_printable(self, formatted):
         if isinstance(formatted, list):
             return formatted
-        if self._logging:
-            print(f"[WRN] forcing colour printable result: action={formatted}")
+        warnings.warn(f"forcing colour printable result: action={formatted}")
         return [("", formatted)]
 
     def _get_colour_printable(self, left_formatted, right_formatted, newline_separator):

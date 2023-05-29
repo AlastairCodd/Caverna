@@ -1,7 +1,9 @@
 import math
 from typing import TypeVar, List, Generator
+import logging
 
 from core.forges.base_list_permutation_forge import BaseListPermutationForge
+from core.constants.logging import DollarMessage as __
 
 T = TypeVar("T")
 
@@ -23,7 +25,10 @@ class AllocationFreeListPermutationForge(BaseListPermutationForge):
         self._factorial_cache = [math.factorial(i) for i in range(self._number_of_items_to_permute)]
 
         number_of_permutations: int = self._factorial_cache[-1] * self._number_of_items_to_permute
-        print(f"{self._number_of_items_to_permute=}, {number_of_permutations=}")
+        logging.debug(__(
+            "permuting {i} items, {p} possible permutations",
+            i=self._number_of_items_to_permute,
+            p=number_of_permutations))
         # this will be immediately incremented on entering the loop
         self._index = -1
         self._result = [0 for _ in self._factorial_cache]

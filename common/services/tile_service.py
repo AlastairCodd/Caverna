@@ -162,7 +162,7 @@ class TileService(object):
         for available_tile in turn_descriptor.tiles:
             if available_tile.id == tile.id:
                 return True
-        print("cant find tile", tile, list(map(lambda x: x.name, turn_descriptor.tiles)))
+        warnings.warn("cant find tile", tile, list(map(lambda x: x.name, turn_descriptor.tiles)))
         return False
 
     def can_place_tile_at_location(

@@ -1,4 +1,5 @@
 from functools import reduce
+import logging
 from typing import List, Iterable, Tuple, Union, Optional, Callable
 
 from buisness_logic.actions.activate_dwarf_action import ActivateDwarfAction
@@ -16,6 +17,7 @@ from core.baseClasses.base_constraint import BaseConstraint
 from core.baseClasses.base_prototype import BaseImmutablePrototype
 from core.baseClasses.base_permutation_ordering_service import BasePermutationOrderingService
 from core.baseClasses.base_tile import BaseTile
+from core.constants.logging import VERBOSE_LOG_LEVEL, DollarMessage as __
 from core.forges.base_list_permutation_forge import BaseListPermutationForge
 from core.services.base_constraint_validator import BaseConstraintValidator
 from core.exceptions.invalid_operation_error import InvalidOperationError
@@ -61,6 +63,8 @@ class ConfigurableActionOrderingService(ActionOrderingService):
 
         self._turn_descriptor_tiles: Optional[List[BaseTile]] = None
         self._debug_flag_do_not_invoke_actions: bool = False
+        self._logger = logging.getLogger(__name__)
+        self._logger.setLevel(logging.INFO)
 
     def calculate_best_order(
             self,
@@ -78,12 +82,12 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         if current_dwarf is None:
             raise ValueError
 
-        print(f"[DBG] ordering {len(actions.actions)} actions")
+        self._logger.info(__("ordering {number_of_actions} actions", number_of_actions=len(actions.actions)))
         for action in actions.actions:
-            print(f"[VRB]   {action!r}")
-        print(f"[DBG] with {len(actions.constraints)} constraints")
+            self._logger.debug(__("  {action!r}", action=action))
+        self._logger.info(__("with {number_of_constraints} constraints", number_of_constraints=len(actions.constraints)))
         for constraint in actions.constraints:
-            print(f"[VRB]   {constraint!r}")
+            self._logger.debug(__("   {constraint!r}", constraint=constraint))
 
         successful_permutations: List[Tuple[List[BaseAction], int, BasePlayerRepository]] = []
         unsuccessful_permutations: List[ResultLookup[int]] = []
@@ -99,8 +103,9 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         activate_dwarf_action: ActivateDwarfAction = [action for action in actions.actions if isinstance(action, ActivateDwarfAction)][0]
 
         for permutation in permutations:
+            self._logger.log(VERBOSE_LOG_LEVEL, "")
             if not self._does_pass_all_constraints(permutation, constraint_validator):
-                #print(f"permutation {permutation_index} does not pass constraints")
+                self._logger.log(VERBOSE_LOG_LEVEL, __("permutation {permutation_index} does not pass constraints", permutation_index=permutation_index))
                 permutation_index += 1
                 continue
             if self._debug_flag_do_not_invoke_actions:
@@ -118,16 +123,16 @@ class ConfigurableActionOrderingService(ActionOrderingService):
             successes: int = 0
             errors_for_permutation: List[str] = []
 
-            #print(f"[DBG] considering permutation {permutation_index}")
+            self._logger.debug(__("considering permutation {i}", i=permutation_index))
 
             action: BaseAction
             for (i, action) in enumerate(permutation):
                 if not success: 
-                    #print(f"[DBG]        _: action {i}: {action:4}")
+                    self._logger.debug(__("       _: action {i}: {action!r}", i=i, action=action))
                     continue
                 action_result: ResultLookup[int]
                 if action is activate_dwarf_action:
-                    #print(f"[DBG]  success: action {i} {action:4}")
+                    self._logger.debug(__(" success: action {i}: {action!r}", i=i, action=action))
                     successes += 1
                     continue
 
@@ -136,12 +141,12 @@ class ConfigurableActionOrderingService(ActionOrderingService):
                 errors_for_permutation.extend(action_result.errors)
 
                 if not action_result.flag:
-                    #print(f"[DBG] *** FAIL: action {i} {action:4}")
+                    self._logger.debug(__("*** FAIL: action {i}: {action!r}", i=i, action=action))
                     success = False
                     self._permutation_forge.mark_last_permutation_as_invalid(i)
-                    break
+                    continue
 
-                #print(f"[DBG]  success: action {i} {action:4}")
+                self._logger.debug(__(" success: action {i}: {action!r}", i=i, action=action))
                 successes += action_result.value
 
             if success:
@@ -150,7 +155,6 @@ class ConfigurableActionOrderingService(ActionOrderingService):
             else:
                 permutation_result: ResultLookup[int] = ResultLookup(success, successes, errors_for_permutation)
                 unsuccessful_permutations.append(permutation_result)
-            #print("[VRB]")
             permutation_index += 1
 
         self.reset(turn_descriptor)
@@ -161,7 +165,11 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         number_of_successful_permutations = len(successful_permutations)
         number_of_unsuccessful_permutations = len(unsuccessful_permutations)
         total_permutations_that_passed_constraints = number_of_successful_permutations + number_of_unsuccessful_permutations 
-        print(f"[INF] permutations considered: {total_permutations_that_passed_constraints}/{permutation_index} passed the constraint check, {number_of_successful_permutations}/{total_permutations_that_passed_constraints} are possible")
+        self._logger.info(__(
+            "permutations considered: {valid}/{permutation_index} passed the constraint check, {number_of_successful_permutations}/{valid} are possible",
+            permutation_index=permutation_index,
+            valid=total_permutations_that_passed_constraints,
+            number_of_successful_permutations=number_of_successful_permutations))
         if not any(successful_permutations):
             errors: List[str] = ["There is not a permutation which allows for all actions to be performed"]
             for partition in unsuccessful_permutations:
@@ -208,11 +216,14 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         if index_of_first_action == -1:
             return True
         self._permutation_forge.mark_last_permutation_as_invalid(index_of_first_action)
-#        print(f"[DBG] permutation does not pass constraints; failed at {index_of_first_action}")
-#        for action in permutation[:index_of_first_action]:
-#            print(f"[DBG]          action {action:8}")
-#        print(f"[DBG] ## fail: action {permutation[index_of_first_action]:8}")
-#        for action in permutation[index_of_first_action+1:]:
-#            print(f"[DBG] skipped: action {action:8}")
-#        print("[VRB]")
+        self._logger.debug(__("permutation does not pass constraints; failed at {i}", i=index_of_first_action))
+        i = 0
+        for action in permutation[:index_of_first_action]:
+            self._logger.debug(__("   pass: action {i}: {action!r}", action=action, i=i))
+            i += 1
+        self._logger.debug(__("## fail: action {i} {action!r}", action=permutation[index_of_first_action], i=i))
+        i += 1
+        for action in permutation[index_of_first_action+1:]:
+            self._logger.debug(__("   skip: action {i}: {action!r}", action=action, i=i))
+            i += 1
         return False

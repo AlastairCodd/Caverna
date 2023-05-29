@@ -1,4 +1,5 @@
 from typing import List, Optional, Any
+import logging
 
 from buisness_logic.actions.check_animal_storage_action import CheckAnimalStorageAction
 from buisness_logic.actions.convert_action import ConvertAction
@@ -47,7 +48,7 @@ class TurnExecutionService(object):
         success &= chosen_turn_descriptor_result.flag
         errors.extend(chosen_turn_descriptor_result.errors)
 
-        print(f"[VRB] {chosen_turn_descriptor_result.value.choice:4}")
+        logging.debug(chosen_turn_descriptor_result.value.choice.__format__("4"))
 
         choice: DwarfCardActionCombinationLookup = chosen_turn_descriptor_result.value.choice
 
