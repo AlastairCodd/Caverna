@@ -216,6 +216,9 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
         self._turn_descriptor = None
 
     def __str__(self) -> str:
+        return self.__format__("")
+
+    def __format__(self, format_spec):
         tile_type_displayable: Dict[TileTypeEnum,str] = {
             TileTypeEnum.pastureTwin: "Twin Pasture",
             TileTypeEnum.cavernTunnelTwin: "Cavern Tunnel Twin",
@@ -224,13 +227,22 @@ class PlaceATwinTileAction(BasePlayerChoiceAction):
             TileTypeEnum.meadowFieldTwin: "Meadow and Field pair",
         }
 
-        result = f"Place a {tile_type_displayable[self._tile_type]}"
+        text = [
+            ("", "Place a "),
+            ("", tile_type_displayable[self._tile_type])]
         cost = self._get_cost()
         if any(cost):
-            result += " (for "
-            result += ", ".join(f"{amount} {resource.name}" for (resource, amount) in cost.items())
-            result += ")"
-        return result
+            text.append(("", " (for "))
+            for (i, (resource, amount)) in enumerate(cost.items()):
+                text.append(("class:count", str(amount)))
+                text.append(("", " "))
+                text.append(("class:resource", resource.name))
+                if i != len(cost) - 1:
+                    text.append(("", ", "))
+            text.append(("", ")"))
+        if "pp" in format_spec:
+            return text
+        return "".join(e[1] for e in text)
 
     def __repr__(self) -> str:
         return f"PlaceATwinTileAction(tile_type={self._tile_type}, override_cost={self._tile_cost_override})"
