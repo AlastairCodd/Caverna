@@ -1,7 +1,6 @@
 from typing import Tuple, List
 
 from buisness_logic.actions.convert_single_action import ConvertSingleAction
-from buisness_logic.services.base_receive_event_service import BaseReceiveEventService
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
 from common.entities.result_lookup import ResultLookup
@@ -13,7 +12,7 @@ from core.repositories.base_player_repository import BasePlayerRepository
 from core.services.base_player_service import BasePlayerService
 
 
-class ConvertAction(BaseReceiveEventService, BasePlayerChoiceAction):
+class ConvertAction(BasePlayerChoiceAction):
     def __init__(self) -> None:
         self._hash = self._precompute_hash()
         BasePlayerChoiceAction.__init__(self, "ConvertAction", False, False, False)
