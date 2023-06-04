@@ -216,6 +216,8 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         if index_of_first_action == -1:
             return True
         self._permutation_forge.mark_last_permutation_as_invalid(index_of_first_action)
+        if self._logger.isEnabledFor(logging.DEBUG):
+            return False
         self._logger.debug(__("permutation does not pass constraints; failed at {i}", i=index_of_first_action))
         i = 0
         for action in permutation[:index_of_first_action]:
