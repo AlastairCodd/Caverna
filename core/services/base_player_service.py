@@ -135,6 +135,16 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
+    def get_player_choice_free_actions_to_use(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> List[BaseAction]:
+        """Gets user choice for which actions to take outside of the turn ordering.
+
+        :param turn_descriptor: The description of game state. This cannot be null, or empty.
+        :returns: The actions the player has chosen to take."""
+        raise NotImplementedError()
+
+    @abstractmethod
     def get_player_choice_fences_to_build(
             self,
             place_pasture_action: BaseAction,

@@ -1,7 +1,8 @@
 from abc import ABCMeta
 from typing import Dict, List
 
-from buisness_logic.effects import population_effects, animal_storage_effects, conversion_effects
+from buisness_logic.actions.place_a_single_tile_action import PlaceASingleTileAction
+from buisness_logic.effects import population_effects, animal_storage_effects, conversion_effects, free_action_effects
 from core.baseClasses.base_effect import BaseEffect
 from core.baseClasses.base_tile import BaseSpecificTile
 from core.constants import tile_ids
@@ -107,8 +108,8 @@ class EntryLevelDwelling(BaseDwelling):
              conversion_effects.ConvertEffect({ResourceTypeEnum.donkey: 2}, {ResourceTypeEnum.food: 3}),
              conversion_effects.ConvertEffect({ResourceTypeEnum.cow: 1}, {ResourceTypeEnum.food: 3}),
              # free action...
-             # free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.meadow, override_cost={ResourceTypeEnum.ruby: 1})),
-             # free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.field, override_cost={ResourceTypeEnum.ruby: 1})),
-             # free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.tunnel, override_cost={ResourceTypeEnum.ruby: 1})),
-             # free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.cavern, override_cost={ResourceTypeEnum.ruby: 2})),
+             free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.meadow, override_cost={ResourceTypeEnum.ruby: 1})),
+             free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.field, override_cost={ResourceTypeEnum.ruby: 1})),
+             free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.tunnel, override_cost={ResourceTypeEnum.ruby: 1})),
+             free_action_effects.FreeActionEffect(PlaceASingleTileAction(TileTypeEnum.cavern, override_cost={ResourceTypeEnum.ruby: 2})),
             ])

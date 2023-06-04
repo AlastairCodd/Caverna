@@ -103,6 +103,9 @@ class DeterministicPlayer(BasePlayerService):
         print(repr(choices[0]))
         return ResultLookup(True, choices[0])
 
+    def get_player_choice_free_actions_to_use(self, _turn_descriptor):
+        return []
+
     def get_player_choice_resources_to_sow(self, _turn_descriptor):
         return ResultLookup(True, ResourcesToSow(2, 0))
 

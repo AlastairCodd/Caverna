@@ -207,6 +207,12 @@ class ActionChoicePlayerService(BasePlayerService):
 
         return result
 
+    def get_player_choice_free_actions_to_use(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> List[BaseAction]:
+        warnings.warn("not implemented")
+        return []
+
     def get_player_choice_fences_to_build(
             self,
             place_pasture_action: BaseAction,

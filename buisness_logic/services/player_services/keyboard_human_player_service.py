@@ -11,6 +11,7 @@ from InquirerPy import inquirer, prompt
 from buisness_logic.actions.receive_action import ReceiveAction
 from buisness_logic.effects.conversion_effects import ConvertEffect
 from buisness_logic.effects.food_effects import BaseFoodEffect
+from buisness_logic.effects.free_action_effects import FreeActionEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
 from common.defaults.tile_container_default import TileContainerDefault
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -378,6 +379,27 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
         result: ResultLookup[ActionChoiceLookup] = ResultLookup(True, actions_to_use)
         return result
+
+    def get_player_choice_free_actions_to_use(
+            self,
+            turn_descriptor: TurnDescriptorLookup) -> List[BaseAction]:
+        prompt = inquirer.confirm(
+            message="Use any free actions?", 
+            default=False)
+        self._add_keybinding_that_shows_resources(prompt)
+        if not prompt.execute():
+            return []
+
+        choices: List[Dict[str, Any]] = [
+            {"name": str(effect.action),
+             "value": effect.action, }
+            for effect in self.get_effects_of_type(FreeActionEffect)]
+
+        actions_to_use = inquirer.checkbox(
+            message="Choose some actions to use",
+            choices=choices).execute()
+
+        return actions_to_use
 
     def get_player_choice_fences_to_build(
             self,

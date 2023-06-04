@@ -3,6 +3,7 @@ import logging
 
 from buisness_logic.actions.check_animal_storage_action import CheckAnimalStorageAction
 from buisness_logic.actions.convert_action import ConvertAction
+from buisness_logic.actions.free_action import FreeAction
 from buisness_logic.actions.resolve_harvest_action import ResolveHarvestAction
 from buisness_logic.services.turn_transfer_service import TurnTransferService, ChosenDwarfCardActionCombinationAndEquivalentLookup
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -55,6 +56,7 @@ class TurnExecutionService(object):
         untested_actions: List[BaseAction] = []
         untested_actions.extend(choice.actions.actions)
         untested_actions.append(ConvertAction())
+        untested_actions.append(FreeAction())
 
         has_check_for_animal_storage = False
         actions_to_take: List[BaseAction] = []
