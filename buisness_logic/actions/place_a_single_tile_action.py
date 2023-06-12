@@ -152,7 +152,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
             self._tile_requisites_override)
 
         if not is_tile_available:
-            errors.append(f"Tile ({specific_tile.name}) has already been built")
+            errors.append(f"Tile ({chosen_tile.name}) has already been built")
 
         if not can_place_tile_at_chosen_location:
             errors.append(f"Chosen location {self._tile_location} is invalid")
@@ -166,7 +166,7 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
         if actual_cost_of_tile_result.flag:
             can_player_afford_tile: bool = player.has_more_resources_than(actual_cost_of_tile_result.value)
             if not can_player_afford_tile:
-                errors.append(CannotAffordActionError("Player", "tile", actual_cost_of_tile_result.value, player.resources))
+                errors.append(CannotAffordActionError("Player", chosen_tile.name, actual_cost_of_tile_result.value, player.resources))
 
         success: bool = len(errors) == 0
 
