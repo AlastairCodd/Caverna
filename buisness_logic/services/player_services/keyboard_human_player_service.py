@@ -597,12 +597,6 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
         valid_locations: List[int] = tile_service.get_available_locations_for_single(self, tile.tile_type)
 
-        additional_information = self._create_map_for_tile_placement(valid_locations)
-        if isinstance(additional_information, str):
-            print(additional_information)
-        else:
-            color_print(additional_information[0], additional_information[1])
-
         location = self._create_prompt_for_tile_placement(valid_locations).execute()
 
         result: ResultLookup[int] = ResultLookup(True, location)
@@ -625,12 +619,6 @@ class KeyboardHumanPlayerService(BasePlayerService):
             else:
                 valid_locations[location] = [tile_placement]
 
-        additional_information = self._create_map_for_tile_placement(valid_locations)
-        if isinstance(additional_information, str):
-            print(additional_information)
-        else:
-            color_print(additional_information[0], additional_information[1])
-
         location: int = self._create_prompt_for_tile_placement(valid_locations).execute()
 
         placement = inquirer.select(
@@ -650,12 +638,6 @@ class KeyboardHumanPlayerService(BasePlayerService):
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
         valid_locations: List[int] = [location for (location, tile) in self.tiles.items() if tile.tile_type != TileTypeEnum.unavailable]
-
-        additional_information = self._create_map_for_tile_placement(valid_locations)
-        if isinstance(additional_information, str):
-            print(additional_information)
-        else:
-            color_print(additional_information[0], additional_information[1])
 
         location: int = self._create_prompt_for_tile_placement(valid_locations).execute()
 
@@ -846,6 +828,12 @@ class KeyboardHumanPlayerService(BasePlayerService):
         return result
 
     def _create_prompt_for_tile_placement(self, valid_locations):
+        additional_information = self._create_map_for_tile_placement(valid_locations)
+        if isinstance(additional_information, str):
+            print(additional_information)
+        else:
+            color_print(additional_information[0], additional_information[1])
+
         def validate_location(chosen_location: str) -> bool:
             location_is_valid: bool = chosen_location.isdigit()
             if location_is_valid:
