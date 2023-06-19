@@ -20,6 +20,7 @@ from common.entities.resources_to_sow_lookup import ResourcesToSow
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
+from common.services.tile_service import LocationValidity, ValidLocations
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
@@ -595,7 +596,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
         from common.services.tile_service import TileService
         tile_service: TileService = TileService()
 
-        valid_locations: List[int] = tile_service.get_available_locations_for_single(self, tile.tile_type)
+        valid_locations: ValidLocations = tile_service.get_available_locations_for_single(self, tile.tile_type)
 
         location = self._create_prompt_for_tile_placement(valid_locations).execute()
 
@@ -842,9 +843,8 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
         prompt = inquirer.number(
             message="Choose a location",
-            min_allowed=min(valid_locations),
-            max_allowed=max(valid_locations),
-            validate=validate_location,
+            min_allowed=valid_locations.minimum(),
+            max_allowed=valid_locations.maximum(),
             filter=lambda result: int(result),
             instruction="Use ↑/↓ to pick the location"
         )
@@ -863,7 +863,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 if has_current_location_been_found:
                     prompt._whole_buffer.text = str(location)
                     return
-            prompt._whole_buffer.text = str(max(valid_locations))
+            prompt._whole_buffer.text = str(valid_locations.maximum())
 
         def _handle_previous_location(event):
             #patched_print("spin down")
@@ -879,7 +879,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 if has_current_location_been_found:
                     prompt._whole_buffer.text = str(location)
                     return
-            prompt._whole_buffer.text = str(min(valid_locations))
+            prompt._whole_buffer.text = str(valid_locations.minimum())
 
         prompt.kb_func_lookup["up"][0]["func"] = _handle_next_location
         prompt.kb_func_lookup["down"][0]["func"] = _handle_previous_location

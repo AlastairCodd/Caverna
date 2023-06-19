@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List, Dict, Iterable, Tuple, Optional, Callable, cast
 
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
@@ -14,6 +15,59 @@ from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.baseClasses.base_tile import BaseTile
 from core.containers.tile_container import TileContainer
 from core.enums.caverna_enums import TileTypeEnum, ResourceTypeEnum, TileDirectionEnum
+
+
+class LocationValidity(Enum):
+    OtherSide = -1
+    Invalid = 0
+    Adjacent = 1
+    Prerequisite = 2
+    Valid = 3
+
+    def __or__(self, other) -> 'LocationValidity':
+        if self is LocationValidity.OtherSide or other is LocationValidity.OtherSide:
+            return LocationValidity.OtherSide
+        if self is LocationValidity.Invalid:
+            return other
+        if other is LocationValidity.Invalid:
+            return self
+        if self == other:
+            return self
+        # everything else either contains Valid, or is 'Adjacent | Prerequisite'
+        return LocationValidity.Valid
+
+
+class ValidLocations(object):
+    def __init__(self, source: List[LocationValidity]) -> None:
+        self._source = source
+
+    def ignore_requisites(self) -> 'ValidLocations':
+        return __class__([v | LocationValidity.Prerequisite for v in self._source])
+
+    def ignore_adjacency(self) -> 'ValidLocations':
+        return __class([v | LocationValidity.Adjacent for v in self._source])
+
+    def __contains__(self, item) -> bool:
+        return self._source[item] == LocationValidity.Valid
+
+    def __iter__(self):
+        return self._actually_valid_locations()
+
+    def __reversed__(self):
+        for (location, validity) in reversed(enumerate(self._source)):
+            if validity is LocationValidity.Valid:
+                yield location
+
+    def minimum(self) -> int:
+        return min(self._actually_valid_locations())
+
+    def maximum(self) -> int:
+        return max(self._actually_valid_locations())
+
+    def _actually_valid_locations(self):
+        for (location, validity) in enumerate(self._source):
+            if validity is LocationValidity.Valid:
+                yield location
 
 
 class TileService(object):
@@ -334,13 +388,11 @@ class TileService(object):
     def get_available_locations_for_single(
             self,
             player: TileContainer,
-            tile_type: Optional[TileTypeEnum] = None,
-            requisites_override: Optional[List[TileTypeEnum]] = None) -> List[int]:
+            tile_type: TileTypeEnum) -> ValidLocations:
         """Get all locations available for a tile with the given type
 
         :param player: The player where the tile will be placed. This may not be null.
         :param tile_type: The type of the tile to be placed.
-        :param requisites_override: The requisites that the tile must be placed on. If this is null, the default will be used.
         :returns: A list of locations. This will never be null.
         """
         if player is None:
@@ -348,27 +400,29 @@ class TileService(object):
         if self.is_tile_a_twin_tile(tile_type):
             raise ValueError("Tile is twin tile -- cannot be placed as single")
 
-        tile_requisites: List[TileTypeEnum]
-        if requisites_override is not None:
-            tile_requisites = requisites_override
-        elif tile_type is not None:
-            all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
-            tile_requisites = all_tile_requisites[tile_type]
-        else:
-            raise ValueError("Both tile_type and requisites_override cannot be None")
+        all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
+        tile_requisites = all_tile_requisites[tile_type]
 
-        valid_positions: List[int] = []
+        is_tile_placed_outside = self.is_tile_placed_outside(tile_type)
+
+        valid_positions: List[LocationValidity] = [
+                LocationValidity.Invalid
+                    if self.is_tile_placed_outside(tile.tile_type) == is_tile_placed_outside
+                    else LocationValidity.OtherSide
+                for tile
+                in player.tiles.values()]
+
         for location in player.tiles:
             location_tile_type: TileTypeEnum = player.tiles[location].tile_type
-
             if location_tile_type in tile_requisites:
-                adjacent_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(player, location)
-                is_tile_connected: bool = self._is_location_connected(player, location, adjacent_tile_locations)
+                valid_positions[location] |= LocationValidity.Prerequisite
 
-                if is_tile_connected:
-                    valid_positions.append(location)
+            adjacent_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(player, location)
+            is_tile_connected: bool = self._is_location_connected(player, location, adjacent_tile_locations)
+            if is_tile_connected:
+                valid_positions[location] |= LocationValidity.Adjacent
 
-        return valid_positions
+        return ValidLocations(valid_positions)
 
     def get_available_locations_for_twin(
             self,
