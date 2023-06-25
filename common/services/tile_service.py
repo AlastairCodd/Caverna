@@ -100,8 +100,8 @@ class ValidLocations(BaseValidLocations):
         return self._actually_valid_locations()
 
     def __reversed__(self):
-        for (location, validity) in reversed(enumerate(self._source)):
-            if validity is LocationValidity.Valid:
+        for location in range(len(self._source) - 1, -1, -1):
+            if self._source[location] is LocationValidity.Valid:
                 yield location
 
     def minimum(self) -> int:
@@ -174,8 +174,8 @@ class ValidTwinTileLocations(BaseValidLocations):
                 yield location
 
     def __reversed__(self):
-        for (location, twin_validity) in reversed(enumerate(self._tiles)):
-            if twin_validity.are_any_directions_valid():
+        for location in range(len(self._tiles) - 1, -1, -1):
+            if self._tiles[location].are_any_directions_valid():
                 yield location
 
     def minimum(self) -> int:
