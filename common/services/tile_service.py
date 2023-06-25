@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+from abc import ABCMeta, abstractmethod
 from enum import Enum
-from typing import List, Dict, Iterable, Tuple, Optional, Callable, cast
+from typing import List, Dict, Iterable, Tuple, Optional, Callable, cast, Self
 
 from buisness_logic.effects.board_effects import ChangeRequisiteEffect
 from buisness_logic.effects.purchase_effects import BaseTilePurchaseEffect
@@ -24,7 +27,7 @@ class LocationValidity(Enum):
     Prerequisite = 2
     Valid = 3
 
-    def __or__(self, other) -> 'LocationValidity':
+    def __or__(self, other) -> LocationValidity:
         if self is LocationValidity.OtherSide or other is LocationValidity.OtherSide:
             return LocationValidity.OtherSide
         if self is LocationValidity.Invalid:
@@ -37,15 +40,45 @@ class LocationValidity(Enum):
         return LocationValidity.Valid
 
 
-class ValidLocations(object):
+class BaseValidLocations(metaclass=ABCMeta):
+    @abstractmethod
+    def ignore_requisites(self) -> Self:
+        raise NotImplemented()
+
+    @abstractmethod
+    def ignore_adjacency(self) -> Self:
+        raise NotImplemented()
+
+    @abstractmethod
+    def __contains__(self, item) -> bool:
+        raise NotImplemented()
+
+    @abstractmethod
+    def minimum(self) -> int:
+        raise NotImplemented()
+
+    @abstractmethod
+    def maximum(self) -> int:
+        raise NotImplemented()
+
+    @abstractmethod
+    def __iter__(self):
+        raise NotImplemented()
+
+    @abstractmethod
+    def __reversed__(self):
+        raise NotImplemented()
+
+
+class ValidLocations(BaseValidLocations):
     def __init__(self, source: List[LocationValidity]) -> None:
         self._source = source
 
-    def ignore_requisites(self) -> 'ValidLocations':
-        return __class__([v | LocationValidity.Prerequisite for v in self._source])
+    def ignore_requisites(self) -> Self:
+        return ValidLocations([v | LocationValidity.Prerequisite for v in self._source])
 
-    def ignore_adjacency(self) -> 'ValidLocations':
-        return __class([v | LocationValidity.Adjacent for v in self._source])
+    def ignore_adjacency(self) -> Self:
+        return ValidLocations([v | LocationValidity.Adjacent for v in self._source])
 
     def __contains__(self, item) -> bool:
         return self._source[item] == LocationValidity.Valid
