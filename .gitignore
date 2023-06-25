@@ -22,10 +22,7 @@ htmlcov/
 # envs
 workenv/
 venv/
-venv6/
-venv6 prompt-toolkit/
-venv9/
-venv10/
+venv11/
 
 # profiles
 profiles/
