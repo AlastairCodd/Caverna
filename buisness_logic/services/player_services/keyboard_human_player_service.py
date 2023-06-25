@@ -68,6 +68,13 @@ def wrap_styled_text_to_fit_current_terminal(
     return text
 
 
+class TilePlacementOptions:
+    def __init__(self) -> None:
+        self.needs_clean = True
+        self.ignore_adjacency = False
+        self.ignore_requisites = False
+
+
 class KeyboardHumanPlayerService(BasePlayerService):
     def __init__(
             self,
@@ -596,9 +603,19 @@ class KeyboardHumanPlayerService(BasePlayerService):
         from common.services.tile_service import TileService
         tile_service: TileService = TileService()
 
-        valid_locations: ValidLocations = tile_service.get_available_locations_for_single(self, tile.tile_type)
+        valid_locations: ValidLocations
+        location: Optional[int] = None
+        options = TilePlacementOptions()
 
-        location = self._create_prompt_for_tile_placement(valid_locations).execute()
+        while location is None:
+            if options.needs_clean:
+                valid_locations = tile_service.get_available_locations_for_single(self, tile.tile_type)
+                options.needs_clean = False
+                if options.ignore_adjacency:
+                    valid_locations.ignore_adjacency()
+                if options.ignore_requisites:
+                    valid_locations.ignore_requisites()
+            location = self._create_prompt_for_tile_placement(valid_locations, options).execute()
 
         result: ResultLookup[int] = ResultLookup(True, location)
 
@@ -611,8 +628,19 @@ class KeyboardHumanPlayerService(BasePlayerService):
         from common.services.tile_service import TileService
         tile_service: TileService = TileService()
 
-        valid_locations: TwinLocationValidity = tile_service.get_available_locations_for_twin(self, tile_type)
-        location: int = self._create_prompt_for_tile_placement(valid_locations).execute()
+        valid_locations: TwinValidLocations
+        location: Optional[int] = None
+        options = TilePlacementOptions()
+
+        while location is None:
+            if options.needs_clean:
+                valid_locations: TwinLocationValidity = tile_service.get_available_locations_for_twin(self, tile_type)
+                options.needs_clean = False
+                if options.ignore_adjacency:
+                    valid_locations.ignore_adjacency()
+                if options.ignore_requisites:
+                    valid_locations.ignore_requisites()
+            location = self._create_prompt_for_tile_placement(valid_locations, options).execute()
 
         placement = inquirer.select(
             message="Pick a direction",
@@ -630,9 +658,20 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def get_player_choice_location_to_build_stable(
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
-        valid_locations: List[int] = [location for (location, tile) in self.tiles.items() if tile.tile_type != TileTypeEnum.unavailable]
 
-        location: int = self._create_prompt_for_tile_placement(valid_locations).execute()
+        valid_locations: List[int]
+        location: Optional[int] = None
+        options = TilePlacementOptions()
+
+        while location is None:
+            if options.needs_clean:
+                valid_locations = [location for (location, tile) in self.tiles.items() if tile.tile_type != TileTypeEnum.unavailable]
+                options.needs_clean = False
+                if options.ignore_adjacency:
+                    valid_locations.ignore_adjacency()
+                if options.ignore_requisites:
+                    valid_locations.ignore_requisites()
+            location = self._create_prompt_for_tile_placement(valid_locations, options).execute()
 
         return ResultLookup(True, location)
 
@@ -820,12 +859,39 @@ class KeyboardHumanPlayerService(BasePlayerService):
             result += f"{' '.join(line_map_readable[0])}    {' '.join(line_map_readable[1])}\r\n"
         return result
 
-    def _create_prompt_for_tile_placement(self, valid_locations):
+    def _create_prompt_for_tile_placement(
+            self,
+            valid_locations,
+            prompt_options: TilePlacementOptions):
+        from prompt_toolkit.validation import Validator
+
         additional_information = self._create_map_for_tile_placement(valid_locations)
         if isinstance(additional_information, str):
             print(additional_information)
         else:
             color_print(additional_information[0], additional_information[1])
+
+        def format_result(result: str | None):
+            if result is not None:
+                return result
+            if prompt_options.ignore_requisites:
+                if prompt_options.ignore_adjacency:
+                    return "allow tile to be placed anywhere"
+                return "allow tile to be placed on any type"
+            if prompt_options.ignore_adjacency:
+                return "allow tile to be placed on unconnected tiles"
+            return "allow tile to be placed on locations that were valid at start of turn"
+
+        default_message = "Choose a location"
+
+        prompt = inquirer.number(
+            message=default_message,
+            min_allowed=valid_locations.minimum(),
+            max_allowed=valid_locations.maximum(),
+            filter=lambda result: None if result is None else int(result),
+            instruction="Use ↑/↓ to pick the location",
+            mandatory=False
+        )
 
         def validate_location(chosen_location: str) -> bool:
             location_is_valid: bool = chosen_location.isdigit()
@@ -833,13 +899,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
                 location_is_valid = int(chosen_location) in valid_locations
             return location_is_valid
 
-        prompt = inquirer.number(
-            message="Choose a location",
-            min_allowed=valid_locations.minimum(),
-            max_allowed=valid_locations.maximum(),
-            filter=lambda result: int(result),
-            instruction="Use ↑/↓ to pick the location"
-        )
+        prompt.validator = Validator.from_callable(validate_location)
 
         def _handle_next_location(event):
             #patched_print("spin up")
@@ -847,6 +907,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
             #patched_print(f" {prompt._whole_buffer=}")
             #patched_print(f" {prompt._integral_buffer=}")
             current_location = int(prompt._whole_buffer.text)
+
             has_current_location_been_found = False
             for location in valid_locations:
                 if location == current_location:
@@ -876,5 +937,31 @@ class KeyboardHumanPlayerService(BasePlayerService):
         prompt.kb_func_lookup["up"][0]["func"] = _handle_next_location
         prompt.kb_func_lookup["down"][0]["func"] = _handle_previous_location
         del prompt.kb_func_lookup["input"][0]
+
+        @prompt.register_kb("r")
+        def _handle_change_tile_validity(event):
+            if prompt_options.ignore_requisites:
+                prompt_options.ignore_requisites = False
+                prompt_options.needs_clean = True
+                prompt._message = "Changing valid locations to " + format_result(None)
+                prompt._handle_skip(event)
+                return
+            prompt_options.ignore_requisites = True
+            valid_locations.ignore_requisites()
+            prompt._message = "Changing valid locations to " + format_result(None)
+            prompt._handle_skip(event)
+
+        @prompt.register_kb("a")
+        def _handle_change_tile_validity(event):
+            if prompt_options.ignore_adjacency:
+                prompt_options.ignore_adjacency = False
+                prompt_options.needs_clean = True
+                prompt._message = "Changing valid locations to " + format_result(None)
+                prompt._handle_skip(event)
+                return
+            prompt_options.ignore_adjacency = True
+            valid_locations.ignore_adjacency()
+            prompt._message = "Changing valid locations to " + format_result(None)
+            prompt._handle_skip(event)
 
         return prompt
