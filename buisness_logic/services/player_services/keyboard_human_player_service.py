@@ -20,7 +20,7 @@ from common.entities.resources_to_sow_lookup import ResourcesToSow
 from common.entities.result_lookup import ResultLookup
 from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from common.services.tile_service import LocationValidity, ValidLocations
+from common.services.tile_service import LocationValidity, ValidLocations, TwinLocationValidity
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
@@ -611,15 +611,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
         from common.services.tile_service import TileService
         tile_service: TileService = TileService()
 
-        locations_for_twin: List[TileTwinPlacementLookup] = tile_service.get_available_locations_for_twin(self, tile_type)
-        valid_locations: Dict[int, List[TileTwinPlacementLookup]] = {}
-        for tile_placement in locations_for_twin:
-            location: int = tile_placement.location
-            if location in valid_locations:
-                valid_locations[location].append(tile_placement)
-            else:
-                valid_locations[location] = [tile_placement]
-
+        valid_locations: TwinLocationValidity = tile_service.get_available_locations_for_twin(self, tile_type)
         location: int = self._create_prompt_for_tile_placement(valid_locations).execute()
 
         placement = inquirer.select(

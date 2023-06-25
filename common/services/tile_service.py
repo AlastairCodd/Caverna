@@ -103,6 +103,72 @@ class ValidLocations(BaseValidLocations):
                 yield location
 
 
+class TwinLocationValidity(object):
+    def __init__(
+            self,
+            validity: LocationValidity = LocationValidity.Invalid,
+            secondary_tiles: Optional[Dict[TileDirectionEnum, LocationValidity]] = None) -> None:
+        self._primary_tile = validity
+        self._secondary_tiles = {direction: LocationValidity.Invalid for direction in TileDirectionEnum} if secondary_tiles is None else secondary_tiles
+
+    def __or__(self, validity) -> Self:
+        # we are safe to use our own secondary_tiles without cloning because the user should avoid touching us again
+        return TwinLocationValidity(self._primary_tile | validity, self._secondary_tiles)
+
+    def __getitem__(self, direction) -> LocationValidity:
+        '''Misuse! Gets whether a twin tile may point in the given direction, or the reason why not'''
+        return self._secondary_tiles[direction]
+
+    def __setitem__(self, direction, validity) -> None:
+        self._secondary_tiles[direction] = validity
+
+    def __contains__(self, direction) -> bool:
+        '''Misuse! Returns whether the tile at the given location is valid'''
+        return self._primary_tile is LocationValidity.Prerequisite and \
+                self._secondary_tiles[direction] is LocationValidity.Prerequisite and \
+                (self._primary_tile is LocationValidity.Adjacent or \
+                    self._secondary_tiles[direction] is LocationValidity.Adjacent)
+
+    def are_any_directions_valid(self) -> bool:
+        return any(direction in self for direction in TileDirectionEnum)
+
+
+class ValidTwinTileLocations(BaseValidLocations):
+    def __init__(self, source: List[LocationValidity]) -> None:
+        self._tiles = [TwinLocationValidity(validity) for validity in source]
+
+    def ignore_adjacency(self) -> Self:
+        raise NotImplemented()
+
+    def ignore_requisites(self) -> Self:
+        raise NotImplemented()
+
+    def __getitem__(self, location) -> TwinLocationValidity:
+        return self._tiles[location]
+
+    def __setitem__(self, location, value) -> None:
+        self._tiles[location] = value
+
+    def __contains__(self, location) -> bool:
+        return self._tiles[location].are_any_directions_valid()
+
+    def __iter__(self):
+        for (location, twin_validity) in enumerate(self._tiles):
+            if twin_validity.are_any_directions_valid():
+                yield location
+
+    def __reversed__(self):
+        for (location, twin_validity) in reversed(enumerate(self._tiles)):
+            if twin_validity.are_any_directions_valid():
+                yield location
+
+    def minimum(self) -> int:
+        return min(self.__iter__())
+
+    def maximum(self) -> int:
+        return max(self.__iter__())
+
+
 class TileService(object):
     def __init__(
             self,
@@ -460,8 +526,7 @@ class TileService(object):
     def get_available_locations_for_twin(
             self,
             player: TileContainer,
-            twin_tile_type: Optional[TileTypeEnum] = None,
-            requisites_override: Optional[List[TileTypeEnum]] = None) -> List[TileTwinPlacementLookup]:
+            twin_tile_type: TileTypeEnum) -> ValidTwinTileLocations:
         """Get all locations available for a tile with the given type
 
         :param player: The player where the tile will be placed. This may not be null.
@@ -472,49 +537,50 @@ class TileService(object):
         if player is None:
             raise ValueError("Player may not be null")
 
-        tile_requisites: List[TileTypeEnum]
-        if requisites_override is not None:
-            tile_requisites = requisites_override
-        elif twin_tile_type is not None:
-            all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
-            tile_requisites = all_tile_requisites[twin_tile_type]
-        else:
-            raise ValueError("Both twin_tile_type and requisites_override cannot be None")
+        all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
+        tile_requisites: List[TileTypeEnum] = all_tile_requisites[twin_tile_type]
 
-        valid_positions_with_adjacent: List[TileTwinPlacementLookup] = []
+        is_tile_placed_outside = self.is_tile_placed_outside(twin_tile_type)
+
+        valid_locations = ValidTwinTileLocations(
+            LocationValidity.Invalid
+                if self.is_tile_placed_outside(tile.tile_type) == is_tile_placed_outside
+                else LocationValidity.OtherSide
+            for tile
+            in player.tiles.values())
 
         for location in player.tiles:
             primary_location_tile_type: TileTypeEnum = player.tiles[location].tile_type
 
-            if primary_location_tile_type not in tile_requisites:
-                continue
+            if primary_location_tile_type in tile_requisites:
+               valid_locations[location] |= LocationValidity.Prerequisite
             adjacent_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(player, location)
             does_primary_tile_have_connected_adjacent_tiles: bool = self._is_location_connected(player, location, adjacent_tile_locations)
 
+            is_location_connected: bool = does_primary_tile_have_connected_adjacent_tiles
+            if does_primary_tile_have_connected_adjacent_tiles:
+                valid_locations[location] |= LocationValidity.Adjacent
+
             for secondary_tile_location in adjacent_tile_locations:
+                direction = secondary_tile_location.direction
                 secondary_location_tile_type: TileTypeEnum = player.tiles[secondary_tile_location.location].tile_type
-                if secondary_location_tile_type not in tile_requisites or \
-                    (primary_location_tile_type == TileTypeEnum.unavailable and \
-                        secondary_location_tile_type == TileTypeEnum.unavailable):
-                    continue
 
-                is_location_connected: bool = does_primary_tile_have_connected_adjacent_tiles
-                if not is_location_connected:
-                    adjacent_to_secondary_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(
-                        player,
-                        secondary_tile_location.location)
+                if secondary_location_tile_type in tile_requisites:
+                    valid_locations[location][direction] |= LocationValidity.Prerequisite
+                if (primary_location_tile_type is TileTypeEnum.unavailable and \
+                        secondary_location_tile_type is TileTypeEnum.unavailable):
+                    valid_locations[location][direction] = LocationValidity.OtherSide
 
-                    is_location_connected = self._is_location_connected(player, secondary_tile_location.location, adjacent_to_secondary_tile_locations)
+                adjacent_to_secondary_tile_locations: List[TileTwinPlacementLookup] = self.get_adjacent_tiles(
+                    player,
+                    secondary_tile_location.location)
 
-                if not is_location_connected:
-                    continue
+                is_location_connected = self._is_location_connected(player, secondary_tile_location.location, adjacent_to_secondary_tile_locations)
 
-                valid_positions_with_adjacent.append(
-                    TileTwinPlacementLookup(
-                        location,
-                        secondary_tile_location.direction))
+                if is_location_connected:
+                    valid_locations[location][direction] |= LocationValidity.Adjacent
 
-        return valid_positions_with_adjacent
+        return valid_locations
 
     def get_adjacent_tiles(
             self,
