@@ -142,6 +142,11 @@ class TwinLocationValidity(object):
                 (LocationValidity.Adjacent in self._primary_tile or \
                     LocationValidity.Adjacent in self._secondary_tiles[direction])
 
+    def __iter__(self):
+        for direction in TileDirectionEnum:
+            if direction in self:
+                yield direction
+
     def are_any_directions_valid(self) -> bool:
         return any(direction in self for direction in TileDirectionEnum)
 

@@ -617,13 +617,13 @@ class KeyboardHumanPlayerService(BasePlayerService):
         placement = inquirer.select(
             message="Pick a direction",
             choices=[
-                {"name": placement.direction.name,
+                {"name": placement.name,
                  "value": placement}
                 for placement in
                 valid_locations[location]
             ]).execute()
 
-        result: ResultLookup[TileTwinPlacementLookup] = ResultLookup(True, placement)
+        result: ResultLookup[TileTwinPlacementLookup] = ResultLookup(True, TileTwinPlacementLookup(location, placement))
 
         return result
 
