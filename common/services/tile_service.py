@@ -39,6 +39,19 @@ class LocationValidity(Enum):
         # everything else either contains Valid, or is 'Adjacent | Prerequisite'
         return LocationValidity.Valid
 
+    def __contains__(self, other):
+        if other is LocationValidity.OtherSide:
+            raise KeyError
+        if self is LocationValidity.OtherSide:
+            return False
+        if other is LocationValidity.Invalid:
+            return True
+        if self == LocationValidity.Valid:
+            return True
+        if self == other:
+            return True
+        return False
+
 
 class BaseValidLocations(metaclass=ABCMeta):
     @abstractmethod
@@ -124,13 +137,16 @@ class TwinLocationValidity(object):
 
     def __contains__(self, direction) -> bool:
         '''Misuse! Returns whether the tile at the given location is valid'''
-        return self._primary_tile is LocationValidity.Prerequisite and \
-                self._secondary_tiles[direction] is LocationValidity.Prerequisite and \
-                (self._primary_tile is LocationValidity.Adjacent or \
-                    self._secondary_tiles[direction] is LocationValidity.Adjacent)
+        return LocationValidity.Prerequisite in self._primary_tile and \
+                LocationValidity.Prerequisite in self._secondary_tiles[direction] and \
+                (LocationValidity.Adjacent in self._primary_tile or \
+                    LocationValidity.Adjacent in self._secondary_tiles[direction])
 
     def are_any_directions_valid(self) -> bool:
         return any(direction in self for direction in TileDirectionEnum)
+
+    def __repr__(self) -> str:
+        return f"TwinLocationValidity({self._primary_tile}, {self._secondary_tiles!r})"
 
 
 class ValidTwinTileLocations(BaseValidLocations):
