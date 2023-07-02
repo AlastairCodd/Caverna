@@ -537,7 +537,8 @@ class TileService(object):
 
         valid_positions: List[LocationValidity] = [
                 LocationValidity.Invalid
-                    if self.is_tile_placed_outside(tile.tile_type) == is_tile_placed_outside
+                    if self.is_tile_placed_outside(tile.tile_type) == is_tile_placed_outside and \
+                        tile.tile_type != TileTypeEnum.unavailable
                     else LocationValidity.OtherSide
                 for tile
                 in player.tiles.values()]
