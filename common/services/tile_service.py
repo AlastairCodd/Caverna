@@ -665,16 +665,13 @@ class TileService(object):
 
         available_locations: List[int] = self.get_available_locations_for_single(player, tile.tile_type, requisites_override)
 
-        success: bool = False
-        errors: List[str] = []
+        if location not in available_locations:
+            location_validity = available_locations[location]
+            return ResultLookup(errors=f"Cannot place {tile} at {location}: {location_validity}")
 
-        if location in available_locations:
-            player.tiles[location].set_tile(tile)
-            success = True
-        else:
-            errors.append(f"Invalid location {location}")
+        player.tiles[location].set_tile(tile)
 
-        result: ResultLookup[bool] = ResultLookup(success, success, errors)
+        result: ResultLookup[bool] = ResultLookup(True, True)
         return result
 
     def place_twin_tile(
