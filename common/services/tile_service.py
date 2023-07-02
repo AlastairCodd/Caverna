@@ -170,8 +170,10 @@ class ValidTwinTileLocations(BaseValidLocations):
     def __setitem__(self, location, value) -> None:
         self._tiles[location] = value
 
-    def __contains__(self, location) -> bool:
-        return self._tiles[location].are_any_directions_valid()
+    def __contains__(self, location: int | TileTwinPlacementLookup) -> bool:
+        if type(location) is int:
+            return self._tiles[location].are_any_directions_valid()
+        return self._tiles[location.location][location.direction] is LocationValidity.Valid
 
     def __iter__(self):
         for (location, twin_validity) in enumerate(self._tiles):
