@@ -510,11 +510,13 @@ class TileService(object):
     def get_available_locations_for_single(
             self,
             player: TileContainer,
-            tile_type: TileTypeEnum) -> ValidLocations:
+            tile_type: TileTypeEnum,
+            requisites_override: Optional[List[TileTypeEnum]] = None) -> ValidLocations:
         """Get all locations available for a tile with the given type
 
         :param player: The player where the tile will be placed. This may not be null.
         :param tile_type: The type of the tile to be placed.
+        :param requistes_override: The requisites that the tile must be placed on. If this is null, the default will be used.
         :returns: A list of locations. This will never be null.
         """
         if player is None:
@@ -522,8 +524,14 @@ class TileService(object):
         if self.is_tile_a_twin_tile(tile_type):
             raise ValueError("Tile is twin tile -- cannot be placed as single")
 
-        all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
-        tile_requisites = all_tile_requisites[tile_type]
+        tile_requisites: List[TileTypeEnum]
+        if requisites_override is not None:
+            tile_requisites = requisites_override
+        elif tile_type is not None:
+            all_tile_requisites: Dict[TileTypeEnum, List[TileTypeEnum]] = self._get_requisites_for_player(player)
+            tile_requisites = all_tile_requisites[tile_type]
+        else:
+            raise ValueError("Both tile_type and requisites_override cannot be None")
 
         is_tile_placed_outside = self.is_tile_placed_outside(tile_type)
 
