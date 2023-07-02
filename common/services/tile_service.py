@@ -55,11 +55,11 @@ class LocationValidity(Enum):
 
 class BaseValidLocations(metaclass=ABCMeta):
     @abstractmethod
-    def ignore_requisites(self) -> Self:
+    def ignore_requisites(self) -> None:
         raise NotImplemented()
 
     @abstractmethod
-    def ignore_adjacency(self) -> Self:
+    def ignore_adjacency(self) -> None:
         raise NotImplemented()
 
     @abstractmethod
@@ -87,11 +87,11 @@ class ValidLocations(BaseValidLocations):
     def __init__(self, source: List[LocationValidity]) -> None:
         self._source = source
 
-    def ignore_requisites(self) -> Self:
-        return ValidLocations([v | LocationValidity.Prerequisite for v in self._source])
+    def ignore_requisites(self) -> None:
+        self._source = [v | LocationValidity.Prerequisite for v in self._source]
 
-    def ignore_adjacency(self) -> Self:
-        return ValidLocations([v | LocationValidity.Adjacent for v in self._source])
+    def ignore_adjacency(self) -> None:
+        self._source = [v | LocationValidity.Adjacent for v in self._source]
 
     def __contains__(self, item) -> bool:
         return self._source[item] == LocationValidity.Valid
@@ -158,11 +158,11 @@ class ValidTwinTileLocations(BaseValidLocations):
     def __init__(self, source: List[LocationValidity]) -> None:
         self._tiles = [TwinLocationValidity(validity) for validity in source]
 
-    def ignore_adjacency(self) -> Self:
-        raise NotImplemented()
+    def ignore_adjacency(self) -> None:
+        self._tiles = [t | LocationValidity.Adjacent for t in self._tiles]
 
-    def ignore_requisites(self) -> Self:
-        raise NotImplemented()
+    def ignore_requisites(self) -> None:
+        self._tiles = [t | LocationValidity.Prerequisite for t in self._tiles]
 
     def __getitem__(self, location) -> TwinLocationValidity:
         return self._tiles[location]
