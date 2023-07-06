@@ -658,6 +658,8 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def get_player_choice_location_to_build_stable(
             self,
             turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
+        from common.services.tile_service import TileService
+        tile_service: TileService = TileService()
 
         valid_locations: List[int]
         location: Optional[int] = None
@@ -665,7 +667,7 @@ class KeyboardHumanPlayerService(BasePlayerService):
 
         while location is None:
             if options.needs_clean:
-                valid_locations = [location for (location, tile) in self.tiles.items() if tile.tile_type != TileTypeEnum.unavailable]
+                valid_locations = tile_service.get_available_locations_for_stable(self)
                 options.needs_clean = False
                 if options.ignore_adjacency:
                     valid_locations.ignore_adjacency()

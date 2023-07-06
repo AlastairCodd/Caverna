@@ -614,6 +614,32 @@ class TileService(object):
 
         return valid_locations
 
+    def get_available_locations_for_stable(
+            self,
+            player: TileContainer) -> ValidLocations:
+        valid_positions: List[LocationValidity] = [LocationValidity.OtherSide for _ in player.tiles]
+
+        for (location, tile) in player.tiles.items():
+            if tile.has_stable:
+                # may be overkill to say other side (it's not, it's just not the correct requsites), but this stops things breaking
+                continue
+
+            if tile.tile_type is TileTypeEnum.unavailable:
+                adjacent_tiles = self.get_adjacent_tiles(player, location)
+                for (adjacent_tile_location, _) in adjacent_tiles:
+                    adjacent_tile = player.tiles[adjacent_tile_location]
+                    if self.is_tile_placed_outside(adjacent_tile/tile_type) and \
+                            not adjacent_tile.has_stable:
+                        valid_positions[location] = LocationValidity.Adjacent
+                        break
+                continue
+
+            if not self.is_tile_placed_outside(tile.tile_type):
+                continue
+            valid_positions[location] = LocationValidity.Valid
+
+        return ValidLocations(valid_positions)
+
     def get_adjacent_tiles(
             self,
             player: TileContainer,
