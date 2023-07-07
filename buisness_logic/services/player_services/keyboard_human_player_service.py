@@ -628,13 +628,13 @@ class KeyboardHumanPlayerService(BasePlayerService):
         from common.services.tile_service import TileService
         tile_service: TileService = TileService()
 
-        valid_locations: TwinValidLocations
+        valid_locations: ValidTwinTileLocations
         location: Optional[int] = None
         options = TilePlacementOptions()
 
         while location is None:
             if options.needs_clean:
-                valid_locations: TwinLocationValidity = tile_service.get_available_locations_for_twin(self, tile_type)
+                valid_locations: ValidTwinTileLocations = tile_service.get_available_locations_for_twin(self, tile_type)
                 options.needs_clean = False
                 if options.ignore_adjacency:
                     valid_locations.ignore_adjacency()

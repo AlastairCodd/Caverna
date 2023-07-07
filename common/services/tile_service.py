@@ -399,12 +399,12 @@ class TileService(object):
         if location < 0 or location >= player.tile_count:
             raise IndexError(f"Location index ({location}) must be in range [0, Number of Tiles owned by Player: {player.tile_count})")
 
-        possible_locations: List[TileTwinPlacementLookup] = self \
+        possible_locations: ValidTwinTileLocations = self \
             .get_available_locations_for_twin(
-            player,
-            twin_tile_type)
+                player,
+                twin_tile_type)
 
-        result: bool = TileTwinPlacementLookup(location, direction) in possible_locations
+        result: bool = direction in possible_locations[location]
         return result
 
     def get_resources_taken_when_placing_tile_at_location(
@@ -717,25 +717,23 @@ class TileService(object):
         if location < 0 or location >= player.tile_count:
             raise IndexError(f"Location index ({location}) must be in range [0, Number of Tiles owned by Player: {player.tile_count})")
 
-        possible_locations: List[TileTwinPlacementLookup] = self.get_available_locations_for_twin(
+        possible_locations: ValidTwinTileLocations = self.get_available_locations_for_twin(
             player,
             twin_tile_type)
 
-        result: ResultLookup[bool]
+        if not direction in possible_locations[location]:
+            return ResultLookup(errors=f"Chosen position ({location}, {direction.name}) is invalid")
 
-        if TileTwinPlacementLookup(location, direction) in possible_locations:
-            player.tiles[location].set_tile(primary_tile)
+        player.tiles[location].set_tile(primary_tile)
 
-            location_of_secondary_tile: int = location + self._direction_offset[direction](player)
-            player.tiles[location_of_secondary_tile].set_tile(secondary_tile)
+        location_of_secondary_tile: int = location + self._direction_offset[direction](player)
+        player.tiles[location_of_secondary_tile].set_tile(secondary_tile)
 
-            if twin_tile_type in self._inseparable_twin_tile_funcs:
-                tile_as_twin: BaseTwinTile = cast(BaseTwinTile, primary_tile)
-                tile_as_twin.place_tile(location, location_of_secondary_tile)
+        if twin_tile_type in self._inseparable_twin_tile_funcs:
+            tile_as_twin: BaseTwinTile = cast(BaseTwinTile, primary_tile)
+            tile_as_twin.place_tile(location, location_of_secondary_tile)
 
-            result = ResultLookup(True, True)
-        else:
-            result = ResultLookup(errors=f"Chosen position ({location}, {direction.name}) are invalid")
+        result = ResultLookup(True, True)
 
         return result
 
