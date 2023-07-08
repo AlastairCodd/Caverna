@@ -70,7 +70,7 @@ class StoreSpecificAnimalEffect(BaseAnimalStorageEffect):
             text.append(("", " "))
             text.append(("", animal.name))
             if i != len(self._animal_storage_buckets) - 1:
-                text.append((" or ", ""))
+                text.append(("", " or "))
 
         if format_spec == "pp":
             return text
