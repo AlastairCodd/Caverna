@@ -37,7 +37,7 @@ class DecreasePriceOfTileEffect(BaseTilePurchaseEffect):
         """
         if decrease_by is None:
             raise ValueError("Amount to decrease by cannot be null.")
-        self._decreaseBy: Dict[ResourceTypeEnum] = decrease_by
+        self._decrease_by: Dict[ResourceTypeEnum] = decrease_by
         BaseTilePurchaseEffect.__init__(self, True)
 
     def invoke(
@@ -53,13 +53,28 @@ class DecreasePriceOfTileEffect(BaseTilePurchaseEffect):
 
         new_price: Dict[ResourceTypeEnum, int] = dict(current_price)
 
-        for resource in self._decreaseBy:
+        for resource in self._decrease_by:
             current_price_for_resource = new_price.get(resource, 0)
-            current_price_for_resource -= self._decreaseBy[resource]
+            current_price_for_resource -= self._decrease_by[resource]
 
             new_price[resource] = current_price_for_resource
 
         return new_price
+
+    def __str__(self) -> str:
+        return self.__format__(" ")
+
+    def __format__(self, format_spec):
+        text = [("", "Decrease cost of any purchase by ")]
+        for (i, (resource, amount)) in enumerate(self._decrease_by.items()):
+            text.append(("class:count", str(amount)))
+            text.append(("", " "))
+            text.append(("class:resource", resource.name))
+            if i != len(self._decrease_by) - 1:
+                text.append(("", ", "))
+        if format_spec == "pp":
+            return text
+        return "".join(e[1] for e in text)
 
 
 class AllowSubstitutionForPurchaseEffect(BaseTilePurchaseEffect):
@@ -183,3 +198,18 @@ class DecreasePriceOfWeaponEffect(BaseWeaponPurchaseEffect):
             new_price[resource] = current_price_for_resource
 
         return new_price
+
+    def __str__(self) -> str:
+        return self.__format__(" ")
+
+    def __format__(self, format_spec):
+        text = [("", "Decrease cost of weapon purchase by ")]
+        for (i, (resource, amount)) in enumerate(self._decrease_by.items()):
+            text.append(("class:count", str(amount)))
+            text.append(("", " "))
+            text.append(("class:resource", resource.name))
+            if i != len(self._decrease_by) - 1:
+                text.append(("", ", "))
+        if format_spec == "pp":
+            return text
+        return "".join(e[1] for e in text)
