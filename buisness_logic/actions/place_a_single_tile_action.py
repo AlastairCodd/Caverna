@@ -161,34 +161,36 @@ class PlaceASingleTileAction(BasePlayerChoiceAction):
             chosen_tile,
             self._tile_cost_override,
             self._effects_to_use)
-        errors.extend(actual_cost_of_tile_result.errors)
 
-        if actual_cost_of_tile_result.flag:
-            can_player_afford_tile: bool = player.has_more_resources_than(actual_cost_of_tile_result.value)
-            if not can_player_afford_tile:
-                errors.append(CannotAffordActionError("Player", chosen_tile.name, actual_cost_of_tile_result.value, player.resources))
+        if not actual_cost_of_tile_result.flag:
+            return ResultLookup(errors=actual_cost_of_tile_result.errors)
+
+        can_player_afford_tile: bool = player.has_more_resources_than(actual_cost_of_tile_result.value)
+        if not can_player_afford_tile:
+            errors.append(CannotAffordActionError("Player", chosen_tile.name, actual_cost_of_tile_result.value, player.resources))
 
         success: bool = len(errors) == 0
 
-        if success:
-            was_tile_placed_successfully_result: ResultLookup[bool] = self._tile_service.place_single_tile(
-                player,
-                chosen_tile,
-                self._tile_location,
-                self._tile_requisites_override)
+        if not success:
+            return ResultLookup(errors=errors)
 
-            success = was_tile_placed_successfully_result.flag
-            errors.extend(was_tile_placed_successfully_result.errors)
+        was_tile_placed_successfully_result: ResultLookup[bool] = self._tile_service.place_single_tile(
+            player,
+            chosen_tile,
+            self._tile_location,
+            self._tile_requisites_override)
 
-            if success:
-                success = player.take_resources(actual_cost_of_tile_result.value)
+        if not was_tile_placed_successfully_result.flag:
+            return ResultLookup(errors=was_tile_placed_successfully_result.errors)
 
-                for effect in chosen_tile.effects:
-                    if isinstance(effect, BaseOnPurchaseEffect):
-                        success &= effect.invoke(player)
+        success = player.take_resources(actual_cost_of_tile_result.value)
 
-                if not self._tile_service.does_tile_type_have_unique_tile(self._tile_type):
-                    self._turn_descriptor.tiles.remove(chosen_tile)
+        for effect in chosen_tile.effects:
+            if isinstance(effect, BaseOnPurchaseEffect):
+                success &= effect.invoke(player)
+
+        if not self._tile_service.does_tile_type_have_unique_tile(self._tile_type):
+            self._turn_descriptor.tiles.remove(chosen_tile)
 
         result: ResultLookup[int] = ResultLookup(success, 1 if success else 0, errors)
         return result
