@@ -416,15 +416,15 @@ class TileService(object):
         if location_to_build_tile is None:
             raise ValueError("Location to build tile must not be None")
 
-        primary_tile: TileEntity
+        tile_to_build: TileEntity
 
         try:
-            primary_tile = player.get_tile_at_location(location_to_build_tile)
+            tile_to_build = player.get_tile_at_location(location_to_build_tile)
         except IndexError as err:
             return ResultLookup(errors=err)
 
         resources: Dict[ResourceTypeEnum, int] = {}
-        for effect in primary_tile.get_effects_of_type(ReceiveOnCoveringEffect):
+        for effect in tile_to_build.get_effects_of_type(ReceiveOnCoveringEffect):
             for (resource, amount) in effect.resources.items():
                 resources[resource] = resources.get(resource, 0) + amount
 
