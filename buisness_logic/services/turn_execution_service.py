@@ -12,24 +12,25 @@ from common.entities.dwarf_card_action_combination_lookup import DwarfCardAction
 from common.entities.precedes_constraint import PrecedesConstraint
 from common.entities.result_lookup import ResultLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
-from common.services.action_invoke_service import ActionInvokeService
+from common.services.configurable_action_ordering_service import ConfigurableActionOrderingService
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_action_ordering_service import ActionOrderingService
 from core.baseClasses.base_constraint import BaseConstraint
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
+from core.constants.logging import DollarMessage as __
 from core.services.base_player_service import BasePlayerService
 
 
 class TurnExecutionService(object):
     def __init__(self, action_ordering_service: Optional[ActionOrderingService] = None) -> None:
         self._turn_transfer_service: TurnTransferService = TurnTransferService()
-        self._action_invoke_service: ActionInvokeService = ActionInvokeService(action_ordering_service)
+        self._action_ordering_service: ActionOrderingService = action_ordering_service if action_ordering_service is not None else ConfigurableActionOrderingService()
 
     def take_turn(
             self,
             player: BasePlayerService,
             is_players_final_turn: bool,
-            turn_descriptor: TurnDescriptorLookup) -> ResultLookup[int]:
+            turn_descriptor: TurnDescriptorLookup):
         if player is None:
             raise ValueError("Player cannot be None")
         if turn_descriptor is None:
@@ -46,7 +47,6 @@ class TurnExecutionService(object):
         errors: List[str] = []
         count: int = 0
 
-        success &= chosen_turn_descriptor_result.flag
         errors.extend(chosen_turn_descriptor_result.errors)
 
         logging.debug(chosen_turn_descriptor_result.value.choice.__format__("4"))
@@ -107,20 +107,39 @@ class TurnExecutionService(object):
 
         full_action_choice: ActionChoiceLookup = ActionChoiceLookup(actions_to_take, constraints_on_actions)
 
-        invoked_result: ResultLookup[int] = self._action_invoke_service.invoke(
+        actions_best_order: ResultLookup[List[BaseAction]] = self._action_ordering_service.calculate_best_order(
             full_action_choice,
             player,
             choice.card,
             choice.dwarf,
             turn_descriptor)
 
-        success &= invoked_result.flag
-        errors.extend(invoked_result.errors)
+        if not actions_best_order.flag:
+            player_response = player.report_action_choice_failed(full_action_choice)
+            raise NotImplementedError("TODO react to player choice")
 
-        if invoked_result.flag:
-            count = invoked_result.value
+        self._invoke_best_ordering(actions_best_order.value, player, choice.card, choice.dwarf)
 
-        return ResultLookup(success, count, errors)
+    def _invoke_best_ordering(
+            self,
+            actions,
+            player,
+            current_card,
+            current_dwarf) -> None:
+        logging.info("> returned valid ordering")
+
+        for action in actions:
+            logging.info(__("  > Invoking {action}", action=action))
+
+            invoke_result: ResultLookup[int] = action.invoke(
+                    player,
+                    current_card,
+                    current_dwarf)
+
+            if not invoke_result.flag:
+                raise InvalidOperationError("Ordering service's supposedly valid ordering was actually invalid")
+            logging.debug(__("    > Success, {successes} actions", successes=invoke_result.value))
+
 
     def _handle_action(
             self,

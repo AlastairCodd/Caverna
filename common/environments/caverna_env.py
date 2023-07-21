@@ -113,13 +113,11 @@ class CavernaEnv(object):
             style={"": "underline"},
         )
 
-        turn_result: ResultLookup[int] = self._turn_execution_service.take_turn(
+        # Not convinced of this API -- feels weird to say that the take_turn operation never fails
+        self._turn_execution_service.take_turn(
             current_player,
             self._state.is_current_players_final_turn,
             turn_descriptor)
-
-        for error in turn_result.errors:
-            print(format(error, "4"))
 
         next_player_result: ResultLookup[BasePlayerService] = self._state.get_next_player()
 
