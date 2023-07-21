@@ -185,14 +185,20 @@ class DeterministicPlayer(BasePlayerService):
         from core.enums.caverna_enums import TileTypeEnum
 
         tile_service = TileService()
-        tile_service.place_single_tile(self, CavernTile(), 12)
-        tile_service.place_single_tile(self, CavernTile(), 13)
-        tile_service.place_single_tile(self, TunnelTile(), 20)
-        tile_service.place_single_tile(self, TunnelTile(), 21)
+        self._place_tile(tile_service, TunnelTile(), 20)
+        self._place_tile(tile_service, TunnelTile(), 21)
+        self._place_tile(tile_service, CavernTile(), 12)
+        self._place_tile(tile_service, CavernTile(), 13)
 
-        tile_service.place_single_tile(self, MeadowTile(), 27)
-        tile_service.place_single_tile(self, FieldTile(), 34)
-        tile_service.place_single_tile(self, FieldTile(), 35)
+        self._place_tile(tile_service, FieldTile(), 35)
+        self._place_tile(tile_service, MeadowTile(), 27)
+        self._place_tile(tile_service, FieldTile(), 34)
+
+    def _place_tile(self, tile_service, tile, location):
+        if not (result := tile_service.place_single_tile(self, tile, location)).flag:
+            for error in result.errors:
+                print(error)
+
 
 if __name__ == "__main__":
     import cProfile
