@@ -7,13 +7,8 @@ split list of tiles into sections
 show only possible effects -- those that the player already has, and those which could be gained using tile effects
 
 bugs:
-* do not get extra food for placing tiles over water tiles
-* tile placement shows u for tiles only accessible with tile effect
- - also suggests you might be able to place a tile on the starting dwelling
 * trying to do something impossible still increments player count, should probably give you a second choice
-* tiles are already built when they're not
 * if there's no valid place to build a tile, the keyboard human player service throws up
-* weekly market action output seems like it's not actually requiring the constraints pass? weird.
 
 nice to haves:
 * changing the location to build could change the location map to highlight the currently chosen location
