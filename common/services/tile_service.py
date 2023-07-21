@@ -96,6 +96,9 @@ class ValidLocations(BaseValidLocations):
     def __contains__(self, item) -> bool:
         return self._source[item] == LocationValidity.Valid
 
+    def __getitem__(self, item) -> LocationValidity:
+        return self._source[item]
+
     def __iter__(self):
         return self._actually_valid_locations()
 
@@ -689,7 +692,7 @@ class TileService(object):
         if location < 0 or location > player.tile_count:
             raise ValueError("location must point to a valid position")
 
-        available_locations: List[int] = self.get_available_locations_for_single(player, tile.tile_type, requisites_override)
+        available_locations: ValidLocations = self.get_available_locations_for_single(player, tile.tile_type, requisites_override)
 
         if location not in available_locations:
             location_validity = available_locations[location]
