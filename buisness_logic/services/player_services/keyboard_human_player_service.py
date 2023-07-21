@@ -26,7 +26,7 @@ from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
 from core.containers.resource_container import ResourceContainer
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
-from core.services.base_player_service import BasePlayerService
+from core.services.base_player_service import BasePlayerService, InvalidActionCombinationResponse
 
 
 FormattedText = List[Tuple[str, str]]
@@ -87,6 +87,11 @@ class KeyboardHumanPlayerService(BasePlayerService):
             player_descriptor,
             player_turn_index,
             TileContainerDefault())
+
+    def report_action_choice_failed(
+            self,
+            actions) -> InvalidActionCombinationResponse:
+        raise NotImplementedError()
 
     def get_player_choice_conversions_to_perform(
             self,

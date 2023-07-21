@@ -28,7 +28,7 @@ from core.baseClasses.base_card import BaseCard
 from core.baseClasses.base_tile import BaseTile
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.services.base_action_choice_processor_service import BaseActionChoiceProcessorService
-from core.services.base_player_service import BasePlayerService
+from core.services.base_player_service import BasePlayerService, InvalidActionCombinationResponse
 
 
 class ActionChoicePlayerService(BasePlayerService):
@@ -92,6 +92,11 @@ class ActionChoicePlayerService(BasePlayerService):
             raise ValueError(f"Action choice is not of correct length (actual={len(action_choice)}, expected={self._action_choice_length})")
         for service in self._processor_services:
             service.set_action_choice(action_choice)
+
+    def report_action_choice_failed(
+            self,
+            actions) -> InvalidActionCombinationResponse:
+        raise NotImplementedError()
 
     def get_player_choice_conversions_to_perform(
             self,

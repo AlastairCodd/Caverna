@@ -6,7 +6,7 @@ from common.entities.tile_twin_placement_lookup import TileTwinPlacementLookup
 from common.entities.turn_descriptor_lookup import TurnDescriptorLookup
 from core.enums.caverna_enums import TileDirectionEnum, ResourceTypeEnum
 from core.enums.harvest_type_enum import HarvestTypeEnum
-from core.services.base_player_service import BasePlayerService
+from core.services.base_player_service import BasePlayerService, InvalidActionCombinationResponse
 
 
 def main_exhaustive():
@@ -95,6 +95,11 @@ class DeterministicPlayer(BasePlayerService):
         })
 
         self._place_tiles()
+
+    def report_action_choice_failed(
+            self,
+            actions) -> InvalidActionCombinationResponse:
+        raise NotImplementedError()
 
     def get_player_choice_card_to_use(self, _cards, _turn_descriptor):
         return ResultLookup(True, self._card)

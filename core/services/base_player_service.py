@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABCMeta
+from enum import Enum, auto
 from typing import List, Dict, Tuple, Optional
 
 from buisness_logic.effects.food_effects import BaseFoodEffect
@@ -15,6 +16,17 @@ from core.baseClasses.base_tile_container_default import BaseTileContainerDefaul
 from core.enums.caverna_enums import ResourceTypeEnum, TileTypeEnum
 from core.repositories.base_player_repository import BasePlayerRepository
 
+class InvalidActionCombinationResponse(Enum):
+    ResetEntireChoice = auto()
+    UseDifferentDwarf = auto()
+    PickCardAgain = auto()
+    MakeDifferentCardChoice = auto()
+    # ChooseDifferentOptionsOnCardActions = auto()  # when would you want this level of specifitity?
+    # ChooseDifferentOptionsOnChildActions = auto() # when would you want this level of specificity?
+    ChooseDifferentOptionsInActions = auto()
+    TryDifferentConversions = auto()
+    StopTryingToPerformSomeFreeActions = auto()   # this would probably benefit from knowing that it was specifically the free actions that were Bad
+
 
 class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
     def __init__(
@@ -29,6 +41,12 @@ class BasePlayerService(BasePlayerRepository, metaclass=ABCMeta):
             player_descriptor,
             turn_index,
             tile_container_default)
+
+    @abstractmethod
+    def report_action_choice_failed(
+            self,
+            actions) -> InvalidActionCombinationResponse:
+        raise NotImplementedError()
 
     @abstractmethod
     def get_player_choice_conversions_to_perform(
