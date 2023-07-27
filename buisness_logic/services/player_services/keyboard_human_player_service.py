@@ -91,7 +91,24 @@ class KeyboardHumanPlayerService(BasePlayerService):
     def report_action_choice_failed(
             self,
             actions) -> InvalidActionCombinationResponse:
-        raise NotImplementedError()
+        choices_and_text: Dict[InvalidActionCombinationResponse, str] = {
+                InvalidActionCombinationResponse.ResetEntireChoice: "Make entirely different choices",
+                InvalidActionCombinationResponse.UseDifferentDwarf: "Change which dwarf to use",
+                InvalidActionCombinationResponse.PickCardAgain: "Pick a different card",
+                InvalidActionCombinationResponse.MakeDifferentCardChoice: "Choose different card actions",
+                InvalidActionCombinationResponse.ChooseDifferentOptionsInActions: "Make different choices for actions",
+                InvalidActionCombinationResponse.TryDifferentConversions: "Choose different conversions",
+                InvalidActionCombinationResponse.StopTryingToPerformSomeFreeActions: "Choose different free actions",
+        }
+
+        choices: List[Dict[str, Any]] = [{'value': k, 'name': v} for (k, v) in choices_and_text.items()]
+
+        choice: InvalidActionCombinationResponse = inquirer.select(
+            message="The chosen actions cannot be performed",
+            choices=choices
+        ).execute()
+
+        return choice
 
     def get_player_choice_conversions_to_perform(
             self,
