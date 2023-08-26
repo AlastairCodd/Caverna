@@ -23,7 +23,7 @@ from core.baseClasses.base_action_ordering_service import ActionOrderingService
 from core.baseClasses.base_constraint import BaseConstraint
 from core.baseClasses.base_player_choice_action import BasePlayerChoiceAction
 from core.constants.logging import VERBOSE_LOG_LEVEL, DollarMessage as __
-from core.services.base_player_service import BasePlayerService
+from core.services.base_player_service import BasePlayerService, InvalidActionCombinationResponse
 
 
 class TurnExecutionService(object):
@@ -155,9 +155,34 @@ class ChooseActionsTurnState(TurnState):
             warnings.warn("inform player of incorrect action combination")
             return self
 
-        dwarf_action_choice = self._dwarf_actions
-        card_action_choice = self._card_actions
-        action_action_choice = action_result.value
+        action_tree = ActionTree(
+                self._dwarf_actions,
+                self._card_actions,
+                action_result.value,
+                self._is_players_final_turn)
+
+        return MakeChoicesForActionsTurnState(
+                self._player,
+                self._dwarf,
+                self._card,
+                action_tree,
+                self._turn_descriptor)
+
+class VisitResult(Enum):
+    set_successfully = auto()
+    failed = auto()
+    none_remaining = auto()
+
+class ActionTree(object):
+    def __init__(
+            self,
+            dwarf_action_choice,
+            card_action_choice,
+            action_action_choice,
+            is_players_final_turn) -> None:
+        self._dwarf_action_choice = dwarf_action_choice
+        self._card_action_choice = card_action_choice
+        self._action_action_choice = action_action_choice
 
         actions: List[BaseAction] = []
         actions.extend(dwarf_action_choice.actions)
@@ -183,30 +208,15 @@ class ChooseActionsTurnState(TurnState):
                 constraint: BaseConstraint = PrecedesConstraint(card_action, action_action)
                 constraints.append(constraint)
 
-        action_tree = ActionTree(actions, constraints, self._is_players_final_turn)
+        self._has_check_for_animal_storage = False
+        self._was_ever_players_final_turn = self._is_players_final_turn = is_players_final_turn
 
-        return MakeChoicesForActionsTurnState(
-                self._player,
-                self._dwarf,
-                self._card,
-                action_tree,
-                self._turn_descriptor)
-
-class VisitResult(Enum):
-    set_successfully = auto()
-    failed = auto()
-    none_remaining = auto()
-
-class ActionTree(object):
-    def __init__(self, actions, constraints, is_players_final_turn) -> None:
         self._untested_actions = actions
         self._untested_actions.append(ConvertAction())
         self._untested_actions.append(FreeAction())
 
         self._actions_to_take = []
         self._constraints = constraints
-        self._has_check_for_animal_storage = False
-        self._is_players_final_turn = is_players_final_turn
 
     def get_next_action(self) -> BaseAction:
         while len(self._untested_actions) > 0:
@@ -260,6 +270,22 @@ class ActionTree(object):
         self._is_players_final_turn = False
         return harvest_action
 
+    def get_args_for_choosing_card(self) -> Tuple[bool, ActionChoiceLookup]:
+        return (self._was_ever_players_final_turn, self._dwarf_action_choice)
+
+    def get_args_for_choosing_actions(self) -> Tuple[bool, ActionChoiceLookup, ActionChoiceLookup]:
+        return (self._was_ever_players_final_turn, self._dwarf_action_choice, self._card_action_choice)
+
+    def get_root_level_action_tree(self) -> 'ActionTree':
+        raise NotImplementedError()
+
+    def get_action_tree_with_reset_conversions(self) -> 'ActionTree':
+        raise NotImplementedError()
+
+    def get_action_tree_with_default_free_actions(self) -> 'ActionTree':
+        raise NotImplementedError()
+
+
 class MakeChoicesForActionsTurnState(TurnState):
     def __init__(
             self,
@@ -286,6 +312,7 @@ class MakeChoicesForActionsTurnState(TurnState):
                             self._player,
                             self._dwarf,
                             self._card,
+                            self._action_tree,
                             full_action_choice,
                             self._turn_descriptor)
                 case VisitResult.set_successfully:
@@ -293,7 +320,7 @@ class MakeChoicesForActionsTurnState(TurnState):
                 case (VisitResult.Failed, action, errors):
                     match self._player.report_action_choice_failed(action_result.value):
                         case InvalidActionCombinationResponse.ResetEntireChoice | InvalidActionCombinationResponse.UseDifferentDwarf:
-                            return ChooseDwarfTurnState(self._player, self._turn_descriptor)
+                            return ChooseDwarfTurnState(self._player, self._action_tree._was_ever_players_final_turn, self._turn_descriptor)
                         case InvalidActionCombinationResponse.PickCardAgain:
                             return ChooseCardTurnState(self._player, self._dwarf, self._turn_descriptor)
                         case InvalidActionCombinationResponse.MakeDifferentCardChoice:
@@ -309,11 +336,14 @@ class OrderActionsTurnState(TurnState):
             player,
             dwarf,
             card,
+            action_tree,
             full_action_choice,
             turn_descriptor):
         self._player = player
         self._dwarf = dwarf
         self._card = card
+
+        self._action_tree = action_tree
         self._full_action_choice = full_action_choice
         self._turn_descriptor = turn_descriptor
         self._action_ordering_service = ConfigurableActionOrderingService()
@@ -327,8 +357,57 @@ class OrderActionsTurnState(TurnState):
             self._turn_descriptor)
 
         if not actions_best_order.flag:
-            player_response = self._player.report_action_choice_failed(self._full_action_choice)
-            raise NotImplementedError("TODO react to player choice")
+            match self._player.report_action_choice_failed(self._full_action_choice):
+                case InvalidActionCombinationResponse.ResetEntireChoice | InvalidActionCombinationResponse.UseDifferentDwarf:
+                    return ChooseDwarfTurnState(
+                            self._player,
+                            self._action_tree._was_ever_players_final_turn,
+                            self._turn_descriptor)
+                case InvalidActionCombinationResponse.PickCardAgain:
+                    (is_players_final_turn, dwarf_actions) = self._action_tree.get_args_for_choosing_card()
+                    return ChooseCardTurnState(
+                            self._player,
+                            is_players_final_turn,
+                            self._dwarf,
+                            dwarf_actions,
+                            self._turn_descriptor)
+                case InvalidActionCombinationResponse.MakeDifferentCardChoice:
+                    (is_players_final_turn, dwarf_actions, card_actions) = self._action_tree.get_args_for_choosing_actions()
+                    return ChooseActionsTurnState(
+                            self._player,
+                            is_players_final_turn,
+                            self._dwarf,
+                            dwarf_actions,
+                            self._card,
+                            card_actions,
+                            self._turn_descriptor)
+                case InvalidActionCombinationResponse.ChooseDifferentOptionsInActions:
+                    root_level_action_tree = self._action_tree.get_root_level_action_tree()
+                    return MakeChoicesForActionsTurnState(
+                            self._player,
+                            self._dwarf,
+                            self._card,
+                            root_level_action_tree,
+                            self._turn_descriptor)
+                case InvalidActionCombinationResponse.TryDifferentConversions:
+                    action_tree_without_conversions = self._action_tree.get_action_tree_with_reset_conversions()
+                    return MakeChoicesForActionsTurnState(
+                            self._player,
+                            self._dwarf,
+                            self._card,
+                            action_tree_without_conversions,
+                            self._turn_descriptor)
+                case InvalidActionCombinationResponse.StopTryingToPerformSomeFreeActions:
+                    action_tree_without_free_actions = self._action_tree.get_action_tree_with_default_free_actions()
+                    return MakeChoicesForActionsTurnState(
+                            self._player,
+                            self._dwarf,
+                            self._card,
+                            action_tree_without_free_actions,
+                            self._turn_descriptor)
+                case response:
+                    # probably not required in rust?
+                    raise ValueError(f"unknown action combination response -- {response}")
 
         return InvokeBestOrderingTurnState(
                 self._player,
