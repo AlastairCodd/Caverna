@@ -65,6 +65,7 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         self._debug_flag_do_not_invoke_actions: bool = False
         self._logger = logging.getLogger(__name__)
         self._logger.setLevel(logging.INFO)
+        self._log_debug = False
 
     def calculate_best_order(
             self,
@@ -216,7 +217,7 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         if index_of_first_action == -1:
             return True
         self._permutation_forge.mark_last_permutation_as_invalid(index_of_first_action)
-        if self._logger.isEnabledFor(logging.DEBUG):
+        if not self._log_debug:
             return False
         self._logger.debug(__("permutation does not pass constraints; failed at {i}", i=index_of_first_action))
         i = 0
