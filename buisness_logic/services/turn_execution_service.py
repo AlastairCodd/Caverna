@@ -31,6 +31,9 @@ class TurnExecutionService(object):
         self._turn_transfer_service: TurnTransferService = TurnTransferService()
         self._action_ordering_service: ActionOrderingService = action_ordering_service if action_ordering_service is not None else ConfigurableActionOrderingService()
 
+        self._logger = logging.getLogger(__name__)
+        self._logger.setLevel(logging.INFO)
+
     def take_turn(
             self,
             player: BasePlayerService,
@@ -41,7 +44,7 @@ class TurnExecutionService(object):
         if turn_descriptor is None:
             raise ValueError("Turn Descriptor cannot be None")
 
-        turn_state = ChooseDwarfTurnState(player, is_players_final_turn, turn_descriptor)
+        turn_state = ChooseDwarfTurnState(self._logger, player, is_players_final_turn, turn_descriptor)
         while turn_state is not None:
             turn_state = turn_state.next()
 
@@ -67,7 +70,13 @@ class TurnState(metaclass=ABCMeta):
         pass
 
 class ChooseDwarfTurnState(TurnState):
-    def __init__(self, player, is_players_final_turn, turn_descriptor) -> None:
+    def __init__(
+            self,
+            logger,
+            player,
+            is_players_final_turn,
+            turn_descriptor) -> None:
+        self._logger = logger
         self._player = player
         self._is_players_final_turn = is_players_final_turn
         self._turn_descriptor = turn_descriptor
@@ -84,6 +93,7 @@ class ChooseDwarfTurnState(TurnState):
 
         chosen_dwarf, dwarf_action_choice = dwarf_result.value
         return ChooseCardTurnState(
+                self._logger,
                 self._player,
                 self._is_players_final_turn,
                 chosen_dwarf,
@@ -93,11 +103,13 @@ class ChooseDwarfTurnState(TurnState):
 class ChooseCardTurnState(TurnState):
     def __init__(
             self,
+            logger,
             player,
             is_players_final_turn,
             dwarf,
             dwarf_actions,
             turn_descriptor) -> None:
+        self._logger = logger
         self._player = player
         self._is_players_final_turn = is_players_final_turn
         self._dwarf = dwarf
@@ -117,6 +129,7 @@ class ChooseCardTurnState(TurnState):
 
         chosen_card, card_action_choice = card_result.value
         return ChooseActionsTurnState(
+                self._logger,
                 self._player,
                 self._is_players_final_turn,
                 self._dwarf,
@@ -128,6 +141,7 @@ class ChooseCardTurnState(TurnState):
 class ChooseActionsTurnState(TurnState):
     def __init__(
             self,
+            logger,
             player,
             is_players_final_turn,
             dwarf,
@@ -135,6 +149,7 @@ class ChooseActionsTurnState(TurnState):
             card,
             card_actions,
             turn_descriptor) -> None:
+        self._logger = logger
         self._player = player
         self._is_players_final_turn = is_players_final_turn
         self._dwarf = dwarf
@@ -156,12 +171,14 @@ class ChooseActionsTurnState(TurnState):
             return self
 
         action_tree = ActionTree(
+                self._logger,
                 self._dwarf_actions,
                 self._card_actions,
                 action_result.value,
                 self._is_players_final_turn)
 
         return MakeChoicesForActionsTurnState(
+                self._logger,
                 self._player,
                 self._dwarf,
                 self._card,
@@ -176,10 +193,12 @@ class VisitResult(Enum):
 class ActionTree(object):
     def __init__(
             self,
+            logger,
             dwarf_action_choice,
             card_action_choice,
             action_action_choice,
             is_players_final_turn) -> None:
+        self._logger = logger
         self._dwarf_action_choice = dwarf_action_choice
         self._card_action_choice = card_action_choice
         self._action_action_choice = action_action_choice
@@ -232,12 +251,12 @@ class ActionTree(object):
     def visit(self, player, dwarf, turn_descriptor) -> VisitResult | Tuple[VisitResult, ActionChoiceLookup] | Tuple[VisitResult, BaseAction, list[str]]:
         next_action = self.get_next_action()
         if next_action is None:
-            logging.log(VERBOSE_LOG_LEVEL, __("visited all actions"))
+            self._logger.log(VERBOSE_LOG_LEVEL, __("visited all actions"))
             if not self._is_players_final_turn:
                 return (VisitResult.none_remaining, ActionChoiceLookup(self._actions_to_take, self._constraints))
-            logging.log(VERBOSE_LOG_LEVEL, __("... but is palyers final turn, so adding harvest action"))
+            self._logger.log(VERBOSE_LOG_LEVEL, __("... but is palyers final turn, so adding harvest action"))
             next_action = self._resolve_harvest()
-        logging.log(VERBOSE_LOG_LEVEL, __("visiting {action!r}", action=next_action))
+        self._logger.log(VERBOSE_LOG_LEVEL, __("visiting {action!r}", action=next_action))
         if not isinstance(next_action, BasePlayerChoiceAction):
             self._actions_to_take.append(next_action)
             return VisitResult.set_successfully
@@ -289,11 +308,13 @@ class ActionTree(object):
 class MakeChoicesForActionsTurnState(TurnState):
     def __init__(
             self,
+            logger,
             player,
             dwarf,
             card,
             action_tree,
             turn_descriptor) -> None:
+        self._logger = logger
         self._player = player
         self._dwarf = dwarf
         self._card = card
@@ -301,7 +322,7 @@ class MakeChoicesForActionsTurnState(TurnState):
         self._turn_descriptor = turn_descriptor
 
     def next(self) -> TurnState:
-        logging.log(VERBOSE_LOG_LEVEL, "starting to visit actions")
+        self._logger.log(VERBOSE_LOG_LEVEL, "starting to visit actions")
         while True:
             match self._action_tree.visit(
                     self._player,
@@ -309,6 +330,7 @@ class MakeChoicesForActionsTurnState(TurnState):
                     self._turn_descriptor):
                 case (VisitResult.none_remaining, full_action_choice):
                     return OrderActionsTurnState(
+                            self._logger,
                             self._player,
                             self._dwarf,
                             self._card,
@@ -320,11 +342,11 @@ class MakeChoicesForActionsTurnState(TurnState):
                 case (VisitResult.Failed, action, errors):
                     match self._player.report_action_choice_failed(action_result.value):
                         case InvalidActionCombinationResponse.ResetEntireChoice | InvalidActionCombinationResponse.UseDifferentDwarf:
-                            return ChooseDwarfTurnState(self._player, self._action_tree._was_ever_players_final_turn, self._turn_descriptor)
+                            return ChooseDwarfTurnState(self._logger, self._player, self._action_tree._was_ever_players_final_turn, self._turn_descriptor)
                         case InvalidActionCombinationResponse.PickCardAgain:
-                            return ChooseCardTurnState(self._player, self._dwarf, self._turn_descriptor)
+                            return ChooseCardTurnState(self._logger, self._player, self._dwarf, self._turn_descriptor)
                         case InvalidActionCombinationResponse.MakeDifferentCardChoice:
-                            return ChooseActionTurnState(self._player, self._dwarf, self._card, self._turn_descriptor)
+                            return ChooseActionTurnState(self._logger, self._player, self._dwarf, self._card, self._turn_descriptor)
                         case _:
                             raise NotImplementedError()
                 case err:
@@ -333,18 +355,21 @@ class MakeChoicesForActionsTurnState(TurnState):
 class OrderActionsTurnState(TurnState):
     def __init__(
             self,
+            logger,
             player,
             dwarf,
             card,
             action_tree,
             full_action_choice,
             turn_descriptor):
+        self._logger = logger
         self._player = player
         self._dwarf = dwarf
         self._card = card
 
         self._action_tree = action_tree
         self._full_action_choice = full_action_choice
+
         self._turn_descriptor = turn_descriptor
         self._action_ordering_service = ConfigurableActionOrderingService()
 
@@ -360,12 +385,14 @@ class OrderActionsTurnState(TurnState):
             match self._player.report_action_choice_failed(self._full_action_choice):
                 case InvalidActionCombinationResponse.ResetEntireChoice | InvalidActionCombinationResponse.UseDifferentDwarf:
                     return ChooseDwarfTurnState(
+                            self._logger,
                             self._player,
                             self._action_tree._was_ever_players_final_turn,
                             self._turn_descriptor)
                 case InvalidActionCombinationResponse.PickCardAgain:
                     (is_players_final_turn, dwarf_actions) = self._action_tree.get_args_for_choosing_card()
                     return ChooseCardTurnState(
+                            self._logger,
                             self._player,
                             is_players_final_turn,
                             self._dwarf,
@@ -374,6 +401,7 @@ class OrderActionsTurnState(TurnState):
                 case InvalidActionCombinationResponse.MakeDifferentCardChoice:
                     (is_players_final_turn, dwarf_actions, card_actions) = self._action_tree.get_args_for_choosing_actions()
                     return ChooseActionsTurnState(
+                            self._logger,
                             self._player,
                             is_players_final_turn,
                             self._dwarf,
@@ -384,6 +412,7 @@ class OrderActionsTurnState(TurnState):
                 case InvalidActionCombinationResponse.ChooseDifferentOptionsInActions:
                     root_level_action_tree = self._action_tree.get_root_level_action_tree()
                     return MakeChoicesForActionsTurnState(
+                            self._logger,
                             self._player,
                             self._dwarf,
                             self._card,
@@ -392,6 +421,7 @@ class OrderActionsTurnState(TurnState):
                 case InvalidActionCombinationResponse.TryDifferentConversions:
                     action_tree_without_conversions = self._action_tree.get_action_tree_with_reset_conversions()
                     return MakeChoicesForActionsTurnState(
+                            self._logger,
                             self._player,
                             self._dwarf,
                             self._card,
@@ -400,6 +430,7 @@ class OrderActionsTurnState(TurnState):
                 case InvalidActionCombinationResponse.StopTryingToPerformSomeFreeActions:
                     action_tree_without_free_actions = self._action_tree.get_action_tree_with_default_free_actions()
                     return MakeChoicesForActionsTurnState(
+                            self._logger,
                             self._player,
                             self._dwarf,
                             self._card,
@@ -410,6 +441,7 @@ class OrderActionsTurnState(TurnState):
                     raise ValueError(f"unknown action combination response -- {response}")
 
         return InvokeBestOrderingTurnState(
+                self._logger,
                 self._player,
                 self._dwarf,
                 self._card,
@@ -418,20 +450,22 @@ class OrderActionsTurnState(TurnState):
 class InvokeBestOrderingTurnState(TurnState):
     def __init__(
             self,
+            logger,
             player,
             dwarf,
             card,
             ordered_actions):
+        self._logger = logger
         self._player = player
         self._dwarf = dwarf
         self._card = card
         self._ordered_actions = ordered_actions
 
     def next(self) -> TurnState:
-        logging.info("> returned valid ordering")
+        self._logger.info("> returned valid ordering")
 
         for action in self._ordered_actions:
-            logging.info(__("  > Invoking {action}", action=action))
+            self._logger.info(__("  > Invoking {action}", action=action))
 
             invoke_result: ResultLookup[int] = action.invoke(
                     self._player,
@@ -440,6 +474,6 @@ class InvokeBestOrderingTurnState(TurnState):
 
             if not invoke_result.flag:
                 raise InvalidOperationError("Ordering service's supposedly valid ordering was actually invalid")
-            logging.debug(__("    > Success, {successes} actions", successes=invoke_result.value))
+            self._logger.debug(__("    > Success, {successes} actions", successes=invoke_result.value))
 
         return None
