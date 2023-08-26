@@ -36,8 +36,8 @@ class ConfigurableActionOrderingService(ActionOrderingService):
 
         self._permutation_forge: BaseListPermutationForge
         if permutation_forge is None:
-            from common.forges.pruning_list_permutation_forge import PruningListPermutationForge
-            self._permutation_forge = PruningListPermutationForge()
+            from common.forges.allocation_free_list_permutation_forge import AllocationFreeListPermutationForge
+            self._permutation_forge = AllocationFreeListPermutationForge()
         else:
             self._permutation_forge = permutation_forge
 
@@ -56,8 +56,8 @@ class ConfigurableActionOrderingService(ActionOrderingService):
 
         self._constraint_validator_func: Callable[List[BaseConstraint], BaseConstraintValidator]
         if constraint_validator_func is None:
-            from common.services.collating_constraint_validator import CollatingConstraintValidator
-            self._constraint_validator_func = lambda constraints: CollatingConstraintValidator(constraints)
+            from common.services.bitmanip_constraint_validator import BitmanipConstraintValidator
+            self._constraint_validator_func = lambda constraints: BitmanipConstraintValidator(constraints)
         else:
             self._constraint_validator_func = constraint_validator_func
 
