@@ -1,3 +1,5 @@
 gym
 InquirerPy
 typing-extensions
+# line_profiler is used for line-by-line profiling
+line_profiler

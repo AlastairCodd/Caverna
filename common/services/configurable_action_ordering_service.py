@@ -2,6 +2,8 @@ from functools import reduce
 import logging
 from typing import List, Iterable, Tuple, Union, Optional, Callable
 
+from line_profiler import profile
+
 from buisness_logic.actions.activate_dwarf_action import ActivateDwarfAction
 from common.entities.action_choice_lookup import ActionChoiceLookup
 from common.entities.dwarf import Dwarf
@@ -67,6 +69,7 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         self._logger.setLevel(logging.INFO)
         self._log_debug = False
 
+    @profile
     def calculate_best_order(
             self,
             actions: ActionChoiceLookup,
@@ -194,6 +197,7 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         # if we've exhausted all ordering services, just pick a permutation at random
         return ResultLookup(True, ordering_result.value[0][0])
 
+    @profile
     def reset(self, turn_descriptor: TurnDescriptorLookup) -> None:
         self._reset_turn_descriptor(turn_descriptor)
         self._turn_descriptor_tiles = None
@@ -203,12 +207,14 @@ class ConfigurableActionOrderingService(ActionOrderingService):
             raise InvalidOperationError("cannot call _cache_turn_descriptor_state multiple times without reset()ing")
         self._turn_descriptor_tiles = list(turn_descriptor.tiles)
 
+    @profile
     def _reset_turn_descriptor(self, turn_descriptor: TurnDescriptorLookup) -> None:
         if self._turn_descriptor_tiles is None:
             raise InvalidOperationError("must call _cache_turn_descriptor_state before _reset_turn_descriptor_state")
         turn_descriptor.tiles.clear()
         turn_descriptor.tiles.extend(self._turn_descriptor_tiles)
 
+    @profile
     def _does_pass_all_constraints(
             self,
             permutation: List[BaseAction],

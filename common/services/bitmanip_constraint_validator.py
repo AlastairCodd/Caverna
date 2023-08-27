@@ -1,5 +1,7 @@
 from typing import List, NamedTuple
 
+from line_profiler import profile
+
 from core.baseClasses.base_action import BaseAction
 from core.baseClasses.base_constraint import BaseConstraint
 from common.entities.precedes_constraint import PrecedesConstraint
@@ -24,6 +26,7 @@ class BitmanipConstraintValidator(object):
             self._constraints[constraint._action_one].append((i, True, offset))
             self._constraints[constraint._action_two].append((i, False, offset))
 
+    @profile
     def get_index_of_first_action_which_fails_constraints(
             self,
             permutation: List[BaseAction]) -> int:
