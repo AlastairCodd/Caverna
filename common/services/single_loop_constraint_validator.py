@@ -27,21 +27,21 @@ class SingleLoopConstraintValidator(object):
             permutation: List[BaseAction]) -> int:
         self._reset()
         for (i, action) in enumerate(permutation):
-            if action not in self._constraints:
-                #print(f"discarding action: {action}, not in {self._constraints}")
+            try:
+                constraints_on_action = self._constraints[action]
+                    #print("[DBG]", i, "action", repr(action))
+                    #print("[DBG]   has constraints", [(index, "is first" if c else "not first") for (index, c) in constraints_on_action])
+                for (constraint_index, is_first_action) in constraints_on_action:
+                    if self._already_considered[constraint_index]:
+                        #print(f"[DBG]   > first item in constraint '{constraint_index}' already considered, skipping")
+                        continue
+                    if not is_first_action:
+                        #print(f"[DBG]   > found second item in constraint '{constraint_index}' first. failing constraint at position {i}")
+                        return i
+                    #print(f"[DBG]   > found first item in constraint '{constraint_index}', marking as now considered")
+                    self._already_considered[constraint_index] = True
+            except KeyError:
                 continue
-            constraints_on_action = self._constraints[action]
-            #print("[DBG]", i, "action", repr(action))
-            #print("[DBG]   has constraints", [(index, "is first" if c else "not first") for (index, c) in constraints_on_action])
-            for (constraint_index, is_first_action) in constraints_on_action:
-                if self._already_considered[constraint_index]:
-                    #print(f"[DBG]   > first item in constraint '{constraint_index}' already considered, skipping")
-                    continue
-                if not is_first_action:
-                    #print(f"[DBG]   > found second item in constraint '{constraint_index}' first. failing constraint at position {i}")
-                    return i
-                #print(f"[DBG]   > found first item in constraint '{constraint_index}', marking as now considered")
-                self._already_considered[constraint_index] = True
         return -1
 
     def _reset(self) -> None:

@@ -32,21 +32,22 @@ class BitmanipConstraintValidator(object):
             permutation: List[BaseAction]) -> int:
         already_considered = 0
         for (i, action) in enumerate(permutation):
-            if action not in self._constraints:
-                continue
             #print()
-            constraints_on_action = self._constraints[action]
-            #print(i, "action", repr(action))
-            #print("constraints", constraints_on_action)
-            for (constraint_index, is_first_action, offset) in constraints_on_action:
-                #print(f"{offset=:b}")
-                if already_considered & offset != 0:
-                    #print(" ", constraint_index, "skipped")
-                    continue
-                if not is_first_action:
-                    #print(constraint_index, "bad", i)
-                    return i
-                #print(constraint_index, "good")
-                already_considered |= offset
-            #print(f"{self._already_considered:b}")
+            try:
+                constraints_on_action = self._constraints[action]
+                #print(i, "action", repr(action))
+                #print("constraints", constraints_on_action)
+                for (constraint_index, is_first_action, offset) in constraints_on_action:
+                    #print(f"{offset=:b}")
+                    if already_considered & offset != 0:
+                        #print(" ", constraint_index, "skipped")
+                        continue
+                    if not is_first_action:
+                        #print(constraint_index, "bad", i)
+                        return i
+                    #print(constraint_index, "good")
+                    already_considered |= offset
+                #print(f"{self._already_considered:b}")
+            except KeyError:
+                continue
         return -1
