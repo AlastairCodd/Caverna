@@ -107,11 +107,12 @@ class ConfigurableActionOrderingService(ActionOrderingService):
         activate_dwarf_action: ActivateDwarfAction = [action for action in actions.actions if isinstance(action, ActivateDwarfAction)][0]
 
         for permutation in permutations:
-            self._logger.log(VERBOSE_LOG_LEVEL, "")
-            if not self._does_pass_all_constraints(permutation, constraint_validator):
-                self._logger.log(VERBOSE_LOG_LEVEL, __("permutation {permutation_index} does not pass constraints", permutation_index=permutation_index))
+            index_of_first_action = constraint_validator.get_index_of_first_action_which_fails_constraints(permutation)
+            if index_of_first_action != -1:
+                self._permutation_forge.mark_last_permutation_as_invalid(index_of_first_action)
                 permutation_index += 1
                 continue
+
             if self._debug_flag_do_not_invoke_actions:
                 permutation_index += 1
                 continue
@@ -213,26 +214,3 @@ class ConfigurableActionOrderingService(ActionOrderingService):
             raise InvalidOperationError("must call _cache_turn_descriptor_state before _reset_turn_descriptor_state")
         turn_descriptor.tiles.clear()
         turn_descriptor.tiles.extend(self._turn_descriptor_tiles)
-
-    @profile
-    def _does_pass_all_constraints(
-            self,
-            permutation: List[BaseAction],
-            constraint_validator: BaseConstraintValidator) -> bool:
-        index_of_first_action = constraint_validator.get_index_of_first_action_which_fails_constraints(permutation)
-        if index_of_first_action == -1:
-            return True
-        self._permutation_forge.mark_last_permutation_as_invalid(index_of_first_action)
-        if not self._log_debug:
-            return False
-        self._logger.debug(__("permutation does not pass constraints; failed at {i}", i=index_of_first_action))
-        i = 0
-        for action in permutation[:index_of_first_action]:
-            self._logger.debug(__("   pass: action {i}: {action!r}", action=action, i=i))
-            i += 1
-        self._logger.debug(__("## fail: action {i} {action!r}", action=permutation[index_of_first_action], i=i))
-        i += 1
-        for action in permutation[index_of_first_action+1:]:
-            self._logger.debug(__("   skip: action {i}: {action!r}", action=action, i=i))
-            i += 1
-        return False
