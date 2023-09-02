@@ -11,7 +11,7 @@ class PrecedesConstraint(BaseConstraint):
         if action_two is None:
             raise ValueError
         if action_one == action_two:
-            raise ValueError("actions cannot be equal")
+            raise ValueError(f"actions cannot be equal: left={action_one!r}, right={action_two!r}")
 
         self._action_one: BaseAction = action_one
         self._action_two: BaseAction = action_two

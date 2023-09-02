@@ -5,4 +5,4 @@ class TilePurchaseEffectActionChoiceProcessorService(BaseActionChoiceProcessorSe
     def __init__(self) -> None:
         number_of_tile_purchase_effects: int = 2
 
-        BaseActionChoiceProcessorService.__init__()
+        BaseActionChoiceProcessorService.__init__(self, 2)

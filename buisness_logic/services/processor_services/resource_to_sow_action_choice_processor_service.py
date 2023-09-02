@@ -1,7 +1,7 @@
 from typing import List, Tuple, NamedTuple
 
+from common.entities.resources_to_sow_lookup import ResourcesToSow
 from core.enums.caverna_enums import ResourceTypeEnum
-from core.entities.resources_to_sow_lookup import ResourcesToSow
 from core.services.base_action_choice_processor_service import BaseActionChoiceProcessorService
 
 

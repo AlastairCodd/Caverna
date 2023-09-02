@@ -1,4 +1,4 @@
-from typing import NamedTuple, List, Tuple, Dict, Optional, TypeVar, Callable
+from typing import NamedTuple, Tuple, Dict, Optional, TypeVar, Callable
 
 from buisness_logic.cards.imitation_card import ImitationCard
 from common.entities.action_choice_lookup import ActionChoiceLookup
@@ -70,7 +70,7 @@ class CardActionChoiceProcessorService(BaseActionChoiceProcessorService):
     def _process_action(
             self,
             index_conversion_func: Callable[[int], T]) -> T:
-        probabilities: List[Tuple[int, float]] = self._get_action_choice_subset(self._length)
+        probabilities: list[Tuple[int, float]] = self._get_action_choice_subset(self._length)
 
         for index, probability in probabilities:
             if index in self._invalid_actions:
@@ -84,16 +84,16 @@ class CardActionChoiceProcessorService(BaseActionChoiceProcessorService):
             Dict[int, UseDwarfOutOfOrderActionChoice],
             Dict[int, Optional[DwarfToUseOutOfOrder]]
     ]:
-        from common.forges.card_forge_complete import CompleteCardForge
-        from common.services.conditional_service import ConditionalService
-        from buisness_logic.effects.action_effects import ChangeDecisionVerb, ActionCombinationEnum
-        from common.entities.action_choice_lookup import ActionChoiceLookup
         from buisness_logic.actions.go_on_an_expedition_action import GoOnAnExpeditionAction
         from buisness_logic.actions.give_dwarf_a_weapon_action import GiveDwarfAWeaponAction
+        from buisness_logic.effects.action_effects import ChangeDecisionVerb, ActionCombinationEnum
+        from common.entities.action_choice_lookup import ActionChoiceLookup
+        from common.forges.card_forge_complete import CompleteCardForge
+        from common.services.conditional_service import ConditionalService
 
         complete_card_forge: CompleteCardForge = CompleteCardForge()
         conditional_service: ConditionalService = ConditionalService()
-        change_decision_effects: List[ChangeDecisionVerb] = [ChangeDecisionVerb(ActionCombinationEnum.EitherOr, ActionCombinationEnum.AndOr)]
+        change_decision_effects: list[ChangeDecisionVerb] = [ChangeDecisionVerb(ActionCombinationEnum.EitherOr, ActionCombinationEnum.AndOr)]
 
         all_cards: Dict[int, BaseCard] = complete_card_forge.get_cards()
 
@@ -108,7 +108,7 @@ class CardActionChoiceProcessorService(BaseActionChoiceProcessorService):
             if isinstance(card, ImitationCard):
                 continue
             card_action_conditional: Conditional = card.actions
-            possible_action_choices: List[ActionChoiceLookup] = conditional_service.get_possible_choices(card_action_conditional, change_decision_effects)
+            possible_action_choices: list[ActionChoiceLookup] = conditional_service.get_possible_choices(card_action_conditional, change_decision_effects)
 
             for action_choice in possible_action_choices:
                 card_choices[index] = CardActionChoice(index, card.id)
