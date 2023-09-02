@@ -2,6 +2,8 @@ import math
 from typing import TypeVar, List, Generator
 import logging
 
+from line_profiler import profile
+
 from core.forges.base_list_permutation_forge import BaseListPermutationForge
 from core.constants.logging import DollarMessage as __
 
@@ -37,6 +39,7 @@ class AllocationFreeListPermutationForge(BaseListPermutationForge):
             self._index += 1
             yield self.generate_list_permutation_for_index(list_to_permute, self._index, self._number_of_items_to_permute)
 
+    @profile
     def generate_list_permutation_for_index(
             self,
             list_to_permute: List[T],
@@ -86,6 +89,7 @@ class AllocationFreeListPermutationForge(BaseListPermutationForge):
         #   for i in n
         #     divmod(
 
+    @profile
     def _get_indicies(self, index: int, number_of_items_to_permute: int) -> tuple[int, int]:
         number_of_items_to_permute_excluding_first_factorial = self._factorial_cache[number_of_items_to_permute - 1]
 
