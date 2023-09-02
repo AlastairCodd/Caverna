@@ -27,3 +27,5 @@ venv11/
 # profiles
 profiles/
 profile_output*
+
+bot_players_logging

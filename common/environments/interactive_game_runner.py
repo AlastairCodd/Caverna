@@ -4,8 +4,13 @@ from common.environments.caverna_env import CavernaEnv
 
 
 class InteractiveGameRunner(object):
-    def __init__(self, number_of_players: Optional[int]) -> None:
-        self._caverna_env: CavernaEnv = CavernaEnv() if number_of_players is None else CavernaEnv(number_of_players=number_of_players)
+    def __init__(
+            self,
+            number_of_players: Optional[int],
+            player_default = None) -> None:
+        self._caverna_env: CavernaEnv = CavernaEnv(players_default=player_default) \
+                if number_of_players is None \
+                else CavernaEnv(number_of_players=number_of_players, players_default=player_default)
 
     def run(self) -> None:
         self._caverna_env.reset()
