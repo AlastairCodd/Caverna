@@ -64,7 +64,7 @@ class AllocationFreeListPermutationForge(BaseListPermutationForge):
         #print(f"generating permutation for index {index}")
 
         for i in range(number_of_items_to_permute):
-            index_in_remaining_list, previous_remainder = self._get_indicies(previous_remainder, number_of_items_to_permute - i)
+            index_in_remaining_list, previous_remainder = divmod(previous_remainder, self._factorial_cache[number_of_items_to_permute - i - 1])
             index_in_complete_list = current_offsets[index_in_remaining_list]
             #print(f"{index_in_remaining_list=} {previous_remainder=} {index_in_complete_list=}")
             current_offsets.pop(index_in_remaining_list)
@@ -88,9 +88,3 @@ class AllocationFreeListPermutationForge(BaseListPermutationForge):
         # this service works by counting from 0 to n!, where n is the number of items
         #   for i in n
         #     divmod(
-
-    @profile
-    def _get_indicies(self, index: int, number_of_items_to_permute: int) -> tuple[int, int]:
-        number_of_items_to_permute_excluding_first_factorial = self._factorial_cache[number_of_items_to_permute - 1]
-
-        return divmod(index, number_of_items_to_permute_excluding_first_factorial)
