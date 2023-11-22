@@ -122,39 +122,43 @@ class CheckAnimalStorageAction(BaseAction):
             raise ValueError("Tile cannot be none")
 
         storage_for_tile: Dict[ResourceTypeEnum, int] = {}
-        if tile_entity.tile is not None:
-            is_tile_twin: bool = isinstance(tile_entity.tile, BaseTwinTile)
-            is_primary_tile: bool = not is_tile_twin or cast(BaseTwinTile, tile_entity.tile).primary_tile_id == tile_entity.id
 
-            if is_primary_tile:
-                animal_storage_effects_for_tile: List[BaseAnimalStorageEffect] = tile_entity.get_effects_of_type(
-                    BaseAnimalStorageEffect)
+        if tile_entity.tile is None:
+            return storage_for_tile
+        is_tile_twin: bool = isinstance(tile_entity.tile, BaseTwinTile)
+        is_primary_tile: bool = not is_tile_twin or cast(BaseTwinTile, tile_entity.tile).primary_tile_id == tile_entity.id
 
-                storage_for_tile = {animal: 0 for animal in resource_types.farm_animals}
-                if len(animal_storage_effects_for_tile) > 0:
-                    for effect in animal_storage_effects_for_tile:
-                        new_buckets: Dict[ResourceTypeEnum, int] = effect.get_animal_storage_buckets(player)
-                        self._update_storage_for_tile(
-                            new_buckets,
-                            storage_for_tile)
-                    if tile_entity.has_stable:
-                        for animal in storage_for_tile:
-                            storage_for_tile[animal] *= 2
-                    if is_tile_twin and player.tiles[cast(BaseTwinTile, tile_entity.tile).secondary_tile_id].has_stable:
-                        for animal in storage_for_tile:
-                            storage_for_tile[animal] *= 2
-                else:
-                    for effect in base_animal_storage_effects:
-                        new_buckets_result: ResultLookup[Dict[ResourceTypeEnum, int]] = effect \
-                            .get_animal_storage_buckets_for_tile(
-                            player,
-                            tile_entity)
+        if not is_primary_tile:
+            return storage_for_tile
 
-                        if new_buckets_result:
-                            new_buckets: Dict[ResourceTypeEnum, int] = new_buckets_result.value
-                            self._update_storage_for_tile(
-                                new_buckets,
-                                storage_for_tile)
+        animal_storage_effects_for_tile: List[BaseAnimalStorageEffect] = tile_entity.get_effects_of_type(
+            BaseAnimalStorageEffect)
+
+        storage_for_tile = {animal: 0 for animal in resource_types.farm_animals}
+        if len(animal_storage_effects_for_tile) > 0:
+            for effect in animal_storage_effects_for_tile:
+                new_buckets: Dict[ResourceTypeEnum, int] = effect.get_animal_storage_buckets(player)
+                self._update_storage_for_tile(
+                    new_buckets,
+                    storage_for_tile)
+            if tile_entity.has_stable:
+                for animal in storage_for_tile:
+                    storage_for_tile[animal] *= 2
+            if is_tile_twin and player.tiles[cast(BaseTwinTile, tile_entity.tile).secondary_tile_id].has_stable:
+                for animal in storage_for_tile:
+                    storage_for_tile[animal] *= 2
+        else:
+            for effect in base_animal_storage_effects:
+                new_buckets_result: ResultLookup[Dict[ResourceTypeEnum, int]] = effect \
+                    .get_animal_storage_buckets_for_tile(
+                    player,
+                    tile_entity)
+
+                if new_buckets_result:
+                    new_buckets: Dict[ResourceTypeEnum, int] = new_buckets_result.value
+                    self._update_storage_for_tile(
+                        new_buckets,
+                        storage_for_tile)
 
         return storage_for_tile
 
